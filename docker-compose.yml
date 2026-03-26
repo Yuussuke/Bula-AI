@@ -1,0 +1,29 @@
+version: "3.9"
+
+services:
+  # PostgreSQL database service
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-Yuussuke}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bulagpt}
+      POSTGRES_DB: ${POSTGRES_DB:-bulagpt}
+    ports:
+      - "5432:5432"
+    volumes:
+      # Persist database data between container restarts
+      - postgres_data:/var/lib/postgresql/data
+
+  # FastAPI backend service
+  api:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    environment:
+      # Connection string used by the backend to reach PostgreSQL
+      DATABASE_URL: postgresql://${POSTGRES_USER:-Yuussuke}:${POSTGRES_PASSWORD:-bulagpt}@postgres:5432/${POSTGRES_DB:-bulagpt}
+
+volumes:
+  postgres_data:
