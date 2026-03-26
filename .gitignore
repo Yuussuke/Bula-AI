@@ -1,0 +1,16 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment variable files (keep only the example)
+.env
+
+# OS / editor artefacts
+.DS_Store
+.idea/
+.vscode/
