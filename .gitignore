@@ -7,10 +7,19 @@ __pycache__/
 venv/
 env/
 
-# Environment variable files (keep only the example)
+# Python build files
+*.egg-info/
+dist/
+build/
+
+# Environment variable files
 .env
+
+# Logs
+*.log
 
 # OS / editor artefacts
 .DS_Store
+Thumbs.db
 .idea/
 .vscode/
