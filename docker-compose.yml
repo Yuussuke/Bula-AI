@@ -19,6 +19,8 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
     depends_on:
       - postgres
     environment:
