@@ -1,15 +1,12 @@
-# Use a lightweight Python 3.11 base image
-FROM python:3.11-slim
+FROM python:3.12-slim
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Install Python dependencies first (layer caching optimisation)
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir uv
 
-# Copy the application source code
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev
+
 COPY app/ ./app/
 
-# Run the API server on all interfaces so Docker can expose the port
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
