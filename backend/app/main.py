@@ -8,7 +8,7 @@ def create_app() -> FastAPI:
     def health():
         return {"status": "ok"}
 
-    app.include_router(bulas_router)
+    app.include_router(bulas_router, prefix="/api/v1")
     return app
 
 app = create_app()
