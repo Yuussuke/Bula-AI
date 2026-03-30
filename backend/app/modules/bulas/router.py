@@ -2,7 +2,7 @@ from fastapi import APIRouter, UploadFile, File
 
 from app.modules.bulas.service import process_bula_pdf
 
-router = APIRouter(prefix="", tags=["bulas"])
+router = APIRouter(prefix="/bulas", tags=["bulas"])
 
 @router.post("/upload")
 async def upload_file(file: UploadFile = File(...)):
