@@ -1,4 +1,6 @@
 from pypdf import PdfReader
+from app.modules.bulas.repository import create_document
+from app.core.db.session import SessionLocal
 
 def extract_text_from_pdf(file):
     reader = PdfReader(file)
@@ -19,9 +21,15 @@ def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50):
 def process_bula_pdf(file, filename: str | None = None) -> dict:
     text, pages = extract_text_from_pdf(file)
     chunks = chunk_text(text)
+
+    db = SessionLocal()
+    doc = create_document(db, filename)
+    db.close()
+
     return {
         "filename": filename,
         "pages": pages,
         "characters": len(text),
         "chunks": len(chunks),
+        "document_id": doc.id,
     }
