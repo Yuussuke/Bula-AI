@@ -1,10 +1,9 @@
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.bulas.models import Document
 
-
-def create_document(db: Session, name: str):
+async def create_document(db: AsyncSession, name: str) -> Document:
     document = Document(name=name)
     db.add(document)
-    db.commit()
-    db.refresh(document)
+    await db.flush()
+    await db.refresh(document)
     return document
