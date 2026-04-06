@@ -1,13 +1,13 @@
 
-# AGENTS.md — BulaGPT Developer Guide for AI Assistants
+# AGENTS.md — Bula AI Developer Guide for AI Assistants
 
-> **Who this file is for:** This file guides any AI coding assistant (Copilot, Cursor, Claude, etc.) helping develop the BulaGPT project. Read this fully before writing, suggesting, or modifying any code. These rules are non-negotiable and override any "clever" shortcut the AI might prefer.
+> **Who this file is for:** This file guides any AI coding assistant (Copilot, Cursor, Claude, etc.) helping develop the Bula AI project. Read this fully before writing, suggesting, or modifying any code. These rules are non-negotiable and override any "clever" shortcut the AI might prefer.
 
 ---
 
 ## Project Overview
 
-**BulaGPT** is a RAG-powered medication assistant for Brazilian patients. It answers questions about drug leaflets (bulas) using retrieved content from ingested PDFs — never from model hallucination. The backend is a Python FastAPI service, the frontend is React + TypeScript, and the AI pipeline uses LangChain with the Maritaca/Sabiá API and Qdrant for vector search.
+**Bula AI** is a RAG-powered medication assistant for Brazilian patients. It answers questions about drug leaflets (bulas) using retrieved content from ingested PDFs — never from model hallucination. The backend is a Python FastAPI service, the frontend is React + TypeScript, and the AI pipeline uses LangChain with the Maritaca/Sabiá API and Qdrant for vector search.
 
 **Developer context:** The person using this AI assistant is finishing a Computer Science graduation and is working part-time on this project. They are learning. Explanations matter. Code must be readable. Shortcuts that "work but you'll figure it out later" are not acceptable.
 
@@ -42,10 +42,10 @@
 
 ## Repository Structure
 
-The project is a **monorepo**. Everything lives inside a single `bulagpt/` repository:
+The project is a **monorepo**. Everything lives inside a single `Bula AI/` repository:
 
 ```
-bulagpt/
+Bula AI/
 ├── backend/
 │   ├── app/
 │   │   ├── main.py                  # FastAPI app factory (create_app function)
@@ -270,13 +270,13 @@ from app.main import app
 async def test_register_creates_user_and_returns_201():
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.post("/api/v1/auth/register", json={
-            "email": "test@bulagpt.com",
+            "email": "test@Bula AI.com",
             "password": "secret123",
             "full_name": "Test User",
         })
 
     assert response.status_code == 201
-    assert response.json()["email"] == "test@bulagpt.com"
+    assert response.json()["email"] == "test@Bula AI.com"
 
 @pytest.mark.anyio
 async def test_login_with_valid_credentials_returns_token():

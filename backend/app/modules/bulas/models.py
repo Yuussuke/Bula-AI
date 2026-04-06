@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime
 from datetime import datetime
-from app.core.database import Base
+from app.core.base import Base
 
 
 class Document(Base):
