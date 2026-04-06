@@ -1,38 +1,16 @@
-import os
 from typing import AsyncGenerator
 
-from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import DeclarativeBase
+from app.core.config import DATABASE_URL, SQL_ECHO
+from app.core.base import Base
 
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://bulaai:bulaai@postgres:5432/bulaai"
-)
-
-SQL_ECHO = os.getenv("SQL_ECHO", "false").lower() == "true"
-
-
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL is not set. Please configure it in your environment.")
-
-
-NAMING_CONVENTION = {
-    "ix": "ix_%(column_0_label)s",
-    "uq": "uq_%(table_name)s_%(column_0_name)s",
-    "ck": "ck_%(table_name)s_%(constraint_name)s",
-    "fk": "fk_%(table_name)s_%(column_0_name)s_%(referred_table_name)s",
-    "pk": "pk_%(table_name)s",
-}
-
-
-class Base(DeclarativeBase):
-    metadata = MetaData(naming_convention=NAMING_CONVENTION)
+__all__ = ["Base", "engine", "async_session_factory", "get_db", "close_engine"]
 
 
 engine = create_async_engine(
     DATABASE_URL,
+    echo=SQL_ECHO,
     pool_size=5,
     max_overflow=10,
     pool_timeout=30,
@@ -54,6 +32,6 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             await session.rollback()
             raise
 
-# engine lifecyle 
-async def close_engine():
+
+async def close_engine() -> None:
     await engine.dispose()
