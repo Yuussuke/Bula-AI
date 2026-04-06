@@ -17,15 +17,15 @@ logs:
 	docker compose logs -f
 
 shell:
-	docker compose exec backend bash
+	docker compose exec api bash
 
 # --- Database ---
 migrate:
-	docker compose exec backend alembic upgrade head
+	docker compose exec api uv run alembic upgrade head
 
 makemigrations:
 	@read -p "Migration message: " msg; \
-	docker compose exec backend alembic revision --autogenerate -m "$$msg"
+	docker compose exec api uv run alembic revision --autogenerate -m "$$msg"
 
 reset-db:
 	docker compose down -v && docker compose up -d
@@ -34,16 +34,16 @@ reset-db:
 
 # --- Testes e Qualidade ---
 test:
-	docker compose exec backend pytest
+	docker compose exec api pytest
 
 test-cov:
-	docker compose exec backend pytest --cov=app --cov-report=term-missing
+	docker compose exec api pytest --cov=app --cov-report=term-missing
 
 lint:
-	docker compose exec backend ruff check .
+	docker compose exec api ruff check .
 
 format:
-	docker compose exec backend ruff format .
+	docker compose exec api ruff format .
 
 # --- Help ---
 help:
@@ -53,7 +53,7 @@ help:
 	@echo "  make rebuild        - Build images and start containers"
 	@echo "  make down           - Stop and remove containers"
 	@echo "  make logs           - View real-time logs"
-	@echo "  make shell          - Access the backend bash shell"
+	@echo "  make shell          - Access the api bash shell"
 	@echo "  make migrate        - Run database migrations"
 	@echo "  make makemigrations - Generate a new migration (prompts for message)"
 	@echo "  make reset-db       - Destroy volumes and remigrate from scratch"
