@@ -1,6 +1,6 @@
-# BulaGPT
+# Bula AI
 
-BulaGPT is an AI-powered application that helps users understand Brazilian medication package inserts (bulas) through natural language questions. Users can upload a PDF and receive clear, simplified answers based strictly on the document content. The system uses a retrieval-based approach to ensure accuracy and reduce hallucinations. It is designed to improve accessibility of medical information while maintaining safety.
+Bula AI is an AI-powered application that helps users understand Brazilian medication package inserts (bulas) through natural language questions. Users can upload a PDF and receive clear, simplified answers based strictly on the document content. The system uses a retrieval-based approach to ensure accuracy and reduce hallucinations. It is designed to improve accessibility of medical information while maintaining safety.
 
 ## Tech Stack
 

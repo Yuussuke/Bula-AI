@@ -8,7 +8,7 @@ from sqlalchemy.orm import DeclarativeBase
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
-    "postgresql+asyncpg://Yuussuke:bulagpt@postgres:5432/bulagpt"
+    "postgresql+asyncpg://bulaai:bulaai@postgres:5432/bulaai"
 )
 
 SQL_ECHO = os.getenv("SQL_ECHO", "false").lower() == "true"
