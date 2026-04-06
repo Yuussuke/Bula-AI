@@ -1,50 +1,63 @@
+# app/modules/bulas/service.py
 from typing import BinaryIO
 from pypdf import PdfReader
+from pypdf.errors import PdfReadError
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.modules.bulas.repository import create_document
+from app.modules.bulas.repository import DocumentRepository
+from app.modules.bulas.schemas import BulaUploadResponse
 
 
-def extract_text_from_pdf(file: BinaryIO) -> tuple[str, int]:
-    reader = PdfReader(file)
-    text = ""
-    for page in reader.pages:
-        text += page.extract_text() or ""
-    return text, len(reader.pages)
+class InvalidPdfError(Exception):
+    """Raised when the uploaded file cannot be parsed as a valid PDF."""
 
+class BulaService:
+    def __init__(self, db: AsyncSession):
+        self.db = db
+        self.document_repo = DocumentRepository(db)
 
-def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
-    chunks: list[str] = []
-    start = 0
+    def _extract_text_from_pdf(self, file: BinaryIO) -> tuple[str, int]:
+        """Private method to extract text from the PDF."""
+        try:
+            reader = PdfReader(file)
+        except PdfReadError as exc:
+            raise InvalidPdfError("Arquivo PDF invalido ou corrompido.") from exc
 
-    while start < len(text):
-        end = start + chunk_size
-        chunks.append(text[start:end])
-        start += chunk_size - overlap
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text() or ""
+        return text, len(reader.pages)
 
-    return chunks
+    def _chunk_text(self, text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
+        """Private method to split text into smaller chunks."""
+        chunks: list[str] = []
+        start = 0
 
+        while start < len(text):
+            end = start + chunk_size
+            chunks.append(text[start:end])
+            start += chunk_size - overlap
 
-async def process_bula_pdf(
-    file: BinaryIO,
-    db: AsyncSession,
-    filename: str | None = None,
-) -> dict:
-    text, pages = extract_text_from_pdf(file)
-    chunks = chunk_text(text)
+        return chunks
 
-    safe_name = filename or "arquivo_sem_nome.pdf"
+    async def process_pdf(self, file: BinaryIO, filename: str | None = None) -> BulaUploadResponse:
+        text, pages = self._extract_text_from_pdf(file)
+        chunks = self._chunk_text(text)
 
-    try:
-        doc = await create_document(db, safe_name)
-        await db.commit()
-    except Exception:
-        await db.rollback()
-        raise
+        safe_name = filename or "arquivo_sem_nome.pdf"
 
-    return {
-        "filename": safe_name,
-        "pages": pages,
-        "characters": len(text),
-        "chunks": len(chunks),
-        "document_id": doc.id,
-    }
+        try:
+            # Use the new repository class method!
+            doc = await self.document_repo.create(safe_name)
+            await self.db.commit()
+        except Exception:
+            await self.db.rollback()
+            raise
+
+        return BulaUploadResponse(
+            filename=safe_name,
+            pages=pages,
+            characters=len(text),
+            chunks=len(chunks),
+            document_id=doc.id,
+        )
+    
