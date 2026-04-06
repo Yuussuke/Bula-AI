@@ -1,11 +1,13 @@
+name: bula-ai
+
 services:
   # PostgreSQL database service
   postgres:
     image: postgres:15
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-Yuussuke}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bulagpt}
-      POSTGRES_DB: ${POSTGRES_DB:-bulagpt}
+      POSTGRES_USER: ${POSTGRES_USER:-bulaai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bulaai}
+      POSTGRES_DB: ${POSTGRES_DB:-bulaai}
     ports:
       - "5432:5432"
     volumes:
@@ -18,12 +20,12 @@ services:
     ports:
       - "8000:8000"
     volumes:
-      - ./backend/app:/app/app
+      - ./backend:/app
     depends_on:
       - postgres
     environment:
       # Connection string used by the backend to reach PostgreSQL
-      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-Yuussuke}:${POSTGRES_PASSWORD:-bulagpt}@postgres:5432/${POSTGRES_DB:-bulagpt}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bulaai}:${POSTGRES_PASSWORD:-bulaai}@postgres:5432/${POSTGRES_DB:-bulaai}
 
 volumes:
   postgres_data:
