@@ -23,7 +23,7 @@ services:
       - postgres
     environment:
       # Connection string used by the backend to reach PostgreSQL
-      DATABASE_URL: postgresql://${POSTGRES_USER:-Yuussuke}:${POSTGRES_PASSWORD:-bulagpt}@postgres:5432/${POSTGRES_DB:-bulagpt}
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-Yuussuke}:${POSTGRES_PASSWORD:-bulagpt}@postgres:5432/${POSTGRES_DB:-bulagpt}
 
 volumes:
   postgres_data:
