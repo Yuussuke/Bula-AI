@@ -8,6 +8,14 @@ class DocumentRepository:
     async def create(self, name: str) -> Document:
         document = Document(name=name)
         self.db.add(document)
-        await self.db.flush()
-        await self.db.refresh(document)
-        return document
+        
+        try:
+            await self.db.commit()
+            
+            await self.db.refresh(document)
+            
+            return document
+            
+        except Exception as e:
+            await self.db.rollback()
+            raise e
