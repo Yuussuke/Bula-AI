@@ -1,5 +1,5 @@
 
-# AGENTS.md — Bula AI Developer Guide for AI Assistants
+## AGENTS.md — Bula AI Developer Guide for AI Assistants
 
 > **Who this file is for:** This file guides any AI coding assistant (Copilot, Cursor, Claude, etc.) helping develop the Bula AI project. Read this fully before writing, suggesting, or modifying any code. These rules are non-negotiable and override any "clever" shortcut the AI might prefer.
 
