@@ -2,6 +2,7 @@ from typing import BinaryIO
 from app.modules.bulas.repository import DocumentRepository
 from app.modules.bulas.helpers import PdfTextExtractor, Chunking
 from app.modules.bulas.schemas import BulaUploadResponse
+from fastapi.concurrency import run_in_threadpool
 
 class BulaService:
     def __init__(
@@ -17,7 +18,9 @@ class BulaService:
     async def process_pdf(self, file: BinaryIO, filename: str | None = None) -> BulaUploadResponse:
         safe_name = filename or "arquivo_sem_nome.pdf"
 
-        text, pages = self.extractor.extract(file)
+        extracted = await run_in_threadpool(self.extractor.extract, file)
+        text = extracted.text
+        pages = extracted.pages
         
         chunks = self.chunker.split(text)
 
