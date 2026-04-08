@@ -3,7 +3,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.modules.bulas.schemas import BulaUploadResponse
-from app.modules.bulas.service import BulaService, InvalidPdfError
+from app.modules.bulas.service import BulaService
+from app.modules.bulas.helpers import PdfTextExtractor, Chunking, InvalidPdfError
+from app.modules.bulas.repository import DocumentRepository
 
 router = APIRouter(prefix="/bulas", tags=["bulas"])
 
@@ -16,7 +18,15 @@ async def upload_file(
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
 ):
-    service = BulaService(db)
+    repo = DocumentRepository(db)
+    extractor = PdfTextExtractor()
+    chunker = Chunking()
+
+    service = BulaService(
+        document_repo=repo, 
+        pdf_extractor=extractor, 
+        chunking=chunker
+    )
 
     try:
         result = await service.process_pdf(file=file.file, filename=file.filename)
