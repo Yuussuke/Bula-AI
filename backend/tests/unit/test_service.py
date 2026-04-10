@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import Mock, AsyncMock # <-- A mágica mora aqui
+from unittest.mock import Mock, AsyncMock 
 from app.modules.bulas.service import BulaService
 from app.modules.bulas.helpers import ExtractedBula, InvalidPdfError
 
