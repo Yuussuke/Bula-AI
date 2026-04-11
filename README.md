@@ -22,7 +22,19 @@ Bula AI is an AI-powered application that helps users understand Brazilian medic
    cp .env.example .env
    ```
 
+   PowerShell alternative:
+
+   ```powershell
+   Copy-Item .env.example .env
+   ```
+
 2. Start all services with a single command:
+
+   ```bash
+   make up
+   ```
+
+   Docker Compose alternative:
 
    ```bash
    docker compose up
