@@ -26,6 +26,8 @@ services:
     environment:
       # Connection string used by the backend to reach PostgreSQL
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bulaai}:${POSTGRES_PASSWORD:-bulaai}@postgres:5432/${POSTGRES_DB:-bulaai}
+      SECRET_KEY: ${SECRET_KEY}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
 
 volumes:
   postgres_data:
