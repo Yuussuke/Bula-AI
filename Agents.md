@@ -22,7 +22,7 @@
 | **Backend framework** | FastAPI (async) |
 | **ORM** | SQLAlchemy 2 async + Alembic for migrations |
 | **Data validation** | Pydantic v2 |
-| **Auth** | JWT (PyJWT + passlib/bcrypt) |
+| **Auth** | JWT (PyJWT + pwdlib/Argon2id) |
 | **Relational DB** | PostgreSQL 16 |
 | **Vector DB** | Qdrant |
 | **LLM** | Maritaca Sabiá-3 API (OpenAI-compatible) |
@@ -358,7 +358,7 @@ async def get_bula_for_user(self, bula_id: str, user_id: str) -> Bula:
 
 These must never be skipped:
 
-- **Passwords** are always hashed with bcrypt before storing. Never store or log a plain-text password.
+- **Passwords** are always hashed with Argon2id (via pwdlib) before storing. Never store or log a plain-text password.
 - **JWT tokens** are validated on every protected request via the `get_current_user` dependency.
 - **File uploads** are validated: only `application/pdf` is accepted, maximum 10MB.
 - **Environment variables** hold all secrets. Nothing secret is hardcoded. The `.env` file is never committed to git.
