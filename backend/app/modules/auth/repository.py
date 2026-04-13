@@ -11,11 +11,17 @@ class UserRepository:
     async def get_user_by_email(self, email: str) -> User | None:
         """
         Fetches a user from the database by their email address.
-        Returns None if the user is not found.
         """
     
         result = await self.db.execute(select(User).where(User.email == email)) 
         return result.scalars().first()
+    async def get_user_by_id(self, user_id: int) -> User | None:
+        """
+        Fetches a user from the database by their primary key (ID).
+        """
+        result = await self.db.execute(select(User).where(User.id == user_id))
+        return result.scalars().first()
+
 
     async def create_user(self, email: str, hashed_password: str) -> User:
         """

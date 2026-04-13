@@ -94,7 +94,7 @@ class AuthService:
 
         access_token_expires = timedelta(minutes=self.token_service.access_token_expire_minutes)
         access_token = self.create_access_token(
-            data={"sub": user.email},
+            data={"sub": str(user.id)},
             expires_delta=access_token_expires,
         )
 
@@ -102,7 +102,7 @@ class AuthService:
 
     async def get_user_from_token(self, token: str) -> User:
         """
-        Validates the JWT token and retrieves the corresponding user from the database.
+        Validates the JWT token and retrieves the corresponding user from the database by ID.
         """
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -111,13 +111,16 @@ class AuthService:
         )
 
         try:
-            email = self.token_service.decode_subject(token)
-            if email is None:
+            subject = self.token_service.decode_subject(token)
+            if subject is None:
                 raise credentials_exception
-        except jwt.PyJWTError:
+            
+            user_id = int(subject)
+            
+        except (jwt.PyJWTError, ValueError):
             raise credentials_exception
 
-        user = await self.user_repository.get_user_by_email(email=email)
+        user = await self.user_repository.get_user_by_id(user_id=user_id)
 
         if user is None:
             raise credentials_exception
