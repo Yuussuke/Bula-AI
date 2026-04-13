@@ -1,10 +1,10 @@
-import os
 from functools import lru_cache
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
+from app.core.config import settings
 
 from app.modules.auth.repository import UserRepository
 from app.modules.auth.service import AuthService, TokenService
@@ -23,13 +23,13 @@ def get_password_hasher() -> PasswordHasher:
 @lru_cache
 def get_token_service() -> TokenService:
     """
-    Provides a cached instance of TokenService configured with environment variables.
+    Provides a cached instance of TokenService configured with application settings.
     """
-    secret_key = os.getenv("SECRET_KEY")
-    if not secret_key:
-        raise RuntimeError("SECRET_KEY is required. Set it in the container environment.")
-    expires = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
-    return TokenService(secret_key=secret_key, access_token_expire_minutes=expires)
+    return TokenService(
+        secret_key=settings.secret_key,
+        algorithm=settings.algorithm, 
+        access_token_expire_minutes=settings.access_token_expire_minutes
+    )
 
 
 

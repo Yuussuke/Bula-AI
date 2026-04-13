@@ -36,7 +36,7 @@ makemigrations:
 reset-db:
 	$(COMPOSE) down -v && $(COMPOSE) up -d
 	sleep 3
-	$(MAKE) migrate
+	make migrate
 
 # --- Tests and quality ---
 test:
@@ -59,7 +59,7 @@ dependencies:
 add-dependency:
 	@read -p "Package name (e.g. requests or requests@2.25.1): " package; \
 	$(COMPOSE) run --rm api uv add "$$package"; \
-	$(MAKE) dependencies
+	make dependencies
 
 # --- Help ---
 help:
