@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.modules.auth.repository import UserRepository
 from app.modules.auth.service import AuthService, TokenService
 from app.modules.auth.security import PasswordHasher
+from app.modules.auth.models import User
 
 bearer_scheme = HTTPBearer(auto_error=True) 
 
@@ -52,7 +53,7 @@ def get_auth_service(
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     auth_service: AuthService = Depends(get_auth_service)
-):
+) -> User:
     """FastAPI gets the token from the Authorization header, and the Auth Service."""
     user = await auth_service.get_user_from_token(token=credentials.credentials)
     

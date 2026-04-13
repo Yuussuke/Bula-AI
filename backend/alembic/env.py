@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 #import Base e config
-from app.core.config import DATABASE_URL
+from app.core.config import DatabaseSettings
 from app.core.base import Base
 from app.modules.auth.models import User
 
@@ -17,14 +17,14 @@ from app.modules.bulas import models as bulas_models
 # from app.modules.auth import models as auth_models
 # from app.modules.chat import models as chat_models
 
+db_settings = DatabaseSettings()
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Define a variável de configuração para a URL do banco de dados
-config.set_main_option("sqlalchemy.url", DATABASE_URL)
+config.set_main_option("sqlalchemy.url", db_settings.database_url)
 target_metadata = Base.metadata
 
 
