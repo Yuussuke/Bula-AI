@@ -1,15 +1,12 @@
-# Business logic (Hashing, Token generation)
 import os
 from datetime import datetime, timedelta, timezone
 
 import jwt
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.auth import schemas, repository, security
 from app.modules.auth.models import User
-
 
 class TokenService:
     def __init__(
@@ -42,7 +39,7 @@ class AuthService:
     def __init__(
         self,
         user_repository: repository.UserRepository,
-        password_hasher: security.PasswordHasher,
+        password_hasher: security.PasswordHasher, 
         token_service: TokenService,
     ) -> None:
         self.user_repository = user_repository
@@ -51,15 +48,15 @@ class AuthService:
 
     def create_access_token(self, data: dict, expires_delta: timedelta | None = None) -> str:
         """
-        Generates a JWT token containing the user's data and an expiration time.
+        Creates a JWT access token with the given data and expiration.
         """
         return self.token_service.create_access_token(data, expires_delta)
 
-    async def register_new_user(self, db: AsyncSession, user_in: schemas.UserCreate) -> User:
+    async def register_new_user(self, user_in: schemas.UserCreate) -> User:
         """
-        Validates if the user exists, hashes the password, and delegates creation to the repository.
+        Registers a new user and Hashes the password before saving to the database.
         """
-        existing_user = await self.user_repository.get_user_by_email(db, email=user_in.email)
+        existing_user = await self.user_repository.get_user_by_email(email=user_in.email)
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -70,25 +67,24 @@ class AuthService:
 
         try:
             new_user = await self.user_repository.create_user(
-                db=db,
                 email=user_in.email,
                 hashed_password=hashed_password,
             )
-        except IntegrityError:
-            error_msg = str(IntegrityError.orig).lower()
+        except IntegrityError as exc:
+            error_msg = str(getattr(exc, "orig", "")).lower()
             if "unique constraint" in error_msg or "23505" in error_msg:
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Email already registered.",
                 ) from None
-            raise IntegrityError
+            raise exc
         return new_user
 
-    async def authenticate_user(self, db: AsyncSession, email: str, password: str) -> schemas.Token:
+    async def authenticate_user(self, email: str, password: str) -> schemas.Token:
         """
-        Validates credentials and returns a JWT token if successful.
+        Authenticates a user by email and password and returns a JWT token
         """
-        user = await self.user_repository.get_user_by_email(db, email=email)
+        user = await self.user_repository.get_user_by_email(email=email)
 
         if not user or not self.password_hasher.verify_password(password, user.hashed_password):
             raise HTTPException(
@@ -105,10 +101,9 @@ class AuthService:
 
         return schemas.Token(access_token=access_token, token_type="bearer")
 
-    async def get_user_from_token(self, db: AsyncSession, token: str) -> User:
+    async def get_user_from_token(self, token: str) -> User:
         """
-        Decodes the JWT token and fetches the user from the database.
-        Raises exceptions if the token is invalid or the user is not found/inactive.
+        Validates the JWT token and retrieves the corresponding user from the database.
         """
         credentials_exception = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -123,7 +118,7 @@ class AuthService:
         except jwt.PyJWTError:
             raise credentials_exception
 
-        user = await self.user_repository.get_user_by_email(db, email=email)
+        user = await self.user_repository.get_user_by_email(email=email)
 
         if user is None:
             raise credentials_exception
@@ -135,23 +130,3 @@ class AuthService:
             )
 
         return user
-
-
-SECRET_KEY = os.getenv("SECRET_KEY")
-if not SECRET_KEY:
-    raise RuntimeError("SECRET_KEY is required. Set it in the container environment.")
-
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
-
-TOKEN_SERVICE = TokenService(
-    secret_key=SECRET_KEY,
-    algorithm=ALGORITHM,
-    access_token_expire_minutes=ACCESS_TOKEN_EXPIRE_MINUTES,
-)
-
-AUTH_SERVICE = AuthService(
-    user_repository=repository.USER_REPOSITORY,
-    password_hasher=security.PASSWORD_HASHER,
-    token_service=TOKEN_SERVICE,
-)

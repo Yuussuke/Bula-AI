@@ -48,7 +48,3 @@ class PasswordHasher:
             True if password matches, False otherwise
         """
         return self._hasher.verify(plain_password, hashed_password)
-
-
-# Global instance for dependency injection
-PASSWORD_HASHER = PasswordHasher()

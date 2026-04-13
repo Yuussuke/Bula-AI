@@ -1,18 +1,64 @@
-from fastapi import Depends
+import os
+from functools import lru_cache
+from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.auth import service
-from app.core.database import get_db 
+from app.core.database import get_db
 
-bearer_scheme = HTTPBearer()
+from app.modules.auth.repository import UserRepository
+from app.modules.auth.service import AuthService, TokenService
+from app.modules.auth.security import PasswordHasher
+
+bearer_scheme = HTTPBearer(auto_error=True) 
+
+
+@lru_cache
+def get_password_hasher() -> PasswordHasher:
+    """
+    Provides a cached instance of PasswordHasher for secure password hashing.
+    """
+    return PasswordHasher()
+
+@lru_cache
+def get_token_service() -> TokenService:
+    """
+    Provides a cached instance of TokenService configured with environment variables.
+    """
+    secret_key = os.getenv("SECRET_KEY")
+    if not secret_key:
+        raise RuntimeError("SECRET_KEY is required. Set it in the container environment.")
+    expires = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    return TokenService(secret_key=secret_key, access_token_expire_minutes=expires)
+
+
+
+def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
+    """FastAPI gets the database session and wires the User Repository."""
+    return UserRepository(db=db)
+
+def get_auth_service(
+    repo: UserRepository = Depends(get_user_repository),
+    hasher: PasswordHasher = Depends(get_password_hasher),
+    token_srv: TokenService = Depends(get_token_service)
+) -> AuthService:
+    """FastAPI gets the Repository, Hasher, and TokenService, and wires the Auth Service."""
+    return AuthService(
+        user_repository=repo,
+        password_hasher=hasher,
+        token_service=token_srv
+    )
 
 async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
-    db: AsyncSession = Depends(get_db)
+    auth_service: AuthService = Depends(get_auth_service)
 ):
-    """
-    Dependency that delegates token validation to the service layer.
-    """
-
-    return await service.AUTH_SERVICE.get_user_from_token(db, credentials.credentials)
+    """FastAPI gets the token from the Authorization header, and the Auth Service."""
+    user = await auth_service.get_user_from_token(token=credentials.credentials)
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
+    return user
