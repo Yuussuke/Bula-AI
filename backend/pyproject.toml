@@ -10,6 +10,7 @@ dependencies = [
     "email-validator>=2.3.0",
     "fastapi>=0.135.2",
     "pwdlib[argon2]>=0.2.1",
+    "pydantic-settings>=2.13.1",
     "pyjwt>=2.12.1",
     "pypdf>=6.9.2",
     "python-multipart>=0.0.22",

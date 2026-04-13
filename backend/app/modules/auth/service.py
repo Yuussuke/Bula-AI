@@ -1,4 +1,3 @@
-import os
 from datetime import datetime, timedelta, timezone
 
 import jwt
@@ -12,8 +11,8 @@ class TokenService:
     def __init__(
         self,
         secret_key: str,
-        algorithm: str = "HS256",
-        access_token_expire_minutes: int = 30,
+        algorithm: str,
+        access_token_expire_minutes: int,
     ) -> None:
         self.secret_key = secret_key
         self.algorithm = algorithm

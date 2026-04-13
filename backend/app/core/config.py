@@ -1,13 +1,18 @@
-import os
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
+class Settings(BaseSettings):
 
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql+asyncpg://bulaai:bulaai@postgres:5432/bulaai",
-)
+    database_url: str = "postgresql+asyncpg://bulaai:bulaai@postgres:5432/bulaai"
+    sql_echo: bool = False 
 
-SQL_ECHO = os.getenv("SQL_ECHO", "false").lower() == "true"
+    secret_key: str 
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
 
+    model_config = SettingsConfigDict(
+        env_file=".env", 
+        env_file_encoding="utf-8", 
+        extra="ignore" 
+    )
 
-if not DATABASE_URL:
-    raise RuntimeError("DATABASE_URL is not set. Please configure it in your environment.")
+settings = Settings()
