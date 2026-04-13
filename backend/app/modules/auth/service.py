@@ -66,6 +66,7 @@ class AuthService:
 
         try:
             new_user = await self.user_repository.create_user(
+                full_name=user_in.full_name,
                 email=user_in.email,
                 hashed_password=hashed_password,
             )

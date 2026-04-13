@@ -23,12 +23,13 @@ class UserRepository:
         return result.scalars().first()
 
 
-    async def create_user(self, email: str, hashed_password: str) -> User:
+    async def create_user(self, full_name: str, email: str, hashed_password: str) -> User:
         """
         Creates and persists a new user record in the database.
         Returns the newly created User instance.
         """
         db_user = User(
+            full_name=full_name,
             email=email,
             hashed_password=hashed_password,
         )

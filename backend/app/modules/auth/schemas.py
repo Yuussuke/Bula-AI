@@ -1,18 +1,18 @@
-# Validation (Pydantic)
 from pydantic import BaseModel, EmailStr, Field
 
-class UserCreate(BaseModel):
+class UserBase(BaseModel):
     email: EmailStr
+    full_name: str  
+  
+class UserCreate(UserBase):
     password: str = Field(min_length=8, max_length=16)
-
 
 class UserLogin(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=16)
 
-class UserResponse(BaseModel):
+class UserResponse(UserBase):
     id: int
-    email: EmailStr
     is_active: bool
     
     class Config:
