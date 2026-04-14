@@ -40,10 +40,10 @@ reset-db:
 
 # --- Tests and quality ---
 test:
-	$(COMPOSE) exec api pytest
+	$(COMPOSE) exec api uv run pytest -v
 
 test-cov:
-	$(COMPOSE) exec api pytest --cov=app --cov-report=term-missing
+	$(COMPOSE) exec api uv run pytest --cov=app --cov-report=term-missing
 
 lint:
 	$(COMPOSE) exec api ruff check .

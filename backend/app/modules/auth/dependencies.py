@@ -11,8 +11,7 @@ from app.modules.auth.service import AuthService, TokenService
 from app.modules.auth.security import PasswordHasher
 from app.modules.auth.models import User
 
-bearer_scheme = HTTPBearer(auto_error=True) 
-
+security = HTTPBearer(auto_error=False) 
 
 @lru_cache
 def get_password_hasher() -> PasswordHasher:
@@ -51,15 +50,14 @@ def get_auth_service(
     )
 
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    credentials: HTTPAuthorizationCredentials = Depends(security),
     auth_service: AuthService = Depends(get_auth_service)
 ) -> User:
     """FastAPI gets the token from the Authorization header, and the Auth Service."""
-    user = await auth_service.get_user_from_token(token=credentials.credentials)
-    
-    if not user:
+    if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
         )
-    return user
+    return await auth_service.get_user_from_token(token=credentials.credentials)
