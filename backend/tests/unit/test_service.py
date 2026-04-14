@@ -3,7 +3,7 @@ from unittest.mock import Mock, AsyncMock
 from app.modules.bulas.service import BulaService
 from app.modules.bulas.helpers import ExtractedBula, InvalidPdfError
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_bula_service_success():
     # --- ARRANGE ---
     fake_file = b"fake pdf content"
@@ -42,7 +42,7 @@ async def test_bula_service_success():
 
     mock_repo.create.assert_awaited_once_with(fake_filename)
 
-@pytest.mark.asyncio
+@pytest.mark.anyio
 async def test_bula_service_invalid_pdf():
     # --- ARRANGE ---
     fake_file = b"dados de uma imagem ou arquivo corrompido"

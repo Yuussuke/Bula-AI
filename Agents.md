@@ -22,7 +22,7 @@
 | **Backend framework** | FastAPI (async) |
 | **ORM** | SQLAlchemy 2 async + Alembic for migrations |
 | **Data validation** | Pydantic v2 |
-| **Auth** | JWT (PyJWT + pwdlib/Argon2id) |
+| **Auth** | JWT (PyJWT + Argon2id) |
 | **Relational DB** | PostgreSQL 16 |
 | **Vector DB** | Qdrant |
 | **LLM** | Maritaca Sabiá-3 API (OpenAI-compatible) |
