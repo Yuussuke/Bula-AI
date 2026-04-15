@@ -8,7 +8,6 @@ from app.modules.auth.router import router as auth_router
 from app.modules.chat.router import router as chat_router
 
 
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
