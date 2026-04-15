@@ -1,18 +1,29 @@
+from uuid import UUID
 from datetime import datetime
-from typing import Optional
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+from app.modules.bulas.models import BulaStatus
 
-class BulaCreateRequest(BaseModel):
-    title: str = Field(..., min_length=3, description="O Nome do medicamento")
-    description: Optional[str] = Field(None, description="Um resumo da bula")
-    category: str = Field(..., description="Analgesico, Antibiotico, Antidepressivo, etc.")
+# What the user sends to the API 
+class BulaCreate(BaseModel):
+    drug_name: str = Field(..., json_schema_extra={"example": "Dipirona Monoidratada"})
+    file_url: str = Field(..., json_schema_extra={"example": "https://storage.../bula.pdf"})
+    manufacturer: str | None = Field(
+        default=None,
+        json_schema_extra={"example": "Medley"},
+    )
 
+# What the API returns to the user
 class BulaResponse(BaseModel):
-    id: int
-    title: str
-    description: Optional[str]
-    category: str
+    id: UUID
+    user_id: int
+    drug_name: str
+    manufacturer: str | None
+    file_url: str
+    qdrant_collection: str | None
+    status: BulaStatus
     created_at: datetime
+    updated_at: datetime
+
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -21,4 +32,4 @@ class BulaUploadResponse(BaseModel):
     pages: int
     characters: int
     chunks: int
-    document_id: int
+    bula_id: UUID

@@ -11,6 +11,10 @@ from app.main import app
 from app.core.base import Base
 from app.core.database import get_db
 
+from app.modules.auth.models import User
+from app.modules.bulas.models import Bula
+from app.modules.chat.models import ChatSession, ChatMessage
+
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 engine = create_async_engine(

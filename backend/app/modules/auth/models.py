@@ -1,6 +1,7 @@
 #Database representation (SQLAlchemy)
 from sqlalchemy import Column, Integer, String, Boolean
 from app.core.base import Base 
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 
 class User(Base):
     __tablename__ = "users"
@@ -10,3 +11,5 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
+    bulas: Mapped[list["Bula"]] = relationship("Bula", back_populates="user", cascade="all, delete-orphan")
+    chat_sessions: Mapped[list["ChatSession"]] = relationship("ChatSession", back_populates="user", cascade="all, delete-orphan")
