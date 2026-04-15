@@ -2,6 +2,7 @@ from langchain_community.chat_models import ChatMaritalk
 
 from app.core.config import settings
 
+
 def get_maritalk_llm() -> ChatMaritalk:
     """Create a ChatMaritalk instance.
 

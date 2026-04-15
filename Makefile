@@ -46,10 +46,13 @@ test-cov:
 	$(COMPOSE) exec api uv run pytest --cov=app --cov-report=term-missing
 
 lint:
-	$(COMPOSE) exec api ruff check .
+	$(COMPOSE) exec api uv run ruff check .
+
+lint-fix:
+	$(COMPOSE) exec api uv run ruff check --fix .
 
 format:
-	$(COMPOSE) exec api ruff format .
+	$(COMPOSE) exec api uv run ruff format .
 
 # --- Dependencies ---
 dependencies:
