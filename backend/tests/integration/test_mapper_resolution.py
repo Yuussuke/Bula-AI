@@ -1,0 +1,221 @@
+"""
+Test that reproduces the mapper configuration error that happens in production
+when not all models are imported before accessing the User mapper.
+
+This test simulates the scenario where the auth module is used without
+the chat models being imported first - which causes the production error.
+
+DEPENDENCY NOTE:
+These tests depend on `app.core.database` being imported in conftest.py before
+the test database is set up. This module imports all models (User, Bula,
+ChatSession, ChatMessage) to ensure they are registered in SQLAlchemy's mapper
+registry before any mapper configuration happens. This pattern avoids the error:
+
+    InvalidRequestError: When initializing mapper Mapper[User(users)],
+    expression 'ChatSession' failed to locate a name ('ChatSession')
+
+The model imports in app.core.database allow both production (main.py) and
+tests (conftest.py) to share the same model initialization logic.
+"""
+
+import pytest
+from sqlalchemy import select
+
+
+@pytest.mark.anyio
+async def test_user_mapper_fails_without_chat_models_imported():
+    """
+    This test reproduces the production error:
+    "When initializing mapper Mapper[User(users)], expression 'ChatSession' failed to locate a name"
+
+    The issue is that User model has a relationship referencing ChatSession as a string,
+    but if ChatSession hasn't been imported/registered with SQLAlchemy, the mapper fails.
+
+    In SQLAlchemy 2.x, we can check the registry through the Base's metadata and mappers.
+    The error occurs when the User mapper tries to resolve 'ChatSession' but it's not registered.
+    """
+    from app.core.base import Base
+
+    # SQLAlchemy 2.x: Check if ChatSession is in the registry
+    # The registry contains all mapped classes
+    mapper_registry = Base.registry
+
+    # Get all mapped classes from the registry
+    mapped_classes = []
+    for mapper in mapper_registry.mappers:
+        mapped_classes.append(mapper.class_.__name__)
+
+    # Check if ChatSession is properly registered
+    assert "ChatSession" in mapped_classes, (
+        "ChatSession class not found in SQLAlchemy mapper registry. "
+        "This causes: 'When initializing mapper Mapper[User(users)], "
+        "expression 'ChatSession' failed to locate a name'. "
+        "The fix is to ensure all models are imported in the main app before use.\n\n"
+        f"Currently registered classes: {mapped_classes}"
+    )
+
+
+@pytest.mark.anyio
+async def test_user_query_requires_all_models_imported(db_session):
+    """
+    This test reproduces the actual production error that occurs when
+    trying to query User without ChatSession being registered.
+
+    Error: sqlalchemy.exc.InvalidRequestError: When initializing mapper Mapper[User(users)],
+    expression 'ChatSession' failed to locate a name ('ChatSession').
+    """
+    from app.modules.auth.models import User
+
+    # This query will trigger the mapper configuration
+    # If ChatSession is not properly registered, this will raise:
+    # InvalidRequestError about ChatSession
+    try:
+        await db_session.execute(select(User).where(User.email == "test@example.com"))
+        # If we get here without an exception, the mapper is properly configured
+        assert True, "User mapper configured successfully"
+    except Exception as e:
+        error_msg = str(e)
+        if "ChatSession" in error_msg and "failed to locate a name" in error_msg:
+            pytest.fail(
+                f"Production error reproduced: {error_msg}\n\n"
+                "This error occurs because ChatSession model is not imported "
+                "before the User mapper is configured. The fix is to import "
+                "all models in app.core.database before any database operations."
+            )
+        else:
+            raise
+
+
+@pytest.mark.anyio
+async def test_register_endpoint_fails_without_proper_model_imports(client):
+    """
+    This test reproduces the exact production error from the traceback:
+    - POST /api/v1/auth/register returns 500
+    - Error: When initializing mapper Mapper[User(users)],
+      expression 'ChatSession' failed to locate a name ('ChatSession')
+
+    The test will fail with 500 if the chat models aren't properly imported
+    before the auth service tries to query the User model.
+    """
+    TEST_USER = {
+        "full_name": "Production Test User",
+        "email": "prod_test@bulaai.com",
+        "password": "secret123",  # Must be <= 16 chars
+    }
+
+    response = await client.post("/api/v1/auth/register", json=TEST_USER)
+
+    # If we get 500, it means the production error is reproduced
+    if response.status_code == 500:
+        error_detail = response.text
+        pytest.fail(
+            f"Register endpoint returned 500 - production error reproduced!\n"
+            f"Response: {error_detail}\n\n"
+            f"This happens because ChatSession is not imported before auth operations.\n"
+            f"Fix: Ensure app.core.database imports all models for proper registration."
+        )
+
+    # Expected: 201 Created
+    assert response.status_code == 201, (
+        f"Expected 201 but got {response.status_code}: {response.text}"
+    )
+
+
+@pytest.mark.anyio
+async def test_chat_session_must_be_imported_before_user_mapper_used():
+    """
+    CRITICAL TEST: This test demonstrates WHY the production error occurs.
+
+    The User model has this relationship:
+        chat_sessions: Mapped[list["ChatSession"]] = relationship("ChatSession", ...)
+
+    The string "ChatSession" is a forward reference. SQLAlchemy tries to resolve
+    it when the User mapper is configured. If ChatSession class hasn't been imported
+    and registered with the Base's mapper registry, SQLAlchemy raises:
+
+        InvalidRequestError: When initializing mapper Mapper[User(users)],
+        expression 'ChatSession' failed to locate a name ('ChatSession').
+
+    This test verifies that ChatSession IS properly imported via app.core.database
+    in conftest.py, which is why the tests pass.
+
+    TO REPRODUCE THE PRODUCTION ERROR:
+    1. Remove model imports from app.core.database
+    2. Run this test - it will fail with the production error
+    3. This demonstrates that the error is caused by missing imports
+
+    THE FIX (already applied):
+    Model imports in app.core.database that are imported by both:
+    - app/main.py (for production)
+    - tests/conftest.py (for tests)
+
+    This ensures consistent model registration across environments.
+    """
+    from app.core.base import Base
+
+    # Get all registered mappers
+    registered_mappers = list(Base.registry.mappers)
+    registered_class_names = [m.class_.__name__ for m in registered_mappers]
+
+    # Verify ChatSession is registered - this is what prevents the production error in tests
+    assert "ChatSession" in registered_class_names, (
+        "PRODUCTION ERROR REPRODUCED!\n\n"
+        "ChatSession is not registered in SQLAlchemy's mapper registry.\n"
+        "This means when User's mapper tries to resolve 'ChatSession', it fails.\n\n"
+        "Root cause: Models not imported in app.core.database before use\n"
+        "This is why tests would fail just like production with:\n"
+        "  InvalidRequestError: When initializing mapper Mapper[User(users)],\n"
+        "  expression 'ChatSession' failed to locate a name ('ChatSession').\n\n"
+        "SOLUTION:\n"
+        "Import all models in app.core.database:\n"
+        "  from app.modules.auth.models import User  # noqa: F401\n"
+        "  from app.modules.bulas.models import Bula  # noqa: F401\n"
+        "  from app.modules.chat.models import ChatSession, ChatMessage  # noqa: F401\n\n"
+        "Currently registered classes: " + str(registered_class_names)
+    )
+
+    # Also verify ChatMessage is registered (it might have similar issues)
+    assert "ChatMessage" in registered_class_names, (
+        "ChatMessage is not registered in SQLAlchemy's mapper registry. "
+        "This could cause similar issues with ChatSession relationships.\n\n"
+        "Currently registered classes: " + str(registered_class_names)
+    )
+
+
+@pytest.mark.anyio
+async def test_verify_all_required_models_registered():
+    """
+    Comprehensive test that verifies all models required for auth operations
+    are properly registered in SQLAlchemy's mapper registry.
+
+    This test documents all the dependencies and prevents future production
+    errors when new relationships are added.
+    """
+    from app.core.base import Base
+
+    # Models that User model has relationships with (defined in app/modules/auth/models.py)
+    required_models = ["ChatSession", "Bula"]
+
+    # Get registered classes
+    registered_class_names = [m.class_.__name__ for m in Base.registry.mappers]
+
+    missing = []
+    for model in required_models:
+        if model not in registered_class_names:
+            missing.append(model)
+
+    if missing:
+        pytest.fail(
+            f"CRITICAL: Required models not registered: {missing}\n\n"
+            f"User model has relationships to these classes but they are not registered:\n"
+            f"  - chat_sessions: Mapped[list['ChatSession']]\n"
+            f"  - bulas: Mapped[list['Bula']]\n\n"
+            f"This causes production errors like:\n"
+            f"  InvalidRequestError: expression 'ChatSession' failed to locate a name\n\n"
+            f"FIX: Ensure app.core.database imports all models:\n"
+            f"  from app.modules.auth.models import User  # noqa: F401\n"
+            f"  from app.modules.bulas.models import Bula  # noqa: F401\n"
+            f"  from app.modules.chat.models import ChatSession, ChatMessage  # noqa: F401\n\n"
+            f"This file is imported by both main.py and conftest.py.\n\n"
+            f"Currently registered: {registered_class_names}"
+        )

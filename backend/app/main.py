@@ -1,6 +1,10 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
+# Import from database module which also imports all models.
+# This ensures SQLAlchemy mapper configuration works with forward references.
+# When User model has relationships referencing "ChatSession" and "Bula",
+# SQLAlchemy needs these classes registered before User's mapper is configured.
 from app.core.database import close_engine
 
 from app.modules.bulas.router import router as bulas_router
