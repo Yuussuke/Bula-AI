@@ -1,8 +1,11 @@
 from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class MaritacaSettings(BaseSettings):
-    maritaca_api_key: str
+    # Optional so the app and CI can boot without a paid API key.
+    # Endpoints that require the LLM should validate this at call time.
+    maritaca_api_key: str | None = None
 
 
 class DatabaseSettings(BaseSettings):
