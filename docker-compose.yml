@@ -1,7 +1,12 @@
 name: bula-ai
 
+# =============================================================================
+# SERVICES
+# =============================================================================
 services:
-  # PostgreSQL database service
+  # ---------------------------------------------------------------------------
+  # Infrastructure: PostgreSQL
+  # ---------------------------------------------------------------------------
   postgres:
     image: postgres:15
     environment:
@@ -14,7 +19,9 @@ services:
       # Persist database data between container restarts
       - postgres_data:/var/lib/postgresql/data
 
-  # FastAPI backend service
+  # ---------------------------------------------------------------------------
+  # Application: FastAPI backend
+  # ---------------------------------------------------------------------------
   api:
     build: ./backend
     ports:
@@ -26,8 +33,16 @@ services:
     environment:
       # Connection string used by the backend to reach PostgreSQL
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-bulaai}:${POSTGRES_PASSWORD:-bulaai}@postgres:5432/${POSTGRES_DB:-bulaai}
+
+      # Auth / Security
       SECRET_KEY: ${SECRET_KEY}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
 
+      # LLM (Maritaca)
+      MARITACA_API_KEY: ${MARITACA_API_KEY}
+
+# =============================================================================
+# VOLUMES
+# =============================================================================
 volumes:
   postgres_data:
