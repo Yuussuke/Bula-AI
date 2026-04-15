@@ -19,8 +19,8 @@ def test_import():
     """Test that pwdlib and argon2 are importable."""
     print("🔧 Testing imports...")
     try:
-        from pwdlib import PasswordHash
-        import argon2
+        from pwdlib import PasswordHash  # noqa: F401
+        import argon2  # noqa: F401
 
         print("   ✅ pwdlib imported successfully")
         print("   ✅ argon2-cffi imported successfully")

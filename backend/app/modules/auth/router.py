@@ -7,20 +7,24 @@ from app.modules.auth.service import AuthService
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-@router.post("/register", response_model=schemas.UserResponse, status_code=status.HTTP_201_CREATED)
+
+@router.post(
+    "/register",
+    response_model=schemas.UserResponse,
+    status_code=status.HTTP_201_CREATED,
+)
 async def register(
-    user_in: schemas.UserCreate, 
-    auth_service: AuthService = Depends(get_auth_service) 
+    user_in: schemas.UserCreate, auth_service: AuthService = Depends(get_auth_service)
 ):
     """
     Registers a new user and returns their profile.
     """
     return await auth_service.register_new_user(user_in)
 
+
 @router.post("/login", response_model=schemas.Token)
 async def login(
-    user_in: schemas.UserLogin, 
-    auth_service: AuthService = Depends(get_auth_service)
+    user_in: schemas.UserLogin, auth_service: AuthService = Depends(get_auth_service)
 ):
     """
     Authenticates a user and returns a JWT access token.
@@ -30,10 +34,9 @@ async def login(
         password=user_in.password,
     )
 
+
 @router.get("/me", response_model=schemas.UserResponse)
-async def get_my_profile(
-    current_user: models.User = Depends(get_current_user)
-):
+async def get_my_profile(current_user: models.User = Depends(get_current_user)):
     """
     Returns the profile of the currently authenticated user.
     """
