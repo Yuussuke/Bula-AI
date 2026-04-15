@@ -4,12 +4,13 @@ from app.modules.bulas.helpers import PdfTextExtractor, Chunking
 from app.modules.bulas.schemas import BulaUploadResponse
 from fastapi.concurrency import run_in_threadpool
 
+
 class BulaService:
     def __init__(
-        self, 
-        bula_repo: BulaRepository, 
-        pdf_extractor: PdfTextExtractor, 
-        chunking: Chunking
+        self,
+        bula_repo: BulaRepository,
+        pdf_extractor: PdfTextExtractor,
+        chunking: Chunking,
     ):
         self.repo = bula_repo
         self.extractor = pdf_extractor
@@ -29,7 +30,7 @@ class BulaService:
         extracted = await run_in_threadpool(self.extractor.extract, file)
         text = extracted.text
         pages = extracted.pages
-        
+
         chunks = self.chunker.split(text)
 
         bula = await self.repo.create_bula(

@@ -3,8 +3,10 @@ from pypdf import PdfReader
 from pypdf.errors import PdfReadError
 from dataclasses import dataclass
 
+
 class InvalidPdfError(Exception):
     """Raised when the uploaded file cannot be parsed as a valid PDF."""
+
 
 @dataclass
 class ExtractedBula:
@@ -13,7 +15,6 @@ class ExtractedBula:
 
 
 class PdfTextExtractor:
-    
     def extract(self, file: BinaryIO) -> ExtractedBula:
         """
         Reads a PDF file and returns the concatenated text and the total number of pages.
@@ -27,6 +28,7 @@ class PdfTextExtractor:
             text_pieces.append(page.extract_text() or "")
         final_text = "".join(text_pieces)
         return ExtractedBula(text=final_text, pages=len(reader.pages))
+
 
 class Chunking:
     def __init__(self, chunk_size: int = 500, overlap: int = 50):
