@@ -9,8 +9,9 @@ class DatabaseSettings(BaseSettings):
     database_url: str = "postgresql+asyncpg://bulaai:bulaai@postgres:5432/bulaai"
     sql_echo: bool = False 
 
+
 class SecuritySettings(BaseSettings):
-    secret_key: str 
+    secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
 
@@ -20,6 +21,7 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     """
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    pass
 
 @lru_cache
 def get_settings() -> Settings:

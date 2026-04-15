@@ -9,8 +9,9 @@ from app.modules.bulas.dependencies import get_bula_service
 
 router = APIRouter(prefix="/bulas", tags=["bulas"])
 
+
 @router.post(
-    "/upload", 
+    "/upload",
     response_model=BulaUploadResponse,
     status_code=status.HTTP_201_CREATED,
 )
@@ -30,6 +31,8 @@ async def upload_file(
             filename=file.filename,
         )
     except InvalidPdfError as exc:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(exc)
+        ) from exc
 
     return result

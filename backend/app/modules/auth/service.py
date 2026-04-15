@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from app.modules.auth import schemas, repository, security
 from app.modules.auth.models import User
 
+
 class TokenService:
     def __init__(
         self,
@@ -18,13 +19,17 @@ class TokenService:
         self.algorithm = algorithm
         self.access_token_expire_minutes = access_token_expire_minutes
 
-    def create_access_token(self, data: dict, expires_delta: timedelta | None = None) -> str:
+    def create_access_token(
+        self, data: dict, expires_delta: timedelta | None = None
+    ) -> str:
         to_encode = data.copy()
 
         if expires_delta:
             expire = datetime.now(timezone.utc) + expires_delta
         else:
-            expire = datetime.now(timezone.utc) + timedelta(minutes=self.access_token_expire_minutes)
+            expire = datetime.now(timezone.utc) + timedelta(
+                minutes=self.access_token_expire_minutes
+            )
 
         to_encode.update({"exp": expire})
         return jwt.encode(to_encode, self.secret_key, algorithm=self.algorithm)
@@ -38,14 +43,16 @@ class AuthService:
     def __init__(
         self,
         user_repository: repository.UserRepository,
-        password_hasher: security.PasswordHasher, 
+        password_hasher: security.PasswordHasher,
         token_service: TokenService,
     ) -> None:
         self.user_repository = user_repository
         self.password_hasher = password_hasher
         self.token_service = token_service
 
-    def create_access_token(self, data: dict, expires_delta: timedelta | None = None) -> str:
+    def create_access_token(
+        self, data: dict, expires_delta: timedelta | None = None
+    ) -> str:
         """
         Creates a JWT access token with the given data and expiration.
         """
@@ -55,7 +62,9 @@ class AuthService:
         """
         Registers a new user and Hashes the password before saving to the database.
         """
-        existing_user = await self.user_repository.get_user_by_email(email=user_in.email)
+        existing_user = await self.user_repository.get_user_by_email(
+            email=user_in.email
+        )
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
@@ -86,14 +95,18 @@ class AuthService:
         """
         user = await self.user_repository.get_user_by_email(email=email)
 
-        if not user or not self.password_hasher.verify_password(password, user.hashed_password):
+        if not user or not self.password_hasher.verify_password(
+            password, user.hashed_password
+        ):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Incorrect email or password.",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-        access_token_expires = timedelta(minutes=self.token_service.access_token_expire_minutes)
+        access_token_expires = timedelta(
+            minutes=self.token_service.access_token_expire_minutes
+        )
         access_token = self.create_access_token(
             data={"sub": str(user.id)},
             expires_delta=access_token_expires,
@@ -115,9 +128,9 @@ class AuthService:
             subject = self.token_service.decode_subject(token)
             if subject is None:
                 raise credentials_exception
-            
+
             user_id = int(subject)
-            
+
         except (jwt.PyJWTError, ValueError):
             raise credentials_exception
 

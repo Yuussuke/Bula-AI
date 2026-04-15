@@ -7,14 +7,11 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
 
-#import Base e config
+# import Base e config
 from app.core.config import DatabaseSettings
 from app.core.base import Base
 
 # Import models
-from app.modules.bulas import models as bulas_models
-from app.modules.auth import models as auth_models
-from app.modules.chat import models as chat_models
 
 db_settings = DatabaseSettings()
 

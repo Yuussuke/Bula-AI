@@ -3,14 +3,18 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 from app.modules.bulas.models import BulaStatus
 
-# What the user sends to the API 
+
+# What the user sends to the API
 class BulaCreate(BaseModel):
     drug_name: str = Field(..., json_schema_extra={"example": "Dipirona Monoidratada"})
-    file_url: str = Field(..., json_schema_extra={"example": "https://storage.../bula.pdf"})
+    file_url: str = Field(
+        ..., json_schema_extra={"example": "https://storage.../bula.pdf"}
+    )
     manufacturer: str | None = Field(
         default=None,
         json_schema_extra={"example": "Medley"},
     )
+
 
 # What the API returns to the user
 class BulaResponse(BaseModel):
