@@ -1,5 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-
+from sqlalchemy.exc import IntegrityError
 from app.modules.bulas.models import Bula, BulaStatus
 
 
@@ -30,9 +30,9 @@ class BulaRepository:
 
         try:
             await self.db.commit()
-        except Exception as exc:
+        except IntegrityError:
             await self.db.rollback()
-            raise exc
+            raise IntegrityError("Failed to create Bula due to integrity error.")
 
         await self.db.refresh(bula)
         return bula
