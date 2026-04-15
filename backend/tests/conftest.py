@@ -12,13 +12,10 @@ from httpx import AsyncClient, ASGITransport
 
 from app.main import app
 from app.core.base import Base
-from app.core.database import get_db
 
-# Import all models to ensure SQLAlchemy mapper configuration works
-# These are needed for forward reference resolution
-from app.modules.auth.models import User  # noqa: F401
-from app.modules.bulas.models import Bula  # noqa: F401
-from app.modules.chat.models import ChatSession, ChatMessage  # noqa: F401
+# Import from database module which also imports all models.
+# This ensures SQLAlchemy mapper configuration works with forward references.
+from app.core.database import get_db
 
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
