@@ -30,10 +30,7 @@ def create_app() -> FastAPI:
 
     app.include_router(bulas_router, prefix="/api/v1")
     app.include_router(auth_router, prefix="/api/v1")
-<<<<<<< HEAD
     app.include_router(chat_router, prefix="/api/v1")
-=======
->>>>>>> origin/main
 
     return app
 
