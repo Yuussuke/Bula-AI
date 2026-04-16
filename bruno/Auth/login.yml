@@ -1,0 +1,35 @@
+info:
+  name: login
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/auth/login"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "allan@example.com",
+        "password": "yuussuke123"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: after-response
+      code: |-
+        const data = res.getBody();
+
+        // Verifica se o token veio na resposta (adapte 'access_token' para o nome exato que sua API retorna)
+        if (data && data.access_token) {
+          // Salva o token na variável de ambiente do Bruno
+          bru.setEnvVar("token", data.access_token);
+          console.log("Token capturado com sucesso!");
+        }
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
