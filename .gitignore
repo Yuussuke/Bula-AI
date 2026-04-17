@@ -23,3 +23,8 @@ build/
 Thumbs.db
 .idea/
 .vscode/
+
+# Node / Frontend
+node_modules/
+.vite/
+*.tsbuildinfo
