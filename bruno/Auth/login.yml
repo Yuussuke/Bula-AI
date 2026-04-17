@@ -21,9 +21,8 @@ runtime:
       code: |-
         const data = res.getBody();
 
-        // Verifica se o token veio na resposta (adapte 'access_token' para o nome exato que sua API retorna)
         if (data && data.access_token) {
-          // Salva o token na variável de ambiente do Bruno
+
           bru.setEnvVar("token", data.access_token);
           console.log("Token capturado com sucesso!");
         }

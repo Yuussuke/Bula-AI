@@ -79,6 +79,7 @@ help:
 	@echo "  make test           - Run the test suite"
 	@echo "  make test-cov       - Run tests with coverage report"
 	@echo "  make lint           - Check code style with Ruff"
+	@echo "  make lint-fix       - Automatically fix lint issues with Ruff"
 	@echo "  make format         - Format code with Ruff"
 	@echo "  make dependencies   - Sync dependencies from lockfile and rebuild api container"
 	@echo "  make add-dependency - Add one dependency and sync (prompts for package name)"

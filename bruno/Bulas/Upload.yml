@@ -1,0 +1,30 @@
+info:
+  name: upload
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: "{{base_url}}/bulas/upload"
+  body:
+    type: multipart-form
+    data:
+      - name: drug_name
+        type: text
+        value: Losartana Potássica
+      - name: manufacturer
+        type: text
+        value: ""
+      - name: file
+        type: file
+        value:
+          - ../../Bulas/bula-losartana-potassica.pdf
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
