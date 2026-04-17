@@ -38,9 +38,12 @@ class TokenService:
         payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
         return payload.get("sub")
 
+
 class UserAlreadyExistsError(Exception):
     """Raised when trying to register a user with an email that already exists."""
+
     pass
+
 
 class AuthService:
     def __init__(

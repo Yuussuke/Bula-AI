@@ -1,7 +1,5 @@
 # API endpoints(Request / Response)
-from http.client import HTTPException
-
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.modules.auth import schemas, models
 from app.modules.auth.dependencies import get_current_user, get_auth_service
@@ -25,10 +23,9 @@ async def register(
         return await auth_service.register_new_user(user_in)
     except UserAlreadyExistsError:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             detail="A user with this email already exists.",
         )
-    
 
 
 @router.post("/login", response_model=schemas.Token)
