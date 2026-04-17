@@ -7,7 +7,7 @@ from app.core.database import get_db
 from app.core.config import settings
 
 from app.modules.auth.repository import UserRepository
-from app.modules.auth.service import AuthService, TokenService
+from app.modules.auth.service import AuthService, InvalidCredentialsError, TokenService
 from app.modules.auth.security import PasswordHasher
 from app.modules.auth.models import User
 
@@ -61,4 +61,12 @@ async def get_current_user(
             detail="Not authenticated",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return await auth_service.get_user_from_token(token=credentials.credentials)
+
+    try:
+        return await auth_service.get_user_from_token(token=credentials.credentials)
+    except InvalidCredentialsError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
