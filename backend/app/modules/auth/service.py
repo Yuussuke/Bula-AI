@@ -1,11 +1,28 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
-from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
 
 from app.modules.auth import schemas, repository, security
 from app.modules.auth.models import User
+
+
+class UserAlreadyExistsError(Exception):
+    """Raised when trying to register a user with an email that already exists."""
+
+    pass
+
+
+class InvalidCredentialsError(Exception):
+    """Raised when authentication fails due to invalid email or password."""
+
+    pass
+
+
+class UserNotFoundError(Exception):
+    """Raised when a user is not found in the database."""
+
+    pass
 
 
 class TokenService:
@@ -37,12 +54,6 @@ class TokenService:
     def decode_subject(self, token: str) -> str | None:
         payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
         return payload.get("sub")
-
-
-class UserAlreadyExistsError(Exception):
-    """Raised when trying to register a user with an email that already exists."""
-
-    pass
 
 
 class AuthService:
@@ -98,11 +109,7 @@ class AuthService:
         if not user or not self.password_hasher.verify_password(
             password, user.hashed_password
         ):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect email or password.",
-                headers={"WWW-Authenticate": "Bearer"},
-            )
+            raise InvalidCredentialsError()
 
         access_token_expires = timedelta(
             minutes=self.token_service.access_token_expire_minutes
@@ -118,12 +125,7 @@ class AuthService:
         """
         Validates the JWT token and retrieves the corresponding user from the database by ID.
         """
-        credentials_exception = HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
+        credentials_exception = InvalidCredentialsError()
         try:
             subject = self.token_service.decode_subject(token)
             if subject is None:
@@ -140,9 +142,6 @@ class AuthService:
             raise credentials_exception
 
         if not user.is_active:
-            raise HTTPException(
-                status_code=status.HTTP_403_FORBIDDEN,
-                detail="Inactive user account",
-            )
+            raise UserNotFoundError()
 
         return user

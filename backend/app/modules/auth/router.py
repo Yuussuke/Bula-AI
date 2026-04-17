@@ -3,7 +3,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.modules.auth import schemas, models
 from app.modules.auth.dependencies import get_current_user, get_auth_service
-from app.modules.auth.service import AuthService, UserAlreadyExistsError
+from app.modules.auth.service import (
+    AuthService,
+    InvalidCredentialsError,
+    UserAlreadyExistsError,
+)
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
@@ -35,10 +39,17 @@ async def login(
     """
     Authenticates a user and returns a JWT access token.
     """
-    return await auth_service.authenticate_user(
-        email=user_in.email,
-        password=user_in.password,
-    )
+    try:
+        return await auth_service.authenticate_user(
+            email=user_in.email,
+            password=user_in.password,
+        )
+    except InvalidCredentialsError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
 
 @router.get("/me", response_model=schemas.UserResponse)
