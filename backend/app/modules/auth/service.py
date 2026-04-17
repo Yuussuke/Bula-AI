@@ -38,6 +38,9 @@ class TokenService:
         payload = jwt.decode(token, self.secret_key, algorithms=[self.algorithm])
         return payload.get("sub")
 
+class UserAlreadyExistsError(Exception):
+    """Raised when trying to register a user with an email that already exists."""
+    pass
 
 class AuthService:
     def __init__(
@@ -66,10 +69,7 @@ class AuthService:
             email=user_in.email
         )
         if existing_user:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="Email already registered.",
-            )
+            raise UserAlreadyExistsError()
 
         hashed_password = self.password_hasher.get_password_hash(user_in.password)
 
@@ -82,10 +82,7 @@ class AuthService:
         except IntegrityError as exc:
             error_msg = str(getattr(exc, "orig", "")).lower()
             if "unique constraint" in error_msg or "23505" in error_msg:
-                raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail="Email already registered.",
-                ) from None
+                raise UserAlreadyExistsError()
             raise exc
         return new_user
 

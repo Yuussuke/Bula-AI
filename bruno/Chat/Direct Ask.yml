@@ -1,14 +1,17 @@
 info:
-  name: profile
+  name: direct-ask
   type: http
-  seq: 3
+  seq: 1
 
 http:
-  method: GET
-  url: "{{base_url}}/auth/me"
+  method: POST
+  url: "{{base_url}}/chat/direct-ask"
   body:
     type: json
-    data: ""
+    data: |-
+      {
+        "question": "O que essa bula diz sobre contraindicações?"
+      }
   auth:
     type: bearer
     token: "{{token}}"
