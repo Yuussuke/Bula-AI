@@ -1,0 +1,90 @@
+info:
+  name: Register
+  type: http
+  seq: 1
+  tags:
+    - Authentication
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/auth/register"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "samuel@daniel.com",
+        "full_name": "Samuel Daniel",
+        "password": "DanielSamuel"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 201 Response
+    description: Successful Response
+    request:
+      url: "{{baseUrl}}/api/v1/auth/register"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "email": "",
+            "full_name": "",
+            "password": ""
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "email": "",
+            "full_name": "",
+            "id": 0,
+            "is_active": false
+          }
+  - name: 422 Response
+    description: Validation Error
+    request:
+      url: "{{baseUrl}}/api/v1/auth/register"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "email": "",
+            "full_name": "",
+            "password": ""
+          }
+    response:
+      status: 422
+      statusText: Unprocessable Entity
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "detail": [
+              {
+                "loc": [],
+                "msg": "",
+                "type": "",
+                "input": "",
+                "ctx": {}
+              }
+            ]
+          }
+
+docs: Registers a new user and returns their profile.
