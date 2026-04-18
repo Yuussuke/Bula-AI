@@ -8,9 +8,15 @@
 
 *A Retrieval-Augmented Generation (RAG) assistant bringing clarity to Brazilian medication leaflets through AI and clean architecture.*
 
-> Preview space reserved for a future GIF/screenshot demonstrating the end-to-end flow.
->
-> Suggested placement: upload a leaflet, ask a question, and show the grounded response.
+> Preview space for screenshot demonstrating the end-to-end flow.
+><img width="1900" height="900" alt="image" src="https://github.com/user-attachments/assets/b9ae14d2-d798-44d9-868b-1afc51fc7448" />
+> <br>
+><img width="1900" height="900" alt="image" src="https://github.com/user-attachments/assets/508ba5e6-1918-4167-8823-a8894c06a661" />
+>  <br>
+> <img width="1900" height="900" alt="image" src="https://github.com/user-attachments/assets/8319776e-718f-4095-929f-a86ea82cc43d" />
+> <br>
+><img width="1900" height="900" alt="image" src="https://github.com/user-attachments/assets/c3e68a69-7995-4dcf-b235-bba389e42915" />
+> 
 
 Bula AI helps people understand Brazilian medication leaflets (bulas) through natural language questions. Users upload a PDF and receive responses grounded in retrieved passages from the document, reducing hallucination risk and improving answer traceability.
 
