@@ -18,8 +18,10 @@ def test_app_info_processor_adds_application_context() -> None:
 
 
 def test_build_processors_appends_console_renderer_when_not_json() -> None:
-    """Tests that the build_processors function appends a ConsoleRenderer
-    when use_json is False."""
+    """
+    Tests that the build_processors function appends a ConsoleRenderer
+    when use_json is False.
+    """
     processors = build_processors(
         use_json=False,
         app_version="0.1.0",
