@@ -1,4 +1,5 @@
 from functools import lru_cache
+import structlog
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -63,7 +64,11 @@ async def get_current_user(
         )
 
     try:
-        return await auth_service.get_user_from_token(token=credentials.credentials)
+        current_user = await auth_service.get_user_from_token(
+            token=credentials.credentials
+        )
+        structlog.contextvars.bind_contextvars(user_id=current_user.id)
+        return current_user
     except InvalidCredentialsError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
