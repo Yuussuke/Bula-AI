@@ -158,13 +158,13 @@ http://localhost:8000/docs
 
 ### API Testing with Bruno
 
-The repository includes a ready-to-use Bruno collection in [Bruno/bula-ai-api](Bruno/bula-ai-api). The login request stores the JWT token automatically in the environment and authenticated requests reuse it via Bearer auth, improving developer experience when validating endpoints.
+The repository includes a ready-to-use Bruno collection in [bruno/bula-ai-api](bruno/bula-ai-api). The login request stores the JWT token automatically in the environment and authenticated requests reuse it via Bearer auth, improving developer experience when validating endpoints.
 
 Main files:
 
-- [Bruno/bula-ai-api/opencollection.yml](Bruno/bula-ai-api/opencollection.yml)
-- [Bruno/bula-ai-api/Authentication/Login.yml](Bruno/bula-ai-api/Authentication/Login.yml)
-- [Bruno/bula-ai-api/Authentication/get-my-profile.yml](Bruno/bula-ai-api/Authentication/get-my-profile.yml)
+- [bruno/bula-ai-api/opencollection.yml](bruno/bula-ai-api/opencollection.yml)
+- [bruno/bula-ai-api/Authentication/Login.yml](bruno/bula-ai-api/Authentication/Login.yml)
+- [bruno/bula-ai-api/Authentication/get-my-profile.yml](bruno/bula-ai-api/Authentication/get-my-profile.yml)
 
 ## Useful Commands
 
