@@ -43,7 +43,7 @@ test:
 	$(COMPOSE) exec api uv run pytest -v
 
 test-cov:
-	$(COMPOSE) exec api uv run pytest --cov=app --cov-report=term-missing
+	$(COMPOSE) exec api uv run --with pytest-cov pytest --cov=app --cov-report=term-missing
 
 lint:
 	$(COMPOSE) exec api uv run ruff check .
