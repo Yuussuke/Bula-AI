@@ -1,0 +1,103 @@
+info:
+  name: Upload File
+  type: http
+  seq: 1
+  tags:
+    - bulas
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/bulas/upload"
+  body:
+    type: multipart-form
+    data:
+      - name: drug_name
+        type: text
+        value: ""
+      - name: manufacturer
+        type: text
+        value: ""
+      - name: file
+        type: file
+        value: []
+  auth:
+    type: bearer
+    token: "{{token}}"
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 201 Response
+    description: Successful Response
+    request:
+      url: "{{baseUrl}}/api/v1/bulas/upload"
+      method: POST
+      body:
+        type: multipart-form
+        data:
+          - name: drug_name
+            type: text
+            value: ""
+          - name: manufacturer
+            type: text
+            value: ""
+          - name: file
+            type: text
+            value: ""
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "filename": "",
+            "pages": 0,
+            "characters": 0,
+            "chunks": 0,
+            "bula_id": ""
+          }
+  - name: 422 Response
+    description: Validation Error
+    request:
+      url: "{{baseUrl}}/api/v1/bulas/upload"
+      method: POST
+      body:
+        type: multipart-form
+        data:
+          - name: drug_name
+            type: text
+            value: ""
+          - name: manufacturer
+            type: text
+            value: ""
+          - name: file
+            type: text
+            value: ""
+    response:
+      status: 422
+      statusText: Unprocessable Entity
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "detail": [
+              {
+                "loc": [],
+                "msg": "",
+                "type": "",
+                "input": "",
+                "ctx": {}
+              }
+            ]
+          }

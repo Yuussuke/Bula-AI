@@ -1,7 +1,7 @@
 opencollection: 1.0.0
 
 info:
-  name: Bulas
+  name: Bula AI API
 bundled: false
 extensions:
   bruno:
