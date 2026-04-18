@@ -17,6 +17,11 @@ class SecuritySettings(BaseSettings):
     secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
+    log_level: str = "INFO"
+    json_logs: bool = True  # Set to False in .env for development
+    environment: str = "development"  # Set to "development" in .env for development
+
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):

@@ -1,10 +1,13 @@
 from datetime import datetime, timedelta, timezone
 
 import jwt
+import structlog
 from sqlalchemy.exc import IntegrityError
 
 from app.modules.auth import schemas, repository, security
 from app.modules.auth.models import User
+
+logger = structlog.get_logger(__name__)
 
 
 class UserAlreadyExistsError(Exception):
@@ -76,13 +79,17 @@ class AuthService:
         return self.token_service.create_access_token(data, expires_delta)
 
     async def register_new_user(self, user_in: schemas.UserCreate) -> User:
-        """
-        Registers a new user and Hashes the password before saving to the database.
-        """
+        logger.info("user_registration_attempt", email=user_in.email)
+
         existing_user = await self.user_repository.get_user_by_email(
-            email=user_in.email
+            email=user_in.email.lower()
         )
         if existing_user:
+            logger.warning(
+                "user_registration_failed",
+                reason="email_already_exists",
+                email=user_in.email,
+            )
             raise UserAlreadyExistsError()
 
         hashed_password = self.password_hasher.get_password_hash(user_in.password)
@@ -90,7 +97,7 @@ class AuthService:
         try:
             new_user = await self.user_repository.create_user(
                 full_name=user_in.full_name,
-                email=user_in.email,
+                email=user_in.email.lower(),
                 hashed_password=hashed_password,
             )
         except IntegrityError as exc:
@@ -98,17 +105,25 @@ class AuthService:
             if "unique constraint" in error_msg or "23505" in error_msg:
                 raise UserAlreadyExistsError()
             raise exc
+        logger.info(
+            "user_registered_successfully", user_id=new_user.id, email=new_user.email
+        )
         return new_user
 
     async def authenticate_user(self, email: str, password: str) -> schemas.Token:
         """
         Authenticates a user by email and password and returns a JWT token
         """
-        user = await self.user_repository.get_user_by_email(email=email)
+        logger.info("user_login_attempt", email=email)
+
+        user = await self.user_repository.get_user_by_email(email=email.lower())
 
         if not user or not self.password_hasher.verify_password(
             password, user.hashed_password
         ):
+            logger.warning(
+                "user_authentication_failed", reason="invalid_credentials", email=email
+            )
             raise InvalidCredentialsError()
 
         access_token_expires = timedelta(
@@ -125,23 +140,38 @@ class AuthService:
         """
         Validates the JWT token and retrieves the corresponding user from the database by ID.
         """
+        logger.info("token_validation_attempt")
         credentials_exception = InvalidCredentialsError()
         try:
             subject = self.token_service.decode_subject(token)
             if subject is None:
+                logger.warning("token_validation_failed", reason="missing_subject")
                 raise credentials_exception
 
             user_id = int(subject)
 
         except (jwt.PyJWTError, ValueError):
+            logger.warning("token_validation_failed", reason="invalid_token")
             raise credentials_exception
 
         user = await self.user_repository.get_user_by_id(user_id=user_id)
 
         if user is None:
+            logger.warning(
+                "token_validation_failed",
+                reason="user_not_found",
+                user_id=user_id,
+            )
             raise credentials_exception
 
         if not user.is_active:
-            raise UserNotFoundError()
+            logger.warning(
+                "token_validation_failed",
+                reason="inactive_user",
+                user_id=user.id,
+            )
+            raise credentials_exception
+
+        logger.info("token_validation_succeeded", user_id=user.id)
 
         return user
