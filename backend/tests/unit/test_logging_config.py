@@ -4,7 +4,7 @@ from app.core.logging_config import AppInfoProcessor, build_processors
 
 
 def test_app_info_processor_adds_application_context() -> None:
-    """Tests that the AppInfoProcessor correctly adds app_version and 
+    """Tests that the AppInfoProcessor correctly adds app_version and
     environment to log events."""
     processor = AppInfoProcessor(app_version="1.2.3", environment="test")
 
@@ -18,7 +18,7 @@ def test_app_info_processor_adds_application_context() -> None:
 
 
 def test_build_processors_appends_console_renderer_when_not_json() -> None:
-    """Tests that the build_processors function appends a ConsoleRenderer 
+    """Tests that the build_processors function appends a ConsoleRenderer
     when use_json is False."""
     processors = build_processors(
         use_json=False,
@@ -31,7 +31,7 @@ def test_build_processors_appends_console_renderer_when_not_json() -> None:
 
 
 def test_build_processors_appends_json_renderer_when_json_enabled() -> None:
-    """Tests that the build_processors function appends a JSONRenderer 
+    """Tests that the build_processors function appends a JSONRenderer
     when use_json is True."""
     processors = build_processors(
         use_json=True,
