@@ -73,6 +73,15 @@ def configure_stdlib_logging(*, log_level: str) -> None:
         logging.getLogger(logger_name).setLevel(logging.WARNING)
 
 
+def should_use_json_logs(*, json_logs: bool, is_tty: bool) -> bool:
+    """Decide if logs should be rendered as JSON.
+
+    Explicit configuration always wins over runtime auto-detection.
+    """
+    _ = is_tty
+    return json_logs
+
+
 def configure_logging(
     *,
     log_level: str = "INFO",
@@ -89,9 +98,11 @@ def configure_logging(
         app_version: Application version for log context
         environment: Environment name (development, staging, production)
     """
-    # Determine if we should use JSON or console output
-    # Default to JSON if not a tty (e.g., in containers/production)
-    use_json = json_logs or not sys.stdout.isatty()
+    # Respect explicit configuration for log format.
+    use_json = should_use_json_logs(
+        json_logs=json_logs,
+        is_tty=sys.stdout.isatty(),
+    )
 
     processors = build_processors(
         use_json=use_json,

@@ -1,6 +1,10 @@
 import structlog
 
-from app.core.logging_config import AppInfoProcessor, build_processors
+from app.core.logging_config import (
+    AppInfoProcessor,
+    build_processors,
+    should_use_json_logs,
+)
 
 
 def test_app_info_processor_adds_application_context() -> None:
@@ -41,3 +45,13 @@ def test_build_processors_appends_json_renderer_when_json_enabled() -> None:
 
     assert any(isinstance(proc, AppInfoProcessor) for proc in processors)
     assert isinstance(processors[-1], structlog.processors.JSONRenderer)
+
+
+def test_should_use_json_logs_respects_explicit_false_in_non_tty() -> None:
+    """Ensures explicit JSON_LOGS=false is honored even in non-TTY runtimes."""
+    assert should_use_json_logs(json_logs=False, is_tty=False) is False
+
+
+def test_should_use_json_logs_respects_explicit_true_in_tty() -> None:
+    """Ensures explicit JSON_LOGS=true is honored in interactive terminals."""
+    assert should_use_json_logs(json_logs=True, is_tty=True) is True
