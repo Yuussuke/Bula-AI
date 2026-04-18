@@ -6,8 +6,6 @@ from contextlib import asynccontextmanager
 # When User model has relationships referencing "ChatSession" and "Bula",
 # SQLAlchemy needs these classes registered before User's mapper is configured.
 from app.core.database import close_engine
-from app.core.logging_config import configure_logging
-from app.core.config import settings
 from app.core.middleware import CorrelationIdMiddleware
 from app.core.request_logging import RequestLoggingMiddleware
 
@@ -18,14 +16,6 @@ from app.modules.chat.router import router as chat_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Configure logging on startup
-    configure_logging(
-        log_level=settings.log_level,
-        json_logs=settings.json_logs,
-        app_version="0.1.0",
-        environment=settings.environment,
-    )
-
     yield
     await close_engine()
 
