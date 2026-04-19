@@ -18,6 +18,11 @@ build/
 # Logs
 *.log
 
+# Test / coverage artefacts
+.coverage
+htmlcov/
+.pytest_cache/
+
 # OS / editor artefacts
 .DS_Store
 Thumbs.db
