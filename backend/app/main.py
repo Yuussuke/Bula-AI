@@ -2,21 +2,12 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from app.core.config import settings
 from app.core.database import close_engine
-from app.core.logging_config import configure_logging
 from app.core.middleware import CorrelationIdMiddleware
 from app.core.request_logging import RequestLoggingMiddleware
 from app.modules.auth.router import router as auth_router
 from app.modules.bulas.router import router as bulas_router
 from app.modules.chat.router import router as chat_router
-
-configure_logging(
-    log_level=settings.log_level,
-    json_logs=settings.json_logs,
-    app_version="0.1.0",
-    environment=settings.environment,
-)
 
 
 @asynccontextmanager
