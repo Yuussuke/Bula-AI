@@ -2,9 +2,11 @@ import logging
 
 import structlog
 
+import app.core.logging_config as logging_config
 from app.core.logging_config import (
     AppInfoProcessor,
     build_processors,
+    configure_logging,
     configure_stdlib_logging,
     should_use_json_logs,
 )
@@ -88,3 +90,38 @@ def test_configure_stdlib_logging_sets_up_structlog_formatting() -> None:
     finally:
         root_logger.handlers = original_handlers
         root_logger.setLevel(original_level)
+
+
+def test_configure_logging_is_idempotent_for_same_configuration(
+    monkeypatch,
+) -> None:
+    """Ensures repeated calls with identical settings do not reconfigure logging."""
+
+    captured_calls: list[tuple[str, int]] = []
+
+    def fake_configure_stdlib_logging(
+        *, log_level: str, shared_processors: list
+    ) -> None:
+        captured_calls.append((log_level, len(shared_processors)))
+
+    monkeypatch.setattr(logging_config, "_configured_settings", None)
+    monkeypatch.setattr(
+        logging_config,
+        "configure_stdlib_logging",
+        fake_configure_stdlib_logging,
+    )
+
+    configure_logging(
+        log_level="INFO",
+        json_logs=True,
+        app_version="0.1.0",
+        environment="test",
+    )
+    configure_logging(
+        log_level="INFO",
+        json_logs=True,
+        app_version="0.1.0",
+        environment="test",
+    )
+
+    assert len(captured_calls) == 1
