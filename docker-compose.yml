@@ -38,6 +38,14 @@ services:
       SECRET_KEY: ${SECRET_KEY}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
 
+      # Logging
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+      JSON_LOGS: ${JSON_LOGS:-true}
+
+      # Environment
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      SQL_ECHO: ${SQL_ECHO:-false}
+
       # LLM (Maritaca)
       MARITACA_API_KEY: ${MARITACA_API_KEY}
 
