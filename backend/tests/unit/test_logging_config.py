@@ -1,6 +1,13 @@
+import logging
+
 import structlog
 
-from app.core.logging_config import AppInfoProcessor, build_processors
+from app.core.logging_config import (
+    AppInfoProcessor,
+    build_processors,
+    configure_stdlib_logging,
+    should_use_json_logs,
+)
 
 
 def test_app_info_processor_adds_application_context() -> None:
@@ -43,3 +50,43 @@ def test_build_processors_appends_json_renderer_when_json_enabled() -> None:
 
     assert any(isinstance(proc, AppInfoProcessor) for proc in processors)
     assert isinstance(processors[-1], structlog.processors.JSONRenderer)
+
+
+def test_should_use_json_logs_respects_explicit_false_in_non_tty() -> None:
+    """Ensures explicit JSON_LOGS=false is honored even in non-TTY runtimes."""
+    assert should_use_json_logs(json_logs=False, is_tty=False) is False
+
+
+def test_should_use_json_logs_respects_explicit_true_in_tty() -> None:
+    """Ensures explicit JSON_LOGS=true is honored in interactive terminals."""
+    assert should_use_json_logs(json_logs=True, is_tty=True) is True
+
+
+def test_configure_stdlib_logging_sets_up_structlog_formatting() -> None:
+    """Ensures stdlib logging uses structlog formatter and expected logger levels."""
+    processors = build_processors(
+        use_json=True,
+        app_version="0.1.0",
+        environment="test",
+    )
+
+    root_logger = logging.getLogger()
+    original_handlers = root_logger.handlers[:]
+    original_level = root_logger.level
+
+    try:
+        configure_stdlib_logging(log_level="INFO", shared_processors=processors)
+
+        assert root_logger.level == logging.INFO
+        assert len(root_logger.handlers) == 1
+        assert isinstance(
+            root_logger.handlers[0].formatter,
+            structlog.stdlib.ProcessorFormatter,
+        )
+
+        assert logging.getLogger("sqlalchemy.engine").level == logging.WARNING
+        assert logging.getLogger("sqlalchemy.engine.base").level == logging.WARNING
+        assert logging.getLogger("uvicorn.access").level == logging.WARNING
+    finally:
+        root_logger.handlers = original_handlers
+        root_logger.setLevel(original_level)

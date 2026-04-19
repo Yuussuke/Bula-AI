@@ -3,7 +3,7 @@ import sys
 from typing import Any
 
 import structlog
-from structlog.stdlib import add_log_level
+from structlog.stdlib import add_log_level, ProcessorFormatter
 from structlog.types import EventDict, Processor
 
 
@@ -56,21 +56,43 @@ def build_processors(
     return processors
 
 
-def configure_stdlib_logging(*, log_level: str) -> None:
-    """Configure standard library logging handlers and noisy third-party loggers."""
-    logging.basicConfig(
-        format="%(message)s",
-        stream=sys.stdout,
-        level=getattr(logging, log_level.upper()),
+def configure_stdlib_logging(
+    *, log_level: str, shared_processors: list[Processor]
+) -> None:
+    """Configure stdlib logging to use the same structlog processor pipeline."""
+    pre_processors = shared_processors[:-1]
+    renderer = shared_processors[-1]
+
+    formatter = ProcessorFormatter(
+        foreign_pre_chain=pre_processors,
+        processors=[
+            ProcessorFormatter.remove_processors_meta,
+            renderer,
+        ],
     )
 
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(formatter)
+
+    root_logger = logging.getLogger()
+    root_logger.handlers = []
+    root_logger.addHandler(handler)
+    root_logger.setLevel(getattr(logging, log_level.upper()))
+
     for logger_name in [
-        "uvicorn",
-        "uvicorn.access",
-        "uvicorn.error",
         "sqlalchemy.engine",
+        "sqlalchemy.engine.base",
+        "uvicorn.access",
     ]:
         logging.getLogger(logger_name).setLevel(logging.WARNING)
+
+
+def should_use_json_logs(*, json_logs: bool, is_tty: bool) -> bool:
+    """
+    Decide if logs should be rendered as JSON.
+    """
+    _ = is_tty
+    return json_logs
 
 
 def configure_logging(
@@ -89,9 +111,11 @@ def configure_logging(
         app_version: Application version for log context
         environment: Environment name (development, staging, production)
     """
-    # Determine if we should use JSON or console output
-    # Default to JSON if not a tty (e.g., in containers/production)
-    use_json = json_logs or not sys.stdout.isatty()
+    # Respect explicit configuration for log format.
+    use_json = should_use_json_logs(
+        json_logs=json_logs,
+        is_tty=sys.stdout.isatty(),
+    )
 
     processors = build_processors(
         use_json=use_json,
@@ -100,11 +124,11 @@ def configure_logging(
     )
 
     structlog.configure(
-        processors=processors,
+        processors=processors[:-1] + [ProcessorFormatter.wrap_for_formatter],
         wrapper_class=structlog.stdlib.BoundLogger,
         context_class=dict,
         logger_factory=structlog.stdlib.LoggerFactory(),
         cache_logger_on_first_use=True,
     )
 
-    configure_stdlib_logging(log_level=log_level)
+    configure_stdlib_logging(log_level=log_level, shared_processors=processors)

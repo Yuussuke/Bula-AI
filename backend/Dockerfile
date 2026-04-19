@@ -18,5 +18,6 @@ RUN uv sync --frozen --no-dev
 # Copy application code and scripts
 COPY app/ ./app/
 COPY scripts/ ./scripts/
+COPY run.py ./
 
-CMD ["uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uv", "run", "python", "run.py"]
