@@ -6,6 +6,8 @@ import structlog
 from structlog.stdlib import add_log_level, ProcessorFormatter
 from structlog.types import EventDict, Processor
 
+_configured_settings: tuple[str, bool, str, str] | None = None
+
 
 class AppInfoProcessor:
     def __init__(self, app_version: str, environment: str) -> None:
@@ -111,6 +113,20 @@ def configure_logging(
         app_version: Application version for log context
         environment: Environment name (development, staging, production)
     """
+    global _configured_settings
+
+    normalized_log_level = log_level.upper()
+    configuration_signature = (
+        normalized_log_level,
+        json_logs,
+        app_version,
+        environment,
+    )
+
+    # Avoid duplicated global reconfiguration when the same settings are applied.
+    if _configured_settings == configuration_signature:
+        return
+
     # Respect explicit configuration for log format.
     use_json = should_use_json_logs(
         json_logs=json_logs,
@@ -131,4 +147,9 @@ def configure_logging(
         cache_logger_on_first_use=True,
     )
 
-    configure_stdlib_logging(log_level=log_level, shared_processors=processors)
+    configure_stdlib_logging(
+        log_level=normalized_log_level,
+        shared_processors=processors,
+    )
+
+    _configured_settings = configuration_signature
