@@ -366,6 +366,29 @@ These must never be skipped:
 
 ---
 
+## Dependency Update Automation (Dependabot)
+
+The repository uses Dependabot for automated dependency maintenance. The source of truth is `.github/dependabot.yml`.
+
+Current required ecosystems:
+
+- `uv` in `/backend` (Python dependencies and `uv.lock` updates)
+- `npm` in `/frontend` (frontend dependencies and lockfile updates)
+- `docker` in `/backend` (backend base image updates)
+- `docker` in `/frontend` (kept ready for future `frontend/Dockerfile`)
+- `docker` in `/` (root `docker-compose.yml` image updates)
+- `github-actions` in `/` (workflow action version updates)
+
+Rules for assistants and maintainers:
+
+- Keep update schedules weekly unless explicitly changed by maintainers.
+- Keep labels and reviewer assignment aligned with repository policy.
+- Keep `uv` and `npm` updates grouped: one group for minor/patch and one group for major.
+- Treat major runtime/image upgrades (for example Python and PostgreSQL) as manual-review updates that require compatibility testing.
+- Do not remove the `/frontend` Docker entry just because `frontend/Dockerfile` is not present yet; it is intentionally pre-configured.
+
+---
+
 ## What to Do When Unsure
 
 If a task is ambiguous or could be done in more than one way, **ask before writing code**. It is better to spend 2 minutes clarifying than 2 hours refactoring.
@@ -389,6 +412,7 @@ If you are adding a new module or new feature that is not covered by the develop
 | Tests (anti-pattern) | No tests that just mirror the implementation. |
 | DB changes | Always use Alembic migrations. Never `create_all()` in production. |
 | Security | Hash passwords. Validate JWTs. Validate file types. Never commit secrets. |
+| Dependency updates | Keep `.github/dependabot.yml` aligned with all active ecosystems and lockfiles. |
 | Code style | Readable over clever. Verbose over terse. Long names over short names. |
 | Git | Small PRs. Descriptive commit messages. Never push directly to `main`. |
 
