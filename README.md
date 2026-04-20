@@ -185,6 +185,27 @@ Main files:
 - Lint: `make lint`
 - Format: `make format`
 
+## Automated Dependency Updates
+
+This repository uses Dependabot to keep dependencies up to date with controlled PR volume and clear review ownership.
+
+- Configuration file: `.github/dependabot.yml`
+- Schedule: weekly (Monday at 09:00)
+- Reviewer: `Yuussuke`
+- Ecosystems covered:
+   - `uv` for backend Python dependencies (`/backend`)
+   - `npm` for frontend dependencies (`/frontend`)
+   - `docker` for backend image references (`/backend`)
+   - `docker` for frontend image references (`/frontend`, pre-configured for future Dockerfile)
+   - `docker` for root Compose image references (`/`)
+   - `github-actions` for workflow action versions (`/`)
+
+Policy notes:
+
+- Minor and patch dependency updates are grouped separately from major updates for `uv` and `npm`.
+- Major Docker/runtime updates should be validated in staging before production rollout.
+- Security-driven updates should be prioritized, even when noise-reduction ignore rules are in place.
+
 ## Roadmap
 
 - Improve retrieval quality and context ranking.

@@ -1,0 +1,135 @@
+# .github/dependabot.yml
+version: 2
+updates:
+  # Python dependencies via uv (backend)
+  - package-ecosystem: "uv"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+      - "automated"
+    reviewers:
+      - "Yuussuke"
+    groups:
+      uv-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      uv-major:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+
+  # npm dependencies (frontend)
+  - package-ecosystem: "npm"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "javascript"
+      - "automated"
+    reviewers:
+      - "Yuussuke"
+    groups:
+      npm-minor-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+      npm-major:
+        patterns:
+          - "*"
+        update-types:
+          - "major"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    versioning-strategy: "increase"
+
+  # Docker base images (backend)
+  - package-ecosystem: "docker"
+    directory: "/backend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+    reviewers:
+      - "Yuussuke"
+    ignore:
+      # Ignore patch updates for Python to reduce noise
+      - dependency-name: "python"
+        update-types: ["version-update:semver-patch"]
+
+  # Docker base images (frontend) - for when Dockerfile is added
+  - package-ecosystem: "docker"
+    directory: "/frontend"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+    reviewers:
+      - "Yuussuke"
+    ignore:
+      # Ignore patch updates for Node to reduce noise (security updates still come through)
+      - dependency-name: "node"
+        update-types: ["version-update:semver-patch"]
+
+  # Docker Compose services (root) - monitors postgres:15
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+    reviewers:
+      - "Yuussuke"
+    ignore:
+      # Ignore PostgreSQL patch updates to reduce noise (security updates still come through)
+      - dependency-name: "postgres"
+        update-types: ["version-update:semver-patch"]
+
+  # GitHub Actions (when workflows are added)
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+      - "automated"
+    reviewers:
+      - "Yuussuke"
