@@ -50,9 +50,11 @@ async def test_login_with_valid_credentials_returns_token(client: AsyncClient):
     assert "token" in data
     assert "access_token" in data["token"]
     assert data["token"]["token_type"] == "bearer"
-        
+
     assert "user" in data
     assert data["user"]["email"] == TEST_USER["email"]
+
+
 @pytest.mark.anyio
 async def test_login_wrong_password_returns_401(client: AsyncClient):
     """Tests if login with incorrect password is rejected."""
