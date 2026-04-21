@@ -90,11 +90,14 @@ async def login(
 
 
 @router.get("/me", response_model=schemas.UserResponse)
-async def get_my_profile(current_user: models.User = Depends(get_current_user)):
+async def get_my_profile(
+    current_user: models.User = Depends(get_current_user)
+):
+    
     """
     Returns the profile of the currently authenticated user.
     """
-    return current_user
+    return schemas.UserResponse.model_validate(current_user)
 
 
 REFRESH_COOKIE_NAME = "refresh_token"
