@@ -12,12 +12,12 @@ from app.modules.auth.service import (
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
-
 @router.post(
     "/register",
     response_model=schemas.TokenWithUser,
     status_code=status.HTTP_201_CREATED,
 )
+
 async def register(
     response: Response,
     user_in: schemas.UserCreate,
@@ -85,7 +85,10 @@ async def login(
 
 
 @router.get("/me", response_model=schemas.UserResponse)
-async def get_my_profile(current_user: models.User = Depends(get_current_user)):
+async def get_my_profile(
+    current_user: models.User = Depends(get_current_user)
+):
+    
     """
     Returns the profile of the currently authenticated user.
     """
