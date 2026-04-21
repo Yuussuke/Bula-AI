@@ -303,7 +303,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "langchain-community", specifier = ">=0.4.1" },
     { name = "orjson", specifier = ">=3.11.8" },
-    { name = "pwdlib", extras = ["argon2"], specifier = ">=0.2.1" },
+    { name = "pwdlib", extras = ["argon2"], specifier = ">=0.3.0" },
     { name = "pydantic-settings", specifier = ">=2.13.1" },
     { name = "pyjwt", specifier = ">=2.12.1" },
     { name = "pypdf", specifier = ">=6.10.2" },
