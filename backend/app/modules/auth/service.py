@@ -207,32 +207,6 @@ class AuthService:
 
         return schemas.Token(access_token=new_access_token, token_type="bearer"), new_refresh_token.token
     
-    async def refresh_session(self, raw_refresh_token: str) -> tuple[schemas.Token, str]:
-        """
-        Validates and rotates a refresh token.
-        Returns a new access token and a new raw refresh token string.
-        Raises InvalidRefreshTokenError if the token is missing, expired, or revoked.
-        """
-        existing_token = await self.refresh_token_repository.get_valid_token(raw_refresh_token)
-
-        if existing_token is None:
-            raise InvalidRefreshTokenError()
-
-        # Rotate: revoke the old token before issuing the new one
-        await self.refresh_token_repository.revoke(existing_token)
-
-        access_token_expires = timedelta(minutes=self.token_service.access_token_expire_minutes)
-        new_access_token = self.create_access_token(
-            data={"sub": str(existing_token.user_id)},
-            expires_delta=access_token_expires,
-        )
-
-        new_refresh_token = await self.refresh_token_repository.create(
-            user_id=existing_token.user_id
-        )
-
-        return schemas.Token(access_token=new_access_token, token_type="bearer"), new_refresh_token.token
-    
     async def logout(self, raw_refresh_token: str) -> None:
         """
         Revokes the refresh token identified by the given value.
