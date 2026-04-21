@@ -3,6 +3,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.auth.models import User
+import secrets
+from datetime import datetime, timedelta, timezone
 
 
 class UserRepository:
@@ -45,3 +47,37 @@ class UserRepository:
 
         await self.db.refresh(db_user)
         return db_user
+
+class RefreshTokenRepository:
+    def __init__(self, db: AsyncSession) -> None:
+        self.db = db
+
+    async def create(self, user_id: int, expires_in_days: int = 30) -> RefreshToken:
+        """Creates a new refresh token for the given user and persists it."""
+        token_value = secrets.token_urlsafe(48)
+        expires_at = datetime.now(timezone.utc) + timedelta(days=expires_in_days)
+        refresh_token = RefreshToken(
+            token=token_value,
+            user_id=user_id,
+            expires_at=expires_at,
+        )
+        self.db.add(refresh_token)
+        await self.db.commit()
+        await self.db.refresh(refresh_token)
+        return refresh_token
+
+    async def get_valid_token(self, token_value: str) -> RefreshToken | None:
+        """Returns the token only if it exists, is not revoked, and has not expired."""
+        result = await self.db.execute(
+            select(RefreshToken).where(
+                RefreshToken.token == token_value,
+                RefreshToken.is_revoked == False,
+                RefreshToken.expires_at > datetime.now(timezone.utc),
+            )
+        )
+        return result.scalar_one_or_none()
+
+    async def revoke(self, token: RefreshToken) -> None:
+        """Marks a refresh token as revoked (used during logout or rotation)."""
+        token.is_revoked = True
+        await self.db.commit()
