@@ -12,12 +12,17 @@ from app.modules.auth.service import (
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
+
 @router.post(
     "/register",
     response_model=schemas.UserResponse,
     status_code=status.HTTP_201_CREATED,
 )
-@router.post("/register", response_model=schemas.TokenWithUser, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/register",
+    response_model=schemas.TokenWithUser,
+    status_code=status.HTTP_201_CREATED,
+)
 async def register(
     response: Response,
     user_in: schemas.UserCreate,
@@ -45,8 +50,7 @@ async def register(
 
     return schemas.TokenWithUser(
         token=schemas.Token(
-            access_token=token.access_token,
-            token_type=token.token_type
+            access_token=token.access_token, token_type=token.token_type
         ),
         user=schemas.UserResponse.model_validate(new_user),
     )
@@ -79,11 +83,11 @@ async def login(
     user = await auth_service.get_user_from_token(token.access_token)
     return schemas.TokenWithUser(
         token=schemas.Token(
-            access_token=token.access_token,
-            token_type=token.token_type
+            access_token=token.access_token, token_type=token.token_type
         ),
         user=schemas.UserResponse.model_validate(user),
     )
+
 
 @router.get("/me", response_model=schemas.UserResponse)
 async def get_my_profile(current_user: models.User = Depends(get_current_user)):
@@ -92,8 +96,10 @@ async def get_my_profile(current_user: models.User = Depends(get_current_user)):
     """
     return current_user
 
+
 REFRESH_COOKIE_NAME = "refresh_token"
 REFRESH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30  # 30 days
+
 
 def set_refresh_cookie(response: Response, token_value: str) -> None:
     """Sets the HttpOnly refresh token cookie on the response."""
@@ -101,7 +107,7 @@ def set_refresh_cookie(response: Response, token_value: str) -> None:
         key=REFRESH_COOKIE_NAME,
         value=token_value,
         httponly=True,
-        secure=False,        # Set to True in production (HTTPS)
+        secure=False,  # Set to True in production (HTTPS)
         samesite="lax",
         path="/auth/refresh",
         max_age=REFRESH_COOKIE_MAX_AGE,
@@ -111,6 +117,7 @@ def set_refresh_cookie(response: Response, token_value: str) -> None:
 def clear_refresh_cookie(response: Response) -> None:
     """Clears the refresh token cookie."""
     response.delete_cookie(key=REFRESH_COOKIE_NAME, path="/auth/refresh")
+
 
 @router.post("/refresh", response_model=schemas.Token)
 async def refresh_token(
@@ -131,7 +138,9 @@ async def refresh_token(
         )
 
     try:
-        token, new_raw_refresh_token = await auth_service.refresh_session(raw_refresh_token)
+        token, new_raw_refresh_token = await auth_service.refresh_session(
+            raw_refresh_token
+        )
     except InvalidRefreshTokenError:
         clear_refresh_cookie(response)
         raise HTTPException(
@@ -141,6 +150,7 @@ async def refresh_token(
 
     set_refresh_cookie(response, new_raw_refresh_token)
     return token
+
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)
 async def logout(

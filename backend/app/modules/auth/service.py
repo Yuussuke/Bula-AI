@@ -27,9 +27,12 @@ class UserNotFoundError(Exception):
 
     pass
 
+
 class InvalidRefreshTokenError(Exception):
     """Raised when a refresh token is missing, expired, or revoked."""
+
     pass
+
 
 class TokenService:
     def __init__(
@@ -127,11 +130,15 @@ class AuthService:
         if user is None:
             raise InvalidCredentialsError()
 
-        password_is_valid = self.password_hasher.verify_password(password, user.hashed_password)
+        password_is_valid = self.password_hasher.verify_password(
+            password, user.hashed_password
+        )
         if not password_is_valid:
             raise InvalidCredentialsError()
 
-        access_token_expires = timedelta(minutes=self.token_service.access_token_expire_minutes)
+        access_token_expires = timedelta(
+            minutes=self.token_service.access_token_expire_minutes
+        )
         access_token = self.create_access_token(
             data={"sub": str(user.id)},
             expires_delta=access_token_expires,
@@ -139,7 +146,9 @@ class AuthService:
 
         refresh_token = await self.refresh_token_repository.create(user_id=user.id)
 
-        return schemas.Token(access_token=access_token, token_type="bearer"), refresh_token.token
+        return schemas.Token(
+            access_token=access_token, token_type="bearer"
+        ), refresh_token.token
 
     async def get_user_from_token(self, token: str) -> User:
         """
@@ -180,14 +189,18 @@ class AuthService:
         logger.info("token_validation_succeeded", user_id=user.id)
 
         return user
-    
-    async def refresh_session(self, raw_refresh_token: str) -> tuple[schemas.Token, str]:
+
+    async def refresh_session(
+        self, raw_refresh_token: str
+    ) -> tuple[schemas.Token, str]:
         """
         Validates and rotates a refresh token.
         Returns a new access token and a new raw refresh token string.
         Raises InvalidRefreshTokenError if the token is missing, expired, or revoked.
         """
-        existing_token = await self.refresh_token_repository.get_valid_token(raw_refresh_token)
+        existing_token = await self.refresh_token_repository.get_valid_token(
+            raw_refresh_token
+        )
 
         if existing_token is None:
             raise InvalidRefreshTokenError()
@@ -195,7 +208,9 @@ class AuthService:
         # Rotate: revoke the old token before issuing the new one
         await self.refresh_token_repository.revoke(existing_token)
 
-        access_token_expires = timedelta(minutes=self.token_service.access_token_expire_minutes)
+        access_token_expires = timedelta(
+            minutes=self.token_service.access_token_expire_minutes
+        )
         new_access_token = self.create_access_token(
             data={"sub": str(existing_token.user_id)},
             expires_delta=access_token_expires,
@@ -205,15 +220,18 @@ class AuthService:
             user_id=existing_token.user_id
         )
 
-        return schemas.Token(access_token=new_access_token, token_type="bearer"), new_refresh_token.token
-    
+        return schemas.Token(
+            access_token=new_access_token, token_type="bearer"
+        ), new_refresh_token.token
+
     async def logout(self, raw_refresh_token: str) -> None:
         """
         Revokes the refresh token identified by the given value.
         If the token does not exist or is already revoked, this is a no-op.
         """
-        existing_token = await self.refresh_token_repository.get_valid_token(raw_refresh_token)
+        existing_token = await self.refresh_token_repository.get_valid_token(
+            raw_refresh_token
+        )
 
         if existing_token is not None:
             await self.refresh_token_repository.revoke(existing_token)
-

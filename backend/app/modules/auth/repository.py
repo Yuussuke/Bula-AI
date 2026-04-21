@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.auth.models import User
+from app.modules.auth.models import User, RefreshToken
 import secrets
 from datetime import datetime, timedelta, timezone
 
@@ -15,7 +15,6 @@ class UserRepository:
         """
         Fetches a user from the database by their email address.
         """
-
         result = await self.db.execute(select(User).where(User.email == email))
         return result.scalars().first()
 
@@ -48,6 +47,7 @@ class UserRepository:
         await self.db.refresh(db_user)
         return db_user
 
+
 class RefreshTokenRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
@@ -71,7 +71,7 @@ class RefreshTokenRepository:
         result = await self.db.execute(
             select(RefreshToken).where(
                 RefreshToken.token == token_value,
-                RefreshToken.is_revoked == False,
+                RefreshToken.is_revoked == False,  # noqa: E712
                 RefreshToken.expires_at > datetime.now(timezone.utc),
             )
         )

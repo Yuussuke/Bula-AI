@@ -39,9 +39,13 @@ def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
     """FastAPI gets the database session and wires the User Repository."""
     return UserRepository(db=db)
 
-def get_refresh_token_repository(db: AsyncSession = Depends(get_db)) -> RefreshTokenRepository:
+
+def get_refresh_token_repository(
+    db: AsyncSession = Depends(get_db),
+) -> RefreshTokenRepository:
     """FastAPI gets the database session and wires the Refresh Token Repository."""
     return RefreshTokenRepository(db=db)
+
 
 def get_auth_service(
     repo: UserRepository = Depends(get_user_repository),
@@ -51,10 +55,10 @@ def get_auth_service(
 ) -> AuthService:
     """FastAPI gets the Repository, Hasher, and TokenService, and wires the Auth Service."""
     return AuthService(
-        user_repository=repo, 
+        user_repository=repo,
         refresh_token_repository=refresh_token_repo,
-        password_hasher=hasher, 
-        token_service=token_srv
+        password_hasher=hasher,
+        token_service=token_srv,
     )
 
 
