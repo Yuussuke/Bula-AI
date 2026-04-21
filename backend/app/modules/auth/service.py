@@ -90,13 +90,13 @@ class AuthService:
         logger.info("user_registration_attempt", email=user_in.email)
 
         existing_user = await self.user_repository.get_user_by_email(
-            email=user_in.email.lower()
+            email=user_in.email.lower().strip()
         )
         if existing_user:
             logger.warning(
                 "user_registration_failed",
                 reason="email_already_exists",
-                email=user_in.email,
+                email=user_in.email.lower().strip(),
             )
             raise UserAlreadyExistsError()
 
@@ -105,7 +105,7 @@ class AuthService:
         try:
             new_user = await self.user_repository.create_user(
                 full_name=user_in.full_name,
-                email=user_in.email.lower(),
+                email=user_in.email.lower().strip(),
                 hashed_password=hashed_password,
             )
         except IntegrityError as exc:
@@ -125,7 +125,7 @@ class AuthService:
         Authenticates a user and returns (access_token_schema, raw_refresh_token_string).
         The raw refresh token string is what gets stored in the HttpOnly cookie.
         """
-        user = await self.user_repository.get_user_by_email(email=email)
+        user = await self.user_repository.get_user_by_email(email=email.lower().strip())
 
         if user is None:
             raise InvalidCredentialsError()
@@ -194,30 +194,27 @@ class AuthService:
         self, raw_refresh_token: str
     ) -> tuple[schemas.Token, str]:
         """
-        Validates and rotates a refresh token.
-        Returns a new access token and a new raw refresh token string.
-        Raises InvalidRefreshTokenError if the token is missing, expired, or revoked.
+        Validates the refresh token, revokes it, and issues a new access token and refresh token.
+        Returns (access_token_schema, raw_refresh_token_string).
         """
-        existing_token = await self.refresh_token_repository.get_valid_token(
+        consumed_token = await self.refresh_token_repository.consume_atomically(
             raw_refresh_token
         )
 
-        if existing_token is None:
+        if consumed_token is None:
             raise InvalidRefreshTokenError()
-
-        # Rotate: revoke the old token before issuing the new one
-        await self.refresh_token_repository.revoke(existing_token)
 
         access_token_expires = timedelta(
             minutes=self.token_service.access_token_expire_minutes
         )
+
         new_access_token = self.create_access_token(
-            data={"sub": str(existing_token.user_id)},
+            data={"sub": str(consumed_token.user_id)},
             expires_delta=access_token_expires,
         )
 
         new_refresh_token = await self.refresh_token_repository.create(
-            user_id=existing_token.user_id
+            user_id=consumed_token.user_id
         )
 
         return schemas.Token(

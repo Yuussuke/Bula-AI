@@ -29,6 +29,8 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     This class combines all application settings, including database and security configurations.
     """
 
+    FRONTEND_URL: str = "http://localhost:5173"
+
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     pass

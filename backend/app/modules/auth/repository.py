@@ -1,3 +1,5 @@
+from turtle import update
+
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -71,7 +73,7 @@ class RefreshTokenRepository:
         result = await self.db.execute(
             select(RefreshToken).where(
                 RefreshToken.token == token_value,
-                RefreshToken.is_revoked == False,  # noqa: E712
+                RefreshToken.is_revoked.is_(False),
                 RefreshToken.expires_at > datetime.now(timezone.utc),
             )
         )
@@ -81,3 +83,26 @@ class RefreshTokenRepository:
         """Marks a refresh token as revoked (used during logout or rotation)."""
         token.is_revoked = True
         await self.db.commit()
+
+    async def consume_atomically(self, token_value: str) -> RefreshToken | None:
+        """
+        Atomically checks if the token is valid and revokes it in a single database transaction.
+        """
+        stmt = (
+            update(RefreshToken)
+            .where(
+                RefreshToken.token == token_value,
+                RefreshToken.is_revoked.is_(False),
+                RefreshToken.expires_at > datetime.now(timezone.utc),
+            )
+            .values(is_revoked=True)
+            .returning(RefreshToken)
+        )
+
+        result = await self.db.execute(stmt)
+        token = result.scalar_one_or_none()
+
+        if token:
+            await self.db.commit()
+
+        return token
