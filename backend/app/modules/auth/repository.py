@@ -71,7 +71,7 @@ class RefreshTokenRepository:
         result = await self.db.execute(
             select(RefreshToken).where(
                 RefreshToken.token == token_value,
-                RefreshToken.is_revoked == False,  # noqa: E712
+                RefreshToken.is_revoked.is_(False),
                 RefreshToken.expires_at > datetime.now(timezone.utc),
             )
         )
