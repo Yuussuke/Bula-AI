@@ -87,16 +87,17 @@ class AuthService:
         return self.token_service.create_access_token(data, expires_delta)
 
     async def register_new_user(self, user_in: schemas.UserCreate) -> User:
-        logger.info("user_registration_attempt", email=user_in.email)
+        normalized_email = user_in.email.lower().strip()
+        logger.info("user_registration_attempt", email=normalized_email)
 
         existing_user = await self.user_repository.get_user_by_email(
-            email=user_in.email.lower().strip()
+            email=normalized_email
         )
         if existing_user:
             logger.warning(
                 "user_registration_failed",
                 reason="email_already_exists",
-                email=user_in.email.lower().strip(),
+                email=normalized_email,
             )
             raise UserAlreadyExistsError()
 
@@ -105,7 +106,7 @@ class AuthService:
         try:
             new_user = await self.user_repository.create_user(
                 full_name=user_in.full_name,
-                email=user_in.email.lower().strip(),
+                email=normalized_email,
                 hashed_password=hashed_password,
             )
         except IntegrityError as exc:
@@ -125,7 +126,9 @@ class AuthService:
         Authenticates a user and returns (access_token_schema, raw_refresh_token_string).
         The raw refresh token string is what gets stored in the HttpOnly cookie.
         """
-        user = await self.user_repository.get_user_by_email(email=email.lower().strip())
+        normalized_email = email.lower().strip()
+        logger.info("authentication_attempt", email=normalized_email)
+        user = await self.user_repository.get_user_by_email(email=normalized_email)
 
         if user is None:
             raise InvalidCredentialsError()
@@ -134,7 +137,14 @@ class AuthService:
             password, user.hashed_password
         )
         if not password_is_valid:
+            logger.warning(
+                "authentication_failed",
+                reason="invalid_password",
+                email=normalized_email
+            )
             raise InvalidCredentialsError()
+        
+        logger.info("authentication_succeeded", user_id=user.id, email=normalized_email)
 
         access_token_expires = timedelta(
             minutes=self.token_service.access_token_expire_minutes
