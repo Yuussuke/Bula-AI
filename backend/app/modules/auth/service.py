@@ -148,7 +148,7 @@ class AuthService:
 
         return schemas.Token(
             access_token=access_token, token_type="bearer"
-        ), raw_refresh_token
+        ), raw_refresh_token, user
 
     async def get_user_from_token(self, token: str) -> User:
         """

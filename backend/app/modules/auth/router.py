@@ -1,6 +1,7 @@
 # API endpoints(Request / Response)
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
+from app.core.config import settings
 from app.modules.auth import schemas, models
 from app.modules.auth.dependencies import get_current_user, get_auth_service
 from app.modules.auth.service import (
@@ -16,15 +17,17 @@ REFRESH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30  # 30 days
 
 def set_refresh_cookie(response: Response, token_value: str) -> None:
     """Sets the HttpOnly refresh token cookie on the response."""
+    is_production = getattr(settings, "ENVIRONMENT", "development") == "production"
+
     response.set_cookie(
         key=REFRESH_COOKIE_NAME,
         value=token_value,
         httponly=True,
-        secure=False,  # Set to True in production (HTTPS)
-        samesite="lax",
+        secure=is_production,  # <-- AGORA É DINÂMICO! True em Produção, False no Localhost
+        samesite="lax" if not is_production else "none", # 'none' exige secure=True (útil se o front e o back estiverem em domínios diferentes na nuvem)
         path="/api/v1/auth/refresh",
         max_age=REFRESH_COOKIE_MAX_AGE,
-    )
+    )   
 
 
 def clear_refresh_cookie(response: Response) -> None:
@@ -58,7 +61,7 @@ async def register(
         )
 
     # Auto-login: issue tokens immediately after registration
-    token, raw_refresh_token = await auth_service.authenticate_user(
+    token, raw_refresh_token, _ = await auth_service.authenticate_user(
         email=user_in.email,
         password=user_in.password,
     )
@@ -67,7 +70,8 @@ async def register(
 
     return schemas.TokenWithUser(
         token=schemas.Token(
-            access_token=token.access_token, token_type=token.token_type
+            access_token=token.access_token,
+            token_type=token.token_type
         ),
         user=schemas.UserResponse.model_validate(new_user),
     )
@@ -84,7 +88,7 @@ async def login(
     refresh token in an HttpOnly cookie.
     """
     try:
-        token, raw_refresh_token = await auth_service.authenticate_user(
+        token, raw_refresh_token, user = await auth_service.authenticate_user(
             email=user_in.email,
             password=user_in.password,
         )
@@ -97,7 +101,6 @@ async def login(
 
     set_refresh_cookie(response, raw_refresh_token)
 
-    user = await auth_service.get_user_from_token(token.access_token)
     return schemas.TokenWithUser(
         token=schemas.Token(
             access_token=token.access_token, token_type=token.token_type
