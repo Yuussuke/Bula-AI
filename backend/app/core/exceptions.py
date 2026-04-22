@@ -4,6 +4,7 @@ import structlog
 
 logger = structlog.get_logger(__name__)
 
+
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """
     Captura qualquer exceção 500 não tratada.
@@ -14,10 +15,12 @@ async def global_exception_handler(request: Request, exc: Exception) -> JSONResp
         error=str(exc),
         path=request.url.path,
         method=request.method,
-        exc_info=True, 
+        exc_info=True,
     )
 
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        content={"detail": "An unexpected server error occurred. Please try again later."},
+        content={
+            "detail": "An unexpected server error occurred. Please try again later."
+        },
     )
