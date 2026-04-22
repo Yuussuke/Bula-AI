@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.config import settings
 
-from app.modules.auth.repository import UserRepository
+from app.modules.auth.repository import UserRepository, RefreshTokenRepository
 from app.modules.auth.service import AuthService, InvalidCredentialsError, TokenService
 from app.modules.auth.security import PasswordHasher
 from app.modules.auth.models import User
@@ -40,14 +40,25 @@ def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
     return UserRepository(db=db)
 
 
+def get_refresh_token_repository(
+    db: AsyncSession = Depends(get_db),
+) -> RefreshTokenRepository:
+    """FastAPI gets the database session and wires the Refresh Token Repository."""
+    return RefreshTokenRepository(db=db)
+
+
 def get_auth_service(
     repo: UserRepository = Depends(get_user_repository),
+    refresh_token_repo: RefreshTokenRepository = Depends(get_refresh_token_repository),
     hasher: PasswordHasher = Depends(get_password_hasher),
     token_srv: TokenService = Depends(get_token_service),
 ) -> AuthService:
     """FastAPI gets the Repository, Hasher, and TokenService, and wires the Auth Service."""
     return AuthService(
-        user_repository=repo, password_hasher=hasher, token_service=token_srv
+        user_repository=repo,
+        refresh_token_repository=refresh_token_repo,
+        password_hasher=hasher,
+        token_service=token_srv,
     )
 
 

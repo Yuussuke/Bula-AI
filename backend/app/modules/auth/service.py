@@ -28,6 +28,12 @@ class UserNotFoundError(Exception):
     pass
 
 
+class InvalidRefreshTokenError(Exception):
+    """Raised when a refresh token is missing, expired, or revoked."""
+
+    pass
+
+
 class TokenService:
     def __init__(
         self,
@@ -63,10 +69,12 @@ class AuthService:
     def __init__(
         self,
         user_repository: repository.UserRepository,
+        refresh_token_repository: repository.RefreshTokenRepository,
         password_hasher: security.PasswordHasher,
         token_service: TokenService,
     ) -> None:
         self.user_repository = user_repository
+        self.refresh_token_repository = refresh_token_repository
         self.password_hasher = password_hasher
         self.token_service = token_service
 
@@ -82,13 +90,13 @@ class AuthService:
         logger.info("user_registration_attempt", email=user_in.email)
 
         existing_user = await self.user_repository.get_user_by_email(
-            email=user_in.email.lower()
+            email=user_in.email.lower().strip()
         )
         if existing_user:
             logger.warning(
                 "user_registration_failed",
                 reason="email_already_exists",
-                email=user_in.email,
+                email=user_in.email.lower().strip(),
             )
             raise UserAlreadyExistsError()
 
@@ -97,7 +105,7 @@ class AuthService:
         try:
             new_user = await self.user_repository.create_user(
                 full_name=user_in.full_name,
-                email=user_in.email.lower(),
+                email=user_in.email.lower().strip(),
                 hashed_password=hashed_password,
             )
         except IntegrityError as exc:
@@ -110,20 +118,22 @@ class AuthService:
         )
         return new_user
 
-    async def authenticate_user(self, email: str, password: str) -> schemas.Token:
+    async def authenticate_user(
+        self, email: str, password: str
+    ) -> tuple[schemas.Token, str]:
         """
-        Authenticates a user by email and password and returns a JWT token
+        Authenticates a user and returns (access_token_schema, raw_refresh_token_string).
+        The raw refresh token string is what gets stored in the HttpOnly cookie.
         """
-        logger.info("user_login_attempt", email=email)
+        user = await self.user_repository.get_user_by_email(email=email.lower().strip())
 
-        user = await self.user_repository.get_user_by_email(email=email.lower())
+        if user is None:
+            raise InvalidCredentialsError()
 
-        if not user or not self.password_hasher.verify_password(
+        password_is_valid = self.password_hasher.verify_password(
             password, user.hashed_password
-        ):
-            logger.warning(
-                "user_authentication_failed", reason="invalid_credentials", email=email
-            )
+        )
+        if not password_is_valid:
             raise InvalidCredentialsError()
 
         access_token_expires = timedelta(
@@ -134,7 +144,13 @@ class AuthService:
             expires_delta=access_token_expires,
         )
 
-        return schemas.Token(access_token=access_token, token_type="bearer")
+        raw_refresh_token = await self.refresh_token_repository.create(user_id=user.id)
+
+        return (
+            schemas.Token(access_token=access_token, token_type="bearer"),
+            raw_refresh_token,
+            user,
+        )
 
     async def get_user_from_token(self, token: str) -> User:
         """
@@ -175,3 +191,46 @@ class AuthService:
         logger.info("token_validation_succeeded", user_id=user.id)
 
         return user
+
+    async def refresh_session(
+        self, raw_refresh_token: str
+    ) -> tuple[schemas.Token, str]:
+        """
+        Validates the refresh token, revokes it, and issues a new access token and refresh token.
+        Returns (access_token_schema, raw_refresh_token_string).
+        """
+        consumed_token = await self.refresh_token_repository.consume_atomically(
+            raw_refresh_token
+        )
+
+        if consumed_token is None:
+            raise InvalidRefreshTokenError()
+
+        access_token_expires = timedelta(
+            minutes=self.token_service.access_token_expire_minutes
+        )
+
+        new_access_token = self.create_access_token(
+            data={"sub": str(consumed_token.user_id)},
+            expires_delta=access_token_expires,
+        )
+
+        new_raw_refresh_token = await self.refresh_token_repository.create(
+            user_id=consumed_token.user_id
+        )
+
+        return schemas.Token(
+            access_token=new_access_token, token_type="bearer"
+        ), new_raw_refresh_token
+
+    async def logout(self, raw_refresh_token: str) -> None:
+        """
+        Revokes the refresh token identified by the given value.
+        If the token does not exist or is already revoked, this is a no-op.
+        """
+        existing_token = await self.refresh_token_repository.get_valid_token(
+            raw_refresh_token
+        )
+
+        if existing_token is not None:
+            await self.refresh_token_repository.revoke(existing_token)

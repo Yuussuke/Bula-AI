@@ -25,3 +25,8 @@ class UserResponse(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+class TokenWithUser(BaseModel):
+    token: Token
+    user: UserResponse
