@@ -59,6 +59,7 @@ jobs:
           --health-retries 5
     env:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@localhost:5432/bulaai_ci
+      SECRET_KEY: ci_dummy_secret_key_for_migrations_only
     defaults:
       run:
         working-directory: ./backend
