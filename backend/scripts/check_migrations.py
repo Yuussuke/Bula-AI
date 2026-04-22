@@ -8,6 +8,7 @@ from pathlib import Path
 from alembic.config import Config
 from alembic.script import ScriptDirectory
 
+
 def extract_assignment(module: ast.Module, name: str) -> ast.AST | None:
     for node in module.body:
         if isinstance(node, ast.AnnAssign) and isinstance(node.target, ast.Name):
@@ -22,9 +23,14 @@ def extract_assignment(module: ast.Module, name: str) -> ast.AST | None:
     return None
 
 
-def get_upgrade_function(module: ast.Module) -> ast.AsyncFunctionDef | ast.FunctionDef | None:
+def get_upgrade_function(
+    module: ast.Module,
+) -> ast.AsyncFunctionDef | ast.FunctionDef | None:
     for node in module.body:
-        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)) and node.name == "upgrade":
+        if (
+            isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name == "upgrade"
+        ):
             return node
 
     return None
@@ -97,7 +103,9 @@ def check_migration_files(versions_directory: Path) -> list[str]:
 
         parsed_module = ast.parse(file_content, filename=str(migration_file))
 
-        upgrade_create_table_calls = collect_create_table_calls_in_upgrade(parsed_module)
+        upgrade_create_table_calls = collect_create_table_calls_in_upgrade(
+            parsed_module
+        )
         for table_name in upgrade_create_table_calls:
             create_table_calls[table_name].append(migration_file.name)
 
@@ -105,7 +113,10 @@ def check_migration_files(versions_directory: Path) -> list[str]:
 
         if down_revision_value is None:
             errors.append(f"Missing down_revision in {migration_file.name}")
-        elif isinstance(down_revision_value, ast.Constant) and down_revision_value.value is None:
+        elif (
+            isinstance(down_revision_value, ast.Constant)
+            and down_revision_value.value is None
+        ):
             root_revisions += 1
 
     duplicated_tables = {
