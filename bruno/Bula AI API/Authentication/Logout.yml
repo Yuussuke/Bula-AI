@@ -1,0 +1,34 @@
+info:
+  name: Logout
+  type: http
+  seq: 5
+  tags:
+    - Authentication
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/auth/logout"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 204 Response
+    description: Successful Response
+    request:
+      url: "{{baseUrl}}/api/v1/auth/logout"
+      method: POST
+    response:
+      status: 204
+      statusText: No Content
+      body:
+        type: text
+        data: ""
+
+docs: |-
+  Revokes the refresh token and clears the cookie.
+  Always returns 204 — even if no cookie was present.

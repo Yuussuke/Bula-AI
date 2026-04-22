@@ -1,0 +1,44 @@
+opencollection: 1.0.0
+
+info:
+  name: Bula AI API
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
+
+request:
+  scripts:
+    - type: before-request
+      code: |-
+        const token = bru.getEnvVar("access_token");
+        const reqUrl = req.getUrl();
+
+        if (token && !reqUrl.includes("/login") && !reqUrl.includes("/register")) {
+          req.setHeader("Authorization", `Bearer ${token}`);
+        }
+    - type: after-response
+      code: |-
+        const reqUrl = req.getUrl();
+
+        if (reqUrl.includes("/login") && res.getStatus() === 200) {
+          const data = res.getBody();
+          
+          if (data && data.token && data.token.access_token) {
+            bru.setEnvVar("access_token", data.token.access_token);
+            console.log("✅ Token global atualizado pelo script da Collection!");
+          }
+        }
+bundled: false
+extensions:
+  bruno:
+    ignore:
+      - node_modules
+      - .git

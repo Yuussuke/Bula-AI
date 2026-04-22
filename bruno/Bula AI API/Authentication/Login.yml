@@ -1,20 +1,19 @@
 info:
-  name: Register
+  name: Login
   type: http
-  seq: 1
+  seq: 2
   tags:
     - Authentication
 
 http:
   method: POST
-  url: "{{baseUrl}}/api/v1/auth/register"
+  url: "{{baseUrl}}/api/v1/auth/login"
   body:
     type: json
     data: |-
       {
-        "email": "samuel@daniel.com",
-        "full_name": "Samuel Daniel",
-        "password": "DanielSamuel"
+        "email": "vivi@vivi.com",
+        "password": "vivivicio"
       }
   auth: inherit
 
@@ -25,22 +24,21 @@ settings:
   maxRedirects: 5
 
 examples:
-  - name: 201 Response
+  - name: 200 Response
     description: Successful Response
     request:
-      url: "{{baseUrl}}/api/v1/auth/register"
+      url: "{{baseUrl}}/api/v1/auth/login"
       method: POST
       body:
         type: json
         data: |-
           {
             "email": "",
-            "full_name": "",
             "password": ""
           }
     response:
-      status: 201
-      statusText: Created
+      status: 200
+      statusText: OK
       headers:
         - name: Content-Type
           value: application/json
@@ -48,22 +46,27 @@ examples:
         type: json
         data: |-
           {
-            "email": "",
-            "full_name": "",
-            "id": 0,
-            "is_active": false
+            "token": {
+              "access_token": "",
+              "token_type": ""
+            },
+            "user": {
+              "email": "",
+              "full_name": "",
+              "id": 0,
+              "is_active": false
+            }
           }
   - name: 422 Response
     description: Validation Error
     request:
-      url: "{{baseUrl}}/api/v1/auth/register"
+      url: "{{baseUrl}}/api/v1/auth/login"
       method: POST
       body:
         type: json
         data: |-
           {
             "email": "",
-            "full_name": "",
             "password": ""
           }
     response:
@@ -87,4 +90,6 @@ examples:
             ]
           }
 
-docs: Registers a new user and returns their profile.
+docs: |-
+  Authenticates a user. Returns an access token in JSON and sets a
+  refresh token in an HttpOnly cookie.
