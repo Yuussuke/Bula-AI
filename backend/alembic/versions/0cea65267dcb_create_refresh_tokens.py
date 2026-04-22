@@ -1,7 +1,7 @@
 """create refresh tokens
 
 Revision ID: 0cea65267dcb
-Revises: aadeede96f2e
+Revises: ee100f7e5788
 Create Date: 2026-04-22 01:44:54.802821
 
 """
@@ -14,7 +14,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = "0cea65267dcb"
-down_revision: Union[str, Sequence[str], None] = "aadeede96f2e"
+down_revision: Union[str, Sequence[str], None] = "ee100f7e5788"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
