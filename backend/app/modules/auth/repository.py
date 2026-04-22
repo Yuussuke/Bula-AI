@@ -1,6 +1,5 @@
-from turtle import update
-
-from sqlalchemy import select
+import hashlib
+from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -50,29 +49,48 @@ class UserRepository:
         return db_user
 
 
+def _hash_token(token: str) -> str:
+    """Returns a SHA-256 hash of the token string for secure storage and comparison."""
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
 class RefreshTokenRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
-    async def create(self, user_id: int, expires_in_days: int = 30) -> RefreshToken:
-        """Creates a new refresh token for the given user and persists it."""
-        token_value = secrets.token_urlsafe(48)
+    async def create(self, user_id: int, expires_in_days: int = 30) -> str:
+        """Creates a new refresh token, saves the hash, and returns the raw token."""
         expires_at = datetime.now(timezone.utc) + timedelta(days=expires_in_days)
-        refresh_token = RefreshToken(
-            token=token_value,
-            user_id=user_id,
-            expires_at=expires_at,
-        )
-        self.db.add(refresh_token)
-        await self.db.commit()
-        await self.db.refresh(refresh_token)
-        return refresh_token
 
-    async def get_valid_token(self, token_value: str) -> RefreshToken | None:
+        for attempt in range(3):
+            raw_token = secrets.token_urlsafe(48)
+            hashed_token = _hash_token(raw_token)
+
+            refresh_token = RefreshToken(
+                token=hashed_token,
+                user_id=user_id,
+                expires_at=expires_at,
+            )
+            self.db.add(refresh_token)
+            try:
+                await self.db.commit()
+            except IntegrityError:
+                await self.db.rollback()
+                if attempt == 2:
+                    raise
+            else:
+                return raw_token
+
+        raise RuntimeError("Failed to create refresh token after retries")
+
+    async def get_valid_token(self, raw_token_value: str) -> RefreshToken | None:
         """Returns the token only if it exists, is not revoked, and has not expired."""
+
+        hashed_token = _hash_token(raw_token_value)
+
         result = await self.db.execute(
             select(RefreshToken).where(
-                RefreshToken.token == token_value,
+                RefreshToken.token == hashed_token,
                 RefreshToken.is_revoked.is_(False),
                 RefreshToken.expires_at > datetime.now(timezone.utc),
             )
@@ -84,14 +102,16 @@ class RefreshTokenRepository:
         token.is_revoked = True
         await self.db.commit()
 
-    async def consume_atomically(self, token_value: str) -> RefreshToken | None:
+    async def consume_atomically(self, raw_token_value: str) -> RefreshToken | None:
         """
         Atomically checks if the token is valid and revokes it in a single database transaction.
         """
+        hashed_token = _hash_token(raw_token_value)
+
         stmt = (
             update(RefreshToken)
             .where(
-                RefreshToken.token == token_value,
+                RefreshToken.token == hashed_token,
                 RefreshToken.is_revoked.is_(False),
                 RefreshToken.expires_at > datetime.now(timezone.utc),
             )

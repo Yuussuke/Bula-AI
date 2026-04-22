@@ -10,6 +10,28 @@ from app.modules.auth.service import (
     UserAlreadyExistsError,
 )
 
+REFRESH_COOKIE_NAME = "refresh_token"
+REFRESH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30  # 30 days
+
+
+def set_refresh_cookie(response: Response, token_value: str) -> None:
+    """Sets the HttpOnly refresh token cookie on the response."""
+    response.set_cookie(
+        key=REFRESH_COOKIE_NAME,
+        value=token_value,
+        httponly=True,
+        secure=False,  # Set to True in production (HTTPS)
+        samesite="lax",
+        path="/api/v1/auth/refresh",
+        max_age=REFRESH_COOKIE_MAX_AGE,
+    )
+
+
+def clear_refresh_cookie(response: Response) -> None:
+    """Clears the refresh token cookie."""
+    response.delete_cookie(key=REFRESH_COOKIE_NAME, path="/api/v1/auth/refresh")
+
+
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
@@ -90,28 +112,6 @@ async def get_my_profile(current_user: models.User = Depends(get_current_user)):
     Returns the profile of the currently authenticated user.
     """
     return schemas.UserResponse.model_validate(current_user)
-
-
-REFRESH_COOKIE_NAME = "refresh_token"
-REFRESH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30  # 30 days
-
-
-def set_refresh_cookie(response: Response, token_value: str) -> None:
-    """Sets the HttpOnly refresh token cookie on the response."""
-    response.set_cookie(
-        key=REFRESH_COOKIE_NAME,
-        value=token_value,
-        httponly=True,
-        secure=False,  # Set to True in production (HTTPS)
-        samesite="lax",
-        path="/auth/refresh",
-        max_age=REFRESH_COOKIE_MAX_AGE,
-    )
-
-
-def clear_refresh_cookie(response: Response) -> None:
-    """Clears the refresh token cookie."""
-    response.delete_cookie(key=REFRESH_COOKIE_NAME, path="/auth/refresh")
 
 
 @router.post("/refresh", response_model=schemas.Token)

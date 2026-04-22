@@ -103,3 +103,57 @@ async def test_get_me_with_invalid_token_returns_401(client: AsyncClient):
     )
     assert response.status_code == 401
     assert response.json()["detail"] == "Could not validate credentials"
+
+
+@pytest.mark.anyio
+async def test_refresh_returns_new_access_token_and_rotates_cookie(client: AsyncClient):
+    """Testa se a rota de refresh gera um novo token e rotaciona o cookie de forma segura."""
+    await client.post("/api/v1/auth/register", json=TEST_USER)
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": TEST_USER["email"], "password": TEST_USER["password"]},
+    )
+
+    raw_cookie = login_response.cookies.get("refresh_token")
+    assert raw_cookie is not None
+    client.cookies.set("refresh_token", raw_cookie)
+
+    refresh_response = await client.post("/api/v1/auth/refresh")
+
+    assert refresh_response.status_code == 200
+    data = refresh_response.json()
+    assert "access_token" in data
+    assert refresh_response.cookies.get("refresh_token") is not None
+    assert refresh_response.cookies.get("refresh_token") != raw_cookie
+
+    client.cookies.delete("refresh_token")
+
+
+@pytest.mark.anyio
+async def test_refresh_with_no_cookie_returns_401(client: AsyncClient):
+    """Testa se tentar atualizar a sessão sem o cookie HttpOnly é bloqueado."""
+    client.cookies.delete("refresh_token")
+
+    response = await client.post("/api/v1/auth/refresh")
+    assert response.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_logout_clears_cookie_and_revokes_token(client: AsyncClient):
+    """Testa se o logout revoga o token no banco e impede um novo refresh."""
+    await client.post("/api/v1/auth/register", json=TEST_USER)
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": TEST_USER["email"], "password": TEST_USER["password"]},
+    )
+
+    raw_cookie = login_response.cookies.get("refresh_token")
+    client.cookies.set("refresh_token", raw_cookie)
+
+    logout_response = await client.post("/api/v1/auth/logout")
+    assert logout_response.status_code == 204
+
+    refresh_response = await client.post("/api/v1/auth/refresh")
+    assert refresh_response.status_code == 401
+
+    client.cookies.delete("refresh_token")

@@ -144,11 +144,11 @@ class AuthService:
             expires_delta=access_token_expires,
         )
 
-        refresh_token = await self.refresh_token_repository.create(user_id=user.id)
+        raw_refresh_token = await self.refresh_token_repository.create(user_id=user.id)
 
         return schemas.Token(
             access_token=access_token, token_type="bearer"
-        ), refresh_token.token
+        ), raw_refresh_token
 
     async def get_user_from_token(self, token: str) -> User:
         """
@@ -213,13 +213,13 @@ class AuthService:
             expires_delta=access_token_expires,
         )
 
-        new_refresh_token = await self.refresh_token_repository.create(
+        new_raw_refresh_token = await self.refresh_token_repository.create(
             user_id=consumed_token.user_id
         )
 
         return schemas.Token(
             access_token=new_access_token, token_type="bearer"
-        ), new_refresh_token.token
+        ), new_raw_refresh_token
 
     async def logout(self, raw_refresh_token: str) -> None:
         """
