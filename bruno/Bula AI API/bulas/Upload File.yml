@@ -18,8 +18,8 @@ http:
         type: text
         value: ""
       - name: file
-        type: file
-        value: []
+        type: text
+        value: ""
   auth:
     type: bearer
     token: "{{token}}"

@@ -1,0 +1,41 @@
+info:
+  name: Refresh Token
+  type: http
+  seq: 4
+  tags:
+    - Authentication
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/auth/refresh"
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: Successful Response
+    request:
+      url: "{{baseUrl}}/api/v1/auth/refresh"
+      method: POST
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "access_token": "",
+            "token_type": ""
+          }
+
+docs: |-
+  Issues a new access token using the refresh token from the HttpOnly cookie.
+  Rotates the refresh token on every successful call.
