@@ -24,10 +24,12 @@ def set_refresh_cookie(response: Response, token_value: str) -> None:
         value=token_value,
         httponly=True,
         secure=is_production,  # <-- AGORA É DINÂMICO! True em Produção, False no Localhost
-        samesite="lax" if not is_production else "none", # 'none' exige secure=True (útil se o front e o back estiverem em domínios diferentes na nuvem)
+        samesite="lax"
+        if not is_production
+        else "none",  # 'none' exige secure=True (útil se o front e o back estiverem em domínios diferentes na nuvem)
         path="/api/v1/auth/refresh",
         max_age=REFRESH_COOKIE_MAX_AGE,
-    )   
+    )
 
 
 def clear_refresh_cookie(response: Response) -> None:
@@ -70,8 +72,7 @@ async def register(
 
     return schemas.TokenWithUser(
         token=schemas.Token(
-            access_token=token.access_token,
-            token_type=token.token_type
+            access_token=token.access_token, token_type=token.token_type
         ),
         user=schemas.UserResponse.model_validate(new_user),
     )

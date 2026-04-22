@@ -146,9 +146,11 @@ class AuthService:
 
         raw_refresh_token = await self.refresh_token_repository.create(user_id=user.id)
 
-        return schemas.Token(
-            access_token=access_token, token_type="bearer"
-        ), raw_refresh_token, user
+        return (
+            schemas.Token(access_token=access_token, token_type="bearer"),
+            raw_refresh_token,
+            user,
+        )
 
     async def get_user_from_token(self, token: str) -> User:
         """
