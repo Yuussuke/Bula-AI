@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from typing import cast
 
 import jwt
 import structlog
@@ -121,9 +122,10 @@ class AuthService:
 
     async def authenticate_user(
         self, email: str, password: str
-    ) -> tuple[schemas.Token, str]:
+    ) -> tuple[schemas.Token, str, User]:
         """
-        Authenticates a user and returns (access_token_schema, raw_refresh_token_string).
+        Authenticates a user and returns
+        (access_token_schema, raw_refresh_token_string, user).
         The raw refresh token string is what gets stored in the HttpOnly cookie.
         """
         normalized_email = email.lower().strip()
@@ -134,7 +136,7 @@ class AuthService:
             raise InvalidCredentialsError()
 
         password_is_valid = self.password_hasher.verify_password(
-            password, user.hashed_password
+            password, cast(str, user.hashed_password)
         )
         if not password_is_valid:
             logger.warning(
@@ -154,7 +156,9 @@ class AuthService:
             expires_delta=access_token_expires,
         )
 
-        raw_refresh_token = await self.refresh_token_repository.create(user_id=user.id)
+        raw_refresh_token = await self.refresh_token_repository.create(
+            user_id=cast(int, user.id)
+        )
 
         return (
             schemas.Token(access_token=access_token, token_type="bearer"),
@@ -226,7 +230,7 @@ class AuthService:
         )
 
         new_raw_refresh_token = await self.refresh_token_repository.create(
-            user_id=consumed_token.user_id
+            user_id=cast(int, consumed_token.user_id)
         )
 
         return schemas.Token(

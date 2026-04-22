@@ -52,7 +52,7 @@ async def register(
     response: Response,
     user_in: schemas.UserCreate,
     auth_service: AuthService = Depends(get_auth_service),
-):
+) -> schemas.TokenWithUser:
     """
     Registers a new user, automatically logs them in, and returns an access token.
     Sets the refresh token in an HttpOnly cookie.
@@ -88,7 +88,7 @@ async def login(
     response: Response,
     user_in: schemas.UserLogin,
     auth_service: AuthService = Depends(get_auth_service),
-):
+) -> schemas.TokenWithUser:
     """
     Authenticates a user. Returns an access token in JSON and sets a
     refresh token in an HttpOnly cookie.
@@ -117,7 +117,9 @@ async def login(
 
 
 @router.get("/me", response_model=schemas.UserResponse)
-async def get_my_profile(current_user: models.User = Depends(get_current_user)):
+async def get_my_profile(
+    current_user: models.User = Depends(get_current_user),
+) -> schemas.UserResponse:
     """
     Returns the profile of the currently authenticated user.
     """
@@ -129,7 +131,7 @@ async def refresh_token(
     request: Request,
     response: Response,
     auth_service: AuthService = Depends(get_auth_service),
-):
+) -> schemas.Token:
     """
     Issues a new access token using the refresh token from the HttpOnly cookie.
     Rotates the refresh token on every successful call.
@@ -162,7 +164,7 @@ async def logout(
     request: Request,
     response: Response,
     auth_service: AuthService = Depends(get_auth_service),
-):
+) -> None:
     """
     Revokes the refresh token and clears the cookie.
     Always returns 204 — even if no cookie was present.

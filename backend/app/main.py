@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
 
 
 from fastapi import FastAPI
@@ -20,7 +21,8 @@ from app.modules.chat.router import router as chat_router
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    _ = app
     yield
     await close_engine()
 
@@ -48,7 +50,7 @@ def create_app() -> FastAPI:
     app.add_middleware(CorrelationIdMiddleware)
 
     @app.get("/health")
-    async def health():
+    async def health() -> dict[str, str]:
         return {"status": "ok"}
 
     app.include_router(bulas_router, prefix="/api/v1")
