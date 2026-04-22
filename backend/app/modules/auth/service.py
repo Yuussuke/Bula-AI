@@ -127,7 +127,7 @@ class AuthService:
         The raw refresh token string is what gets stored in the HttpOnly cookie.
         """
         normalized_email = email.lower().strip()
-        logger.info("authentication_attempt", email=normalized_email)
+        logger.info("attempting_authenticate_user", email=normalized_email)
         user = await self.user_repository.get_user_by_email(email=normalized_email)
 
         if user is None:
@@ -140,10 +140,10 @@ class AuthService:
             logger.warning(
                 "authentication_failed",
                 reason="invalid_password",
-                email=normalized_email
+                email=normalized_email,
             )
             raise InvalidCredentialsError()
-        
+
         logger.info("authentication_succeeded", user_id=user.id, email=normalized_email)
 
         access_token_expires = timedelta(
