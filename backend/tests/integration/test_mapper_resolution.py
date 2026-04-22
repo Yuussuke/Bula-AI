@@ -100,7 +100,7 @@ async def test_register_endpoint_fails_without_proper_model_imports(client):
     TEST_USER = {
         "full_name": "Production Test User",
         "email": "prod_test@bulaai.com",
-        "password": "secret123",  # Must be <= 16 chars
+        "password": "Secret123!",  # Must be <= 16 chars
     }
 
     response = await client.post("/api/v1/auth/register", json=TEST_USER)

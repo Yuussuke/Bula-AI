@@ -1,4 +1,5 @@
 # API endpoints(Request / Response)
+from app.core.limiter import limiter
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
 from app.core.config import settings
@@ -45,7 +46,9 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
     response_model=schemas.TokenWithUser,
     status_code=status.HTTP_201_CREATED,
 )
+@limiter.limit("5/minute")
 async def register(
+    request: Request,
     response: Response,
     user_in: schemas.UserCreate,
     auth_service: AuthService = Depends(get_auth_service),
@@ -79,7 +82,9 @@ async def register(
 
 
 @router.post("/login", response_model=schemas.TokenWithUser)
+@limiter.limit("5/minute")
 async def login(
+    request: Request,
     response: Response,
     user_in: schemas.UserLogin,
     auth_service: AuthService = Depends(get_auth_service),
@@ -89,6 +94,7 @@ async def login(
     refresh token in an HttpOnly cookie.
     """
     try:
+        # Passando o request para que o slowapi conte a requisição corretamente
         token, raw_refresh_token, user = await auth_service.authenticate_user(
             email=user_in.email,
             password=user_in.password,

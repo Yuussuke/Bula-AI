@@ -17,6 +17,8 @@ from app.core.base import Base
 # This ensures SQLAlchemy mapper configuration works with forward references.
 from app.core.database import get_db
 
+app.state.limiter.enabled = False
+
 TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 
 engine = create_async_engine(

@@ -23,6 +23,13 @@ class SecuritySettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    def check_secret_key(cls, value: str) -> str:
+        if not value or len(value) < 32 or value.lower() == "changeme":
+            raise ValueError(
+                "SECRET_KEY inválida ou muito fraca. Configure uma chave forte no ambiente de produção."
+            )
+        return value
+
 
 class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     """

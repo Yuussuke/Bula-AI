@@ -12,9 +12,9 @@ http:
     type: json
     data: |-
       {
-        "email": "vivi@vivi.com",
+        "email": "vivi1@vivi.com",
         "full_name": "Vi Vicio",
-        "password": "vivivicio"
+        "password": "Vivivicio1!"
       }
   auth: inherit
 
