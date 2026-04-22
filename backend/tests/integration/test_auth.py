@@ -4,7 +4,7 @@ from httpx import AsyncClient
 TEST_USER = {
     "full_name": "Test User",
     "email": "test@bulaai.com",
-    "password": "secretpassword",
+    "password": "Secret123!",
 }
 
 
@@ -157,3 +157,30 @@ async def test_logout_clears_cookie_and_revokes_token(client: AsyncClient):
     assert refresh_response.status_code == 401
 
     client.cookies.delete("refresh_token")
+
+
+@pytest.mark.anyio
+async def test_login_rate_limiting_works(client: AsyncClient):
+    """
+    Tests that the login endpoint is protected by rate limiting
+    and blocks after 5 failed attempts.
+    """
+    from app.main import app
+
+    app.state.limiter.enabled = True
+
+    try:
+        payload = {"email": TEST_USER["email"], "password": TEST_USER["password"]}
+
+        for i in range(5):
+            response = await client.post("/api/v1/auth/login", json=payload)
+            assert response.status_code == 401
+            assert response.json()["detail"] == "Incorrect email or password."
+
+        blocked_response = await client.post("/api/v1/auth/login", json=payload)
+
+        assert blocked_response.status_code == 429
+        assert "Rate limit exceeded" in blocked_response.json()["error"]
+
+    finally:
+        app.state.limiter.enabled = False
