@@ -1,0 +1,5 @@
+[allowlist]
+description = "Allow documented example credentials only"
+regexes = [
+  '''SECRET_KEY=R9w2vY6mQ1tN5kX8pC3sD7fH0jL4zB9uA2eG6rT1yU5iO8nM3qW7xZ0cV4bK1pF''',
+]
