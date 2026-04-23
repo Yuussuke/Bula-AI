@@ -45,7 +45,7 @@ jobs:
           curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b .bin v8.28.0
 
       - name: Run Gitleaks
-        run: .bin/gitleaks detect --source . --redact --verbose
+        run: .bin/gitleaks detect --source . --config .gitleaks.toml --redact --verbose
 
   lint:
     name: Lint
