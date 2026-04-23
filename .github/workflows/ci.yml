@@ -1,5 +1,8 @@
 name: CI
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [main]
@@ -115,6 +118,9 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     defaults:
       run:
         working-directory: ./backend
@@ -135,5 +141,21 @@ jobs:
       - name: Install dependencies
         run: uv sync --frozen
 
-      - name: Run tests
-        run: uv run pytest -v
+      - name: Run tests with coverage
+        run: >-
+          uv run pytest -v
+          --cov=app
+          --cov-report=term-missing
+          --cov-report=json:coverage.json
+
+      - name: Build coverage comment
+        run: uv run python scripts/coverage_comment.py --minimum 79
+
+      - name: Comment coverage map on pull request
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: backend/coverage-summary.md
+
+      - name: Enforce coverage baseline
+        run: uv run coverage report --fail-under=79
