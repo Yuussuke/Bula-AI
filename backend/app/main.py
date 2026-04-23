@@ -1,8 +1,11 @@
 from contextlib import asynccontextmanager
+from collections.abc import AsyncIterator
+from typing import cast
 
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import Response
 
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
@@ -20,9 +23,15 @@ from app.modules.chat.router import router as chat_router
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    _ = app
     yield
     await close_engine()
+
+
+def rate_limit_exceeded_handler(request: Request, exc: Exception) -> Response:
+    rate_limit_error = cast(RateLimitExceeded, exc)
+    return _rate_limit_exceeded_handler(request, rate_limit_error)
 
 
 def create_app() -> FastAPI:
@@ -42,13 +51,13 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
-    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
     app.add_exception_handler(Exception, global_exception_handler)
     app.add_middleware(RequestLoggingMiddleware)
     app.add_middleware(CorrelationIdMiddleware)
 
     @app.get("/health")
-    async def health():
+    async def health() -> dict[str, str]:
         return {"status": "ok"}
 
     app.include_router(bulas_router, prefix="/api/v1")

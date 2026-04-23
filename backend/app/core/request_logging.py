@@ -1,5 +1,5 @@
 import time
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -11,7 +11,11 @@ logger = structlog.get_logger(__name__)
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """Middleware to log all HTTP requests with timing and status."""
 
-    async def dispatch(self, request: Request, call_next: Callable) -> Response:
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: Callable[[Request], Awaitable[Response]],
+    ) -> Response:
         start_time = time.perf_counter()
 
         response = await call_next(request)

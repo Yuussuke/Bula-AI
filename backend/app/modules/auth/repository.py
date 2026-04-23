@@ -1,4 +1,5 @@
 import hashlib
+from typing import cast
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -99,7 +100,13 @@ class RefreshTokenRepository:
 
     async def revoke(self, token: RefreshToken) -> None:
         """Marks a refresh token as revoked (used during logout or rotation)."""
-        token.is_revoked = True
+        token_id = cast(int, token.id)
+        stmt = (
+            update(RefreshToken)
+            .where(RefreshToken.id == token_id)
+            .values(is_revoked=True)
+        )
+        await self.db.execute(stmt)
         await self.db.commit()
 
     async def consume_atomically(self, raw_token_value: str) -> RefreshToken | None:

@@ -32,7 +32,7 @@ class BulaRepository:
             await self.db.commit()
         except IntegrityError:
             await self.db.rollback()
-            raise IntegrityError("Failed to create Bula due to integrity error.")
+            raise
 
         await self.db.refresh(bula)
         return bula

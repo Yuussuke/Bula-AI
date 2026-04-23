@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from langchain_core.prompts import ChatPromptTemplate
 from app.modules.rag.llm import get_maritalk_llm
 from app.modules.auth.dependencies import get_current_user
+from app.modules.auth.models import User
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -11,9 +12,17 @@ class DirectAskRequest(BaseModel):
     question: str
 
 
+class DirectAskResponse(BaseModel):
+    answer: str
+
+
 @router.post("/direct-ask")
-async def direct_ask(req: DirectAskRequest, current_user=Depends(get_current_user)):
+async def direct_ask(
+    req: DirectAskRequest,
+    current_user: User = Depends(get_current_user),
+) -> DirectAskResponse:
     # current_user is used for authentication verification
+    _ = current_user
     llm = get_maritalk_llm()
 
     prompt = ChatPromptTemplate.from_messages(
@@ -31,4 +40,4 @@ async def direct_ask(req: DirectAskRequest, current_user=Depends(get_current_use
 
     response = await chain.ainvoke({"input": req.question})
 
-    return {"answer": response.content}
+    return DirectAskResponse(answer=str(response.content))
