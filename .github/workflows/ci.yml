@@ -42,7 +42,10 @@ jobs:
       - name: Install Gitleaks
         run: |
           mkdir -p .bin
-          curl -sSfL https://raw.githubusercontent.com/gitleaks/gitleaks/master/install.sh | sh -s -- -b .bin v8.28.0
+          curl -sSfL https://github.com/gitleaks/gitleaks/releases/download/v8.28.0/gitleaks_8.28.0_linux_x64.tar.gz -o /tmp/gitleaks.tar.gz
+          tar -xzf /tmp/gitleaks.tar.gz -C .bin gitleaks
+          chmod +x .bin/gitleaks
+          .bin/gitleaks version
 
       - name: Run Gitleaks
         run: .bin/gitleaks detect --source . --config .gitleaks.toml --redact --verbose
