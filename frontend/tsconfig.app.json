@@ -15,15 +15,13 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
-    "ignoreDeprecations": "6.0",
-
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
 
     /* Linting */
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
