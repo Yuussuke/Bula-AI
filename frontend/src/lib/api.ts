@@ -20,7 +20,12 @@ interface AuthPayload {
 }
 
 interface ApiErrorPayload {
-  detail?: string;
+  detail?: string | ValidationErrorItem[];
+}
+
+interface ValidationErrorItem {
+  loc?: Array<string | number>;
+  msg?: string;
 }
 
 interface AuthFetchOptions extends RequestInit {
@@ -39,6 +44,15 @@ async function parseErrorMessage(response: Response): Promise<string> {
     const body = (await response.json()) as ApiErrorPayload;
     if (typeof body.detail === "string" && body.detail.length > 0) {
       return body.detail;
+    }
+
+    if (Array.isArray(body.detail) && body.detail.length > 0) {
+      const firstValidationError = body.detail[0];
+      if (typeof firstValidationError?.msg === "string" && firstValidationError.msg.length > 0) {
+        return firstValidationError.msg;
+      }
+
+      return "Os dados enviados sao invalidos. Revise os campos e tente novamente.";
     }
   } catch {
     // Fall back to status text.

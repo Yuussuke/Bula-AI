@@ -38,7 +38,10 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     """
 
     FRONTEND_URL: str = "http://localhost:5173"
-    backend_cors_origins: list[str] = [FRONTEND_URL]
+    backend_cors_origins: list[str] = [
+        "http://localhost:3000",
+        FRONTEND_URL,
+    ]
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
