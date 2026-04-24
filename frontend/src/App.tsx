@@ -1,21 +1,22 @@
-import { useState } from "react"
-import { AuthView } from "@/components/auth-view"
-import { DashboardView } from "@/components/dashboard-view"
+import { useState } from "react";
+
+import { AuthView } from "@/components/auth-view";
+import { DashboardView } from "@/components/dashboard-view";
 
 export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   const handleLogin = () => {
-    setIsAuthenticated(true)
-  }
+    setIsAuthenticated(true);
+  };
 
   const handleLogout = () => {
-    setIsAuthenticated(false)
-  }
+    setIsAuthenticated(false);
+  };
 
   if (!isAuthenticated) {
-    return <AuthView onLogin={handleLogin} />
+    return <AuthView onLogin={handleLogin} />;
   }
 
-  return <DashboardView onLogout={handleLogout} />
+  return <DashboardView onLogout={handleLogout} />;
 }
