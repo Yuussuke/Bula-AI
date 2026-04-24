@@ -1,28 +1,74 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { Pill, Shield, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { loginRequest, registerRequest } from "@/lib/api";
+import { useAuthStore } from "@/store/auth";
 
-interface AuthViewProps {
-  onLogin: () => void;
-}
+export function AuthView() {
+  const navigate = useNavigate();
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const [loginEmail, setLoginEmail] = useState("");
+  const [loginPassword, setLoginPassword] = useState("");
+  const [registerFullName, setRegisterFullName] = useState("");
+  const [registerEmail, setRegisterEmail] = useState("");
+  const [registerPassword, setRegisterPassword] = useState("");
+  const [loginErrorMessage, setLoginErrorMessage] = useState<string | null>(null);
+  const [registerErrorMessage, setRegisterErrorMessage] = useState<string | null>(null);
 
-export function AuthView({ onLogin }: AuthViewProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const loginMutation = useMutation({
+    mutationFn: loginRequest,
+    onSuccess: (payload) => {
+      setAuth({
+        accessToken: payload.token.access_token,
+        user: payload.user,
+      });
+      void navigate("/", { replace: true });
+    },
+    onError: (error: Error) => {
+      setLoginErrorMessage(error.message);
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const registerMutation = useMutation({
+    mutationFn: registerRequest,
+    onSuccess: (payload) => {
+      setAuth({
+        accessToken: payload.token.access_token,
+        user: payload.user,
+      });
+      void navigate("/", { replace: true });
+    },
+    onError: (error: Error) => {
+      setRegisterErrorMessage(error.message);
+    },
+  });
+
+  const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      onLogin();
-    }, 1000);
+    setLoginErrorMessage(null);
+    loginMutation.mutate({
+      email: loginEmail,
+      password: loginPassword,
+    });
+  };
+
+  const handleRegisterSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setRegisterErrorMessage(null);
+    registerMutation.mutate({
+      email: registerEmail,
+      full_name: registerFullName,
+      password: registerPassword,
+    });
   };
 
   return (
@@ -56,19 +102,38 @@ export function AuthView({ onLogin }: AuthViewProps) {
               </TabsList>
 
               <TabsContent value="login">
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleLoginSubmit}>
                   <FieldGroup>
                     <Field>
                       <FieldLabel htmlFor="email">E-mail</FieldLabel>
-                      <Input id="email" type="email" placeholder="seu@email.com" required />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={loginEmail}
+                        onChange={(event) => setLoginEmail(event.target.value)}
+                        required
+                      />
                     </Field>
                     <Field>
                       <FieldLabel htmlFor="password">Senha</FieldLabel>
-                      <Input id="password" type="password" placeholder="••••••••" required />
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={loginPassword}
+                        onChange={(event) => setLoginPassword(event.target.value)}
+                        required
+                      />
                     </Field>
                   </FieldGroup>
-                  <Button type="submit" className="mt-6 w-full" disabled={isLoading}>
-                    {isLoading ? "Entrando..." : "Entrar"}
+                  {loginErrorMessage ? (
+                    <p className="text-destructive mt-3 text-sm" role="alert">
+                      {loginErrorMessage}
+                    </p>
+                  ) : null}
+                  <Button type="submit" className="mt-6 w-full" disabled={loginMutation.isPending}>
+                    {loginMutation.isPending ? "Entrando..." : "Entrar"}
                   </Button>
                   <p className="text-muted-foreground mt-4 text-center text-sm">
                     <button type="button" className="text-primary hover:underline">
@@ -79,15 +144,29 @@ export function AuthView({ onLogin }: AuthViewProps) {
               </TabsContent>
 
               <TabsContent value="register">
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleRegisterSubmit}>
                   <FieldGroup>
                     <Field>
                       <FieldLabel htmlFor="fullName">Nome completo</FieldLabel>
-                      <Input id="fullName" type="text" placeholder="João Silva" required />
+                      <Input
+                        id="fullName"
+                        type="text"
+                        placeholder="João Silva"
+                        value={registerFullName}
+                        onChange={(event) => setRegisterFullName(event.target.value)}
+                        required
+                      />
                     </Field>
                     <Field>
                       <FieldLabel htmlFor="registerEmail">E-mail</FieldLabel>
-                      <Input id="registerEmail" type="email" placeholder="seu@email.com" required />
+                      <Input
+                        id="registerEmail"
+                        type="email"
+                        placeholder="seu@email.com"
+                        value={registerEmail}
+                        onChange={(event) => setRegisterEmail(event.target.value)}
+                        required
+                      />
                     </Field>
                     <Field>
                       <FieldLabel htmlFor="registerPassword">Senha</FieldLabel>
@@ -95,12 +174,23 @@ export function AuthView({ onLogin }: AuthViewProps) {
                         id="registerPassword"
                         type="password"
                         placeholder="••••••••"
+                        value={registerPassword}
+                        onChange={(event) => setRegisterPassword(event.target.value)}
                         required
                       />
                     </Field>
                   </FieldGroup>
-                  <Button type="submit" className="mt-6 w-full" disabled={isLoading}>
-                    {isLoading ? "Criando conta..." : "Criar conta"}
+                  {registerErrorMessage ? (
+                    <p className="text-destructive mt-3 text-sm" role="alert">
+                      {registerErrorMessage}
+                    </p>
+                  ) : null}
+                  <Button
+                    type="submit"
+                    className="mt-6 w-full"
+                    disabled={registerMutation.isPending}
+                  >
+                    {registerMutation.isPending ? "Criando conta..." : "Criar conta"}
                   </Button>
                 </form>
               </TabsContent>
