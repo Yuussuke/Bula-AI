@@ -18,7 +18,7 @@ REFRESH_COOKIE_MAX_AGE = 60 * 60 * 24 * 30  # 30 days
 
 def set_refresh_cookie(response: Response, token_value: str) -> None:
     """Sets the HttpOnly refresh token cookie on the response."""
-    is_production = getattr(settings, "ENVIRONMENT", "development") == "production"
+    is_production = settings.environment == "production"
 
     response.set_cookie(
         key=REFRESH_COOKIE_NAME,

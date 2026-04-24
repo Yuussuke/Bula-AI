@@ -1,10 +1,16 @@
 import re
-from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator
+from pydantic import (
+    AliasChoices,
+    BaseModel,
+    ConfigDict,
+    EmailStr,
+    Field,
+    field_validator,
+)
 
 
 class UserBase(BaseModel):
     email: EmailStr
-    full_name: str
 
     @field_validator("email")
     @classmethod
@@ -14,6 +20,7 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
+    full_name: str
     password: str = Field(min_length=8, max_length=64)
 
     @field_validator("password")
@@ -43,9 +50,9 @@ class UserLogin(BaseModel):
 
 class UserResponse(UserBase):
     id: int
-    is_active: bool
+    name: str = Field(validation_alias=AliasChoices("name", "full_name"))
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
 
 class Token(BaseModel):

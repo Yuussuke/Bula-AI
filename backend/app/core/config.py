@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -24,6 +25,8 @@ class SecuritySettings(BaseSettings):
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
+    @field_validator("secret_key")
+    @classmethod
     def check_secret_key(cls, value: str) -> str:
         if not value or len(value) < 32 or value.lower() == "changeme":
             raise ValueError(

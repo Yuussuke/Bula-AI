@@ -3,8 +3,7 @@ import { create } from "zustand";
 export interface AuthUser {
   id: number;
   email: string;
-  full_name: string;
-  is_active: boolean;
+  name: string;
 }
 
 interface SetAuthPayload {
