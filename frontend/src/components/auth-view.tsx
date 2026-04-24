@@ -1,53 +1,56 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { FieldGroup, Field, FieldLabel } from "@/components/ui/field"
-import { Pill, Shield, Sparkles } from "lucide-react"
+import { Pill, Shield, Sparkles } from "lucide-react";
+import { useState } from "react";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface AuthViewProps {
-  onLogin: () => void
+  onLogin: () => void;
 }
 
 export function AuthView({ onLogin }: AuthViewProps) {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
     setTimeout(() => {
-      setIsLoading(false)
-      onLogin()
-    }, 1000)
-  }
+      setIsLoading(false);
+      onLogin();
+    }, 1000);
+  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 -left-20 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
+    <div className="bg-background flex min-h-screen items-center justify-center p-4">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="bg-primary/5 absolute top-1/4 -left-20 h-72 w-72 rounded-full blur-3xl" />
+        <div className="bg-accent/5 absolute -right-20 bottom-1/4 h-96 w-96 rounded-full blur-3xl" />
       </div>
 
-      <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
-            <Pill className="w-8 h-8 text-primary" />
+      <div className="relative z-10 w-full max-w-md">
+        <div className="mb-8 text-center">
+          <div className="bg-primary/10 mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl">
+            <Pill className="text-primary h-8 w-8" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Bula AI</h1>
-          <p className="text-muted-foreground mt-2">Inteligência artificial para bulas de medicamentos</p>
+          <h1 className="text-foreground text-3xl font-bold tracking-tight">Bula AI</h1>
+          <p className="text-muted-foreground mt-2">
+            Inteligência artificial para bulas de medicamentos
+          </p>
         </div>
 
-        <Card className="border-border/50 shadow-xl shadow-primary/5">
-          <CardHeader className="text-center pb-2">
+        <Card className="border-border/50 shadow-primary/5 shadow-xl">
+          <CardHeader className="pb-2 text-center">
             <CardTitle className="text-xl">Bem-vindo</CardTitle>
             <CardDescription>Acesse sua conta ou crie uma nova</CardDescription>
           </CardHeader>
           <CardContent>
             <Tabs defaultValue="login" className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsList className="mb-6 grid w-full grid-cols-2">
                 <TabsTrigger value="login">Entrar</TabsTrigger>
                 <TabsTrigger value="register">Cadastrar</TabsTrigger>
               </TabsList>
@@ -57,32 +60,20 @@ export function AuthView({ onLogin }: AuthViewProps) {
                   <FieldGroup>
                     <Field>
                       <FieldLabel htmlFor="email">E-mail</FieldLabel>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="seu@email.com"
-                        required
-                      />
+                      <Input id="email" type="email" placeholder="seu@email.com" required />
                     </Field>
                     <Field>
                       <FieldLabel htmlFor="password">Senha</FieldLabel>
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="••••••••"
-                        required
-                      />
+                      <Input id="password" type="password" placeholder="••••••••" required />
                     </Field>
                   </FieldGroup>
-                  <Button 
-                    type="submit" 
-                    className="w-full mt-6" 
-                    disabled={isLoading}
-                  >
+                  <Button type="submit" className="mt-6 w-full" disabled={isLoading}>
                     {isLoading ? "Entrando..." : "Entrar"}
                   </Button>
-                  <p className="text-center text-sm text-muted-foreground mt-4">
-                    <a href="#" className="text-primary hover:underline">Esqueceu sua senha?</a>
+                  <p className="text-muted-foreground mt-4 text-center text-sm">
+                    <button type="button" className="text-primary hover:underline">
+                      Esqueceu sua senha?
+                    </button>
                   </p>
                 </form>
               </TabsContent>
@@ -92,21 +83,11 @@ export function AuthView({ onLogin }: AuthViewProps) {
                   <FieldGroup>
                     <Field>
                       <FieldLabel htmlFor="fullName">Nome completo</FieldLabel>
-                      <Input
-                        id="fullName"
-                        type="text"
-                        placeholder="João Silva"
-                        required
-                      />
+                      <Input id="fullName" type="text" placeholder="João Silva" required />
                     </Field>
                     <Field>
                       <FieldLabel htmlFor="registerEmail">E-mail</FieldLabel>
-                      <Input
-                        id="registerEmail"
-                        type="email"
-                        placeholder="seu@email.com"
-                        required
-                      />
+                      <Input id="registerEmail" type="email" placeholder="seu@email.com" required />
                     </Field>
                     <Field>
                       <FieldLabel htmlFor="registerPassword">Senha</FieldLabel>
@@ -118,11 +99,7 @@ export function AuthView({ onLogin }: AuthViewProps) {
                       />
                     </Field>
                   </FieldGroup>
-                  <Button 
-                    type="submit" 
-                    className="w-full mt-6" 
-                    disabled={isLoading}
-                  >
+                  <Button type="submit" className="mt-6 w-full" disabled={isLoading}>
                     {isLoading ? "Criando conta..." : "Criar conta"}
                   </Button>
                 </form>
@@ -131,17 +108,17 @@ export function AuthView({ onLogin }: AuthViewProps) {
           </CardContent>
         </Card>
 
-        <div className="mt-8 grid grid-cols-2 gap-4 text-center text-sm text-muted-foreground">
-          <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-card/50">
-            <Shield className="w-5 h-5 text-primary" />
+        <div className="text-muted-foreground mt-8 grid grid-cols-2 gap-4 text-center text-sm">
+          <div className="bg-card/50 flex flex-col items-center gap-2 rounded-lg p-4">
+            <Shield className="text-primary h-5 w-5" />
             <span>Dados seguros e protegidos</span>
           </div>
-          <div className="flex flex-col items-center gap-2 p-4 rounded-lg bg-card/50">
-            <Sparkles className="w-5 h-5 text-accent" />
+          <div className="bg-card/50 flex flex-col items-center gap-2 rounded-lg p-4">
+            <Sparkles className="text-accent h-5 w-5" />
             <span>IA de última geração</span>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
