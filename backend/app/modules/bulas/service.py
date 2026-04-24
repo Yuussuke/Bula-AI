@@ -1,8 +1,10 @@
 from typing import BinaryIO
-from app.modules.bulas.repository import BulaRepository
-from app.modules.bulas.helpers import PdfTextExtractor, Chunking
-from app.modules.bulas.schemas import BulaUploadResponse
+
 from fastapi.concurrency import run_in_threadpool
+
+from app.modules.bulas.helpers import Chunking, PdfTextExtractor
+from app.modules.bulas.repository import BulaRepository
+from app.modules.bulas.schemas import BulaUploadResponse
 
 
 class BulaService:
@@ -11,7 +13,7 @@ class BulaService:
         bula_repo: BulaRepository,
         pdf_extractor: PdfTextExtractor,
         chunking: Chunking,
-    ):
+    ) -> None:
         self.repo = bula_repo
         self.extractor = pdf_extractor
         self.chunker = chunking

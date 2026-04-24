@@ -1,9 +1,10 @@
+from langchain_core.prompts import ChatPromptTemplate
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from langchain_core.prompts import ChatPromptTemplate
-from app.modules.rag.llm import get_maritalk_llm
+
 from app.modules.auth.dependencies import get_current_user
 from app.modules.auth.models import User
+from app.modules.rag.llm import get_maritalk_llm
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -29,8 +30,9 @@ async def direct_ask(
         [
             (
                 "system",
-                "Você é o Bula AI, um assistente virtual especialista em bulas de medicamentos no Brasil. Seja claro,"
-                "objetivo e amigável. Sempre lembre o usuário de consultar um médico.",
+                "You are Bula AI, a virtual assistant specialized in Brazilian medication leaflets."
+                " Answer in Brazilian Portuguese, be clear, objective, and friendly, and always remind"
+                " the user to consult a physician.",
             ),
             ("human", "{input}"),
         ]

@@ -1,10 +1,10 @@
-# API endpoints(Request / Response)
-from app.core.limiter import limiter
+# API endpoints (request / response)
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 
 from app.core.config import settings
-from app.modules.auth import schemas, models
-from app.modules.auth.dependencies import get_current_user, get_auth_service
+from app.core.limiter import limiter
+from app.modules.auth import models, schemas
+from app.modules.auth.dependencies import get_auth_service, get_current_user
 from app.modules.auth.service import (
     AuthService,
     InvalidCredentialsError,
@@ -24,10 +24,8 @@ def set_refresh_cookie(response: Response, token_value: str) -> None:
         key=REFRESH_COOKIE_NAME,
         value=token_value,
         httponly=True,
-        secure=is_production,  # <-- AGORA É DINÂMICO! True em Produção, False no Localhost
-        samesite="lax"
-        if not is_production
-        else "none",  # 'none' exige secure=True (útil se o front e o back estiverem em domínios diferentes na nuvem)
+        secure=is_production,
+        samesite="lax" if not is_production else "none",
         path="/api/v1/auth/refresh",
         max_age=REFRESH_COOKIE_MAX_AGE,
     )
@@ -65,7 +63,7 @@ async def register(
             detail="A user with this email already exists.",
         )
 
-    # Auto-login: issue tokens immediately after registration
+    # Auto-login: issue tokens immediately after registration.
     token, raw_refresh_token, _ = await auth_service.authenticate_user(
         email=user_in.email,
         password=user_in.password,
@@ -94,7 +92,7 @@ async def login(
     refresh token in an HttpOnly cookie.
     """
     try:
-        # Passando o request para que o slowapi conte a requisição corretamente
+        # The request argument allows SlowAPI to count the request correctly.
         token, raw_refresh_token, user = await auth_service.authenticate_user(
             email=user_in.email,
             password=user_in.password,
@@ -167,7 +165,7 @@ async def logout(
 ) -> None:
     """
     Revokes the refresh token and clears the cookie.
-    Always returns 204 — even if no cookie was present.
+    Always returns 204 even if no cookie was present.
     """
     raw_refresh_token = request.cookies.get(REFRESH_COOKIE_NAME)
 
