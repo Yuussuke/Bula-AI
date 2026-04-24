@@ -365,6 +365,18 @@ These must never be skipped:
 - **CORS** is restricted to known frontend origins. The wildcard `*` is never used in production.
 
 ---
+## Auth module
+- Access token: memory only (Zustand store, never localStorage)
+- Refresh token: HttpOnly cookie `refresh_token`, path `/api/v1/auth/refresh`
+- HTTP: native fetch via `authFetch` wrapper (src/lib/api.ts), never axios
+- Auth endpoints prefix: POST /api/v1/auth/{register,login,refresh,logout}
+- Response shape: register/login → {token: {access_token}, user: {id,name,email}}
+
+## Frontend conventions
+- Zero ESLint warnings (--max-warnings 0), noImplicitAny: true
+- No eslint-disable comments as workarounds
+- State: zustand (client), @tanstack/react-query (server)
+- Router: react-router-dom
 
 ## Dependency Update Automation (Dependabot)
 
