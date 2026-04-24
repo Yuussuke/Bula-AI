@@ -1,16 +1,25 @@
 import hashlib
+import secrets
+from datetime import datetime, timedelta, timezone
 from typing import cast
+
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.auth.models import User, RefreshToken
-import secrets
-from datetime import datetime, timedelta, timezone
+from app.modules.auth.models import RefreshToken, User
+
+
+class UserAlreadyExistsRepositoryError(Exception):
+    """Raised when a user cannot be created because the email already exists."""
+
+
+class RefreshTokenCreationError(Exception):
+    """Raised when a refresh token cannot be persisted."""
 
 
 class UserRepository:
-    def __init__(self, db: AsyncSession):
+    def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
     async def get_user_by_email(self, email: str) -> User | None:
@@ -42,9 +51,9 @@ class UserRepository:
         self.db.add(db_user)
         try:
             await self.db.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
             await self.db.rollback()
-            raise
+            raise UserAlreadyExistsRepositoryError() from exc
 
         await self.db.refresh(db_user)
         return db_user
@@ -78,11 +87,11 @@ class RefreshTokenRepository:
             except IntegrityError:
                 await self.db.rollback()
                 if attempt == 2:
-                    raise
+                    raise RefreshTokenCreationError()
             else:
                 return raw_token
 
-        raise RuntimeError("Failed to create refresh token after retries")
+        raise RefreshTokenCreationError()
 
     async def get_valid_token(self, raw_token_value: str) -> RefreshToken | None:
         """Returns the token only if it exists, is not revoked, and has not expired."""

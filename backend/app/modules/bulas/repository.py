@@ -1,6 +1,11 @@
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from app.modules.bulas.models import Bula, BulaStatus
+
+
+class BulaPersistenceError(Exception):
+    """Raised when a bula cannot be persisted."""
 
 
 class BulaRepository:
@@ -30,9 +35,9 @@ class BulaRepository:
 
         try:
             await self.db.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
             await self.db.rollback()
-            raise
+            raise BulaPersistenceError() from exc
 
         await self.db.refresh(bula)
         return bula

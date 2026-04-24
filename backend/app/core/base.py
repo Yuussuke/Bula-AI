@@ -18,7 +18,7 @@ class Base(DeclarativeBase):
 
 
 class TimestampMixin:
-    """Injeta data de criação e atualização automaticamente em qualquer tabela"""
+    """Adds created and updated timestamps automatically to any table."""
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -32,7 +32,7 @@ class TimestampMixin:
 
 
 class UUIDMixin:
-    """Injeta uma chave primária ID baseada em UUID"""
+    """Adds a UUID-based primary key column."""
 
     id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True),

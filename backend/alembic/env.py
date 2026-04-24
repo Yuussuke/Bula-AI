@@ -11,7 +11,10 @@ from alembic import context
 from app.core.config import DatabaseSettings
 from app.core.base import Base
 
-# Import models
+# Import models so Alembic autogenerate sees the full metadata graph.
+from app.modules.auth.models import RefreshToken, User  # noqa: F401
+from app.modules.bulas.models import Bula  # noqa: F401
+from app.modules.chat.models import ChatMessage, ChatSession  # noqa: F401
 
 db_settings = DatabaseSettings()
 

@@ -3,7 +3,6 @@ from typing import cast
 
 import jwt
 import structlog
-from sqlalchemy.exc import IntegrityError
 
 from app.modules.auth import schemas, repository, security
 from app.modules.auth.models import User
@@ -110,11 +109,8 @@ class AuthService:
                 email=normalized_email,
                 hashed_password=hashed_password,
             )
-        except IntegrityError as exc:
-            error_msg = str(getattr(exc, "orig", "")).lower()
-            if "unique constraint" in error_msg or "23505" in error_msg:
-                raise UserAlreadyExistsError()
-            raise exc
+        except repository.UserAlreadyExistsRepositoryError as exc:
+            raise UserAlreadyExistsError() from exc
         logger.info(
             "user_registered_successfully", user_id=new_user.id, email=new_user.email
         )

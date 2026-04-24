@@ -1,14 +1,14 @@
+import structlog
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
-import structlog
 
 logger = structlog.get_logger(__name__)
 
 
 async def global_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     """
-    Captura qualquer exceção 500 não tratada.
-    Loga o rastreio real com structlog e devolve um JSON seguro para o front-end.
+    Catches any unhandled 500 error.
+    Logs the real traceback with structlog and returns a safe JSON response.
     """
     logger.error(
         "unhandled_exception",

@@ -1,4 +1,5 @@
 from functools import lru_cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -26,7 +27,7 @@ class SecuritySettings(BaseSettings):
     def check_secret_key(cls, value: str) -> str:
         if not value or len(value) < 32 or value.lower() == "changeme":
             raise ValueError(
-                "SECRET_KEY inválida ou muito fraca. Configure uma chave forte no ambiente de produção."
+                "SECRET_KEY is invalid or too weak. Configure a strong key in production."
             )
         return value
 
@@ -37,7 +38,10 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     """
 
     FRONTEND_URL: str = "http://localhost:5173"
-    backend_cors_origins: list[str] = [FRONTEND_URL]
+    backend_cors_origins: list[str] = [
+        "http://localhost:3000",
+        FRONTEND_URL,
+    ]
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

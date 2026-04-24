@@ -1,7 +1,8 @@
+from dataclasses import dataclass
 from typing import BinaryIO
+
 from pypdf import PdfReader
 from pypdf.errors import PdfReadError
-from dataclasses import dataclass
 
 
 class InvalidPdfError(Exception):
@@ -31,7 +32,7 @@ class PdfTextExtractor:
 
 
 class Chunking:
-    def __init__(self, chunk_size: int = 500, overlap: int = 50):
+    def __init__(self, chunk_size: int = 500, overlap: int = 50) -> None:
         if overlap >= chunk_size:
             raise ValueError("overlap must be smaller than chunk_size.")
         if chunk_size <= 0:
