@@ -49,6 +49,20 @@ services:
 
       # LLM (Maritaca)
       MARITACA_API_KEY: ${MARITACA_API_KEY}
+# =============================================================================
+# FRONTEND
+# =============================================================================
+  frontend:
+    build: ./frontend
+    tty: true
+    ports:
+      - "3000:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - api
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
 
 # =============================================================================
 # VOLUMES
