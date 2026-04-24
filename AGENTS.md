@@ -32,7 +32,7 @@
 | **Package manager** | `uv` (not pip, not poetry) |
 | **Frontend framework** | React + Vite (TypeScript) |
 | **Frontend styling** | Tailwind CSS |
-| **HTTP client (frontend)** | Axios + TanStack Query |
+| **HTTP client (frontend)** | Native fetch + TanStack Query |
 | **Containerization** | Docker + Docker Compose (local dev) |
 | **CI/CD** | GitHub Actions |
 | **Deployment** | Railway (backend + DB), Vercel (frontend) |
