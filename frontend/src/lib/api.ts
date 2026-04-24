@@ -1,5 +1,5 @@
 import { queryClient } from "@/lib/queryClient";
-import { type AuthUser,useAuthStore } from "@/store/auth";
+import { type AuthUser, useAuthStore } from "@/store/auth";
 
 const envVariables = import.meta.env as Record<string, unknown>;
 const apiBaseUrlFromEnv = envVariables.VITE_API_BASE_URL;
