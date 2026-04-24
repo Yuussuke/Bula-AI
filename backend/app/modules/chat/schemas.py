@@ -33,3 +33,11 @@ class ChatSessionResponse(BaseModel):
     messages: list[ChatMessageResponse] = []
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DirectAskRequest(BaseModel):
+    question: str
+
+
+class DirectAskResponse(BaseModel):
+    answer: str

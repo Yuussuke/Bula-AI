@@ -10,6 +10,27 @@ from app.modules.bulas.dependencies import get_bula_service
 
 router = APIRouter(prefix="/bulas", tags=["bulas"])
 
+MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024
+PDF_CONTENT_TYPE = "application/pdf"
+
+
+def validate_pdf_upload(file: UploadFile) -> None:
+    if file.content_type != PDF_CONTENT_TYPE:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Apenas arquivos PDF são aceitos",
+        )
+
+    file.file.seek(0, 2)
+    file_size = file.file.tell()
+    file.file.seek(0)
+
+    if file_size > MAX_UPLOAD_SIZE_BYTES:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="O arquivo deve ter no máximo 10 MB",
+        )
+
 
 @router.post(
     "/upload",
@@ -23,6 +44,8 @@ async def upload_file(
     current_user: auth_models.User = Depends(get_current_user),
     bula_service: BulaService = Depends(get_bula_service),
 ) -> BulaUploadResponse:
+    validate_pdf_upload(file)
+
     try:
         result = await bula_service.process_pdf(
             user_id=cast(int, current_user.id),

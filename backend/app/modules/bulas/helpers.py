@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import BinaryIO
 
 from pypdf import PdfReader
-from pypdf.errors import PdfReadError
+from pypdf.errors import PyPdfError
 
 
 class InvalidPdfError(Exception):
@@ -22,11 +22,12 @@ class PdfTextExtractor:
         """
         try:
             reader = PdfReader(file)
-        except PdfReadError as exc:
+            text_pieces: list[str] = []
+            for page in reader.pages:
+                text_pieces.append(page.extract_text() or "")
+        except PyPdfError as exc:
             raise InvalidPdfError("Arquivo PDF invalido ou corrompido.") from exc
-        text_pieces: list[str] = []
-        for page in reader.pages:
-            text_pieces.append(page.extract_text() or "")
+
         final_text = "".join(text_pieces)
         return ExtractedBula(text=final_text, pages=len(reader.pages))
 

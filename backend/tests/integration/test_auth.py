@@ -1,5 +1,9 @@
 import pytest
 from httpx import AsyncClient
+from starlette.responses import Response
+
+from app.core.config import Settings
+from app.modules.auth.router import set_refresh_cookie
 
 TEST_USER = {
     "full_name": "Test User",
@@ -17,9 +21,10 @@ async def test_register_creates_user_and_returns_201(client: AsyncClient):
 
     data = response.json()
     assert data["user"]["email"] == TEST_USER["email"]
-    assert data["user"]["full_name"] == TEST_USER["full_name"]
+    assert data["user"]["name"] == TEST_USER["full_name"]
     assert "id" in data["user"]
-    assert "is_active" in data["user"]
+    assert "full_name" not in data["user"]
+    assert "is_active" not in data["user"]
     assert "password" not in data["user"]
     assert "hashed_password" not in data["user"]
 
@@ -53,6 +58,9 @@ async def test_login_with_valid_credentials_returns_token(client: AsyncClient):
 
     assert "user" in data
     assert data["user"]["email"] == TEST_USER["email"]
+    assert data["user"]["name"] == TEST_USER["full_name"]
+    assert "full_name" not in data["user"]
+    assert "is_active" not in data["user"]
 
 
 @pytest.mark.anyio
@@ -84,7 +92,11 @@ async def test_get_me_with_valid_token_returns_user(client: AsyncClient):
         "/api/v1/auth/me", headers={"Authorization": f"Bearer {token}"}
     )
     assert response.status_code == 200
-    assert response.json()["email"] == TEST_USER["email"]
+    data = response.json()
+    assert data["email"] == TEST_USER["email"]
+    assert data["name"] == TEST_USER["full_name"]
+    assert "full_name" not in data
+    assert "is_active" not in data
 
 
 @pytest.mark.anyio
@@ -184,3 +196,23 @@ async def test_login_rate_limiting_works(client: AsyncClient):
 
     finally:
         app.state.limiter.enabled = False
+
+
+def test_refresh_cookie_uses_secure_settings_in_production(monkeypatch):
+    from app.modules.auth import router as auth_router
+
+    monkeypatch.setattr(auth_router.settings, "environment", "production")
+    response = Response()
+
+    set_refresh_cookie(response, "raw-refresh-token")
+
+    cookie_header = response.headers["set-cookie"]
+    assert "HttpOnly" in cookie_header
+    assert "Path=/api/v1/auth/refresh" in cookie_header
+    assert "SameSite=none" in cookie_header
+    assert "Secure" in cookie_header
+
+
+def test_secret_key_validator_rejects_weak_key():
+    with pytest.raises(ValueError):
+        Settings(secret_key="changeme")

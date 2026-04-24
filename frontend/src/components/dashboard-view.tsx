@@ -236,7 +236,7 @@ export function DashboardView() {
       <div className="border-sidebar-border border-t p-4">
         <div className="bg-sidebar-accent/30 flex items-center gap-3 rounded-lg px-2 py-2">
           <div className="bg-sidebar-primary/20 text-sidebar-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium">
-            {user?.full_name
+            {user?.name
               ?.split(" ")
               .map((namePart) => namePart.charAt(0))
               .join("")
@@ -244,7 +244,7 @@ export function DashboardView() {
               .toUpperCase() ?? "US"}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-medium">{user?.full_name ?? "Usuário"}</p>
+            <p className="truncate text-sm font-medium">{user?.name ?? "Usuário"}</p>
             <p className="text-sidebar-foreground/60 truncate text-xs">
               {user?.email ?? "email@dominio.com"}
             </p>
@@ -304,7 +304,7 @@ export function DashboardView() {
             <Avatar className="h-8 w-8 sm:h-9 sm:w-9">
               <AvatarImage src="" alt="User" />
               <AvatarFallback className="bg-primary/10 text-primary text-xs font-medium sm:text-sm">
-                {user?.full_name
+                {user?.name
                   ?.split(" ")
                   .map((namePart) => namePart.charAt(0))
                   .join("")
