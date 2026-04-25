@@ -15,6 +15,7 @@ from app.core.base import Base
 from app.modules.auth.models import RefreshToken, User  # noqa: F401
 from app.modules.bulas.models import Bula  # noqa: F401
 from app.modules.chat.models import ChatMessage, ChatSession  # noqa: F401
+from app.modules.storage.models import StoredObject  # noqa: F401
 
 db_settings = DatabaseSettings()
 
