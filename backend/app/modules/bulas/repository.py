@@ -19,6 +19,7 @@ class BulaRepository:
         drug_name: str,
         file_url: str,
         manufacturer: str | None = None,
+        file_address: str | None = None,
         qdrant_collection: str | None = None,
         status: BulaStatus = BulaStatus.PENDING,
     ) -> Bula:
@@ -27,6 +28,7 @@ class BulaRepository:
             drug_name=drug_name,
             manufacturer=manufacturer,
             file_url=file_url,
+            file_address=file_address,
             qdrant_collection=qdrant_collection,
             status=status,
         )

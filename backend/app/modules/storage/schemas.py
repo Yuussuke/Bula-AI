@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 @dataclass(frozen=True)
-class StoredObjectMetadata:
+class StoredObjectRef:
     object_address: str
     original_filename: str | None
     content_type: str | None

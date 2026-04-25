@@ -143,7 +143,7 @@ async def test_refresh_returns_new_access_token_and_rotates_cookie(client: Async
 
 @pytest.mark.anyio
 async def test_refresh_with_no_cookie_returns_401(client: AsyncClient):
-    """Testa se tentar atualizar a sessão sem o cookie HttpOnly é bloqueado."""
+    """Trying to refresh the session without the HttpOnly cookie is blocked."""
     client.cookies.delete("refresh_token")
 
     response = await client.post("/api/v1/auth/refresh")

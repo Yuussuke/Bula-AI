@@ -28,7 +28,7 @@ def upgrade() -> None:
         sa.Column("content_type", sa.String(length=255), nullable=True),
         sa.Column("content_size_bytes", sa.Integer(), nullable=False),
         sa.Column("sha256_checksum", sa.String(length=64), nullable=False),
-        sa.Column("content", sa.LargeBinary(), nullable=False),
+        sa.Column("data", sa.LargeBinary(), nullable=False),
         sa.Column("id", sa.Uuid(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
@@ -40,9 +40,13 @@ def upgrade() -> None:
         ["object_address"],
         unique=True,
     )
+    op.add_column(
+        "bulas", sa.Column("file_address", sa.String(length=500), nullable=True)
+    )
 
 
 def downgrade() -> None:
     """Downgrade schema."""
+    op.drop_column("bulas", "file_address")
     op.drop_index(op.f("ix_stored_objects_object_address"), table_name="stored_objects")
     op.drop_table("stored_objects")
