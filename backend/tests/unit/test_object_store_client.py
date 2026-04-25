@@ -26,11 +26,11 @@ def object_store_client(db_session: AsyncSession) -> PgObjectStoreClient:
 async def test_put_bytes_saves_and_reads_same_content(
     object_store_client: PgObjectStoreClient,
 ) -> None:
-    original_content = b"leaflet pdf content"
+    original_content = b"bula pdf content"
 
     address = await object_store_client.put_bytes(
         data=original_content,
-        filename="dipyrone-leaflet.pdf",
+        filename="Dipirona-bula.pdf",
     )
 
     retrieved_content = await object_store_client.get_bytes(address)
@@ -47,14 +47,14 @@ async def test_put_bytes_saves_retrievable_metadata(
 
     address = await object_store_client.put_bytes(
         data=original_content,
-        filename="losartan-leaflet.pdf",
+        filename="losartana-bula.pdf",
     )
 
     retrieved_metadata = await object_store_client.get_metadata(address)
 
     assert isinstance(retrieved_metadata, StoredObjectRef)
     assert retrieved_metadata.object_address == address
-    assert retrieved_metadata.original_filename == "losartan-leaflet.pdf"
+    assert retrieved_metadata.original_filename == "losartana-bula.pdf"
     assert retrieved_metadata.content_type is None
     assert retrieved_metadata.content_size_bytes == len(original_content)
     assert retrieved_metadata.sha256_checksum == expected_checksum
@@ -95,11 +95,11 @@ async def test_identical_content_creates_distinct_object_addresses(
 
     first_address = await object_store_client.put_bytes(
         data=original_content,
-        filename="first-leaflet.pdf",
+        filename="first-bula.pdf",
     )
     second_address = await object_store_client.put_bytes(
         data=original_content,
-        filename="second-leaflet.pdf",
+        filename="second-bula.pdf",
     )
     first_metadata = await object_store_client.get_metadata(first_address)
     second_metadata = await object_store_client.get_metadata(second_address)

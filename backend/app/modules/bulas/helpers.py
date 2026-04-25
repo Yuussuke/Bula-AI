@@ -35,9 +35,9 @@ class PdfTextExtractor:
 class Chunking:
     def __init__(self, chunk_size: int = 500, overlap: int = 50) -> None:
         if overlap >= chunk_size:
-            raise ValueError("overlap must be smaller than chunk_size.")
+            raise ValueError("Sobreposição deve ser menor que o tamanho do chunk.")
         if chunk_size <= 0:
-            raise ValueError("chunk_size must be a positive integer.")
+            raise ValueError("Tamanho do chunk deve ser um inteiro positivo.")
 
         self.chunk_size = chunk_size
         self.overlap = overlap

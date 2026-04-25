@@ -10,9 +10,9 @@ from app.modules.bulas.helpers import ExtractedBula, InvalidPdfError
 async def test_bula_service_success():
     # --- ARRANGE ---
     fake_file = BytesIO(b"fake pdf content")
-    fake_filename = "my_leaflet.pdf"
+    fake_filename = "my_bula.pdf"
     user_id = 123
-    drug_name = "Dipyrone"
+    drug_name = "Dipirona"
     manufacturer = "Example Pharma"
 
     mock_extractor = Mock()
@@ -76,7 +76,7 @@ async def test_bula_service_invalid_pdf():
     fake_file = BytesIO(b"corrupted image or file data")
     fake_filename = "foto.png"
     user_id = 123
-    drug_name = "Dipyrone"
+    drug_name = "Dipirona"
     manufacturer = None
 
     mock_extractor = Mock()
@@ -142,7 +142,7 @@ async def test_bula_service_stores_file_via_object_store() -> None:
 
     await service.process_pdf(
         user_id=123,
-        drug_name="Dipyrone",
+        drug_name="Dipirona",
         manufacturer="Example Pharma",
         file=fake_file,
         filename=fake_filename,
@@ -154,7 +154,7 @@ async def test_bula_service_stores_file_via_object_store() -> None:
     )
     mock_repo.create_bula.assert_awaited_once_with(
         user_id=123,
-        drug_name="Dipyrone",
+        drug_name="Dipirona",
         manufacturer="Example Pharma",
         file_url=fake_filename,
         file_address="stored_objects/abc-123",
