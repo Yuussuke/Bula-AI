@@ -161,7 +161,9 @@ async def test_get_metadata_does_not_load_data_column(
     object_store_client: PgObjectStoreClient,
     db_session: AsyncSession,
 ) -> None:
-    address = await object_store_client.put_bytes(data=b"heavy blob", filename="big.pdf")
+    address = await object_store_client.put_bytes(
+        data=b"heavy blob", filename="big.pdf"
+    )
     db_session.expire_all()
 
     await object_store_client.get_metadata(address)
@@ -171,4 +173,6 @@ async def test_get_metadata_does_not_load_data_column(
     stored_object = result.scalar_one()
     state = sa_inspect(stored_object)
 
-    assert "data" in state.unloaded, "data column must remain deferred after get_metadata"
+    assert "data" in state.unloaded, (
+        "data column must remain deferred after get_metadata"
+    )
