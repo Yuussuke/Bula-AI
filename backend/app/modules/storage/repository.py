@@ -1,4 +1,4 @@
-from sqlalchemy import delete, select
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import undefer
@@ -79,13 +79,9 @@ class StoredObjectRepository:
         return stored_object_id is not None
 
     async def delete_by_address(self, object_address: str) -> None:
-        statement = delete(StoredObject).where(
-            StoredObject.object_address == object_address
-        )
-        result = await self.db.execute(statement)
-
-        if result.rowcount == 0:
-            await self.db.rollback()
+        stored_object = await self.get_by_object_address(object_address)
+        if stored_object is None:
             raise StoredObjectNotFoundError(object_address)
 
+        await self.db.delete(stored_object)
         await self.db.commit()
