@@ -1,3 +1,4 @@
+from io import BytesIO
 from typing import BinaryIO
 
 from fastapi.concurrency import run_in_threadpool
@@ -34,9 +35,9 @@ class BulaService:
 
         file.seek(0)
         file_content = file.read()
-        file.seek(0)
+        extraction_file = BytesIO(file_content)
 
-        extracted = await run_in_threadpool(self.extractor.extract, file)
+        extracted = await run_in_threadpool(self.extractor.extract, extraction_file)
         text = extracted.text
         pages = extracted.pages
 

@@ -29,7 +29,7 @@ class FakeBulaService:
         _ = manufacturer
         _ = file
         return BulaUploadResponse(
-            filename=filename or "arquivo_sem_nome.pdf",
+            filename=filename or "unnamed_file.pdf",
             pages=1,
             characters=10,
             chunks=1,
@@ -58,15 +58,15 @@ async def test_upload_valid_pdf_keeps_current_flow(client: AsyncClient):
     try:
         response = await client.post(
             "/api/v1/bulas/upload",
-            data={"drug_name": "Dipirona", "manufacturer": "Medley"},
-            files={"file": ("bula.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
+            data={"drug_name": "Dipyrone", "manufacturer": "Example Pharma"},
+            files={"file": ("leaflet.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
             headers=build_auth_headers(access_token),
         )
     finally:
         app.dependency_overrides.pop(get_bula_service, None)
 
     assert response.status_code == 201, response.json()
-    assert response.json()["filename"] == "bula.pdf"
+    assert response.json()["filename"] == "leaflet.pdf"
 
 
 @pytest.mark.anyio
@@ -75,7 +75,7 @@ async def test_upload_rejects_non_pdf_content_type(client: AsyncClient):
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipirona"},
+        data={"drug_name": "Dipyrone"},
         files={"file": ("imagem.png", b"fake image", "image/png")},
         headers=build_auth_headers(access_token),
     )
@@ -91,7 +91,7 @@ async def test_upload_rejects_files_larger_than_10_mb(client: AsyncClient):
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipirona"},
+        data={"drug_name": "Dipyrone"},
         files={"file": ("grande.pdf", oversized_file, "application/pdf")},
         headers=build_auth_headers(access_token),
     )
@@ -106,8 +106,8 @@ async def test_upload_corrupted_pdf_still_returns_400(client: AsyncClient):
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipirona"},
-        files={"file": ("corrompido.pdf", b"not a real pdf", "application/pdf")},
+        data={"drug_name": "Dipyrone"},
+        files={"file": ("corrupted.pdf", b"not a real pdf", "application/pdf")},
         headers=build_auth_headers(access_token),
     )
 

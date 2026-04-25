@@ -26,11 +26,11 @@ def object_store_client(db_session: AsyncSession) -> PgObjectStoreClient:
 async def test_put_bytes_saves_and_reads_same_content(
     object_store_client: PgObjectStoreClient,
 ) -> None:
-    original_content = b"conteudo de uma bula em pdf"
+    original_content = b"leaflet pdf content"
 
     address = await object_store_client.put_bytes(
         data=original_content,
-        filename="bula-dipirona.pdf",
+        filename="dipyrone-leaflet.pdf",
     )
 
     retrieved_content = await object_store_client.get_bytes(address)
@@ -42,19 +42,19 @@ async def test_put_bytes_saves_and_reads_same_content(
 async def test_put_bytes_saves_retrievable_metadata(
     object_store_client: PgObjectStoreClient,
 ) -> None:
-    original_content = b"metadados importantes"
+    original_content = b"important metadata"
     expected_checksum = hashlib.sha256(original_content).hexdigest()
 
     address = await object_store_client.put_bytes(
         data=original_content,
-        filename="bula-losartana.pdf",
+        filename="losartan-leaflet.pdf",
     )
 
     retrieved_metadata = await object_store_client.get_metadata(address)
 
     assert isinstance(retrieved_metadata, StoredObjectRef)
     assert retrieved_metadata.object_address == address
-    assert retrieved_metadata.original_filename == "bula-losartana.pdf"
+    assert retrieved_metadata.original_filename == "losartan-leaflet.pdf"
     assert retrieved_metadata.content_type is None
     assert retrieved_metadata.content_size_bytes == len(original_content)
     assert retrieved_metadata.sha256_checksum == expected_checksum
@@ -67,8 +67,8 @@ async def test_exists_returns_true_for_saved_object(
     object_store_client: PgObjectStoreClient,
 ) -> None:
     address = await object_store_client.put_bytes(
-        data=b"conteudo existente",
-        filename="existente.pdf",
+        data=b"existing content",
+        filename="existing.pdf",
     )
 
     object_exists = await object_store_client.exists(address)
@@ -80,7 +80,7 @@ async def test_exists_returns_true_for_saved_object(
 async def test_missing_object_does_not_exist(
     object_store_client: PgObjectStoreClient,
 ) -> None:
-    missing_object_address = "stored_objects/nao-existe"
+    missing_object_address = "stored_objects/does-not-exist"
 
     object_exists = await object_store_client.exists(missing_object_address)
 
@@ -91,15 +91,15 @@ async def test_missing_object_does_not_exist(
 async def test_identical_content_creates_distinct_object_addresses(
     object_store_client: PgObjectStoreClient,
 ) -> None:
-    original_content = b"mesmo conteudo"
+    original_content = b"same content"
 
     first_address = await object_store_client.put_bytes(
         data=original_content,
-        filename="primeira-bula.pdf",
+        filename="first-leaflet.pdf",
     )
     second_address = await object_store_client.put_bytes(
         data=original_content,
-        filename="segunda-bula.pdf",
+        filename="second-leaflet.pdf",
     )
     first_metadata = await object_store_client.get_metadata(first_address)
     second_metadata = await object_store_client.get_metadata(second_address)
