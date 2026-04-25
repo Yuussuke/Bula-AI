@@ -11,6 +11,7 @@ from app.core.base import Base
 from app.modules.auth.models import User  # noqa: F401
 from app.modules.bulas.models import Bula  # noqa: F401
 from app.modules.chat.models import ChatSession, ChatMessage  # noqa: F401
+from app.modules.storage.models import StoredObject  # noqa: F401
 
 
 __all__ = ["Base", "engine", "async_session_factory", "get_db", "close_engine"]
