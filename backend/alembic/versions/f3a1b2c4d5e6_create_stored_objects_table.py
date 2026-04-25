@@ -1,7 +1,7 @@
 """create_stored_objects_table
 
 Revision ID: f3a1b2c4d5e6
-Revises: ee100f7e5788
+Revises: 0cea65267dcb
 Create Date: 2026-04-25 00:00:00.000000
 
 """
@@ -14,7 +14,7 @@ import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision: str = "f3a1b2c4d5e6"
-down_revision: Union[str, Sequence[str], None] = "ee100f7e5788"
+down_revision: Union[str, Sequence[str], None] = "0cea65267dcb"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
