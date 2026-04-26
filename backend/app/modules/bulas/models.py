@@ -25,7 +25,7 @@ class Bula(Base, UUIDMixin, TimestampMixin):
 
     drug_name: Mapped[str] = mapped_column(String, index=True)
     manufacturer: Mapped[str | None] = mapped_column(String, nullable=True)
-    file_url: Mapped[str] = mapped_column(String)
+    file_url: Mapped[str | None] = mapped_column(String, nullable=True)
     file_address: Mapped[str | None] = mapped_column(String(500), nullable=True)
     qdrant_collection: Mapped[str | None] = mapped_column(String, nullable=True)
 
