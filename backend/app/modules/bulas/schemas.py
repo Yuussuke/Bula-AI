@@ -22,7 +22,8 @@ class BulaResponse(BaseModel):
     user_id: int
     drug_name: str
     manufacturer: str | None
-    file_url: str
+    file_url: str | None
+    file_address: str | None
     qdrant_collection: str | None
     status: BulaStatus
     created_at: datetime
