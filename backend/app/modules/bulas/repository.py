@@ -1,3 +1,4 @@
+from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -17,9 +18,9 @@ class BulaRepository:
         *,
         user_id: int,
         drug_name: str,
-        file_url: str,
         manufacturer: str | None = None,
         file_address: str | None = None,
+        file_url: str | None = None,
         qdrant_collection: str | None = None,
         status: BulaStatus = BulaStatus.PENDING,
     ) -> Bula:
@@ -43,3 +44,12 @@ class BulaRepository:
 
         await self.db.refresh(bula)
         return bula
+
+    async def list_by_user(self, *, user_id: int) -> list[Bula]:
+        statement = (
+            select(Bula)
+            .where(Bula.user_id == user_id)
+            .order_by(Bula.created_at.desc())
+        )
+        result = await self.db.execute(statement)
+        return list(result.scalars().all())
