@@ -16,6 +16,14 @@ settings:
   followRedirects: true
   maxRedirects: 5
 
+request:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 204) {
+          bru.setEnvVar("access_token", "");
+        }
+
 examples:
   - name: 204 Response
     description: Successful Response

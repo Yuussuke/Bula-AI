@@ -180,10 +180,15 @@ Main files:
 - Stop services: `make down`
 - Follow logs: `make logs`
 - Run migrations: `make migrate`
+- Create an admin user: `make create-admin ARGS="--email admin@example.com --full-name 'Admin User'"`
 - Run tests: `make test`
 - Run tests with coverage: `make test-cov`
 - Lint: `make lint`
 - Format: `make format`
+
+Public registration through `/api/v1/auth/register` always creates regular
+`user` accounts. Administrative users are created through the internal
+management command exposed by `make create-admin`.
 
 ## Automated Dependency Updates
 

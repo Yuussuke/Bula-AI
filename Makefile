@@ -2,7 +2,7 @@
 
 COMPOSE := docker compose
 
-.PHONY: up down build rebuild logs shell migrate makemigrations test test-cov lint format reset-db help dependencies add-dependency
+.PHONY: up down build rebuild logs shell migrate makemigrations create-admin test test-cov lint format reset-db help dependencies add-dependency
 
 # --- Docker ---
 build:
@@ -32,6 +32,9 @@ makemigrations:
 		read -p "Migration message: " msg; \
 	fi; \
 	$(COMPOSE) exec api uv run alembic revision --autogenerate -m "$$msg"
+
+create-admin:
+	$(COMPOSE) exec -e ADMIN_PASSWORD api uv run python -m app.scripts.create_admin $(ARGS)
 
 reset-db:
 	$(COMPOSE) down -v && $(COMPOSE) up -d
@@ -75,6 +78,7 @@ help:
 	@echo "  make shell          - Access the api bash shell"
 	@echo "  make migrate        - Run database migrations"
 	@echo "  make makemigrations - Generate a new migration (prompts for message; or use MSG=\"...\")"
+	@echo "  make create-admin   - Create an admin user inside the api container (optional ARGS=\"...\")"
 	@echo "  make reset-db       - Destroy volumes and remigrate from scratch"
 	@echo "  make test           - Run the test suite"
 	@echo "  make test-cov       - Run tests with coverage report"

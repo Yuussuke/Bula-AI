@@ -8,6 +8,8 @@ from pydantic import (
     field_validator,
 )
 
+from app.modules.auth.models import UserRole
+
 
 class UserBase(BaseModel):
     email: EmailStr
@@ -22,6 +24,8 @@ class UserBase(BaseModel):
 class UserCreate(UserBase):
     full_name: str
     password: str = Field(min_length=8, max_length=64)
+
+    model_config = ConfigDict(extra="forbid")
 
     @field_validator("password")
     @classmethod
@@ -51,6 +55,7 @@ class UserLogin(BaseModel):
 class UserResponse(UserBase):
     id: int
     name: str = Field(validation_alias=AliasChoices("name", "full_name"))
+    role: UserRole
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
