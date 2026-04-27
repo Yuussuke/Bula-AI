@@ -1,0 +1,136 @@
+name: Postgres Image
+
+permissions:
+  contents: read
+  packages: write
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "docker/bula_ai_postgres/**"
+      - ".github/workflows/postgres-image.yml"
+  push:
+    branches: [main]
+    paths:
+      - "docker/bula_ai_postgres/**"
+      - ".github/workflows/postgres-image.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_NAME: bula_ai_postgres
+  IMAGE_CONTEXT: docker/bula_ai_postgres
+  DOCKERFILE_PATH: docker/bula_ai_postgres/Dockerfile
+
+jobs:
+  postgres-image:
+    name: Build Postgres Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Resolve mirrored image tag
+        id: image
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          base_image="$(
+            awk '
+              toupper($1) == "FROM" {
+                for (index = 2; index <= NF; index++) {
+                  if ($index !~ /^--/ && toupper($index) != "AS") {
+                    print $index
+                    exit
+                  }
+                }
+              }
+            ' "$DOCKERFILE_PATH"
+          )"
+
+          if [ -z "$base_image" ]; then
+            echo "::error::Could not find a FROM image in $DOCKERFILE_PATH."
+            exit 1
+          fi
+
+          base_without_digest="${base_image%@*}"
+          base_name="${base_without_digest##*/}"
+
+          if [[ "$base_name" != *:* ]]; then
+            echo "::error::The Postgres image FROM must use an explicit tag."
+            exit 1
+          fi
+
+          base_tag="${base_name##*:}"
+
+          if [ "$base_tag" = "latest" ]; then
+            echo "::error::The Postgres image FROM must not use the latest tag."
+            exit 1
+          fi
+
+          owner_lowercase="$(echo "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          image_repository="ghcr.io/${owner_lowercase}/${IMAGE_NAME}"
+          image_ref="${image_repository}:${base_tag}"
+
+          {
+            echo "base_image=$base_image"
+            echo "base_tag=$base_tag"
+            echo "image_repository=$image_repository"
+            echo "image_ref=$image_ref"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build image
+        run: docker build -t "${{ steps.image.outputs.image_ref }}" "$IMAGE_CONTEXT"
+
+      - name: Verify image capabilities
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          container_name="bula-ai-postgres-image-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+
+          cleanup() {
+            docker rm -f "$container_name" >/dev/null 2>&1 || true
+          }
+
+          trap cleanup EXIT
+
+          docker run -d \
+            --name "$container_name" \
+            -e POSTGRES_USER=postgres \
+            -e POSTGRES_PASSWORD=postgres \
+            -e POSTGRES_DB=postgres \
+            "${{ steps.image.outputs.image_ref }}" >/dev/null
+
+          echo "Waiting for temporary PostgreSQL container..."
+          for attempt in 1 2 3 4 5 6 7 8 9 10; do
+            if docker exec "$container_name" pg_isready -U postgres -d postgres >/dev/null 2>&1; then
+              break
+            fi
+
+            if [ "$attempt" = "10" ]; then
+              docker logs "$container_name"
+              exit 1
+            fi
+
+            sleep 2
+          done
+
+          docker exec "$container_name" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
+            -c "CREATE EXTENSION IF NOT EXISTS vector;" \
+            -c "CREATE EXTENSION IF NOT EXISTS unaccent;" \
+            -c "SELECT extname FROM pg_extension WHERE extname IN ('vector', 'unaccent') ORDER BY extname;" \
+            -c "SELECT to_tsvector('portuguese', unaccent('contraindicação')) AS portuguese_fts_probe;"
+
+      - name: Log in to GHCR
+        if: github.event_name != 'pull_request'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Push image
+        if: github.event_name != 'pull_request'
+        run: docker push "${{ steps.image.outputs.image_ref }}"
