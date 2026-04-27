@@ -94,7 +94,7 @@ class BulaService:
         is_file_too_large = file_size_bytes > self.max_upload_size_bytes
         if is_file_too_large:
             raise HTTPException(
-                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+                status_code=status.HTTP_413_CONTENT_TOO_LARGE,
                 detail="O arquivo excede o tamanho maximo permitido.",
             )
 
