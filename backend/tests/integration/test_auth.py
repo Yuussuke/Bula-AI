@@ -1,9 +1,17 @@
 import pytest
+from fastapi import HTTPException
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import Response
 
 from app.core.config import Settings
+from app.modules.auth.dependencies import require_admin
+from app.modules.auth.models import User, UserRole
+from app.modules.auth.repository import RefreshTokenRepository, UserRepository
 from app.modules.auth.router import set_refresh_cookie
+from app.modules.auth.schemas import UserCreate
+from app.modules.auth.security import PasswordHasher
+from app.modules.auth.service import AuthService, TokenService
 
 TEST_USER = {
     "full_name": "Test User",
@@ -22,11 +30,27 @@ async def test_register_creates_user_and_returns_201(client: AsyncClient):
     data = response.json()
     assert data["user"]["email"] == TEST_USER["email"]
     assert data["user"]["name"] == TEST_USER["full_name"]
+    assert data["user"]["role"] == "user"
     assert "id" in data["user"]
     assert "full_name" not in data["user"]
     assert "is_active" not in data["user"]
     assert "password" not in data["user"]
     assert "hashed_password" not in data["user"]
+
+
+@pytest.mark.anyio
+async def test_register_rejects_role_payload(client: AsyncClient):
+    payload = {**TEST_USER, "email": "role-attempt@bulaai.com", "role": "admin"}
+
+    response = await client.post("/api/v1/auth/register", json=payload)
+
+    assert response.status_code == 422
+
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": payload["email"], "password": payload["password"]},
+    )
+    assert login_response.status_code == 401
 
 
 @pytest.mark.anyio
@@ -59,6 +83,7 @@ async def test_login_with_valid_credentials_returns_token(client: AsyncClient):
     assert "user" in data
     assert data["user"]["email"] == TEST_USER["email"]
     assert data["user"]["name"] == TEST_USER["full_name"]
+    assert data["user"]["role"] == "user"
     assert "full_name" not in data["user"]
     assert "is_active" not in data["user"]
 
@@ -95,6 +120,7 @@ async def test_get_me_with_valid_token_returns_user(client: AsyncClient):
     data = response.json()
     assert data["email"] == TEST_USER["email"]
     assert data["name"] == TEST_USER["full_name"]
+    assert data["role"] == "user"
     assert "full_name" not in data
     assert "is_active" not in data
 
@@ -216,3 +242,69 @@ def test_refresh_cookie_uses_secure_settings_in_production(monkeypatch):
 def test_secret_key_validator_rejects_weak_key():
     with pytest.raises(ValueError):
         Settings(secret_key="changeme")
+
+
+@pytest.mark.anyio
+async def test_require_admin_allows_admin_user():
+    admin_user = User(
+        id=1,
+        full_name="Admin User",
+        email="admin@bulaai.com",
+        hashed_password="hashed",
+        role=UserRole.ADMIN,
+    )
+
+    result = await require_admin(current_user=admin_user)
+
+    assert result is admin_user
+
+
+@pytest.mark.anyio
+async def test_require_admin_rejects_regular_user():
+    regular_user = User(
+        id=1,
+        full_name="Regular User",
+        email="user@bulaai.com",
+        hashed_password="hashed",
+        role=UserRole.USER,
+    )
+
+    with pytest.raises(HTTPException) as exception_info:
+        await require_admin(current_user=regular_user)
+
+    assert exception_info.value.status_code == 403
+
+
+@pytest.mark.anyio
+async def test_create_admin_user_creates_admin_that_can_login(
+    client: AsyncClient,
+    db_session: AsyncSession,
+):
+    auth_service = AuthService(
+        user_repository=UserRepository(db=db_session),
+        refresh_token_repository=RefreshTokenRepository(db=db_session),
+        password_hasher=PasswordHasher(),
+        token_service=TokenService(
+            secret_key="long_and_secure_secret_key_for_testing_purposes_only_1234567890",
+            algorithm="HS256",
+            access_token_expire_minutes=30,
+        ),
+    )
+    admin_payload = UserCreate(
+        full_name="Admin User",
+        email="admin@bulaai.com",
+        password="Secret123!",
+    )
+
+    admin_user = await auth_service.create_admin_user(admin_payload)
+
+    assert admin_user.role == UserRole.ADMIN
+    assert admin_user.hashed_password != admin_payload.password
+
+    login_response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": admin_payload.email, "password": admin_payload.password},
+    )
+
+    assert login_response.status_code == 200, login_response.json()
+    assert login_response.json()["user"]["role"] == "admin"
