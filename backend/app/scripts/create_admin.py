@@ -72,8 +72,7 @@ async def create_admin_user(email: str, full_name: str, password: str) -> None:
         admin_user = await auth_service.create_admin_user(admin_user_input)
 
     print(
-        "Admin user created successfully: "
-        f"id={admin_user.id}, email={admin_user.email}"
+        f"Admin user created successfully: id={admin_user.id}, email={admin_user.email}"
     )
 
 
