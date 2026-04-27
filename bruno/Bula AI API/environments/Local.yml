@@ -3,4 +3,6 @@ variables:
   - name: baseUrl
     value: http://localhost:8000
   - name: access_token
-    value: "{token}"
+    value: ""
+  - name: auth_email
+    value: ""

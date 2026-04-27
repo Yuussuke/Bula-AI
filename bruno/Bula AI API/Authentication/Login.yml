@@ -23,6 +23,18 @@ settings:
   followRedirects: true
   maxRedirects: 5
 
+request:
+  scripts:
+    - type: after-response
+      code: |-
+        if (res.getStatus() === 200) {
+          const data = res.getBody();
+
+          if (data && data.token && data.token.access_token) {
+            bru.setEnvVar("access_token", data.token.access_token);
+          }
+        }
+
 examples:
   - name: 200 Response
     description: Successful Response
@@ -52,9 +64,9 @@ examples:
             },
             "user": {
               "email": "",
-              "full_name": "",
               "id": 0,
-              "is_active": false
+              "name": "",
+              "role": "user"
             }
           }
   - name: 422 Response

@@ -1,0 +1,66 @@
+info:
+  name: Register - Reject Role Payload
+  type: http
+  seq: 6
+  tags:
+    - Authentication
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/v1/auth/register"
+  body:
+    type: json
+    data: |-
+      {
+        "email": "role.attempt@bulaai.com",
+        "full_name": "Role Injection Attempt",
+        "password": "Secret123!",
+        "role": "admin"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 422 Response
+    description: Validation Error
+    request:
+      url: "{{baseUrl}}/api/v1/auth/register"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "email": "role.attempt@bulaai.com",
+            "full_name": "Role Injection Attempt",
+            "password": "Secret123!",
+            "role": "admin"
+          }
+    response:
+      status: 422
+      statusText: Unprocessable Entity
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "detail": [
+              {
+                "type": "extra_forbidden",
+                "loc": [
+                  "body",
+                  "role"
+                ],
+                "msg": "Extra inputs are not permitted",
+                "input": "admin"
+              }
+            ]
+          }
+
+docs: Rejects public self-registration attempts that try to choose a privileged role.
