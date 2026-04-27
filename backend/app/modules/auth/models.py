@@ -27,7 +27,7 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
-    role = Column(
+    role: Column[UserRole] = Column(
         Enum(
             UserRole,
             name="userrole",
