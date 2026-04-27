@@ -1,15 +1,22 @@
 from __future__ import annotations
 
+import enum
 from typing import TYPE_CHECKING
 
 # Database representation (SQLAlchemy)
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy import Boolean, Column, DateTime, Enum, ForeignKey, Integer, String
 from app.core.base import Base
 from sqlalchemy.orm import relationship, Mapped
 
 if TYPE_CHECKING:
     from app.modules.bulas.models import Bula
     from app.modules.chat.models import ChatSession
+
+
+class UserRole(str, enum.Enum):
+    USER = "user"
+    ADMIN = "admin"
+    REVIEWER = "reviewer"
 
 
 class User(Base):
@@ -20,6 +27,16 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     hashed_password = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
+    role = Column(
+        Enum(
+            UserRole,
+            name="userrole",
+            values_callable=lambda user_roles: [role.value for role in user_roles],
+        ),
+        nullable=False,
+        default=UserRole.USER,
+        server_default=UserRole.USER.value,
+    )
 
     bulas: Mapped[list["Bula"]] = relationship(
         "Bula",

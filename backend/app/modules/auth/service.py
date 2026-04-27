@@ -5,7 +5,7 @@ import jwt
 import structlog
 
 from app.modules.auth import schemas, repository, security
-from app.modules.auth.models import User
+from app.modules.auth.models import User, UserRole
 
 logger = structlog.get_logger(__name__)
 
@@ -87,7 +87,43 @@ class AuthService:
         return self.token_service.create_access_token(data, expires_delta)
 
     async def register_new_user(self, user_in: schemas.UserCreate) -> User:
-        normalized_email = user_in.email.lower().strip()
+        new_user = await self._create_user_with_role(
+            full_name=user_in.full_name,
+            email=user_in.email,
+            password=user_in.password,
+            role=UserRole.USER,
+        )
+        logger.info(
+            "user_registered_successfully",
+            user_id=new_user.id,
+            email=new_user.email,
+            role=new_user.role,
+        )
+        return new_user
+
+    async def create_admin_user(self, user_in: schemas.UserCreate) -> User:
+        admin_user = await self._create_user_with_role(
+            full_name=user_in.full_name,
+            email=user_in.email,
+            password=user_in.password,
+            role=UserRole.ADMIN,
+        )
+        logger.info(
+            "admin_user_created_successfully",
+            user_id=admin_user.id,
+            email=admin_user.email,
+        )
+        return admin_user
+
+    async def _create_user_with_role(
+        self,
+        *,
+        full_name: str,
+        email: str,
+        password: str,
+        role: UserRole,
+    ) -> User:
+        normalized_email = email.lower().strip()
         logger.info("user_registration_attempt", email=normalized_email)
 
         existing_user = await self.user_repository.get_user_by_email(
@@ -101,19 +137,18 @@ class AuthService:
             )
             raise UserAlreadyExistsError()
 
-        hashed_password = self.password_hasher.get_password_hash(user_in.password)
+        hashed_password = self.password_hasher.get_password_hash(password)
 
         try:
             new_user = await self.user_repository.create_user(
-                full_name=user_in.full_name,
+                full_name=full_name,
                 email=normalized_email,
                 hashed_password=hashed_password,
+                role=role,
             )
         except repository.UserAlreadyExistsRepositoryError as exc:
             raise UserAlreadyExistsError() from exc
-        logger.info(
-            "user_registered_successfully", user_id=new_user.id, email=new_user.email
-        )
+
         return new_user
 
     async def authenticate_user(

@@ -10,7 +10,7 @@ from app.core.config import settings
 from app.modules.auth.repository import UserRepository, RefreshTokenRepository
 from app.modules.auth.service import AuthService, InvalidCredentialsError, TokenService
 from app.modules.auth.security import PasswordHasher
-from app.modules.auth.models import User
+from app.modules.auth.models import User, UserRole
 
 security = HTTPBearer(auto_error=False)
 
@@ -86,3 +86,16 @@ async def get_current_user(
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+async def require_admin(
+    current_user: User = Depends(get_current_user),
+) -> User:
+    """Ensures that the authenticated user has administrator privileges."""
+    if current_user.role != UserRole.ADMIN:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin privileges are required.",
+        )
+
+    return current_user

@@ -7,7 +7,7 @@ from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.auth.models import RefreshToken, User
+from app.modules.auth.models import RefreshToken, User, UserRole
 
 
 class UserAlreadyExistsRepositoryError(Exception):
@@ -37,7 +37,11 @@ class UserRepository:
         return result.scalars().first()
 
     async def create_user(
-        self, full_name: str, email: str, hashed_password: str
+        self,
+        full_name: str,
+        email: str,
+        hashed_password: str,
+        role: UserRole = UserRole.USER,
     ) -> User:
         """
         Creates and persists a new user record in the database.
@@ -47,6 +51,7 @@ class UserRepository:
             full_name=full_name,
             email=email,
             hashed_password=hashed_password,
+            role=role,
         )
         self.db.add(db_user)
         try:
