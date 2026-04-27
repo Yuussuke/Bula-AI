@@ -26,7 +26,19 @@ make makemigrations
 MSG="your_message" make makemigrations
 ```
 
-## 3) Common DNS error
+## 3) Management commands
+
+Create administrators from inside the Docker workflow:
+
+```bash
+make create-admin ARGS="--email admin@example.com --full-name 'Admin User'"
+```
+
+The command prompts for the password securely. For non-interactive environments,
+set `ADMIN_PASSWORD` before running the make target. Public self-registration
+never accepts a role and always creates `user` accounts.
+
+## 4) Common DNS error
 
 If you get `socket.gaierror: [Errno 11001] getaddrinfo failed`,
 the hostname in `DATABASE_URL` is not resolvable in the current execution context.
