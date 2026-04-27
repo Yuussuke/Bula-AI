@@ -7,6 +7,7 @@ from app.modules.storage.client import ObjectStoreClient
 
 PDF_CONTENT_TYPE = "application/pdf"
 PDF_MAGIC_BYTES = b"%PDF-"
+UPLOAD_VALIDATION_CHUNK_SIZE_BYTES = 1024 * 1024
 
 
 class BulaService:
@@ -83,7 +84,8 @@ class BulaService:
                 detail="Apenas arquivos PDF sao aceitos.",
             )
 
-        file_size_bytes = self._get_file_size_bytes(file)
+        magic_bytes, file_size_bytes = await self._read_magic_bytes_and_file_size(file)
+
         is_file_empty = file_size_bytes == 0
         if is_file_empty:
             raise HTTPException(
@@ -98,10 +100,6 @@ class BulaService:
                 detail="O arquivo excede o tamanho maximo permitido.",
             )
 
-        await file.seek(0)
-        magic_bytes = await file.read(len(PDF_MAGIC_BYTES))
-        await file.seek(0)
-
         is_pdf_magic_valid = magic_bytes == PDF_MAGIC_BYTES
         if not is_pdf_magic_valid:
             raise HTTPException(
@@ -109,11 +107,33 @@ class BulaService:
                 detail="Apenas arquivos PDF validos sao aceitos.",
             )
 
-    def _get_file_size_bytes(self, file: UploadFile) -> int:
-        file.file.seek(0, 2)
-        file_size_bytes = file.file.tell()
-        file.file.seek(0)
-        return file_size_bytes
+    async def _read_magic_bytes_and_file_size(
+        self,
+        file: UploadFile,
+    ) -> tuple[bytes, int]:
+        await file.seek(0)
+
+        magic_bytes = b""
+        file_size_bytes = 0
+
+        while True:
+            chunk = await file.read(UPLOAD_VALIDATION_CHUNK_SIZE_BYTES)
+            has_chunk = len(chunk) > 0
+            if not has_chunk:
+                break
+
+            has_complete_magic_bytes = len(magic_bytes) >= len(PDF_MAGIC_BYTES)
+            if not has_complete_magic_bytes:
+                magic_bytes += chunk
+                magic_bytes = magic_bytes[: len(PDF_MAGIC_BYTES)]
+
+            file_size_bytes += len(chunk)
+            is_file_too_large = file_size_bytes > self.max_upload_size_bytes
+            if is_file_too_large:
+                break
+
+        await file.seek(0)
+        return magic_bytes, file_size_bytes
 
     async def _delete_uploaded_file_after_failure(self, file_address: str) -> None:
         try:

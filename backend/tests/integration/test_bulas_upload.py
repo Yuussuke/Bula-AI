@@ -2,6 +2,10 @@ import pytest
 from httpx import AsyncClient
 
 
+MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024
+PDF_MAGIC_BYTES = b"%PDF-"
+
+
 def build_user(email: str) -> dict[str, str]:
     return {
         "full_name": "Upload Test User",
@@ -137,7 +141,8 @@ async def test_upload_rejects_files_larger_than_10_mb_with_413(
     client: AsyncClient,
 ) -> None:
     access_token = await get_access_token(client, email="oversized@bulaai.com")
-    oversized_file = b"%PDF-" + b"0" * (10 * 1024 * 1024)
+    padding_size_bytes = MAX_UPLOAD_SIZE_BYTES - len(PDF_MAGIC_BYTES) + 1
+    oversized_file = PDF_MAGIC_BYTES + b"0" * padding_size_bytes
 
     response = await client.post(
         "/api/v1/bulas/upload",
