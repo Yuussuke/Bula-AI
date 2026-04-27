@@ -41,6 +41,7 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     """
 
     FRONTEND_URL: str = "http://localhost:5173"
+    max_bula_upload_size_bytes: int = 10 * 1024 * 1024
     backend_cors_origins: list[str] = [
         "http://localhost:3000",
         FRONTEND_URL,
