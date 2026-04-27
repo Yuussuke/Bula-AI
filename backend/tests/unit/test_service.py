@@ -94,7 +94,9 @@ async def test_upload_bula_deletes_file_when_bula_persistence_fails() -> None:
 
 
 @pytest.mark.anyio
-async def test_upload_bula_keeps_original_error_when_compensating_delete_fails() -> None:
+async def test_upload_bula_keeps_original_error_when_compensating_delete_fails() -> (
+    None
+):
     mock_repo = AsyncMock()
     mock_repo.create_bula.side_effect = BulaPersistenceError()
     mock_object_store_client = AsyncMock()

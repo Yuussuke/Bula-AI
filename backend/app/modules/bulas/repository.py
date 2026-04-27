@@ -47,9 +47,7 @@ class BulaRepository:
 
     async def list_by_user(self, *, user_id: int) -> list[Bula]:
         statement = (
-            select(Bula)
-            .where(Bula.user_id == user_id)
-            .order_by(Bula.created_at.desc())
+            select(Bula).where(Bula.user_id == user_id).order_by(Bula.created_at.desc())
         )
         result = await self.db.execute(statement)
         return list(result.scalars().all())
