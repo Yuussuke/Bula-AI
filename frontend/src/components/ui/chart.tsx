@@ -336,7 +336,6 @@ function getPayloadConfigFromPayload(config: ChartConfig, payload: unknown, key:
     configLabelKey = payloadPayload[key as keyof typeof payloadPayload];
   }
 
-
   return configLabelKey in config ? config[configLabelKey] : config[key];
 }
 
