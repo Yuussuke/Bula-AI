@@ -2,6 +2,7 @@ name: Backend CI
 
 permissions:
   contents: read
+  packages: read
 
 on:
   push:
@@ -109,7 +110,10 @@ jobs:
     runs-on: ubuntu-latest
     services:
       postgres:
-        image: postgres:16
+        image: ghcr.io/yuussuke/bula_ai_postgres:0.8.1-pg16
+        credentials:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
