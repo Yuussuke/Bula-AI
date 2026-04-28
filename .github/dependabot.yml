@@ -100,6 +100,21 @@ updates:
       - dependency-name: "node"
         update-types: ["version-update:semver-patch"]
 
+  # Docker base image for the first-party PostgreSQL image
+  - package-ecosystem: "docker"
+    directory: "/docker/bula_ai_postgres"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+      - "automated"
+    reviewers:
+      - "Yuussuke"
+
   # Docker Compose services (root) - monitors postgres:15
   - package-ecosystem: "docker"
     directory: "/"

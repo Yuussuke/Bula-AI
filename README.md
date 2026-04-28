@@ -202,6 +202,7 @@ This repository uses Dependabot to keep dependencies up to date with controlled 
    - `npm` for frontend dependencies (`/frontend`)
    - `docker` for backend image references (`/backend`)
    - `docker` for frontend image references (`/frontend`, pre-configured for future Dockerfile)
+   - `docker` for the first-party PostgreSQL image (`/docker/bula_ai_postgres`)
    - `docker` for root Compose image references (`/`)
    - `github-actions` for workflow action versions (`/`)
 
@@ -209,6 +210,8 @@ Policy notes:
 
 - Minor and patch dependency updates are grouped separately from major updates for `uv` and `npm`.
 - Major Docker/runtime updates should be validated in staging before production rollout.
+- The first-party PostgreSQL image tag mirrors its Dockerfile `FROM` tag and is versioned separately from application releases.
+- PostgreSQL major upgrades and pgvector major upgrades require manual compatibility review.
 - Security-driven updates should be prioritized, even when noise-reduction ignore rules are in place.
 
 ## Roadmap
