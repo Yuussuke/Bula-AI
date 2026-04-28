@@ -81,8 +81,8 @@ create-admin:
 
 reset-db:
 	$(COMPOSE) down -v && $(COMPOSE) up -d
-	sleep 3
-	make migrate
+	$(COMPOSE) exec postgres sh -lc 'until pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"; do sleep 1; done'
+	$(MAKE) migrate
 
 # --- Tests and quality ---
 test:
