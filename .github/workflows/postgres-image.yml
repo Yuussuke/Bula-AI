@@ -127,8 +127,10 @@ jobs:
 
           docker exec "$container_name" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
             -c "CREATE EXTENSION IF NOT EXISTS vector;" \
+            -c "CREATE EXTENSION IF NOT EXISTS vectorscale CASCADE;" \
+            -c "CREATE EXTENSION IF NOT EXISTS pg_textsearch;" \
             -c "CREATE EXTENSION IF NOT EXISTS unaccent;" \
-            -c "SELECT extname FROM pg_extension WHERE extname IN ('vector', 'unaccent') ORDER BY extname;" \
+            -c "SELECT extname FROM pg_extension WHERE extname IN ('vector', 'vectorscale', 'pg_textsearch', 'unaccent') ORDER BY extname;" \
             -c "SELECT to_tsvector('portuguese', unaccent(U&'contraindica\00E7\00E3o')) AS portuguese_fts_probe;"
 
       - name: Log in to GHCR
