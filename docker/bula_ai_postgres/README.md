@@ -2,36 +2,40 @@
 
 This directory defines the first-party PostgreSQL image for Bula AI.
 
-The image is intentionally thin. Its main purpose is to give the project one
-auditable database artifact for local development, CI, and future deployment
+The image is intentionally first-party. Its main purpose is to give the project
+one auditable database artifact for local development, CI, and future deployment
 parity while keeping the database image lifecycle separate from application
 releases.
 
 ## Why first-party GHCR
 
-The `joeychilson/railway-pg-vectorscale-textsearch` project is a useful design
-reference for the pgvector plus text-search direction, but Bula AI should not
-depend on pulling that third-party image directly as its long-term default.
-Using an in-repository Dockerfile and publishing `bula_ai_postgres` to GHCR gives
-the project an explicit, reviewable update path through Dependabot and CI. It
-also keeps rebuild cadence, base-image updates, and local/CI/future production
-parity under this repository's control.
+The `joeychilson/railway-pg-vectorscale-textsearch` project is the design
+reference for the pgvector, pgvectorscale, and pg_textsearch direction. Bula AI
+uses the same shape of image, but should not depend on pulling that third-party
+image directly as its long-term default. Using an in-repository Dockerfile and
+publishing `bula_ai_postgres` to GHCR gives the project an explicit, reviewable
+update path through Dependabot and CI. It also keeps rebuild cadence,
+base-image updates, and local/CI/future production parity under this
+repository's control.
 
 ## Image contract
 
-- Local image name: `bula_ai_postgres:0.8.1-pg16`
-- GHCR image: `ghcr.io/yuussuke/bula_ai_postgres:0.8.1-pg16`
-- Base image: `pgvector/pgvector:0.8.1-pg16`
-- PostgreSQL major version: 16
+- Local image name: `bula_ai_postgres:18`
+- GHCR image: `ghcr.io/yuussuke/bula_ai_postgres:18`
+- Base image: `postgres:18`
+- PostgreSQL major version: 18
 - Required PostgreSQL capabilities:
   - `vector` extension from pgvector
+  - `vectorscale` extension from pgvectorscale
+  - `pg_textsearch` extension for BM25 text search
   - `unaccent` extension
   - PostgreSQL native full-text search with the `portuguese` configuration
+- Image default:
+  - `shared_preload_libraries = 'pg_textsearch'`
 
 The project image tag mirrors the underlying `FROM` tag. For example, if the
-base image becomes `pgvector/pgvector:0.8.2-pg16`, the Bula AI image should be
-published as `ghcr.io/yuussuke/bula_ai_postgres:0.8.2-pg16`. This tag is not an
-application version.
+base image becomes `postgres:18.1`, the Bula AI image should be published as
+`ghcr.io/yuussuke/bula_ai_postgres:18.1`. This tag is not an application version.
 
 ## Local commands
 
@@ -48,9 +52,9 @@ make verify-postgres-image
 ```
 
 The verification starts a temporary PostgreSQL container without a named data
-volume and runs SQL checks for `vector`, `unaccent`, and Portuguese full-text
-search. It does not create the `chunk_meta` schema or implement BM25 retrieval;
-that work belongs to issue #32.
+volume and runs SQL checks for `vector`, `vectorscale`, `pg_textsearch`,
+`unaccent`, and Portuguese full-text search. It does not create the `chunk_meta`
+schema or implement BM25 retrieval; that work belongs to issue #32.
 
 ## Volume reset when changing image tags
 
@@ -110,15 +114,15 @@ to the GHCR image.
 
 ## Dependency updates
 
-Dependabot monitors this directory as a Docker ecosystem. When the
-`pgvector/pgvector` base tag changes, Dependabot should open a reviewable PR
-against `docker/bula_ai_postgres/Dockerfile`.
+Dependabot monitors this directory as a Docker ecosystem. When the `postgres`
+base tag changes, Dependabot should open a reviewable PR against
+`docker/bula_ai_postgres/Dockerfile`.
 
 Review database-image update PRs separately from application releases:
 
 - The Bula AI application version does not control this image tag.
 - The image tag must continue to mirror the underlying `FROM` tag.
-- PostgreSQL major upgrades and pgvector major upgrades require manual
+- PostgreSQL, pgvector, pgvectorscale, and pg_textsearch upgrades require manual
   compatibility review before merge.
 - After changing the base tag, run `make build-postgres-image` and
   `make verify-postgres-image`.
