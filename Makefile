@@ -7,7 +7,7 @@ POSTGRES_IMAGE := $(POSTGRES_IMAGE_NAME):$(POSTGRES_IMAGE_TAG)
 POSTGRES_IMAGE_CONTEXT := docker/bula_ai_postgres
 POSTGRES_VERIFY_CONTAINER := bula-ai-postgres-image-verify
 
-.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate makemigrations create-admin test test-cov lint format reset-db help dependencies add-dependency
+.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate verify-postgres makemigrations create-admin test test-cov lint format reset-db help dependencies add-dependency
 
 # --- Docker ---
 build:
@@ -56,11 +56,18 @@ verify-postgres-image: build-postgres-image
 		-c "CREATE EXTENSION IF NOT EXISTS vector;" \
 		-c "CREATE EXTENSION IF NOT EXISTS unaccent;" \
 		-c "SELECT extname FROM pg_extension WHERE extname IN ('vector', 'unaccent') ORDER BY extname;" \
-		-c "SELECT to_tsvector('portuguese', unaccent('contraindicação')) AS portuguese_fts_probe;"
+		-c "SELECT to_tsvector('portuguese', unaccent(U&'contraindica\00E7\00E3o')) AS portuguese_fts_probe;"
 
 # --- Database ---
 migrate:
 	$(COMPOSE) exec api uv run alembic upgrade head
+
+verify-postgres:
+	$(COMPOSE) exec postgres sh -lc 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -v ON_ERROR_STOP=1 \
+		-c "CREATE EXTENSION IF NOT EXISTS vector;" \
+		-c "CREATE EXTENSION IF NOT EXISTS unaccent;" \
+		-c "SELECT extname FROM pg_extension WHERE extname IN ('\''vector'\'', '\''unaccent'\'') ORDER BY extname;" \
+		-c "SELECT to_tsvector('\''portuguese'\'', unaccent(U&'\''contraindica\00E7\00E3o'\'')) AS portuguese_fts_probe;"'
 
 makemigrations:
 	@msg="$(MSG)"; \
@@ -74,8 +81,8 @@ create-admin:
 
 reset-db:
 	$(COMPOSE) down -v && $(COMPOSE) up -d
-	sleep 3
-	make migrate
+	$(COMPOSE) exec postgres sh -lc 'until pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"; do sleep 1; done'
+	$(MAKE) migrate
 
 # --- Tests and quality ---
 test:
@@ -115,6 +122,7 @@ help:
 	@echo "  make build-postgres-image  - Build the first-party PostgreSQL image"
 	@echo "  make verify-postgres-image - Verify pgvector, unaccent, and FTS support"
 	@echo "  make migrate        - Run database migrations"
+	@echo "  make verify-postgres - Verify extensions and FTS in the running PostgreSQL service"
 	@echo "  make makemigrations - Generate a new migration (prompts for message; or use MSG=\"...\")"
 	@echo "  make create-admin   - Create an admin user inside the api container (optional ARGS=\"...\")"
 	@echo "  make reset-db       - Destroy volumes and remigrate from scratch"

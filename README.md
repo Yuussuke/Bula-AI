@@ -2,7 +2,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Async-009688?logo=fastapi&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 ![Tests](https://img.shields.io/badge/Tests-pytest-0A9EDC?logo=pytest&logoColor=white)
 
@@ -77,7 +77,7 @@ flowchart LR
 ## Tech Stack
 
 - **Backend:** Python 3.12, FastAPI (async)
-- **Database:** PostgreSQL
+- **Database:** PostgreSQL 16 via the first-party `bula_ai_postgres` image
 - **ORM and Migrations:** SQLAlchemy 2 async, Alembic
 - **Auth:** JWT, Argon2id-based password hashing
 - **AI and Retrieval:** LangChain, Maritaca API integration, Qdrant-ready retrieval architecture
@@ -146,6 +146,9 @@ Example production-style structured log:
    ```
 
    Docker will build the backend image and start both the API and the database.
+   The PostgreSQL service uses the first-party GHCR image
+   `ghcr.io/yuussuke/bula_ai_postgres:0.8.1-pg16`. If the package visibility is
+   private, authenticate with `docker login ghcr.io` before running `make up`.
 
 ### Accessing the API
 
@@ -180,6 +183,7 @@ Main files:
 - Stop services: `make down`
 - Follow logs: `make logs`
 - Run migrations: `make migrate`
+- Verify PostgreSQL extensions and FTS: `make verify-postgres`
 - Create an admin user: `make create-admin ARGS="--email admin@example.com --full-name 'Admin User'"`
 - Run tests: `make test`
 - Run tests with coverage: `make test-cov`
@@ -189,6 +193,25 @@ Main files:
 Public registration through `/api/v1/auth/register` always creates regular
 `user` accounts. Administrative users are created through the internal
 management command exposed by `make create-admin`.
+
+## PostgreSQL Image and Local Data
+
+Local development and CI use the first-party PostgreSQL image
+`ghcr.io/yuussuke/bula_ai_postgres:0.8.1-pg16`, which bundles pgvector support
+and PostgreSQL full-text-search capabilities needed by the later BM25 work.
+
+Use `make verify-postgres` after `make up` to confirm that the running database
+can create `vector` and `unaccent` extensions and execute Portuguese FTS.
+
+When changing database image tags, prefer resetting the local database early:
+
+```bash
+make reset-db
+```
+
+This removes the Compose-managed database volume and reruns migrations. It is
+destructive for local data. The Compose volume is declared as `postgres_data`;
+Docker usually materializes it as `bula-ai_postgres_data`.
 
 ## Automated Dependency Updates
 
