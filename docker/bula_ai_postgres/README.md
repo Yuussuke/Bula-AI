@@ -42,6 +42,45 @@ volume and runs SQL checks for `vector`, `unaccent`, and Portuguese full-text
 search. It does not create the `chunk_meta` schema or implement BM25 retrieval;
 that work belongs to issue #32.
 
+## Volume reset when changing image tags
+
+Changing PostgreSQL major versions or database image tags can make an existing
+local data volume incompatible with the new server. Prefer doing this early,
+before local Phase 3 data grows.
+
+Preferred Docker-first reset:
+
+```bash
+make reset-db
+```
+
+This removes the Compose-managed PostgreSQL volume, recreates the stack, waits
+for PostgreSQL to accept connections, and reruns migrations. It is destructive
+for local database data.
+
+The volume is declared in `docker-compose.yml` as `postgres_data`. With the
+current Compose project name, Docker usually materializes it as:
+
+```text
+bula-ai_postgres_data
+```
+
+Fallback inspection command:
+
+```bash
+docker volume ls --filter name=postgres_data
+```
+
+Fallback manual removal, only after stopping the stack and only when local data
+loss is acceptable:
+
+```bash
+make down
+docker volume rm bula-ai_postgres_data
+make up
+make migrate
+```
+
 ## GHCR access policy
 
 The publish workflow builds this image on pull requests and pushes it to GHCR on
