@@ -8,7 +8,7 @@ services:
   # Infrastructure: PostgreSQL
   # ---------------------------------------------------------------------------
   postgres:
-    image: postgres:15
+    image: ghcr.io/yuussuke/bula_ai_postgres:0.8.1-pg16
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-bulaai}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bulaai}
