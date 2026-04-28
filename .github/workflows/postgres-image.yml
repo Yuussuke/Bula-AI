@@ -40,18 +40,22 @@ jobs:
         run: |
           set -euo pipefail
 
-          base_image="$(
-            awk '
-              toupper($1) == "FROM" {
-                for (index = 2; index <= NF; index++) {
-                  if ($index !~ /^--/ && toupper($index) != "AS") {
-                    print $index
-                    exit
-                  }
-                }
-              }
-            ' "$DOCKERFILE_PATH"
-          )"
+          from_line="$(grep -m 1 -E '^[[:space:]]*[Ff][Rr][Oo][Mm][[:space:]]+' "$DOCKERFILE_PATH" || true)"
+          read -r -a from_parts <<< "$from_line"
+
+          base_image=""
+          for from_part in "${from_parts[@]:1}"; do
+            if [[ "$from_part" == --* ]]; then
+              continue
+            fi
+
+            if [[ "${from_part^^}" == "AS" ]]; then
+              break
+            fi
+
+            base_image="$from_part"
+            break
+          done
 
           if [ -z "$base_image" ]; then
             echo "::error::Could not find a FROM image in $DOCKERFILE_PATH."
@@ -125,7 +129,7 @@ jobs:
             -c "CREATE EXTENSION IF NOT EXISTS vector;" \
             -c "CREATE EXTENSION IF NOT EXISTS unaccent;" \
             -c "SELECT extname FROM pg_extension WHERE extname IN ('vector', 'unaccent') ORDER BY extname;" \
-            -c "SELECT to_tsvector('portuguese', unaccent('contraindicação')) AS portuguese_fts_probe;"
+            -c "SELECT to_tsvector('portuguese', unaccent(U&'contraindica\00E7\00E3o')) AS portuguese_fts_probe;"
 
       - name: Log in to GHCR
         if: github.event_name != 'pull_request'
