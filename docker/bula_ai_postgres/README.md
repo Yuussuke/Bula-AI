@@ -58,3 +58,18 @@ the package. Package visibility is a repository policy decision:
 After the first successful publish, confirm the package visibility in GitHub's
 package settings before switching `docker-compose.yml` or CI service containers
 to the GHCR image.
+
+## Dependency updates
+
+Dependabot monitors this directory as a Docker ecosystem. When the
+`pgvector/pgvector` base tag changes, Dependabot should open a reviewable PR
+against `docker/bula_ai_postgres/Dockerfile`.
+
+Review database-image update PRs separately from application releases:
+
+- The Bula AI application version does not control this image tag.
+- The image tag must continue to mirror the underlying `FROM` tag.
+- PostgreSQL major upgrades and pgvector major upgrades require manual
+  compatibility review before merge.
+- After changing the base tag, run `make build-postgres-image` and
+  `make verify-postgres-image`.
