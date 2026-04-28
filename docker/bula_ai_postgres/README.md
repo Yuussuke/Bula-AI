@@ -7,6 +7,16 @@ auditable database artifact for local development, CI, and future deployment
 parity while keeping the database image lifecycle separate from application
 releases.
 
+## Why first-party GHCR
+
+The `joeychilson/railway-pg-vectorscale-textsearch` project is a useful design
+reference for the pgvector plus text-search direction, but Bula AI should not
+depend on pulling that third-party image directly as its long-term default.
+Using an in-repository Dockerfile and publishing `bula_ai_postgres` to GHCR gives
+the project an explicit, reviewable update path through Dependabot and CI. It
+also keeps rebuild cadence, base-image updates, and local/CI/future production
+parity under this repository's control.
+
 ## Image contract
 
 - Local image name: `bula_ai_postgres:0.8.1-pg16`
