@@ -2,10 +2,9 @@
 
 COMPOSE := docker compose
 POSTGRES_IMAGE_NAME := bula_ai_postgres
-POSTGRES_IMAGE_TAG := 0.8.1-pg16
+POSTGRES_IMAGE_TAG := 18
 POSTGRES_IMAGE := $(POSTGRES_IMAGE_NAME):$(POSTGRES_IMAGE_TAG)
 POSTGRES_IMAGE_CONTEXT := docker/bula_ai_postgres
-POSTGRES_VERIFY_CONTAINER := bula-ai-postgres-image-verify
 
 .PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate verify-postgres makemigrations create-admin test test-cov lint format reset-db help dependencies add-dependency
 
@@ -31,32 +30,12 @@ build-postgres-image:
 	docker build -t $(POSTGRES_IMAGE) $(POSTGRES_IMAGE_CONTEXT)
 
 verify-postgres-image: build-postgres-image
-	@set -e; \
-	docker rm -f $(POSTGRES_VERIFY_CONTAINER) >/dev/null 2>&1 || true; \
-	docker run -d \
-		--name $(POSTGRES_VERIFY_CONTAINER) \
+	docker run --rm \
 		-e POSTGRES_USER=postgres \
 		-e POSTGRES_PASSWORD=postgres \
 		-e POSTGRES_DB=postgres \
-		$(POSTGRES_IMAGE) >/dev/null; \
-	cleanup() { docker rm -f $(POSTGRES_VERIFY_CONTAINER) >/dev/null 2>&1 || true; }; \
-	trap cleanup EXIT; \
-	echo "Waiting for temporary PostgreSQL container..."; \
-	for attempt in 1 2 3 4 5 6 7 8 9 10; do \
-		if docker exec $(POSTGRES_VERIFY_CONTAINER) pg_isready -U postgres -d postgres >/dev/null 2>&1; then \
-			break; \
-		fi; \
-		if [ "$$attempt" = "10" ]; then \
-			docker logs $(POSTGRES_VERIFY_CONTAINER); \
-			exit 1; \
-		fi; \
-		sleep 2; \
-	done; \
-	docker exec $(POSTGRES_VERIFY_CONTAINER) psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
-		-c "CREATE EXTENSION IF NOT EXISTS vector;" \
-		-c "CREATE EXTENSION IF NOT EXISTS unaccent;" \
-		-c "SELECT extname FROM pg_extension WHERE extname IN ('vector', 'unaccent') ORDER BY extname;" \
-		-c "SELECT to_tsvector('portuguese', unaccent(U&'contraindica\00E7\00E3o')) AS portuguese_fts_probe;"
+		--entrypoint verify-postgres-image \
+		$(POSTGRES_IMAGE)
 
 # --- Database ---
 migrate:
@@ -65,8 +44,10 @@ migrate:
 verify-postgres:
 	$(COMPOSE) exec postgres sh -lc 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -v ON_ERROR_STOP=1 \
 		-c "CREATE EXTENSION IF NOT EXISTS vector;" \
+		-c "CREATE EXTENSION IF NOT EXISTS vectorscale CASCADE;" \
+		-c "CREATE EXTENSION IF NOT EXISTS pg_textsearch;" \
 		-c "CREATE EXTENSION IF NOT EXISTS unaccent;" \
-		-c "SELECT extname FROM pg_extension WHERE extname IN ('\''vector'\'', '\''unaccent'\'') ORDER BY extname;" \
+		-c "SELECT extname FROM pg_extension WHERE extname IN ('\''vector'\'', '\''vectorscale'\'', '\''pg_textsearch'\'', '\''unaccent'\'') ORDER BY extname;" \
 		-c "SELECT to_tsvector('\''portuguese'\'', unaccent(U&'\''contraindica\00E7\00E3o'\'')) AS portuguese_fts_probe;"'
 
 makemigrations:
@@ -120,7 +101,7 @@ help:
 	@echo "  make logs           - View real-time logs"
 	@echo "  make shell          - Access the api bash shell"
 	@echo "  make build-postgres-image  - Build the first-party PostgreSQL image"
-	@echo "  make verify-postgres-image - Verify pgvector, unaccent, and FTS support"
+	@echo "  make verify-postgres-image - Verify pgvector, pgvectorscale, pg_textsearch, unaccent, and FTS support"
 	@echo "  make migrate        - Run database migrations"
 	@echo "  make verify-postgres - Verify extensions and FTS in the running PostgreSQL service"
 	@echo "  make makemigrations - Generate a new migration (prompts for message; or use MSG=\"...\")"
