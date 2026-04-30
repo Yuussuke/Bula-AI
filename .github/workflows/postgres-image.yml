@@ -92,46 +92,13 @@ jobs:
         run: docker build -t "${{ steps.image.outputs.image_ref }}" "$IMAGE_CONTEXT"
 
       - name: Verify image capabilities
-        shell: bash
         run: |
-          set -euo pipefail
-
-          container_name="bula-ai-postgres-image-ci-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-
-          cleanup() {
-            docker rm -f "$container_name" >/dev/null 2>&1 || true
-          }
-
-          trap cleanup EXIT
-
-          docker run -d \
-            --name "$container_name" \
+          docker run --rm \
             -e POSTGRES_USER=postgres \
             -e POSTGRES_PASSWORD=postgres \
             -e POSTGRES_DB=postgres \
-            "${{ steps.image.outputs.image_ref }}" >/dev/null
-
-          echo "Waiting for temporary PostgreSQL container..."
-          for attempt in 1 2 3 4 5 6 7 8 9 10; do
-            if docker exec "$container_name" pg_isready -U postgres -d postgres >/dev/null 2>&1; then
-              break
-            fi
-
-            if [ "$attempt" = "10" ]; then
-              docker logs "$container_name"
-              exit 1
-            fi
-
-            sleep 2
-          done
-
-          docker exec "$container_name" psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
-            -c "CREATE EXTENSION IF NOT EXISTS vector;" \
-            -c "CREATE EXTENSION IF NOT EXISTS vectorscale CASCADE;" \
-            -c "CREATE EXTENSION IF NOT EXISTS pg_textsearch;" \
-            -c "CREATE EXTENSION IF NOT EXISTS unaccent;" \
-            -c "SELECT extname FROM pg_extension WHERE extname IN ('vector', 'vectorscale', 'pg_textsearch', 'unaccent') ORDER BY extname;" \
-            -c "SELECT to_tsvector('portuguese', unaccent(U&'contraindica\00E7\00E3o')) AS portuguese_fts_probe;"
+            --entrypoint verify-postgres-image \
+            "${{ steps.image.outputs.image_ref }}"
 
       - name: Log in to GHCR
         if: github.event_name != 'pull_request'
