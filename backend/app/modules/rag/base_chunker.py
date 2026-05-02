@@ -13,6 +13,8 @@ from langchain_text_splitters import (
     RecursiveCharacterTextSplitter,
 )
 from openai import AsyncOpenAI
+from openai.types.chat import ChatCompletionMessageParam
+from openai.types.shared_params import ResponseFormatJSONSchema
 
 from app.modules.rag.schemas import (
     ChunkingConfig,
@@ -27,7 +29,7 @@ logger = structlog.get_logger(__name__)
 
 SECTION_HEADING_PATTERN = re.compile(r"^(#{2,3})\s+(.+?)\s*$")
 
-CHUNK_PROPOSALS_RESPONSE_FORMAT: dict[str, object] = {
+CHUNK_PROPOSALS_RESPONSE_FORMAT: ResponseFormatJSONSchema = {
     "type": "json_schema",
     "json_schema": {
         "name": "chunk_proposals",
@@ -226,7 +228,11 @@ class BaseChunker(ABC):
             method=method,
         )
 
-    def _build_llm_messages(self, *, section: MarkdownSection) -> list[dict[str, str]]:
+    def _build_llm_messages(
+        self,
+        *,
+        section: MarkdownSection,
+    ) -> list[ChatCompletionMessageParam]:
         user_prompt = (
             "Divida apenas o texto abaixo em chunks para RAG. "
             "Use somente trechos copiados do texto de origem; nao adicione, "
