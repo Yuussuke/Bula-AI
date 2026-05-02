@@ -49,6 +49,19 @@ services:
 
       # LLM (Maritaca)
       MARITACA_API_KEY: ${MARITACA_API_KEY}
+
+      # LLM chunking (OpenRouter)
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_CHUNK_MODEL: ${OPENROUTER_CHUNK_MODEL:-google/gemini-3-flash-preview}
+      OPENROUTER_CHUNK_FALLBACK_MODEL: ${OPENROUTER_CHUNK_FALLBACK_MODEL:-deepseek/deepseek-v3}
+      OPENROUTER_REQUIRE_ZDR: ${OPENROUTER_REQUIRE_ZDR:-true}
+
+      # RAG semantic chunking
+      PROCESSING_CHUNK_TARGET_TOKENS: ${PROCESSING_CHUNK_TARGET_TOKENS:-600}
+      PROCESSING_CHUNK_MIN_TOKENS: ${PROCESSING_CHUNK_MIN_TOKENS:-200}
+      PROCESSING_CHUNK_MAX_TOKENS: ${PROCESSING_CHUNK_MAX_TOKENS:-850}
+      PROCESSING_CHUNK_OVERLAP_RATIO: ${PROCESSING_CHUNK_OVERLAP_RATIO:-0.12}
+      PROCESSING_CHUNK_MAX_CONCURRENCY: ${PROCESSING_CHUNK_MAX_CONCURRENCY:-4}
 # =============================================================================
 # FRONTEND
 # =============================================================================
