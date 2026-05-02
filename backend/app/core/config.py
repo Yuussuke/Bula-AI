@@ -1,6 +1,6 @@
 from functools import lru_cache
 
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -8,6 +8,34 @@ class MaritacaSettings(BaseSettings):
     # Optional so the app and CI can boot without a paid API key.
     # Endpoints that require the LLM should validate this at call time.
     maritaca_api_key: str | None = None
+
+
+class OpenRouterSettings(BaseSettings):
+    # Optional so CI/dev can use deterministic heuristic chunking without an API key.
+    api_key: str | None = None
+    chunk_model: str = "google/gemini-3-flash-preview"
+    chunk_fallback_model: str = "deepseek/deepseek-v3"
+    require_zdr: bool = True
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="OPENROUTER_",
+        extra="ignore",
+    )
+
+
+class ProcessingSettings(BaseSettings):
+    chunk_target_tokens: int = 600
+    chunk_min_tokens: int = 200
+    chunk_max_tokens: int = 850
+    chunk_overlap_ratio: float = 0.12
+    chunk_max_concurrency: int = 4
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="PROCESSING_",
+        extra="ignore",
+    )
 
 
 class DatabaseSettings(BaseSettings):
@@ -46,10 +74,10 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
         "http://localhost:3000",
         FRONTEND_URL,
     ]
+    openrouter: OpenRouterSettings = Field(default_factory=OpenRouterSettings)
+    processing: ProcessingSettings = Field(default_factory=ProcessingSettings)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
-
-    pass
 
 
 @lru_cache
