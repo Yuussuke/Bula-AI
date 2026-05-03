@@ -45,6 +45,7 @@ async def test_upload_valid_pdf_returns_created_bula(client: AsyncClient) -> Non
     assert response_body["manufacturer"] == "Example Pharma"
     assert response_body["file_url"] is None
     assert response_body["file_address"].startswith("stored_objects/")
+    assert response_body["corpus"] == "private"
     assert "data" not in response_body
 
 
@@ -196,6 +197,7 @@ async def test_list_bulas_returns_only_current_user_bulas_newest_first(
     returned_drug_names = [bula["drug_name"] for bula in response_body]
     assert response.status_code == 200, response_body
     assert returned_drug_names == ["Second Bula", "First Bula"]
+    assert all(bula["corpus"] == "private" for bula in response_body)
     has_only_object_ref_addresses = all(
         bula["file_address"].startswith("stored_objects/") for bula in response_body
     )

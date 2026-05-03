@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.bulas.models import Bula, BulaStatus
+from app.modules.bulas.models import Bula, BulaCorpus, BulaStatus
 
 
 class BulaPersistenceError(Exception):
@@ -23,6 +23,7 @@ class BulaRepository:
         file_url: str | None = None,
         qdrant_collection: str | None = None,
         status: BulaStatus = BulaStatus.PENDING,
+        corpus: BulaCorpus = BulaCorpus.PRIVATE,
     ) -> Bula:
         bula = Bula(
             user_id=user_id,
@@ -32,6 +33,7 @@ class BulaRepository:
             file_address=file_address,
             qdrant_collection=qdrant_collection,
             status=status,
+            corpus=corpus,
         )
 
         self.db.add(bula)

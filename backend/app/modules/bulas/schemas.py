@@ -1,7 +1,7 @@
 from uuid import UUID
 from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
-from app.modules.bulas.models import BulaStatus
+from app.modules.bulas.models import BulaCorpus, BulaStatus
 
 
 # What the user sends to the API
@@ -26,6 +26,7 @@ class BulaResponse(BaseModel):
     file_address: str | None
     qdrant_collection: str | None
     status: BulaStatus
+    corpus: BulaCorpus
     created_at: datetime
     updated_at: datetime
 
