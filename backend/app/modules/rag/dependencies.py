@@ -1,7 +1,9 @@
 from fastapi import Depends
+from langchain_core.embeddings import Embeddings as LCEmbeddings
 from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
+from pydantic import SecretStr
 from qdrant_client import AsyncQdrantClient
 
 from app.core.config import Settings, get_settings
@@ -23,6 +25,7 @@ def get_parser() -> BulaParser:
 
 
 def get_embeddings(settings: Settings = Depends(get_settings)) -> EmbeddingAdapter:
+    embedder: LCEmbeddings
     if settings.embedding.provider == "ollama":
         embedder = OllamaEmbeddings(
             model=settings.embedding.model,
@@ -32,12 +35,12 @@ def get_embeddings(settings: Settings = Depends(get_settings)) -> EmbeddingAdapt
         api_key = _clean_optional_api_key(settings.openrouter.api_key)
         embedder = OpenAIEmbeddings(
             model=settings.embedding.model,
-            openai_api_key=api_key or MISSING_OPENROUTER_API_KEY,
-            openai_api_base=OPENROUTER_BASE_URL,
+            api_key=SecretStr(api_key or MISSING_OPENROUTER_API_KEY),
+            base_url=OPENROUTER_BASE_URL,
             check_embedding_ctx_length=False,
             tiktoken_enabled=False,
             chunk_size=max(1, settings.embedding.batch_size),
-            request_timeout=settings.embedding.timeout_seconds,
+            timeout=settings.embedding.timeout_seconds,
         )
 
     return EmbeddingAdapter(

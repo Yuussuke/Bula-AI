@@ -3,6 +3,7 @@ from typing import cast
 import pytest
 from langchain_core.embeddings import Embeddings as LCEmbeddings
 from openai import AsyncOpenAI
+from pydantic import SecretStr
 
 from app.core.config import (
     EmbeddingSettings,
@@ -90,13 +91,15 @@ def test_get_embeddings_uses_openrouter_provider(
     )
 
     adapter = rag_dependencies.get_embeddings(settings=settings)
+    api_key = created_kwargs["api_key"]
 
     assert isinstance(adapter, EmbeddingAdapter)
     assert created_kwargs["model"] == settings.embedding.model
-    assert created_kwargs["openai_api_key"] == "openrouter-embedding-key"
-    assert created_kwargs["openai_api_base"] == rag_dependencies.OPENROUTER_BASE_URL
+    assert isinstance(api_key, SecretStr)
+    assert api_key.get_secret_value() == "openrouter-embedding-key"
+    assert created_kwargs["base_url"] == rag_dependencies.OPENROUTER_BASE_URL
     assert created_kwargs["chunk_size"] == 8
-    assert created_kwargs["request_timeout"] == 15
+    assert created_kwargs["timeout"] == 15
 
 
 def test_get_embeddings_uses_ollama_provider(
