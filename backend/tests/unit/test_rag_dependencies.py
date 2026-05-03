@@ -1,18 +1,43 @@
 from typing import cast
 
 import pytest
+from langchain_core.embeddings import Embeddings as LCEmbeddings
 from openai import AsyncOpenAI
 
-from app.core.config import OpenRouterSettings, ProcessingSettings, Settings
+from app.core.config import (
+    EmbeddingSettings,
+    OllamaSettings,
+    OpenRouterSettings,
+    ProcessingSettings,
+    QdrantSettings,
+    Settings,
+)
 from app.modules.rag.base_chunker import BaseChunker
 from app.modules.rag.chunker import BulaChunker
+from app.modules.rag import dependencies as rag_dependencies
 from app.modules.rag.dependencies import get_chunker, get_ingestion_service
+from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.parsers.pdf_parser import BulaParser
+from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.service import RAGIngestionService
 
 
 class FakeOpenAIClient:
     pass
+
+
+class FakeEmbeddings(LCEmbeddings):
+    def embed_documents(self, texts: list[str]) -> list[list[float]]:
+        return [[1.0] * 1024 for _ in texts]
+
+    def embed_query(self, text: str) -> list[float]:
+        _ = text
+        return [1.0] * 1024
+
+
+class FakeQdrantClient:
+    def __init__(self, **kwargs: object) -> None:
+        self.kwargs = kwargs
 
 
 def build_settings(
@@ -38,6 +63,100 @@ def build_settings(
             chunk_max_concurrency=2,
         ),
     )
+
+
+def test_get_embeddings_uses_openrouter_provider(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    created_kwargs: dict[str, object] = {}
+
+    def fake_openai_embeddings(**kwargs: object) -> FakeEmbeddings:
+        created_kwargs.update(kwargs)
+        return FakeEmbeddings()
+
+    monkeypatch.setattr(
+        rag_dependencies,
+        "OpenAIEmbeddings",
+        fake_openai_embeddings,
+    )
+    settings = build_settings(
+        api_key="openrouter-embedding-key",
+    )
+    settings.embedding = EmbeddingSettings(
+        provider="openrouter",
+        batch_size=8,
+        dimension=1024,
+        timeout_seconds=15,
+    )
+
+    adapter = rag_dependencies.get_embeddings(settings=settings)
+
+    assert isinstance(adapter, EmbeddingAdapter)
+    assert created_kwargs["model"] == settings.embedding.model
+    assert created_kwargs["openai_api_key"] == "openrouter-embedding-key"
+    assert created_kwargs["openai_api_base"] == rag_dependencies.OPENROUTER_BASE_URL
+    assert created_kwargs["chunk_size"] == 8
+    assert created_kwargs["request_timeout"] == 15
+
+
+def test_get_embeddings_uses_ollama_provider(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    created_kwargs: dict[str, object] = {}
+
+    def fake_ollama_embeddings(**kwargs: object) -> FakeEmbeddings:
+        created_kwargs.update(kwargs)
+        return FakeEmbeddings()
+
+    monkeypatch.setattr(
+        rag_dependencies,
+        "OllamaEmbeddings",
+        fake_ollama_embeddings,
+    )
+    settings = build_settings()
+    settings.embedding = EmbeddingSettings(provider="ollama")
+    settings.ollama = OllamaSettings(host="http://ollama-test", port=11434)
+
+    adapter = rag_dependencies.get_embeddings(settings=settings)
+
+    assert isinstance(adapter, EmbeddingAdapter)
+    assert created_kwargs["model"] == settings.embedding.model
+    assert created_kwargs["base_url"] == "http://ollama-test:11434"
+
+
+def test_get_qdrant_store_uses_qdrant_settings(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    created_kwargs: dict[str, object] = {}
+
+    def fake_qdrant_client(**kwargs: object) -> FakeQdrantClient:
+        created_kwargs.update(kwargs)
+        return FakeQdrantClient(**kwargs)
+
+    monkeypatch.setattr(
+        rag_dependencies,
+        "AsyncQdrantClient",
+        fake_qdrant_client,
+    )
+    settings = build_settings()
+    settings.embedding = EmbeddingSettings(dimension=768)
+    settings.qdrant = QdrantSettings(
+        host="qdrant-test",
+        port=6333,
+        api_key="qdrant-key",
+        timeout_seconds=30,
+    )
+
+    vector_store = rag_dependencies.get_qdrant_store(settings=settings)
+
+    assert isinstance(vector_store, QdrantVectorStore)
+    assert vector_store.vector_size == 768
+    assert created_kwargs == {
+        "host": "qdrant-test",
+        "port": 6333,
+        "api_key": "qdrant-key",
+        "timeout": 30,
+    }
 
 
 def test_get_chunker_returns_bula_chunker_as_base_chunker() -> None:
