@@ -1,10 +1,17 @@
 from fastapi import Depends
+from langchain_core.embeddings import Embeddings as LCEmbeddings
+from langchain_ollama import OllamaEmbeddings
+from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
+from pydantic import SecretStr
+from qdrant_client import AsyncQdrantClient
 
 from app.core.config import Settings, get_settings
 from app.modules.rag.base_chunker import BaseChunker
 from app.modules.rag.chunker import BulaChunker
+from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.parsers.pdf_parser import BulaParser
+from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.schemas import ChunkingConfig
 from app.modules.rag.service import RAGIngestionService
 
@@ -15,6 +22,45 @@ MISSING_OPENROUTER_API_KEY = "missing-openrouter-api-key"
 
 def get_parser() -> BulaParser:
     return BulaParser(ocr_enabled=False)
+
+
+def get_embeddings(settings: Settings = Depends(get_settings)) -> EmbeddingAdapter:
+    embedder: LCEmbeddings
+    if settings.embedding.provider == "ollama":
+        embedder = OllamaEmbeddings(
+            model=settings.embedding.model,
+            base_url=_build_ollama_base_url(settings=settings),
+        )
+    else:
+        api_key = _clean_optional_api_key(settings.openrouter.api_key)
+        embedder = OpenAIEmbeddings(
+            model=settings.embedding.model,
+            api_key=SecretStr(api_key or MISSING_OPENROUTER_API_KEY),
+            base_url=OPENROUTER_BASE_URL,
+            check_embedding_ctx_length=False,
+            tiktoken_enabled=False,
+            chunk_size=max(1, settings.embedding.batch_size),
+            timeout=settings.embedding.timeout_seconds,
+        )
+
+    return EmbeddingAdapter(
+        embedder=embedder,
+        batch_size=settings.embedding.batch_size,
+        dimension=settings.embedding.dimension,
+    )
+
+
+def get_qdrant_store(settings: Settings = Depends(get_settings)) -> QdrantVectorStore:
+    client = AsyncQdrantClient(
+        host=settings.qdrant.host,
+        port=settings.qdrant.port,
+        api_key=settings.qdrant.api_key,
+        timeout=settings.qdrant.timeout_seconds,
+    )
+    return QdrantVectorStore(
+        client=client,
+        vector_size=settings.embedding.dimension,
+    )
 
 
 def get_llm_client(settings: Settings = Depends(get_settings)) -> AsyncOpenAI:
@@ -60,6 +106,15 @@ def _clean_optional_api_key(api_key: str | None) -> str | None:
         return None
 
     return clean_api_key
+
+
+def _build_ollama_base_url(*, settings: Settings) -> str:
+    clean_host = settings.ollama.host.rstrip("/")
+    host_without_scheme = clean_host.split("://", maxsplit=1)[-1]
+    if ":" in host_without_scheme:
+        return clean_host
+
+    return f"{clean_host}:{settings.ollama.port}"
 
 
 def _validate_zdr_model_policy(*, settings: Settings) -> None:

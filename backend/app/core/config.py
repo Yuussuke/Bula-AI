@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Literal
 
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -34,6 +35,44 @@ class ProcessingSettings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_prefix="PROCESSING_",
+        extra="ignore",
+    )
+
+
+class EmbeddingSettings(BaseSettings):
+    provider: Literal["openrouter", "ollama"] = "openrouter"
+    model: str = "jeffh/intfloat-multilingual-e5-large:q8_0"
+    dimension: int = 1024
+    batch_size: int = 32
+    timeout_seconds: int = 60
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="EMBEDDING_",
+        extra="ignore",
+    )
+
+
+class OllamaSettings(BaseSettings):
+    host: str = "http://localhost"
+    port: int = 11434
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="OLLAMA_",
+        extra="ignore",
+    )
+
+
+class QdrantSettings(BaseSettings):
+    host: str = "qdrant"
+    port: int = 6333
+    api_key: str | None = None
+    timeout_seconds: int = 60
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="QDRANT_",
         extra="ignore",
     )
 
@@ -76,6 +115,9 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     ]
     openrouter: OpenRouterSettings = Field(default_factory=OpenRouterSettings)
     processing: ProcessingSettings = Field(default_factory=ProcessingSettings)
+    embedding: EmbeddingSettings = Field(default_factory=EmbeddingSettings)
+    ollama: OllamaSettings = Field(default_factory=OllamaSettings)
+    qdrant: QdrantSettings = Field(default_factory=QdrantSettings)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
