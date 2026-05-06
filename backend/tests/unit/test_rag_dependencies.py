@@ -41,6 +41,18 @@ class FakeQdrantClient:
         self.kwargs = kwargs
 
 
+class FakeQdrantStore:
+    pass
+
+
+class FakeObjectStore:
+    pass
+
+
+class FakeBulaRepository:
+    pass
+
+
 def build_settings(
     *,
     api_key: str | None = "openrouter-test-key",
@@ -203,9 +215,26 @@ def test_get_ingestion_service_receives_base_chunker() -> None:
     fake_llm = cast(AsyncOpenAI, FakeOpenAIClient())
     chunker = get_chunker(llm=fake_llm, settings=build_settings())
     parser = BulaParser(ocr_enabled=False)
+    embeddings = EmbeddingAdapter(
+        embedder=FakeEmbeddings(),
+        batch_size=1,
+        dimension=1024,
+    )
+    qdrant_store = cast(QdrantVectorStore, FakeQdrantStore())
+    object_store = cast(object, FakeObjectStore())
+    bula_repo = cast(object, FakeBulaRepository())
 
-    service = get_ingestion_service(chunker=chunker, parser=parser)
+    service = get_ingestion_service(
+        chunker=chunker,
+        parser=parser,
+        embeddings=embeddings,
+        qdrant_store=qdrant_store,
+        object_store=object_store,
+        bula_repo=bula_repo,
+    )
 
     assert isinstance(service, RAGIngestionService)
     assert service.chunker is chunker
     assert service.parser is parser
+    assert service.embeddings is embeddings
+    assert service.qdrant_store is qdrant_store
