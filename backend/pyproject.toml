@@ -35,6 +35,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "aiosqlite>=0.22.1",
+    "asyncpg-stubs>=0.31.2",
     "greenlet>=3.5.0",
     "httpx>=0.28.1",
     "mypy>=1.18.2",
