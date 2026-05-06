@@ -1,4 +1,3 @@
-from typing import cast
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile, status
@@ -44,7 +43,7 @@ class BulaService:
 
         try:
             await self.ingestion_queue.enqueue_bula_ingestion(
-                bula_id=cast(UUID, bula.id),
+                bula_id=bula.id,
             )
         except Exception:
             await self._cleanup_persisted_bula_after_enqueue_failure(bula)
