@@ -100,3 +100,19 @@ async def test_upsert_points_is_idempotent_for_same_point_ids(
     assert second_upsert_count == len(points)
     assert first_qdrant_count.count == len(points)
     assert second_qdrant_count.count == len(points)
+
+
+@pytest.mark.anyio
+async def test_search_similar_returns_relevant_chunk(
+    qdrant_test_context: tuple[QdrantVectorStore, AsyncQdrantClient, str],
+) -> None:
+    vector_store, _, _ = qdrant_test_context
+    await vector_store.ensure_collection()
+    await vector_store.upsert_points(build_test_points())
+
+    search_result = await vector_store.search_similar(
+        vector=[2.0, 0.1, 0.2, 0.3],
+        limit=1,
+    )
+
+    assert search_result.points[0].payload["chunk_id"] == "test-chunk-2"

@@ -31,7 +31,7 @@ settings:
   maxRedirects: 5
 
 examples:
-  - name: 201 Response
+  - name: 202 Response
     description: Successful Response
     request:
       url: "{{baseUrl}}/api/v1/bulas/upload"
@@ -49,8 +49,8 @@ examples:
             type: text
             value: ""
     response:
-      status: 201
-      statusText: Created
+      status: 202
+      statusText: Accepted
       headers:
         - name: Content-Type
           value: application/json
@@ -58,11 +58,18 @@ examples:
         type: json
         data: |-
           {
-            "filename": "",
-            "pages": 0,
-            "characters": 0,
-            "chunks": 0,
-            "bula_id": ""
+            "id": "11111111-1111-1111-1111-111111111111",
+            "user_id": 1,
+            "drug_name": "Dipirona",
+            "manufacturer": "Example Pharma",
+            "file_url": null,
+            "file_address": "stored_objects/11111111-1111-1111-1111-111111111111",
+            "qdrant_collection": null,
+            "status": "pending",
+            "error_message": null,
+            "corpus": "private",
+            "created_at": "2026-05-05T00:00:00Z",
+            "updated_at": "2026-05-05T00:00:00Z"
           }
   - name: 422 Response
     description: Validation Error

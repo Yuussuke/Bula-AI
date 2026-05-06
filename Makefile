@@ -6,7 +6,7 @@ POSTGRES_IMAGE_TAG := 18
 POSTGRES_IMAGE := $(POSTGRES_IMAGE_NAME):$(POSTGRES_IMAGE_TAG)
 POSTGRES_IMAGE_CONTEXT := docker/bula_ai_postgres
 
-.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate verify-postgres makemigrations create-admin test test-unit test-integration test-cov lint format reset-db help dependencies add-dependency
+.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate pgq-install pgq-upgrade pgq-verify verify-postgres makemigrations create-admin test test-unit test-integration test-cov lint format reset-db help dependencies add-dependency
 
 # --- Docker ---
 build:
@@ -40,6 +40,15 @@ verify-postgres-image: build-postgres-image
 # --- Database ---
 migrate:
 	$(COMPOSE) exec api uv run alembic upgrade head
+
+pgq-install:
+	$(COMPOSE) exec api uv run pgq install
+
+pgq-upgrade:
+	$(COMPOSE) exec api uv run pgq upgrade
+
+pgq-verify:
+	$(COMPOSE) exec api uv run pgq verify --expect present
 
 verify-postgres:
 	$(COMPOSE) exec postgres sh -lc 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -v ON_ERROR_STOP=1 \
@@ -110,6 +119,9 @@ help:
 	@echo "  make build-postgres-image  - Build the first-party PostgreSQL image"
 	@echo "  make verify-postgres-image - Verify pgvector, pgvectorscale, pg_textsearch, unaccent, and FTS support"
 	@echo "  make migrate        - Run database migrations"
+	@echo "  make pgq-install    - Install PGQueuer database objects"
+	@echo "  make pgq-upgrade    - Upgrade PGQueuer database objects"
+	@echo "  make pgq-verify     - Verify PGQueuer database objects"
 	@echo "  make verify-postgres - Verify extensions and FTS in the running PostgreSQL service"
 	@echo "  make makemigrations - Generate a new migration (use MSG=\"...\")"
 	@echo "  make create-admin   - Create an admin user inside the api container (optional ARGS=\"...\")"

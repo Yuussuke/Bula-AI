@@ -7,6 +7,8 @@ from pydantic import SecretStr
 from qdrant_client import AsyncQdrantClient
 
 from app.core.config import Settings, get_settings
+from app.modules.bulas.dependencies import get_bula_repository
+from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.base_chunker import BaseChunker
 from app.modules.rag.chunker import BulaChunker
 from app.modules.rag.embeddings import EmbeddingAdapter
@@ -14,6 +16,8 @@ from app.modules.rag.parsers.pdf_parser import BulaParser
 from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.schemas import ChunkingConfig
 from app.modules.rag.service import RAGIngestionService
+from app.modules.storage.client import ObjectStoreClient
+from app.modules.storage.dependencies import get_object_store_client
 
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
@@ -93,8 +97,19 @@ def get_chunker(
 def get_ingestion_service(
     chunker: BaseChunker = Depends(get_chunker),
     parser: BulaParser = Depends(get_parser),
+    embeddings: EmbeddingAdapter = Depends(get_embeddings),
+    qdrant_store: QdrantVectorStore = Depends(get_qdrant_store),
+    object_store: ObjectStoreClient = Depends(get_object_store_client),
+    bula_repo: BulaRepository = Depends(get_bula_repository),
 ) -> RAGIngestionService:
-    return RAGIngestionService(chunker=chunker, parser=parser)
+    return RAGIngestionService(
+        chunker=chunker,
+        parser=parser,
+        embeddings=embeddings,
+        qdrant_store=qdrant_store,
+        object_store=object_store,
+        bula_repo=bula_repo,
+    )
 
 
 def _clean_optional_api_key(api_key: str | None) -> str | None:

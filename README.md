@@ -183,6 +183,9 @@ Main files:
 - Stop services: `make down`
 - Follow logs: `make logs`
 - Run migrations: `make migrate`
+- Install PGQueuer objects: `make pgq-install`
+- Upgrade PGQueuer objects: `make pgq-upgrade`
+- Verify PGQueuer objects: `make pgq-verify`
 - Verify PostgreSQL extensions and FTS: `make verify-postgres`
 - Create an admin user: `make create-admin ARGS="--email admin@example.com --full-name 'Admin User'"`
 - Run tests: `make test`
@@ -193,6 +196,10 @@ Main files:
 Public registration through `/api/v1/auth/register` always creates regular
 `user` accounts. Administrative users are created through the internal
 management command exposed by `make create-admin`.
+
+PDF ingestion runs through a separate PGQueuer worker. On a new local database,
+run `make migrate` for application tables and `make pgq-install` for queue
+tables before uploading bulas.
 
 ## PostgreSQL Image and Local Data
 
