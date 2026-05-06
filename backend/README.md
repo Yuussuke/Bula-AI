@@ -22,6 +22,7 @@ Run migrations from container to avoid host/DNS mismatches:
 make up
 make verify-postgres
 make migrate
+make pgq-install
 
 # Option A (interactive):
 make makemigrations
@@ -29,6 +30,10 @@ make makemigrations
 # Option B (non-interactive):
 MSG="your_message" make makemigrations
 ```
+
+PGQueuer owns its own queue tables. Use `make pgq-install` on a fresh database,
+`make pgq-upgrade` during deploys, and `make pgq-verify` when checking the
+queue schema.
 
 ## 3) Management commands
 
