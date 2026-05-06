@@ -16,6 +16,7 @@ from app.core.config import settings
 from app.core.exceptions import global_exception_handler
 from app.core.database import close_engine
 from app.core.middleware import CorrelationIdMiddleware
+from app.core.pgqueuer import PGQ_QUERIES_STATE_KEY, create_pgq_queries
 from app.core.request_logging import RequestLoggingMiddleware
 from app.modules.auth.router import router as auth_router
 from app.modules.bulas.router import router as bulas_router
@@ -24,9 +25,14 @@ from app.modules.chat.router import router as chat_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    _ = app
-    yield
-    await close_engine()
+    pgq_pool, pgq_queries = await create_pgq_queries(settings.database_url)
+    setattr(app.state, PGQ_QUERIES_STATE_KEY, pgq_queries)
+
+    try:
+        yield
+    finally:
+        await pgq_pool.close()
+        await close_engine()
 
 
 def rate_limit_exceeded_handler(request: Request, exc: Exception) -> Response:

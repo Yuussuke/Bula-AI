@@ -1,5 +1,6 @@
 import pytest
 from httpx import AsyncClient
+from tests.conftest import FakeBulaIngestionQueue
 
 
 MAX_UPLOAD_SIZE_BYTES = 10 * 1024 * 1024
@@ -40,13 +41,85 @@ async def test_upload_valid_pdf_returns_created_bula(client: AsyncClient) -> Non
     )
 
     response_body = response.json()
-    assert response.status_code == 201, response_body
+    assert response.status_code == 202, response_body
     assert response_body["drug_name"] == "Dipyrone"
     assert response_body["manufacturer"] == "Example Pharma"
     assert response_body["file_url"] is None
     assert response_body["file_address"].startswith("stored_objects/")
+    assert response_body["status"] == "pending"
+    assert response_body["error_message"] is None
     assert response_body["corpus"] == "private"
     assert "data" not in response_body
+
+
+@pytest.mark.anyio
+async def test_upload_enqueues_bula_ingestion_job(
+    client: AsyncClient,
+    fake_bula_ingestion_queue: FakeBulaIngestionQueue,
+) -> None:
+    access_token = await get_access_token(client, email="upload-queue@bulaai.com")
+
+    response = await client.post(
+        "/api/v1/bulas/upload",
+        data={"drug_name": "Dipyrone"},
+        files={"file": ("leaflet.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
+        headers=build_auth_headers(access_token),
+    )
+
+    response_body = response.json()
+    assert response.status_code == 202, response_body
+    assert [
+        str(bula_id) for bula_id in fake_bula_ingestion_queue.enqueued_bula_ids
+    ] == [response_body["id"]]
+
+
+@pytest.mark.anyio
+async def test_get_bula_status_returns_current_status(
+    client: AsyncClient,
+) -> None:
+    access_token = await get_access_token(client, email="status-owner@bulaai.com")
+    upload_response = await client.post(
+        "/api/v1/bulas/upload",
+        data={"drug_name": "Dipyrone"},
+        files={"file": ("leaflet.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
+        headers=build_auth_headers(access_token),
+    )
+    bula_id = upload_response.json()["id"]
+
+    response = await client.get(
+        f"/api/v1/bulas/{bula_id}/status",
+        headers=build_auth_headers(access_token),
+    )
+
+    response_body = response.json()
+    assert response.status_code == 200, response_body
+    assert response_body == {
+        "id": bula_id,
+        "status": "pending",
+        "error_message": None,
+    }
+
+
+@pytest.mark.anyio
+async def test_get_bula_status_returns_404_for_another_user(
+    client: AsyncClient,
+) -> None:
+    first_user_token = await get_access_token(client, email="status-first@bulaai.com")
+    second_user_token = await get_access_token(client, email="status-second@bulaai.com")
+    upload_response = await client.post(
+        "/api/v1/bulas/upload",
+        data={"drug_name": "Dipyrone"},
+        files={"file": ("leaflet.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
+        headers=build_auth_headers(first_user_token),
+    )
+    bula_id = upload_response.json()["id"]
+
+    response = await client.get(
+        f"/api/v1/bulas/{bula_id}/status",
+        headers=build_auth_headers(second_user_token),
+    )
+
+    assert response.status_code == 404
 
 
 @pytest.mark.anyio

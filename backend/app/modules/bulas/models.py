@@ -17,6 +17,7 @@ class BulaStatus(str, enum.Enum):
     PROCESSING = "processing"
     READY = "ready"
     FAILED = "failed"
+    ERROR = "error"
 
 
 class BulaCorpus(str, enum.Enum):
@@ -38,8 +39,13 @@ class Bula(Base, UUIDMixin, TimestampMixin):
     file_url: Mapped[str | None] = mapped_column(String, nullable=True)
     file_address: Mapped[str | None] = mapped_column(String(500), nullable=True)
     qdrant_collection: Mapped[str | None] = mapped_column(String, nullable=True)
+    error_message: Mapped[str | None] = mapped_column(String(1000), nullable=True)
 
-    status: Mapped[BulaStatus] = mapped_column(default=BulaStatus.PENDING)
+    status: Mapped[BulaStatus] = mapped_column(
+        SqlEnum(BulaStatus, name="bulastatus"),
+        nullable=False,
+        default=BulaStatus.PENDING,
+    )
     corpus: Mapped[BulaCorpus] = mapped_column(
         SqlEnum(
             BulaCorpus,
