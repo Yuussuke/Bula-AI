@@ -1,6 +1,5 @@
 from io import BytesIO
 from unittest.mock import AsyncMock, Mock
-from uuid import UUID
 
 import pytest
 from fastapi import HTTPException, UploadFile, status
@@ -27,17 +26,14 @@ def build_bula_service(
     *,
     repo: AsyncMock | None = None,
     object_store_client: AsyncMock | None = None,
-    ingestion_queue: AsyncMock | None = None,
     max_upload_size_bytes: int = 10 * 1024 * 1024,
 ) -> BulaService:
     bula_repo = repo or AsyncMock()
     object_store = object_store_client or AsyncMock()
-    queue = ingestion_queue or AsyncMock()
 
     return BulaService(
         bula_repo=bula_repo,
         object_store=object_store,
-        ingestion_queue=queue,
         max_upload_size_bytes=max_upload_size_bytes,
     )
 
@@ -72,62 +68,6 @@ async def test_upload_bula_creates_bula_with_file_address() -> None:
         manufacturer="Example Pharma",
         file_address="stored_objects/abc-123",
     )
-
-
-@pytest.mark.anyio
-async def test_upload_and_enqueue_bula_enqueues_created_bula() -> None:
-    bula_id = UUID("11111111-1111-1111-1111-111111111111")
-    mock_bula = Mock(id=bula_id, file_address="stored_objects/abc-123")
-    mock_repo = AsyncMock()
-    mock_repo.create_bula.return_value = mock_bula
-    mock_object_store_client = AsyncMock()
-    mock_object_store_client.put_file.return_value = "stored_objects/abc-123"
-    mock_queue = AsyncMock()
-    upload_file = build_upload_file(content=b"%PDF-1.4\n%%EOF")
-    service = build_bula_service(
-        repo=mock_repo,
-        object_store_client=mock_object_store_client,
-        ingestion_queue=mock_queue,
-    )
-
-    result = await service.upload_and_enqueue_bula(
-        user_id=123,
-        drug_name="Dipirona",
-        manufacturer=None,
-        file=upload_file,
-    )
-
-    assert result is mock_bula
-    mock_queue.enqueue_bula_ingestion.assert_awaited_once_with(bula_id=bula_id)
-
-
-@pytest.mark.anyio
-async def test_upload_and_enqueue_bula_cleans_up_when_enqueue_fails() -> None:
-    bula_id = UUID("11111111-1111-1111-1111-111111111111")
-    mock_bula = Mock(id=bula_id, file_address="stored_objects/abc-123")
-    mock_repo = AsyncMock()
-    mock_repo.create_bula.return_value = mock_bula
-    mock_object_store_client = AsyncMock()
-    mock_object_store_client.put_file.return_value = "stored_objects/abc-123"
-    mock_queue = AsyncMock()
-    mock_queue.enqueue_bula_ingestion.side_effect = RuntimeError("queue unavailable")
-    upload_file = build_upload_file(content=b"%PDF-1.4\n%%EOF")
-    service = build_bula_service(
-        repo=mock_repo,
-        object_store_client=mock_object_store_client,
-        ingestion_queue=mock_queue,
-    )
-
-    with pytest.raises(RuntimeError, match="queue unavailable"):
-        await service.upload_and_enqueue_bula(
-            user_id=123,
-            drug_name="Dipirona",
-            manufacturer=None,
-            file=upload_file,
-        )
-
-    mock_repo.delete_bula.assert_awaited_once_with(mock_bula)
-    mock_object_store_client.delete.assert_awaited_once_with("stored_objects/abc-123")
 
 
 @pytest.mark.anyio

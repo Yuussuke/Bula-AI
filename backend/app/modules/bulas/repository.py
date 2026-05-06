@@ -1,13 +1,8 @@
-from uuid import UUID
-
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.bulas.models import Bula, BulaCorpus, BulaStatus
-
-
-MAX_ERROR_MESSAGE_LENGTH = 1000
 
 
 class BulaPersistenceError(Exception):
@@ -58,50 +53,3 @@ class BulaRepository:
         )
         result = await self.db.execute(statement)
         return list(result.scalars().all())
-
-    async def get_by_id(self, *, bula_id: UUID) -> Bula | None:
-        statement = select(Bula).where(Bula.id == bula_id)
-        result = await self.db.execute(statement)
-        return result.scalar_one_or_none()
-
-    async def get_by_id_for_user(
-        self,
-        *,
-        bula_id: UUID,
-        user_id: int,
-    ) -> Bula | None:
-        statement = select(Bula).where(Bula.id == bula_id, Bula.user_id == user_id)
-        result = await self.db.execute(statement)
-        return result.scalar_one_or_none()
-
-    async def update_ingestion_status(
-        self,
-        *,
-        bula: Bula,
-        status: BulaStatus,
-        error_message: str | None = None,
-        qdrant_collection: str | None = None,
-    ) -> Bula:
-        bula.status = status
-        bula.error_message = self._clean_error_message(error_message)
-
-        if qdrant_collection is not None:
-            bula.qdrant_collection = qdrant_collection
-
-        await self.db.commit()
-        await self.db.refresh(bula)
-        return bula
-
-    async def delete_bula(self, bula: Bula) -> None:
-        await self.db.delete(bula)
-        await self.db.commit()
-
-    def _clean_error_message(self, error_message: str | None) -> str | None:
-        if error_message is None:
-            return None
-
-        clean_error_message = error_message.strip()
-        if not clean_error_message:
-            return None
-
-        return clean_error_message[:MAX_ERROR_MESSAGE_LENGTH]

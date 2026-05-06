@@ -26,7 +26,6 @@ class BulaResponse(BaseModel):
     file_address: str | None
     qdrant_collection: str | None
     status: BulaStatus
-    error_message: str | None
     corpus: BulaCorpus
     created_at: datetime
     updated_at: datetime
@@ -40,11 +39,3 @@ class BulaUploadResponse(BaseModel):
     characters: int
     chunks: int
     bula_id: UUID
-
-
-class BulaStatusResponse(BaseModel):
-    id: UUID
-    status: BulaStatus
-    error_message: str | None
-
-    model_config = ConfigDict(from_attributes=True)

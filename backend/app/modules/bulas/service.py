@@ -1,10 +1,6 @@
-from typing import cast
-from uuid import UUID
-
 from fastapi import HTTPException, UploadFile, status
 
 from app.modules.bulas.models import Bula
-from app.modules.bulas.queue import BulaIngestionQueue
 from app.modules.bulas.repository import BulaRepository
 from app.modules.storage.client import ObjectStoreClient
 
@@ -19,38 +15,11 @@ class BulaService:
         self,
         bula_repo: BulaRepository,
         object_store: ObjectStoreClient,
-        ingestion_queue: BulaIngestionQueue,
         max_upload_size_bytes: int,
     ) -> None:
         self.repo = bula_repo
         self.object_store = object_store
-        self.ingestion_queue = ingestion_queue
         self.max_upload_size_bytes = max_upload_size_bytes
-
-    async def upload_and_enqueue_bula(
-        self,
-        *,
-        user_id: int,
-        drug_name: str | None,
-        manufacturer: str | None,
-        file: UploadFile | None,
-    ) -> Bula:
-        bula = await self.upload_bula(
-            user_id=user_id,
-            drug_name=drug_name,
-            manufacturer=manufacturer,
-            file=file,
-        )
-
-        try:
-            await self.ingestion_queue.enqueue_bula_ingestion(
-                bula_id=cast(UUID, bula.id),
-            )
-        except Exception:
-            await self._cleanup_persisted_bula_after_enqueue_failure(bula)
-            raise
-
-        return bula
 
     async def upload_bula(
         self,
@@ -89,21 +58,6 @@ class BulaService:
 
     async def list_bulas_for_user(self, *, user_id: int) -> list[Bula]:
         return await self.repo.list_by_user(user_id=user_id)
-
-    async def get_bula_status_for_user(
-        self,
-        *,
-        bula_id: UUID,
-        user_id: int,
-    ) -> Bula:
-        bula = await self.repo.get_by_id_for_user(bula_id=bula_id, user_id=user_id)
-        if bula is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Bula nao encontrada.",
-            )
-
-        return bula
 
     def _validate_drug_name(self, drug_name: str | None) -> str:
         if drug_name is None:
@@ -186,14 +140,3 @@ class BulaService:
             await self.object_store.delete(file_address)
         except Exception:
             return
-
-    async def _cleanup_persisted_bula_after_enqueue_failure(self, bula: Bula) -> None:
-        try:
-            await self.repo.delete_bula(bula)
-        except Exception:
-            pass
-
-        if bula.file_address is None:
-            return
-
-        await self._delete_uploaded_file_after_failure(bula.file_address)

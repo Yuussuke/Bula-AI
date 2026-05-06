@@ -1,5 +1,4 @@
 import os
-from uuid import UUID
 
 os.environ.setdefault(
     "SECRET_KEY", "long_and_secure_secret_key_for_testing_purposes_only_1234567890"
@@ -17,7 +16,6 @@ from app.core.base import Base
 # Import from database module which also imports all models.
 # This ensures SQLAlchemy mapper configuration works with forward references.
 from app.core.database import get_db
-from app.modules.bulas.dependencies import get_bula_ingestion_queue
 
 app.state.limiter.enabled = False
 
@@ -34,14 +32,6 @@ TestingSessionLocal = async_sessionmaker(
     bind=engine,
     class_=AsyncSession,
 )
-
-
-class FakeBulaIngestionQueue:
-    def __init__(self) -> None:
-        self.enqueued_bula_ids: list[UUID] = []
-
-    async def enqueue_bula_ingestion(self, *, bula_id: UUID) -> None:
-        self.enqueued_bula_ids.append(bula_id)
 
 
 @pytest.fixture
@@ -65,19 +55,8 @@ async def db_session(setup_db) -> AsyncGenerator[AsyncSession, None]:
 
 
 @pytest.fixture
-def fake_bula_ingestion_queue() -> FakeBulaIngestionQueue:
-    return FakeBulaIngestionQueue()
-
-
-@pytest.fixture
-async def client(
-    db_session: AsyncSession,
-    fake_bula_ingestion_queue: FakeBulaIngestionQueue,
-) -> AsyncGenerator[AsyncClient, None]:
+async def client(db_session: AsyncSession) -> AsyncGenerator[AsyncClient, None]:
     app.dependency_overrides[get_db] = lambda: db_session
-    app.dependency_overrides[get_bula_ingestion_queue] = lambda: (
-        fake_bula_ingestion_queue
-    )
 
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
