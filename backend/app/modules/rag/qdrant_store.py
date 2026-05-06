@@ -1,7 +1,7 @@
 import uuid
 
 from qdrant_client import AsyncQdrantClient
-from qdrant_client.models import Distance, PointStruct, VectorParams
+from qdrant_client.models import Distance, PointStruct, QueryResponse, VectorParams
 
 from app.modules.bulas.models import Bula, BulaCorpus
 from app.modules.rag.schemas import DocumentChunk
@@ -75,3 +75,19 @@ class QdrantVectorStore:
             wait=True,
         )
         return len(points)
+
+    async def search_similar(
+        self,
+        *,
+        vector: list[float],
+        limit: int = 5,
+    ) -> QueryResponse:
+        return await self._client.query_points(
+            collection_name=self.collection_name,
+            query=vector,
+            limit=limit,
+            with_payload=True,
+        )
+
+    async def close(self) -> None:
+        await self._client.close()
