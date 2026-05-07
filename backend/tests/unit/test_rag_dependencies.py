@@ -123,7 +123,9 @@ def test_get_embeddings_requires_openrouter_api_key_for_openrouter_provider() ->
         rag_dependencies.get_embeddings(settings=settings)
 
 
-def test_get_embeddings_rejects_local_quantized_model_tag_for_openrouter_provider() -> None:
+def test_get_embeddings_rejects_local_quantized_model_tag_for_openrouter_provider() -> (
+    None
+):
     settings = build_settings(api_key="openrouter-embedding-key")
     settings.embedding = EmbeddingSettings(
         provider="openrouter",
