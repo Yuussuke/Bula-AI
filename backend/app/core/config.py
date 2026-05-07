@@ -15,7 +15,7 @@ class OpenRouterSettings(BaseSettings):
     # Optional so CI/dev can use deterministic heuristic chunking without an API key.
     api_key: str | None = None
     chunk_model: str = "google/gemini-3-flash-preview"
-    chunk_fallback_model: str = "deepseek/deepseek-v3"
+    chunk_fallback_model: str = "deepseek/deepseek-chat"
     require_zdr: bool = True
 
     model_config = SettingsConfigDict(
@@ -41,7 +41,7 @@ class ProcessingSettings(BaseSettings):
 
 class EmbeddingSettings(BaseSettings):
     provider: Literal["openrouter", "ollama"] = "openrouter"
-    model: str = "jeffh/intfloat-multilingual-e5-large:q8_0"
+    model: str = "intfloat/multilingual-e5-large"
     dimension: int = 1024
     batch_size: int = 32
     timeout_seconds: int = 60

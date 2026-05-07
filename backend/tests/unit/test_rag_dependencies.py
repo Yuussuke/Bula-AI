@@ -97,6 +97,7 @@ def test_get_embeddings_uses_openrouter_provider(
     )
     settings.embedding = EmbeddingSettings(
         provider="openrouter",
+        model=rag_dependencies.OPENROUTER_EMBEDDING_MODEL_HINT,
         batch_size=8,
         dimension=1024,
         timeout_seconds=15,
@@ -112,6 +113,27 @@ def test_get_embeddings_uses_openrouter_provider(
     assert created_kwargs["base_url"] == rag_dependencies.OPENROUTER_BASE_URL
     assert created_kwargs["chunk_size"] == 8
     assert created_kwargs["timeout"] == 15
+
+
+def test_get_embeddings_requires_openrouter_api_key_for_openrouter_provider() -> None:
+    settings = build_settings(api_key=None)
+    settings.embedding = EmbeddingSettings(provider="openrouter")
+
+    with pytest.raises(ValueError, match="OPENROUTER_API_KEY is required"):
+        rag_dependencies.get_embeddings(settings=settings)
+
+
+def test_get_embeddings_rejects_local_quantized_model_tag_for_openrouter_provider() -> (
+    None
+):
+    settings = build_settings(api_key="openrouter-embedding-key")
+    settings.embedding = EmbeddingSettings(
+        provider="openrouter",
+        model="local-ollama/example-embedding:q8_0",
+    )
+
+    with pytest.raises(ValueError, match="EMBEDDING_MODEL looks like an Ollama"):
+        rag_dependencies.get_embeddings(settings=settings)
 
 
 def test_get_embeddings_uses_ollama_provider(

@@ -22,6 +22,7 @@ from app.modules.storage.dependencies import get_object_store_client
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 MISSING_OPENROUTER_API_KEY = "missing-openrouter-api-key"
+OPENROUTER_EMBEDDING_MODEL_HINT = "intfloat/multilingual-e5-large"
 
 
 def get_parser() -> BulaParser:
@@ -36,10 +37,11 @@ def get_embeddings(settings: Settings = Depends(get_settings)) -> EmbeddingAdapt
             base_url=_build_ollama_base_url(settings=settings),
         )
     else:
-        api_key = _clean_optional_api_key(settings.openrouter.api_key)
+        api_key = _get_openrouter_api_key_for_embeddings(settings=settings)
+        _validate_openrouter_embedding_model(settings=settings)
         embedder = OpenAIEmbeddings(
             model=settings.embedding.model,
-            api_key=SecretStr(api_key or MISSING_OPENROUTER_API_KEY),
+            api_key=SecretStr(api_key),
             base_url=OPENROUTER_BASE_URL,
             check_embedding_ctx_length=False,
             tiktoken_enabled=False,
@@ -121,6 +123,34 @@ def _clean_optional_api_key(api_key: str | None) -> str | None:
         return None
 
     return clean_api_key
+
+
+def _get_openrouter_api_key_for_embeddings(*, settings: Settings) -> str:
+    api_key = _clean_optional_api_key(settings.openrouter.api_key)
+    if api_key is None:
+        raise ValueError(
+            "OPENROUTER_API_KEY is required when EMBEDDING_PROVIDER=openrouter. "
+            "Set EMBEDDING_PROVIDER=ollama to use local embeddings."
+        )
+
+    return api_key
+
+
+def _validate_openrouter_embedding_model(*, settings: Settings) -> None:
+    if not _looks_like_ollama_model_tag(settings.embedding.model):
+        return
+
+    raise ValueError(
+        "EMBEDDING_MODEL looks like an Ollama model tag, but "
+        "EMBEDDING_PROVIDER=openrouter. Use "
+        f"EMBEDDING_MODEL={OPENROUTER_EMBEDDING_MODEL_HINT} or set "
+        "EMBEDDING_PROVIDER=ollama."
+    )
+
+
+def _looks_like_ollama_model_tag(model_name: str) -> bool:
+    clean_model_name = model_name.strip().lower()
+    return clean_model_name.startswith("jeffh/") or ":q" in clean_model_name
 
 
 def _build_ollama_base_url(*, settings: Settings) -> str:
