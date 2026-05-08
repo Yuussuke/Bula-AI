@@ -27,6 +27,7 @@ class ChatSessionResponse(BaseModel):
     id: UUID
     user_id: int
     bula_id: UUID | None
+    title: str
     created_at: datetime
     updated_at: datetime
 
