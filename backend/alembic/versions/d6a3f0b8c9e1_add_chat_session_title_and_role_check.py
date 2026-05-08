@@ -26,7 +26,7 @@ def upgrade() -> None:
         sa.Column(
             "title",
             sa.String(length=50),
-            server_default="Nova conversa",
+            server_default="New conversation",
             nullable=False,
         ),
     )
