@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import uuid
 import enum
+import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Text, Uuid
+from sqlalchemy import CheckConstraint, ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.base import Base, UUIDMixin, TimestampMixin
@@ -23,12 +23,12 @@ class RetrievalMode(str, enum.Enum):
 class ChatRole(str, enum.Enum):
     USER = "user"
     ASSISTANT = "assistant"
-    SYSTEM = "system"
 
 
 class ChatSession(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "chat_sessions"
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    title: Mapped[str] = mapped_column(String(50), nullable=False)
 
     bula_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid(as_uuid=True),
@@ -47,6 +47,12 @@ class ChatSession(Base, UUIDMixin, TimestampMixin):
 
 class ChatMessage(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "chat_messages"
+    __table_args__ = (
+        CheckConstraint(
+            "role IN ('USER', 'ASSISTANT')",
+            name="role_user_assistant",
+        ),
+    )
 
     session_id: Mapped[uuid.UUID] = mapped_column(
         Uuid(as_uuid=True),
