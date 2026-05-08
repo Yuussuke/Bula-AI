@@ -6,6 +6,7 @@ os.environ.setdefault(
 )
 
 import pytest
+from sqlalchemy import event
 from sqlalchemy.pool import StaticPool
 from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, AsyncSession
@@ -26,6 +27,15 @@ TEST_DATABASE_URL = "sqlite+aiosqlite:///:memory:"
 engine = create_async_engine(
     TEST_DATABASE_URL, connect_args={"check_same_thread": False}, poolclass=StaticPool
 )
+
+
+@event.listens_for(engine.sync_engine, "connect")
+def set_sqlite_pragma(dbapi_conn, connection_record):
+    _ = connection_record
+    cursor = dbapi_conn.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
 
 TestingSessionLocal = async_sessionmaker(
     expire_on_commit=False,
