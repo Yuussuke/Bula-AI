@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, RetrievalMode
 
 MAX_CHAT_SESSION_TITLE_LENGTH = 50
-DEFAULT_CHAT_SESSION_TITLE = "Nova conversa"
+DEFAULT_CHAT_SESSION_TITLE = "New conversation"
 
 
 class ChatPersistenceError(Exception):
