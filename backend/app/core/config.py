@@ -9,11 +9,25 @@ class MaritacaSettings(BaseSettings):
     # Optional so the app and CI can boot without a paid API key.
     # Endpoints that require the LLM should validate this at call time.
     maritaca_api_key: str | None = None
+    maritaca_model: str = "sabiazinho-4"
+
+
+class LLMSettings(BaseSettings):
+    provider: Literal["auto", "maritaca", "openrouter"] = "auto"
+    enable_fallback: bool = True
+    timeout_seconds: int = Field(default=60, gt=0)
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="LLM_",
+        extra="ignore",
+    )
 
 
 class OpenRouterSettings(BaseSettings):
     # Optional so CI/dev can use deterministic heuristic chunking without an API key.
     api_key: str | None = None
+    chat_model: str = "openai/gpt-5.4-mini"
     chunk_model: str = "google/gemini-3-flash-preview"
     chunk_fallback_model: str = "deepseek/deepseek-chat"
     require_zdr: bool = True
@@ -114,6 +128,7 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
         FRONTEND_URL,
     ]
     openrouter: OpenRouterSettings = Field(default_factory=OpenRouterSettings)
+    llm: LLMSettings = Field(default_factory=LLMSettings)
     processing: ProcessingSettings = Field(default_factory=ProcessingSettings)
     embedding: EmbeddingSettings = Field(default_factory=EmbeddingSettings)
     ollama: OllamaSettings = Field(default_factory=OllamaSettings)
