@@ -1,6 +1,7 @@
 from typing import cast
 
 import pytest
+from fastapi import FastAPI, Request
 from langchain_core.embeddings import Embeddings as LCEmbeddings
 from openai import AsyncOpenAI
 from pydantic import SecretStr
@@ -16,9 +17,15 @@ from app.core.config import (
 from app.modules.rag.base_chunker import BaseChunker
 from app.modules.rag.chunker import BulaChunker
 from app.modules.rag import dependencies as rag_dependencies
-from app.modules.rag.dependencies import get_chunker, get_ingestion_service
+from app.modules.rag import qdrant_client as qdrant_client_module
+from app.modules.rag.dependencies import (
+    get_chunker,
+    get_ingestion_service,
+    get_qdrant_client,
+)
 from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.parsers.pdf_parser import BulaParser
+from app.modules.rag.qdrant_client import QDRANT_CLIENT_STATE_KEY
 from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.service import RAGIngestionService
 
@@ -161,7 +168,7 @@ def test_get_embeddings_uses_ollama_provider(
     assert created_kwargs["base_url"] == "http://ollama-test:11434"
 
 
-def test_get_qdrant_store_uses_qdrant_settings(
+def test_create_qdrant_client_uses_qdrant_settings(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     created_kwargs: dict[str, object] = {}
@@ -171,7 +178,7 @@ def test_get_qdrant_store_uses_qdrant_settings(
         return FakeQdrantClient(**kwargs)
 
     monkeypatch.setattr(
-        rag_dependencies,
+        qdrant_client_module,
         "AsyncQdrantClient",
         fake_qdrant_client,
     )
@@ -184,16 +191,49 @@ def test_get_qdrant_store_uses_qdrant_settings(
         timeout_seconds=30,
     )
 
-    vector_store = rag_dependencies.get_qdrant_store(settings=settings)
+    client = qdrant_client_module.create_qdrant_client(settings=settings)
 
-    assert isinstance(vector_store, QdrantVectorStore)
-    assert vector_store.vector_size == 768
+    assert isinstance(client, FakeQdrantClient)
     assert created_kwargs == {
         "host": "qdrant-test",
         "port": 6333,
         "api_key": "qdrant-key",
         "timeout": 30,
     }
+
+
+def test_get_qdrant_client_returns_lifespan_client() -> None:
+    app = FastAPI()
+    fake_client = cast(object, FakeQdrantClient())
+    setattr(app.state, QDRANT_CLIENT_STATE_KEY, fake_client)
+    request = Request({"type": "http", "app": app})
+
+    client = get_qdrant_client(request=request)
+
+    assert client is fake_client
+
+
+def test_get_qdrant_client_requires_lifespan_initialization() -> None:
+    app = FastAPI()
+    request = Request({"type": "http", "app": app})
+
+    with pytest.raises(RuntimeError, match="Qdrant client was not initialized"):
+        get_qdrant_client(request=request)
+
+
+def test_get_qdrant_store_reuses_shared_client() -> None:
+    fake_client = cast(object, FakeQdrantClient())
+    settings = build_settings()
+    settings.embedding = EmbeddingSettings(dimension=768)
+
+    vector_store = rag_dependencies.get_qdrant_store(
+        qdrant_client=cast(object, fake_client),
+        settings=settings,
+    )
+
+    assert isinstance(vector_store, QdrantVectorStore)
+    assert vector_store.vector_size == 768
+    assert vector_store._client is fake_client
 
 
 def test_get_chunker_returns_bula_chunker_as_base_chunker() -> None:

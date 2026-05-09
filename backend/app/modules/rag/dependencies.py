@@ -1,4 +1,6 @@
-from fastapi import Depends
+from typing import cast
+
+from fastapi import Depends, Request
 from langchain_core.embeddings import Embeddings as LCEmbeddings
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.retrievers import BaseRetriever
@@ -17,6 +19,7 @@ from app.modules.rag.chunker import BulaChunker
 from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.llm import OPENROUTER_BASE_URL, get_llm
 from app.modules.rag.parsers.pdf_parser import BulaParser
+from app.modules.rag.qdrant_client import QDRANT_CLIENT_STATE_KEY
 from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.retriever import DenseBulaRetriever
 from app.modules.rag.schemas import ChunkingConfig
@@ -60,15 +63,20 @@ def get_embeddings(settings: Settings = Depends(get_settings)) -> EmbeddingAdapt
     )
 
 
-def get_qdrant_store(settings: Settings = Depends(get_settings)) -> QdrantVectorStore:
-    client = AsyncQdrantClient(
-        host=settings.qdrant.host,
-        port=settings.qdrant.port,
-        api_key=settings.qdrant.api_key,
-        timeout=settings.qdrant.timeout_seconds,
-    )
+def get_qdrant_client(request: Request) -> AsyncQdrantClient:
+    client = getattr(request.app.state, QDRANT_CLIENT_STATE_KEY, None)
+    if client is None:
+        raise RuntimeError("Qdrant client was not initialized.")
+
+    return cast(AsyncQdrantClient, client)
+
+
+def get_qdrant_store(
+    qdrant_client: AsyncQdrantClient = Depends(get_qdrant_client),
+    settings: Settings = Depends(get_settings),
+) -> QdrantVectorStore:
     return QdrantVectorStore(
-        client=client,
+        client=qdrant_client,
         vector_size=settings.embedding.dimension,
     )
 
@@ -93,11 +101,15 @@ def get_chat_llm(settings: Settings = Depends(get_settings)) -> BaseChatModel:
 
 def get_rag_chain_factory(
     settings: Settings = Depends(get_settings),
+    qdrant_client: AsyncQdrantClient = Depends(get_qdrant_client),
 ) -> RAGChainFactory:
     def build_dense_retriever(bula_id: str) -> BaseRetriever:
         return DenseBulaRetriever(
             bula_id=bula_id,
-            qdrant_store=get_qdrant_store(settings=settings),
+            qdrant_store=get_qdrant_store(
+                qdrant_client=qdrant_client,
+                settings=settings,
+            ),
             embeddings=get_embeddings(settings=settings),
         )
 
