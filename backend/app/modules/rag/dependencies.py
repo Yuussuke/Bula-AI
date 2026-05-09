@@ -1,5 +1,6 @@
 from fastapi import Depends
 from langchain_core.embeddings import Embeddings as LCEmbeddings
+from langchain_core.retrievers import BaseRetriever
 from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
@@ -14,6 +15,7 @@ from app.modules.rag.chunker import BulaChunker
 from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.parsers.pdf_parser import BulaParser
 from app.modules.rag.qdrant_store import QdrantVectorStore
+from app.modules.rag.retriever import DenseBulaRetriever
 from app.modules.rag.schemas import ChunkingConfig
 from app.modules.rag.service import RAGIngestionService
 from app.modules.storage.client import ObjectStoreClient
@@ -66,6 +68,20 @@ def get_qdrant_store(settings: Settings = Depends(get_settings)) -> QdrantVector
     return QdrantVectorStore(
         client=client,
         vector_size=settings.embedding.dimension,
+    )
+
+
+def get_dense_retriever(
+    bula_id: str,
+    k: int = 4,
+    qdrant_store: QdrantVectorStore = Depends(get_qdrant_store),
+    embeddings: EmbeddingAdapter = Depends(get_embeddings),
+) -> BaseRetriever:
+    return DenseBulaRetriever(
+        bula_id=bula_id,
+        k=k,
+        qdrant_store=qdrant_store,
+        embeddings=embeddings,
     )
 
 
