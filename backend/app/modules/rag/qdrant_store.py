@@ -1,7 +1,13 @@
 import uuid
 
 from qdrant_client import AsyncQdrantClient
-from qdrant_client.models import Distance, PointStruct, QueryResponse, VectorParams
+from qdrant_client.models import (
+    Distance,
+    Filter,
+    PointStruct,
+    QueryResponse,
+    VectorParams,
+)
 
 from app.modules.bulas.models import Bula, BulaCorpus
 from app.modules.rag.schemas import DocumentChunk
@@ -81,10 +87,12 @@ class QdrantVectorStore:
         *,
         vector: list[float],
         limit: int = 5,
+        query_filter: Filter | None = None,
     ) -> QueryResponse:
         return await self._client.query_points(
             collection_name=self.collection_name,
             query=vector,
+            query_filter=query_filter,
             limit=limit,
             with_payload=True,
         )

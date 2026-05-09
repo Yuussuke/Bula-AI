@@ -6,7 +6,7 @@ POSTGRES_IMAGE_TAG := 18
 POSTGRES_IMAGE := $(POSTGRES_IMAGE_NAME):$(POSTGRES_IMAGE_TAG)
 POSTGRES_IMAGE_CONTEXT := docker/bula_ai_postgres
 
-.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate pgq-install pgq-upgrade pgq-verify verify-postgres makemigrations create-admin test test-unit test-integration test-cov lint format reset-db help dependencies add-dependency
+.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate pgq-install pgq-upgrade pgq-verify verify-postgres makemigrations create-admin test test-unit test-integration test-cov lint typecheck format reset-db help dependencies add-dependency
 
 # --- Docker ---
 build:
@@ -91,6 +91,9 @@ test-cov:
 lint:
 	$(COMPOSE) exec api uv run ruff check .
 
+typecheck:
+	$(COMPOSE) exec api uv run mypy app
+
 lint-fix:
 	$(COMPOSE) exec api uv run ruff check --fix .
 
@@ -131,6 +134,7 @@ help:
 	@echo "  make test-integration - Run backend integration tests"
 	@echo "  make test-cov       - Run tests with coverage report"
 	@echo "  make lint           - Check code style with Ruff"
+	@echo "  make typecheck      - Check backend typing with mypy"
 	@echo "  make lint-fix       - Automatically fix lint issues with Ruff"
 	@echo "  make format         - Format code with Ruff"
 	@echo "  make dependencies   - Sync dependencies from lockfile and rebuild api container"
