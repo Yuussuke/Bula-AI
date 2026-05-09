@@ -1,6 +1,8 @@
 from fastapi import Depends
 from langchain_core.embeddings import Embeddings as LCEmbeddings
+from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.retrievers import BaseRetriever
+from langchain_core.runnables import Runnable
 from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
@@ -11,8 +13,10 @@ from app.core.config import Settings, get_settings
 from app.modules.bulas.dependencies import get_bula_repository
 from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.base_chunker import BaseChunker
+from app.modules.rag.chain import build_dense_rag_chain
 from app.modules.rag.chunker import BulaChunker
 from app.modules.rag.embeddings import EmbeddingAdapter
+from app.modules.rag.llm import OPENROUTER_BASE_URL, get_llm
 from app.modules.rag.parsers.pdf_parser import BulaParser
 from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.retriever import DenseBulaRetriever
@@ -22,7 +26,6 @@ from app.modules.storage.client import ObjectStoreClient
 from app.modules.storage.dependencies import get_object_store_client
 
 
-OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 MISSING_OPENROUTER_API_KEY = "missing-openrouter-api-key"
 OPENROUTER_EMBEDDING_MODEL_HINT = "intfloat/multilingual-e5-large"
 
@@ -83,6 +86,17 @@ def get_dense_retriever(
         qdrant_store=qdrant_store,
         embeddings=embeddings,
     )
+
+
+def get_chat_llm(settings: Settings = Depends(get_settings)) -> BaseChatModel:
+    return get_llm(settings=settings)
+
+
+def build_rag_chain(
+    retriever: BaseRetriever = Depends(get_dense_retriever),
+    llm: BaseChatModel = Depends(get_chat_llm),
+) -> Runnable[dict[str, str], dict[str, object]]:
+    return build_dense_rag_chain(retriever=retriever, llm=llm)
 
 
 def get_llm_client(settings: Settings = Depends(get_settings)) -> AsyncOpenAI:
