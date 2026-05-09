@@ -55,19 +55,25 @@ class ChatRepository:
             bula_id=bula_id,
             title=self._extract_title(first_question),
         )
+        self.db.add(chat_session)
+        await self.db.flush()
+
         user_message = ChatMessage(
             session=chat_session,
             role=ChatRole.USER,
             content=first_question,
             retrieval_mode=retrieval_mode,
         )
+        self.db.add(user_message)
+        await self.db.flush()
+
         assistant_message = ChatMessage(
             session=chat_session,
             role=ChatRole.ASSISTANT,
             content=answer,
             retrieval_mode=retrieval_mode,
         )
-        self.db.add_all([chat_session, user_message, assistant_message])
+        self.db.add(assistant_message)
 
         try:
             await self.db.commit()
