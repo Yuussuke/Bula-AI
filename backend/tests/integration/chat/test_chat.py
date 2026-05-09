@@ -10,7 +10,7 @@ from app.modules.auth.models import User
 from app.modules.bulas.models import Bula, BulaStatus
 from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, RetrievalMode
 from app.modules.chat.repository import ChatRepository
-from app.modules.rag.dependencies import build_rag_chain
+from app.modules.rag.dependencies import get_rag_chain_factory
 
 
 TEST_USER = {
@@ -57,22 +57,53 @@ async def create_ready_bula(
     return bula
 
 
-def override_rag_chain(
+class FakeRAGChainFactory:
+    def __init__(
+        self,
+        *,
+        response_text: str = "Resposta com citacao [Posologia].",
+    ) -> None:
+        self.response_text = response_text
+        self.built_bula_ids: list[str] = []
+
+    def build_dense_chain(self, *, bula_id: str) -> RunnableLambda:
+        self.built_bula_ids.append(bula_id)
+        return RunnableLambda(
+            lambda inputs: {
+                "answer": self.response_text,
+                "source_chunks": [
+                    {
+                        "section_title": "Posologia",
+                        "chunk_text": "Dose usual: 1 comprimido.",
+                        "relevance_score": 0.95,
+                    }
+                ],
+            }
+        )
+
+
+def override_rag_chain_factory(
     response_text: str = "Resposta com citacao [Posologia].",
-) -> None:
-    fake_chain = RunnableLambda(
-        lambda inputs: {
-            "answer": response_text,
-            "source_chunks": [
-                {
-                    "section_title": "Posologia",
-                    "chunk_text": "Dose usual: 1 comprimido.",
-                    "relevance_score": 0.95,
-                }
-            ],
-        }
-    )
-    app.dependency_overrides[build_rag_chain] = lambda: fake_chain
+) -> FakeRAGChainFactory:
+    fake_factory = FakeRAGChainFactory(response_text=response_text)
+    app.dependency_overrides[get_rag_chain_factory] = lambda: fake_factory
+    return fake_factory
+
+
+def build_failing_rag_chain_factory() -> FakeRAGChainFactory:
+    class FailingRAGChainFactory(FakeRAGChainFactory):
+        def build_dense_chain(self, *, bula_id: str) -> RunnableLambda:
+            self.built_bula_ids.append(bula_id)
+
+            async def fail_chain(inputs: dict[str, str]) -> dict[str, object]:
+                _ = inputs
+                raise RuntimeError("LLM unavailable")
+
+            return RunnableLambda(fail_chain)
+
+    fake_factory = FailingRAGChainFactory()
+    app.dependency_overrides[get_rag_chain_factory] = lambda: fake_factory
+    return fake_factory
 
 
 @pytest.mark.anyio
@@ -122,7 +153,7 @@ async def test_endpoint_creates_session_first_message(
     access_token = await get_access_token(client)
     user = await get_user_by_email(db_session, email=TEST_USER["email"])
     bula = await create_ready_bula(db_session, user_id=user.id)
-    override_rag_chain()
+    override_rag_chain_factory()
 
     response = await client.post(
         f"/api/v1/chat/sessions/{bula.id}/ask",
@@ -144,7 +175,7 @@ async def test_endpoint_persists_both_messages(
     access_token = await get_access_token(client)
     user = await get_user_by_email(db_session, email=TEST_USER["email"])
     bula = await create_ready_bula(db_session, user_id=user.id)
-    override_rag_chain()
+    override_rag_chain_factory()
 
     response = await client.post(
         f"/api/v1/chat/sessions/{bula.id}/ask",
@@ -180,7 +211,7 @@ async def test_endpoint_returns_source_chunks(
     access_token = await get_access_token(client)
     user = await get_user_by_email(db_session, email=TEST_USER["email"])
     bula = await create_ready_bula(db_session, user_id=user.id)
-    override_rag_chain()
+    override_rag_chain_factory()
 
     response = await client.post(
         f"/api/v1/chat/sessions/{bula.id}/ask",
@@ -202,7 +233,7 @@ async def test_endpoint_returns_source_chunks(
 @pytest.mark.anyio
 async def test_endpoint_404_missing_bula(client: AsyncClient) -> None:
     access_token = await get_access_token(client)
-    override_rag_chain()
+    fake_factory = override_rag_chain_factory()
 
     response = await client.post(
         "/api/v1/chat/sessions/11111111-1111-1111-1111-111111111111/ask",
@@ -211,6 +242,7 @@ async def test_endpoint_404_missing_bula(client: AsyncClient) -> None:
     )
 
     assert response.status_code == 404
+    assert fake_factory.built_bula_ids == []
 
 
 @pytest.mark.anyio
@@ -223,7 +255,7 @@ async def test_endpoint_404_uningested_bula(
     bula = await create_ready_bula(
         db_session, user_id=user.id, status=BulaStatus.PENDING
     )
-    override_rag_chain()
+    fake_factory = override_rag_chain_factory()
 
     response = await client.post(
         f"/api/v1/chat/sessions/{bula.id}/ask",
@@ -232,6 +264,7 @@ async def test_endpoint_404_uningested_bula(
     )
 
     assert response.status_code == 404
+    assert fake_factory.built_bula_ids == []
 
 
 @pytest.mark.anyio
@@ -239,7 +272,7 @@ async def test_endpoint_returns_501_for_future_retrieval_modes(
     client: AsyncClient,
 ) -> None:
     access_token = await get_access_token(client)
-    override_rag_chain()
+    fake_factory = override_rag_chain_factory()
 
     response = await client.post(
         "/api/v1/chat/sessions/11111111-1111-1111-1111-111111111111/ask",
@@ -248,6 +281,7 @@ async def test_endpoint_returns_501_for_future_retrieval_modes(
     )
 
     assert response.status_code == 501
+    assert fake_factory.built_bula_ids == []
 
 
 @pytest.mark.anyio
@@ -258,12 +292,7 @@ async def test_endpoint_does_not_persist_when_chain_fails(
     access_token = await get_access_token(client)
     user = await get_user_by_email(db_session, email=TEST_USER["email"])
     bula = await create_ready_bula(db_session, user_id=user.id)
-
-    async def fail_chain(inputs: dict[str, str]) -> dict[str, object]:
-        _ = inputs
-        raise RuntimeError("LLM unavailable")
-
-    app.dependency_overrides[build_rag_chain] = lambda: RunnableLambda(fail_chain)
+    fake_factory = build_failing_rag_chain_factory()
 
     with pytest.raises(RuntimeError, match="LLM unavailable"):
         await client.post(
@@ -281,3 +310,4 @@ async def test_endpoint_does_not_persist_when_chain_fails(
 
     assert session_count == 0
     assert message_count == 0
+    assert fake_factory.built_bula_ids == [str(bula.id)]
