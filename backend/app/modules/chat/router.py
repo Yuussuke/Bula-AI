@@ -7,7 +7,12 @@ from langchain_core.runnables import Runnable
 from app.modules.auth.dependencies import get_current_user
 from app.modules.auth.models import User
 from app.modules.chat.dependencies import get_chat_service
-from app.modules.chat.schemas import AskRequest, AskResponse, DirectAskRequest, DirectAskResponse
+from app.modules.chat.schemas import (
+    AskRequest,
+    AskResponse,
+    DirectAskRequest,
+    DirectAskResponse,
+)
 from app.modules.chat.service import ChatService
 from app.modules.rag.dependencies import build_rag_chain
 

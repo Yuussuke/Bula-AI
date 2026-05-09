@@ -91,7 +91,7 @@ class ChatService:
         raise HTTPException(
             status_code=status.HTTP_501_NOT_IMPLEMENTED,
             detail=(
-                 "RAG chat is not yet available on this endpoint. "
+                "RAG chat is not yet available on this endpoint. "
                 "Use /api/v1/chat/sessions/{bula_id}/ask."
             ),
         )
@@ -114,6 +114,8 @@ class ChatService:
                 for source_chunk in raw_source_chunks
             ]
         except ValidationError as exc:
-            raise ChatChainOutputError("RAG chain returned invalid source data.") from exc
+            raise ChatChainOutputError(
+                "RAG chain returned invalid source data."
+            ) from exc
 
         return answer, source_chunks

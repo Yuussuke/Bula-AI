@@ -47,12 +47,12 @@ def build_dense_rag_chain(
     llm: BaseChatModel,
 ) -> Runnable[dict[str, str], dict[str, object]]:
     retrieve_documents = RunnableLambda(_extract_question) | retriever
-    answer_chain = RunnableLambda(_build_prompt_input) | RAG_PROMPT | llm | StrOutputParser()
-    chain = (
-        RunnablePassthrough.assign(documents=retrieve_documents)
-        .assign(answer=answer_chain)
-        | RunnableLambda(_build_chain_output)
+    answer_chain = (
+        RunnableLambda(_build_prompt_input) | RAG_PROMPT | llm | StrOutputParser()
     )
+    chain = RunnablePassthrough.assign(documents=retrieve_documents).assign(
+        answer=answer_chain
+    ) | RunnableLambda(_build_chain_output)
     return cast(Runnable[dict[str, str], dict[str, object]], chain)
 
 

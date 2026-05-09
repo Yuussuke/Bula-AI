@@ -157,7 +157,9 @@ def _build_maritaca_llm(*, settings: Settings) -> ChatMaritalk:
 def _build_openrouter_llm(*, settings: Settings) -> ChatOpenAI:
     api_key = _clean_optional_api_key(settings.openrouter.api_key)
     if api_key is None:
-        raise LLMConfigurationError("OPENROUTER_API_KEY is required for OpenRouter chat.")
+        raise LLMConfigurationError(
+            "OPENROUTER_API_KEY is required for OpenRouter chat."
+        )
 
     return ChatOpenAI(
         model=settings.openrouter.chat_model,

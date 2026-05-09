@@ -14,7 +14,11 @@ from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.retrievers import BaseRetriever
 from pydantic import ConfigDict
 
-from app.modules.rag.chain import build_dense_rag_chain, build_source_chunks, format_documents
+from app.modules.rag.chain import (
+    build_dense_rag_chain,
+    build_source_chunks,
+    format_documents,
+)
 
 
 class FakeRetriever(BaseRetriever):
@@ -112,9 +116,7 @@ def test_build_source_chunks_maps_relevance_score() -> None:
 async def test_chain_with_mock_llm_produces_output() -> None:
     chain = build_dense_rag_chain(
         retriever=FakeRetriever(documents=[build_document()]),
-        llm=FakeChatModel(
-            response="Tome conforme indicado na secao [Posologia]."
-        ),
+        llm=FakeChatModel(response="Tome conforme indicado na secao [Posologia]."),
     )
 
     result = await chain.ainvoke({"question": "Como devo tomar?"})

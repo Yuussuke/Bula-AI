@@ -57,7 +57,9 @@ async def create_ready_bula(
     return bula
 
 
-def override_rag_chain(response_text: str = "Resposta com citacao [Posologia].") -> None:
+def override_rag_chain(
+    response_text: str = "Resposta com citacao [Posologia].",
+) -> None:
     fake_chain = RunnableLambda(
         lambda inputs: {
             "answer": response_text,
@@ -218,7 +220,9 @@ async def test_endpoint_404_uningested_bula(
 ) -> None:
     access_token = await get_access_token(client)
     user = await get_user_by_email(db_session, email=TEST_USER["email"])
-    bula = await create_ready_bula(db_session, user_id=user.id, status=BulaStatus.PENDING)
+    bula = await create_ready_bula(
+        db_session, user_id=user.id, status=BulaStatus.PENDING
+    )
     override_rag_chain()
 
     response = await client.post(
@@ -268,8 +272,12 @@ async def test_endpoint_does_not_persist_when_chain_fails(
             headers=build_auth_headers(access_token),
         )
 
-    session_count = await db_session.scalar(select(func.count()).select_from(ChatSession))
-    message_count = await db_session.scalar(select(func.count()).select_from(ChatMessage))
+    session_count = await db_session.scalar(
+        select(func.count()).select_from(ChatSession)
+    )
+    message_count = await db_session.scalar(
+        select(func.count()).select_from(ChatMessage)
+    )
 
     assert session_count == 0
     assert message_count == 0
