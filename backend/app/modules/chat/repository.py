@@ -41,6 +41,45 @@ class ChatRepository:
         await self.db.refresh(chat_session)
         return chat_session
 
+    async def create_session_with_messages(
+        self,
+        *,
+        user_id: int,
+        bula_id: UUID,
+        first_question: str,
+        answer: str,
+        retrieval_mode: RetrievalMode,
+    ) -> tuple[ChatSession, ChatMessage, ChatMessage]:
+        chat_session = ChatSession(
+            user_id=user_id,
+            bula_id=bula_id,
+            title=self._extract_title(first_question),
+        )
+        user_message = ChatMessage(
+            session=chat_session,
+            role=ChatRole.USER,
+            content=first_question,
+            retrieval_mode=retrieval_mode,
+        )
+        assistant_message = ChatMessage(
+            session=chat_session,
+            role=ChatRole.ASSISTANT,
+            content=answer,
+            retrieval_mode=retrieval_mode,
+        )
+        self.db.add_all([chat_session, user_message, assistant_message])
+
+        try:
+            await self.db.commit()
+        except SQLAlchemyError as exc:
+            await self.db.rollback()
+            raise ChatPersistenceError() from exc
+
+        await self.db.refresh(chat_session)
+        await self.db.refresh(user_message)
+        await self.db.refresh(assistant_message)
+        return chat_session, user_message, assistant_message
+
     async def add_message(
         self,
         *,
