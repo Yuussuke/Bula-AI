@@ -3,7 +3,6 @@ from __future__ import annotations
 from uuid import UUID
 
 from fastapi import HTTPException, status
-from langchain_core.runnables import Runnable
 from pydantic import ValidationError
 
 from app.modules.bulas.models import BulaStatus
@@ -17,6 +16,7 @@ from app.modules.chat.schemas import (
     DirectAskResponse,
     SourceChunkResponse,
 )
+from app.modules.rag.chain import RAGChainFactory
 
 
 class ChatChainOutputError(RuntimeError):
@@ -39,7 +39,7 @@ class ChatService:
         bula_id: UUID,
         payload: AskRequest,
         user_id: int,
-        chain: Runnable[dict[str, str], dict[str, object]],
+        chain_factory: RAGChainFactory,
     ) -> AskResponse:
         if payload.retrieval_mode != RetrievalMode.DENSE:
             raise HTTPException(
@@ -60,6 +60,7 @@ class ChatService:
                 detail="Bula not found or not ready for querying.",
             )
 
+        chain = chain_factory.build_dense_chain(bula_id=str(bula_id))
         chain_result = await chain.ainvoke({"question": payload.question})
         answer, source_chunks = self._parse_chain_result(chain_result)
 

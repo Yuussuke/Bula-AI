@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from typing import cast
 
 from langchain_core.documents import Document
@@ -39,6 +40,26 @@ RAG_PROMPT = ChatPromptTemplate.from_messages(
         ),
     ]
 )
+
+
+class RAGChainFactory:
+    def __init__(
+        self,
+        *,
+        dense_retriever_builder: Callable[[str], BaseRetriever],
+        llm_builder: Callable[[], BaseChatModel],
+    ) -> None:
+        self.dense_retriever_builder = dense_retriever_builder
+        self.llm_builder = llm_builder
+
+    def build_dense_chain(
+        self,
+        *,
+        bula_id: str,
+    ) -> Runnable[dict[str, str], dict[str, object]]:
+        retriever = self.dense_retriever_builder(bula_id)
+        llm = self.llm_builder()
+        return build_dense_rag_chain(retriever=retriever, llm=llm)
 
 
 def build_dense_rag_chain(

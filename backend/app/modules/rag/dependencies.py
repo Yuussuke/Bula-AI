@@ -2,7 +2,6 @@ from fastapi import Depends
 from langchain_core.embeddings import Embeddings as LCEmbeddings
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.retrievers import BaseRetriever
-from langchain_core.runnables import Runnable
 from langchain_ollama import OllamaEmbeddings
 from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
@@ -13,7 +12,7 @@ from app.core.config import Settings, get_settings
 from app.modules.bulas.dependencies import get_bula_repository
 from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.base_chunker import BaseChunker
-from app.modules.rag.chain import build_dense_rag_chain
+from app.modules.rag.chain import RAGChainFactory
 from app.modules.rag.chunker import BulaChunker
 from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.llm import OPENROUTER_BASE_URL, get_llm
@@ -92,11 +91,23 @@ def get_chat_llm(settings: Settings = Depends(get_settings)) -> BaseChatModel:
     return get_llm(settings=settings)
 
 
-def build_rag_chain(
-    retriever: BaseRetriever = Depends(get_dense_retriever),
-    llm: BaseChatModel = Depends(get_chat_llm),
-) -> Runnable[dict[str, str], dict[str, object]]:
-    return build_dense_rag_chain(retriever=retriever, llm=llm)
+def get_rag_chain_factory(
+    settings: Settings = Depends(get_settings),
+) -> RAGChainFactory:
+    def build_dense_retriever(bula_id: str) -> BaseRetriever:
+        return DenseBulaRetriever(
+            bula_id=bula_id,
+            qdrant_store=get_qdrant_store(settings=settings),
+            embeddings=get_embeddings(settings=settings),
+        )
+
+    def build_chat_llm() -> BaseChatModel:
+        return get_llm(settings=settings)
+
+    return RAGChainFactory(
+        dense_retriever_builder=build_dense_retriever,
+        llm_builder=build_chat_llm,
+    )
 
 
 def get_llm_client(settings: Settings = Depends(get_settings)) -> AsyncOpenAI:
