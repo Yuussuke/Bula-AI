@@ -52,8 +52,12 @@ async def qdrant_test_context() -> AsyncGenerator[
         )
         yield vector_store, client, collection_name
     finally:
-        if is_qdrant_available:
-            collection_exists = await client.collection_exists(collection_name)
-            if collection_exists:
-                await client.delete_collection(collection_name)
-        await client.close()
+        try:
+            if is_qdrant_available:
+                collection_exists = await client.collection_exists(collection_name)
+                if collection_exists:
+                    await client.delete_collection(collection_name)
+        except Exception:
+            pass
+        finally:
+            await client.close()
