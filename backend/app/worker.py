@@ -25,6 +25,7 @@ from app.modules.rag.dependencies import (
     get_parser,
     get_qdrant_store,
 )
+from app.modules.rag.qdrant_client import create_qdrant_client
 from app.modules.rag.service import RAGIngestionService
 from app.modules.storage.client import PgObjectStoreClient
 from app.modules.storage.repository import StoredObjectRepository
@@ -59,7 +60,11 @@ async def create_worker() -> AsyncIterator[PgQueuer]:
     llm_client = get_llm_client(settings=worker_settings)
     chunker = get_chunker(llm=llm_client, settings=worker_settings)
     embeddings = get_embeddings(settings=worker_settings)
-    qdrant_store = get_qdrant_store(settings=worker_settings)
+    qdrant_client = create_qdrant_client(settings=worker_settings)
+    qdrant_store = get_qdrant_store(
+        qdrant_client=qdrant_client,
+        settings=worker_settings,
+    )
 
     @pgq.entrypoint(
         INGEST_BULA_ENTRYPOINT,
@@ -92,7 +97,8 @@ async def create_worker() -> AsyncIterator[PgQueuer]:
     try:
         yield pgq
     finally:
-        await qdrant_store.close()
+        # The worker context owns this process-local Qdrant client.
+        await qdrant_client.close()
         await llm_client.close()
         await connection.close()
         await close_engine()
