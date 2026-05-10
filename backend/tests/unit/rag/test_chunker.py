@@ -7,6 +7,13 @@ from openai import AsyncOpenAI
 
 from app.modules.rag.base_chunker import BaseChunker
 from app.modules.rag.schemas import ChunkingConfig
+from app.modules.rag.token_estimator import TiktokenTokenEstimator, TokenEstimator
+
+
+PT_MEDICAL_SNIPPET = (
+    "Não use este medicamento em caso de hipersensibilidade à dipirona, "
+    "asma induzida por analgésicos ou reação alérgica prévia a pirazolonas."
+)
 
 
 class DummyChunker(BaseChunker):
@@ -39,6 +46,11 @@ class FakeOpenAIClient:
     def __init__(self, responses: list[str | Exception]) -> None:
         self.completions = FakeCompletions(responses=responses)
         self.chat = FakeChat(completions=self.completions)
+
+
+class WordTokenEstimator:
+    def estimate(self, text: str) -> int:
+        return max(1, len(text.split()))
 
 
 def build_config(**overrides: object) -> ChunkingConfig:
@@ -74,11 +86,13 @@ def build_chunker(
     *,
     responses: list[str | Exception] | None = None,
     config: ChunkingConfig | None = None,
+    token_estimator: TokenEstimator | None = None,
 ) -> tuple[DummyChunker, FakeOpenAIClient]:
     fake_client = FakeOpenAIClient(responses=responses or [])
     chunker = DummyChunker(
         llm=cast(AsyncOpenAI, fake_client),
         config=config or build_config(),
+        token_estimator=token_estimator,
     )
     return chunker, fake_client
 
@@ -196,6 +210,64 @@ async def test_heuristic_second_pass_only_runs_for_oversized_chunks(
     assert "LONGO" in oversized_chunks[0]
     assert all(chunk.method == "heuristic" for chunk in result.chunks)
     assert len(result.chunks) > 2
+
+
+@pytest.mark.anyio
+async def test_heuristic_chunking_keeps_pt_medical_chunks_within_token_bounds() -> None:
+    config = build_config(is_llm_enabled=False, max_tokens=25, overlap_ratio=0.0)
+    chunker, _ = build_chunker(
+        config=config,
+        token_estimator=TiktokenTokenEstimator(encoding_name="cl100k_base"),
+    )
+    markdown = "## CONTRAINDICACOES\n" + " ".join([PT_MEDICAL_SNIPPET] * 8)
+
+    result = await chunker.chunk_markdown(markdown=markdown, doc_id="bula-123")
+
+    assert len(result.chunks) > 1
+    assert all(chunk.method == "heuristic" for chunk in result.chunks)
+    assert all(chunk.token_estimate <= config.max_tokens for chunk in result.chunks)
+
+
+@pytest.mark.anyio
+async def test_model_chunk_over_token_limit_falls_back_to_heuristic() -> None:
+    config = build_config(max_tokens=8, overlap_ratio=0.0)
+    section_text = f"{PT_MEDICAL_SNIPPET} {PT_MEDICAL_SNIPPET}"
+    chunker, fake_client = build_chunker(
+        responses=[
+            build_chunk_response(chunk_text=section_text),
+            RuntimeError("fallback failed"),
+        ],
+        config=config,
+        token_estimator=TiktokenTokenEstimator(encoding_name="cl100k_base"),
+    )
+
+    result = await chunker.chunk_markdown(
+        markdown=f"## CONTRAINDICACOES\n{section_text}",
+        doc_id="bula-123",
+    )
+
+    assert [request["model"] for request in fake_client.completions.requests] == [
+        "primary-model",
+        "fallback-model",
+    ]
+    assert all(chunk.method == "heuristic" for chunk in result.chunks)
+    assert all(chunk.token_estimate <= config.max_tokens for chunk in result.chunks)
+
+
+@pytest.mark.anyio
+async def test_document_chunk_token_estimate_uses_injected_estimator() -> None:
+    section_text = "Use um comprimido ao dia apos as refeicoes."
+    chunker, _ = build_chunker(
+        responses=[build_chunk_response(chunk_text=section_text)],
+        token_estimator=WordTokenEstimator(),
+    )
+
+    result = await chunker.chunk_markdown(
+        markdown=f"## POSOLOGIA\n{section_text}",
+        doc_id="bula-123",
+    )
+
+    assert result.chunks[0].token_estimate == len(section_text.split())
 
 
 @pytest.mark.anyio

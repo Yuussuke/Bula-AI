@@ -28,6 +28,10 @@ from app.modules.rag.parsers.pdf_parser import BulaParser
 from app.modules.rag.qdrant_client import QDRANT_CLIENT_STATE_KEY
 from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.service import RAGIngestionService
+from app.modules.rag.token_estimator import (
+    HeuristicTokenEstimator,
+    TiktokenTokenEstimator,
+)
 
 
 class FakeOpenAIClient:
@@ -246,6 +250,17 @@ def test_get_chunker_returns_bula_chunker_as_base_chunker() -> None:
     assert isinstance(chunker, BulaChunker)
     assert chunker.llm is fake_llm
     assert chunker.config.is_llm_enabled is True
+    assert isinstance(chunker.token_estimator, TiktokenTokenEstimator)
+
+
+def test_get_chunker_uses_heuristic_token_estimator_when_encoding_is_blank() -> None:
+    fake_llm = cast(AsyncOpenAI, FakeOpenAIClient())
+    settings = build_settings()
+    settings.processing = ProcessingSettings(tokenizer_encoding="")
+
+    chunker = get_chunker(llm=fake_llm, settings=settings)
+
+    assert isinstance(chunker.token_estimator, HeuristicTokenEstimator)
 
 
 def test_get_chunker_disables_llm_when_openrouter_key_is_missing() -> None:
