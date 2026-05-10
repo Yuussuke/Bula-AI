@@ -27,17 +27,21 @@ from app.modules.rag.qdrant_client import (
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    pgq_pool, pgq_queries = await create_pgq_queries(settings.database_url)
-    setattr(app.state, PGQ_QUERIES_STATE_KEY, pgq_queries)
-    qdrant_client = create_qdrant_client(settings=settings)
-    setattr(app.state, QDRANT_CLIENT_STATE_KEY, qdrant_client)
+    pgq_pool = None
+    qdrant_client = None
 
     try:
+        pgq_pool, pgq_queries = await create_pgq_queries(settings.database_url)
+        setattr(app.state, PGQ_QUERIES_STATE_KEY, pgq_queries)
+        qdrant_client = create_qdrant_client(settings=settings)
+        setattr(app.state, QDRANT_CLIENT_STATE_KEY, qdrant_client)
         yield
     finally:
         # The FastAPI lifespan owns the shared Qdrant client and closes it on shutdown.
-        await qdrant_client.close()
-        await pgq_pool.close()
+        if qdrant_client is not None:
+            await qdrant_client.close()
+        if pgq_pool is not None:
+            await pgq_pool.close()
         await close_engine()
 
 
