@@ -1,5 +1,5 @@
-from fastapi import FastAPI
 import pytest
+from fastapi import FastAPI
 
 from app import main as app_main
 from app.core.pgqueuer import PGQ_QUERIES_STATE_KEY
