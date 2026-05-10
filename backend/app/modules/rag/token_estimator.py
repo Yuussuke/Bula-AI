@@ -1,16 +1,25 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Protocol
+from functools import lru_cache
+from typing import Protocol, cast
 
-import tiktoken
+import structlog
 
 from app.core.config import Settings
+
+
+logger = structlog.get_logger(__name__)
 
 
 class TokenEstimator(Protocol):
     def estimate(self, text: str) -> int:
         """Estimate token count for chunk bounds and metadata."""
+
+
+class TokenEncoding(Protocol):
+    def encode(self, text: str) -> list[int]:
+        """Encode text into token ids."""
 
 
 @dataclass(frozen=True)
@@ -24,13 +33,13 @@ class HeuristicTokenEstimator:
 @dataclass(frozen=True)
 class TiktokenTokenEstimator:
     encoding_name: str
-    _encoding: Any = field(init=False, repr=False)
+    _encoding: TokenEncoding = field(init=False, repr=False)
 
     def __post_init__(self) -> None:
         object.__setattr__(
             self,
             "_encoding",
-            tiktoken.get_encoding(self.encoding_name),
+            _get_tiktoken_encoding(self.encoding_name),
         )
 
     def estimate(self, text: str) -> int:
@@ -44,5 +53,17 @@ def build_token_estimator(*, settings: Settings) -> TokenEstimator:
 
     try:
         return TiktokenTokenEstimator(encoding_name=encoding_name)
-    except Exception:
+    except (ImportError, LookupError, ValueError) as exc:
+        logger.warning(
+            "rag_token_estimator_fallback",
+            encoding_name=encoding_name,
+            error_type=exc.__class__.__name__,
+        )
         return HeuristicTokenEstimator()
+
+
+@lru_cache(maxsize=8)
+def _get_tiktoken_encoding(encoding_name: str) -> TokenEncoding:
+    import tiktoken
+
+    return cast(TokenEncoding, tiktoken.get_encoding(encoding_name))
