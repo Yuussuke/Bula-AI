@@ -24,6 +24,7 @@ from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.retriever import DenseBulaRetriever
 from app.modules.rag.schemas import ChunkingConfig
 from app.modules.rag.service import RAGIngestionService
+from app.modules.rag.token_estimator import build_token_estimator
 from app.modules.storage.client import ObjectStoreClient
 from app.modules.storage.dependencies import get_object_store_client
 
@@ -146,7 +147,11 @@ def get_chunker(
         fallback_model=settings.openrouter.chunk_fallback_model,
         is_llm_enabled=openrouter_api_key is not None,
     )
-    return BulaChunker(llm=llm, config=config)
+    return BulaChunker(
+        llm=llm,
+        config=config,
+        token_estimator=build_token_estimator(settings=settings),
+    )
 
 
 def get_ingestion_service(

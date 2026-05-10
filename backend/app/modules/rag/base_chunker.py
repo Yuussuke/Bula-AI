@@ -23,6 +23,7 @@ from app.modules.rag.schemas import (
     ChunkResult,
     DocumentChunk,
 )
+from app.modules.rag.token_estimator import HeuristicTokenEstimator, TokenEstimator
 
 
 logger = structlog.get_logger(__name__)
@@ -84,9 +85,15 @@ def make_chunk_id(doc_id: str, index: int, text: str) -> str:
 
 
 class BaseChunker(ABC):
-    def __init__(self, llm: AsyncOpenAI, config: ChunkingConfig) -> None:
+    def __init__(
+        self,
+        llm: AsyncOpenAI,
+        config: ChunkingConfig,
+        token_estimator: TokenEstimator | None = None,
+    ) -> None:
         self.llm = llm
         self.config = config
+        self.token_estimator = token_estimator or HeuristicTokenEstimator()
 
     @abstractmethod
     def system_prompt(self) -> str:
@@ -308,7 +315,7 @@ class BaseChunker(ABC):
         final_chunk_texts: list[str] = []
 
         for chunk_text in first_pass_chunks:
-            if len(chunk_text) > self._max_chars():
+            if self._estimate_tokens(chunk_text) > self.config.max_tokens:
                 final_chunk_texts.extend(self._split_oversized_chunk(chunk_text))
                 continue
 
@@ -350,11 +357,12 @@ class BaseChunker(ABC):
         return []
 
     def _split_oversized_chunk(self, text: str) -> list[str]:
-        max_chars = self._max_chars()
-        overlap_chars = self._overlap_chars(max_chars=max_chars)
+        max_tokens = self.config.max_tokens
+        overlap_tokens = self._overlap_tokens(max_tokens=max_tokens)
         splitter = RecursiveCharacterTextSplitter(
-            chunk_size=max_chars,
-            chunk_overlap=overlap_chars,
+            chunk_size=max_tokens,
+            chunk_overlap=overlap_tokens,
+            length_function=self._estimate_tokens,
             separators=["\n\n", "\n", ". ", "; ", ", ", " ", ""],
         )
         return [chunk.strip() for chunk in splitter.split_text(text) if chunk.strip()]
@@ -465,14 +473,11 @@ class BaseChunker(ABC):
         return " ".join(text.split())
 
     def _estimate_tokens(self, text: str) -> int:
-        return max(1, len(text) // 4)
+        return self.token_estimator.estimate(text)
 
-    def _max_chars(self) -> int:
-        return max(1, self.config.max_tokens * 4)
-
-    def _overlap_chars(self, *, max_chars: int) -> int:
-        if max_chars <= 1:
+    def _overlap_tokens(self, *, max_tokens: int) -> int:
+        if max_tokens <= 1:
             return 0
 
-        overlap_chars = int(max_chars * self.config.overlap_ratio)
-        return min(overlap_chars, max_chars - 1)
+        overlap_tokens = int(max_tokens * self.config.overlap_ratio)
+        return min(overlap_tokens, max_tokens - 1)
