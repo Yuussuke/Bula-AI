@@ -1,37 +1,47 @@
-from contextlib import asynccontextmanager
 from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
 from typing import cast
-
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.responses import Response
-
-from slowapi.middleware import SlowAPIMiddleware
 from slowapi.errors import RateLimitExceeded
 from slowapi.extension import _rate_limit_exceeded_handler
+from slowapi.middleware import SlowAPIMiddleware
+from starlette.responses import Response
 
-from app.core.limiter import limiter
 from app.core.config import settings
-from app.core.exceptions import global_exception_handler
 from app.core.database import close_engine
+from app.core.exceptions import global_exception_handler
+from app.core.limiter import limiter
 from app.core.middleware import CorrelationIdMiddleware
 from app.core.pgqueuer import PGQ_QUERIES_STATE_KEY, create_pgq_queries
 from app.core.request_logging import RequestLoggingMiddleware
 from app.modules.auth.router import router as auth_router
 from app.modules.bulas.router import router as bulas_router
 from app.modules.chat.router import router as chat_router
+from app.modules.rag.qdrant_client import (
+    QDRANT_CLIENT_STATE_KEY,
+    create_qdrant_client,
+)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    pgq_pool, pgq_queries = await create_pgq_queries(settings.database_url)
-    setattr(app.state, PGQ_QUERIES_STATE_KEY, pgq_queries)
+    pgq_pool = None
+    qdrant_client = None
 
     try:
+        pgq_pool, pgq_queries = await create_pgq_queries(settings.database_url)
+        setattr(app.state, PGQ_QUERIES_STATE_KEY, pgq_queries)
+        qdrant_client = create_qdrant_client(settings=settings)
+        setattr(app.state, QDRANT_CLIENT_STATE_KEY, qdrant_client)
         yield
     finally:
-        await pgq_pool.close()
+        # The FastAPI lifespan owns the shared Qdrant client and closes it on shutdown.
+        if qdrant_client is not None:
+            await qdrant_client.close()
+        if pgq_pool is not None:
+            await pgq_pool.close()
         await close_engine()
 
 
