@@ -312,6 +312,7 @@ dependencies = [
     { name = "slowapi" },
     { name = "sqlalchemy" },
     { name = "structlog" },
+    { name = "tiktoken" },
     { name = "uvicorn", extra = ["standard"] },
 ]
 
@@ -355,6 +356,7 @@ requires-dist = [
     { name = "slowapi", specifier = ">=0.1.9" },
     { name = "sqlalchemy", specifier = ">=2.0.49" },
     { name = "structlog", specifier = ">=25.5.0" },
+    { name = "tiktoken", specifier = ">=0.12.0" },
     { name = "uvicorn", extras = ["standard"], specifier = ">=0.46.0" },
 ]
 
