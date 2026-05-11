@@ -201,6 +201,17 @@ PDF ingestion runs through a separate PGQueuer worker. On a new local database,
 run `make migrate` for application tables and `make pgq-install` for queue
 tables before uploading bulas.
 
+The ingestion worker relies on the Compose restart policy for database listener
+resilience: `docker-compose.yml` runs it with `restart: always` and
+`--shutdown-on-listener-failure`, so a broken PGQueuer listener exits and is
+restarted by the supervisor instead of maintaining custom reconnect logic in the
+application process.
+
+Uploads are intentionally limited to 10 MB. Validation reads the PDF in chunks
+and stops once the configured limit is exceeded; after validation, the current
+local storage path reads the accepted file into memory. Raising this limit should
+come with a DoS/memory review and a streaming object-storage strategy.
+
 ## PostgreSQL Image and Local Data
 
 Local development and CI use the first-party PostgreSQL image

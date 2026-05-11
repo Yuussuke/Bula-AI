@@ -79,6 +79,13 @@ class SectionChunkDraft:
     reason: str | None = None
 
 
+@dataclass(frozen=True)
+class ChunkingAttemptFailure:
+    method: ChunkingMethod
+    error_type: str
+    failure_reason: str
+
+
 def make_chunk_id(doc_id: str, index: int, text: str) -> str:
     digest = hashlib.md5(f"{doc_id}:{index}:{text}".encode()).hexdigest()[:12]
     return f"{doc_id}_{index}_{digest}"
@@ -98,6 +105,10 @@ class BaseChunker(ABC):
     @abstractmethod
     def system_prompt(self) -> str:
         """Domain-specific instruction for the LLM chunking call."""
+
+    @abstractmethod
+    def user_prompt(self, *, section: MarkdownSection) -> str:
+        """Domain-specific user instruction for the LLM chunking call."""
 
     async def chunk_markdown(self, markdown: str, doc_id: str) -> ChunkResult:
         sections = self._split_markdown_sections(markdown)
@@ -150,8 +161,11 @@ class BaseChunker(ABC):
         section: MarkdownSection,
         doc_id: str,
     ) -> list[SectionChunkDraft]:
+        primary_failure: ChunkingAttemptFailure | None = None
+        fallback_failure: ChunkingAttemptFailure | None = None
+
         if self.config.is_llm_enabled:
-            primary_chunks = await self._try_model_chunking(
+            primary_chunks, primary_failure = await self._try_model_chunking(
                 section=section,
                 doc_id=doc_id,
                 model=self.config.model,
@@ -166,7 +180,7 @@ class BaseChunker(ABC):
                 )
                 return primary_chunks
 
-            fallback_chunks = await self._try_model_chunking(
+            fallback_chunks, fallback_failure = await self._try_model_chunking(
                 section=section,
                 doc_id=doc_id,
                 model=self.config.fallback_model,
@@ -187,6 +201,8 @@ class BaseChunker(ABC):
             section=section,
             method="heuristic",
             chunk_count=len(heuristic_chunks),
+            primary_failure=primary_failure,
+            fallback_failure=fallback_failure,
         )
         return heuristic_chunks
 
@@ -197,22 +213,45 @@ class BaseChunker(ABC):
         doc_id: str,
         model: str,
         method: ChunkingMethod,
-    ) -> list[SectionChunkDraft] | None:
+    ) -> tuple[list[SectionChunkDraft] | None, ChunkingAttemptFailure | None]:
         try:
-            return await self._chunk_section_with_model(
-                section=section,
-                model=model,
-                method=method,
+            chunks = await self._chunk_section_with_model(
+                section=section, model=model, method=method
             )
+            return chunks, None
         except Exception as exc:
+            failure = self._build_chunking_attempt_failure(
+                method=method,
+                exc=exc,
+            )
             logger.warning(
                 "rag_section_chunking_model_failed",
                 doc_id=doc_id,
+                section_index=section.index,
                 section_title=section.title,
                 method=method,
-                error=str(exc),
+                error_type=failure.error_type,
+                failure_reason=failure.failure_reason,
             )
-            return None
+            return None, failure
+
+    def _build_chunking_attempt_failure(
+        self,
+        *,
+        method: ChunkingMethod,
+        exc: Exception,
+    ) -> ChunkingAttemptFailure:
+        return ChunkingAttemptFailure(
+            method=method,
+            error_type=exc.__class__.__name__,
+            failure_reason=self._safe_failure_reason(exc),
+        )
+
+    def _safe_failure_reason(self, exc: Exception) -> str:
+        if isinstance(exc, ChunkingModelError):
+            return "untrusted_model_response"
+
+        return "model_call_failed"
 
     async def _chunk_section_with_model(
         self,
@@ -240,17 +279,9 @@ class BaseChunker(ABC):
         *,
         section: MarkdownSection,
     ) -> list[ChatCompletionMessageParam]:
-        user_prompt = (
-            "Divida apenas o texto abaixo em chunks para RAG. "
-            "Use somente trechos copiados do texto de origem; nao adicione, "
-            "corrija ou complete nenhuma informacao medica. "
-            "Se um trecho for curto, mantenha-o junto ao contexto mais proximo. "
-            "Texto da secao:\n\n"
-            f"{section.text}"
-        )
         return [
             {"role": "system", "content": self.system_prompt()},
-            {"role": "user", "content": user_prompt},
+            {"role": "user", "content": self.user_prompt(section=section)},
         ]
 
     def _extract_message_content(self, *, response: Any) -> str:
@@ -450,14 +481,37 @@ class BaseChunker(ABC):
         section: MarkdownSection,
         method: ChunkingMethod,
         chunk_count: int,
+        primary_failure: ChunkingAttemptFailure | None = None,
+        fallback_failure: ChunkingAttemptFailure | None = None,
     ) -> None:
-        logger.info(
-            "rag_section_chunked",
-            doc_id=doc_id,
-            section_title=section.title,
-            method=method,
-            chunk_count=chunk_count,
-        )
+        log_fields: dict[str, object] = {
+            "doc_id": doc_id,
+            "section_index": section.index,
+            "section_title": section.title,
+            "method": method,
+            "chunk_count": chunk_count,
+        }
+        if method == "heuristic":
+            log_fields.update(
+                {
+                    "primary_failed": primary_failure is not None,
+                    "fallback_failed": fallback_failure is not None,
+                    "primary_error_type": (
+                        primary_failure.error_type if primary_failure else None
+                    ),
+                    "fallback_error_type": (
+                        fallback_failure.error_type if fallback_failure else None
+                    ),
+                    "primary_failure_reason": (
+                        primary_failure.failure_reason if primary_failure else None
+                    ),
+                    "fallback_failure_reason": (
+                        fallback_failure.failure_reason if fallback_failure else None
+                    ),
+                }
+            )
+
+        logger.info("rag_section_chunked", **log_fields)
 
     def _is_text_present_in_section(
         self,
