@@ -5,7 +5,9 @@ from typing import cast
 import pytest
 from openai import AsyncOpenAI
 
-from app.modules.rag.base_chunker import BaseChunker
+from app.modules.rag import base_chunker as base_chunker_module
+from app.modules.rag.base_chunker import BaseChunker, MarkdownSection
+from app.modules.rag.chunker import BulaChunker
 from app.modules.rag.schemas import ChunkingConfig
 from app.modules.rag.token_estimator import TiktokenTokenEstimator, TokenEstimator
 
@@ -19,6 +21,9 @@ PT_MEDICAL_SNIPPET = (
 class DummyChunker(BaseChunker):
     def system_prompt(self) -> str:
         return "Split the section into semantic chunks."
+
+    def user_prompt(self, *, section: MarkdownSection) -> str:
+        return f"Custom chunking instruction for {section.title}:\n{section.text}"
 
 
 class FakeCompletions:
@@ -98,6 +103,48 @@ def build_chunker(
 
 
 @pytest.mark.anyio
+async def test_base_chunker_uses_subclass_user_prompt() -> None:
+    section_text = "Use um comprimido ao dia apos as refeicoes."
+    chunker, fake_client = build_chunker(
+        responses=[build_chunk_response(chunk_text=section_text)]
+    )
+
+    result = await chunker.chunk_markdown(
+        markdown=f"## POSOLOGIA\n{section_text}",
+        doc_id="bula-123",
+    )
+
+    request = fake_client.completions.requests[0]
+    messages = cast(list[dict[str, str]], request["messages"])
+    assert result.chunks[0].text == section_text
+    assert messages[0]["content"] == "Split the section into semantic chunks."
+    assert messages[1]["content"] == (
+        f"Custom chunking instruction for POSOLOGIA:\n## POSOLOGIA\n{section_text}"
+    )
+
+
+def test_bula_chunker_user_prompt_preserves_medical_safety_instructions() -> None:
+    fake_client = FakeOpenAIClient(responses=[])
+    chunker = BulaChunker(
+        llm=cast(AsyncOpenAI, fake_client),
+        config=build_config(),
+    )
+    section = MarkdownSection(
+        index=0,
+        title="CONTRAINDICACOES",
+        text="## CONTRAINDICACOES\nNao use em caso de alergia conhecida.",
+    )
+
+    prompt = chunker.user_prompt(section=section)
+
+    assert "Divida apenas o texto abaixo em chunks para RAG." in prompt
+    assert "Use somente trechos copiados do texto de origem" in prompt
+    assert "nao adicione" in prompt
+    assert "corrija ou complete nenhuma informacao medica" in prompt
+    assert section.text in prompt
+
+
+@pytest.mark.anyio
 async def test_primary_failure_falls_through_to_fallback_model() -> None:
     section_text = "Use um comprimido ao dia apos as refeicoes."
     chunker, fake_client = build_chunker(
@@ -143,6 +190,68 @@ async def test_primary_and_fallback_failure_fall_through_to_heuristic() -> None:
     assert len(result.chunks) == 1
     assert result.chunks[0].method == "heuristic"
     assert "Use conforme orientacao medica." in result.chunks[0].text
+
+
+@pytest.mark.anyio
+async def test_heuristic_fallback_logs_safe_model_failure_context(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    warning_calls: list[dict[str, object]] = []
+    info_calls: list[dict[str, object]] = []
+    section_text = "Use conforme orientacao medica."
+
+    def record_warning(event: str, **kwargs: object) -> None:
+        warning_calls.append({"event": event, **kwargs})
+
+    def record_info(event: str, **kwargs: object) -> None:
+        info_calls.append({"event": event, **kwargs})
+
+    monkeypatch.setattr(base_chunker_module.logger, "warning", record_warning)
+    monkeypatch.setattr(base_chunker_module.logger, "info", record_info)
+
+    chunker, _ = build_chunker(
+        responses=[
+            RuntimeError(f"primary leaked raw text: {section_text}"),
+            RuntimeError(f"fallback leaked raw text: {section_text}"),
+        ]
+    )
+
+    result = await chunker.chunk_markdown(
+        markdown=f"## POSOLOGIA\n{section_text}",
+        doc_id="bula-123",
+    )
+
+    heuristic_log = next(
+        call
+        for call in info_calls
+        if call["event"] == "rag_section_chunked" and call["method"] == "heuristic"
+    )
+    assert result.chunks[0].method == "heuristic"
+    assert len(warning_calls) == 2
+    assert warning_calls[0] == {
+        "event": "rag_section_chunking_model_failed",
+        "doc_id": "bula-123",
+        "section_index": 0,
+        "section_title": "POSOLOGIA",
+        "method": "primary",
+        "error_type": "RuntimeError",
+        "failure_reason": "model_call_failed",
+    }
+    assert warning_calls[1]["method"] == "fallback"
+    assert warning_calls[1]["error_type"] == "RuntimeError"
+    assert heuristic_log["primary_failed"] is True
+    assert heuristic_log["fallback_failed"] is True
+    assert heuristic_log["primary_error_type"] == "RuntimeError"
+    assert heuristic_log["fallback_error_type"] == "RuntimeError"
+    assert heuristic_log["primary_failure_reason"] == "model_call_failed"
+    assert heuristic_log["fallback_failure_reason"] == "model_call_failed"
+    logged_values = " ".join(
+        str(value)
+        for call in warning_calls + info_calls
+        for value in call.values()
+    )
+    assert section_text not in logged_values
+    assert "leaked raw text" not in logged_values
 
 
 @pytest.mark.anyio
