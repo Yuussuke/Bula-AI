@@ -1,4 +1,4 @@
-from app.modules.rag.base_chunker import BaseChunker
+from app.modules.rag.base_chunker import BaseChunker, MarkdownSection
 
 
 class BulaChunker(BaseChunker):
@@ -13,4 +13,14 @@ class BulaChunker(BaseChunker):
             f"Meta: ~{self.config.target_tokens} tokens por chunk "
             f"(min {self.config.min_tokens}, max {self.config.max_tokens}). "
             "Retorne SOMENTE JSON valido seguindo o schema fornecido."
+        )
+
+    def user_prompt(self, *, section: MarkdownSection) -> str:
+        return (
+            "Divida apenas o texto abaixo em chunks para RAG. "
+            "Use somente trechos copiados do texto de origem; nao adicione, "
+            "corrija ou complete nenhuma informacao medica. "
+            "Se um trecho for curto, mantenha-o junto ao contexto mais proximo. "
+            "Texto da secao:\n\n"
+            f"{section.text}"
         )
