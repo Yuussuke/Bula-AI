@@ -246,9 +246,7 @@ async def test_heuristic_fallback_logs_safe_model_failure_context(
     assert heuristic_log["primary_failure_reason"] == "model_call_failed"
     assert heuristic_log["fallback_failure_reason"] == "model_call_failed"
     logged_values = " ".join(
-        str(value)
-        for call in warning_calls + info_calls
-        for value in call.values()
+        str(value) for call in warning_calls + info_calls for value in call.values()
     )
     assert section_text not in logged_values
     assert "leaked raw text" not in logged_values
