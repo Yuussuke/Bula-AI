@@ -71,6 +71,8 @@ class RAGIngestionService:
             raise BulaIngestionError("No chunks were generated from the PDF.")
 
         chunk_texts = [chunk.text for chunk in chunk_result.chunks]
+        # LangChain exposes sync embed_documents here, so keep that provider call
+        # off the event loop. Prefer a native async API if upstream adds one.
         vectors = await asyncio.to_thread(self.embeddings.embed_documents, chunk_texts)
         points = [
             build_qdrant_point(bula=bula, chunk=chunk, vector=vector)
