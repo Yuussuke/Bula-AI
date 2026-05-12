@@ -28,6 +28,7 @@ class DetectedSection:
     level: int
     page_number: int
     line_index: int
+    consumed_line_indices: tuple[int, ...] = ()
     char_start: int = 0
     char_end: int | None = None
 
@@ -124,7 +125,121 @@ class SectionDetector:
                 )
             )
 
-        return detected_sections
+        return self._merge_adjacent_wrapped_heading_sections(detected_sections)
+
+    def _merge_adjacent_wrapped_heading_sections(
+        self,
+        detected_sections: list[DetectedSection],
+    ) -> list[DetectedSection]:
+        merged_sections: list[DetectedSection] = []
+        section_index = 0
+
+        while section_index < len(detected_sections):
+            current_section = detected_sections[section_index]
+            next_index = section_index + 1
+
+            while next_index < len(detected_sections):
+                next_section = detected_sections[next_index]
+                if not self._should_merge_wrapped_heading(
+                    current_section=current_section,
+                    next_section=next_section,
+                ):
+                    break
+
+                current_section = DetectedSection(
+                    title=normalize_spaces(
+                        f"{current_section.title} {next_section.title}"
+                    ),
+                    canonical_title=self._merge_canonical_title(
+                        current_section=current_section,
+                        next_section=next_section,
+                    ),
+                    level=current_section.level,
+                    page_number=current_section.page_number,
+                    line_index=current_section.line_index,
+                    consumed_line_indices=self._merge_consumed_line_indices(
+                        current_section=current_section,
+                        next_section=next_section,
+                    ),
+                )
+                next_index += 1
+
+            merged_sections.append(current_section)
+            section_index = next_index
+
+        return merged_sections
+
+    def _should_merge_wrapped_heading(
+        self,
+        *,
+        current_section: DetectedSection,
+        next_section: DetectedSection,
+    ) -> bool:
+        if current_section.page_number != next_section.page_number:
+            return False
+
+        if (
+            self._last_consumed_line_index(current_section) + 1
+            != next_section.line_index
+        ):
+            return False
+
+        if current_section.level not in {2, 3} or next_section.level != 3:
+            return False
+
+        current_title = normalize_spaces(current_section.title)
+        next_title = normalize_spaces(next_section.title)
+        combined_title = normalize_spaces(f"{current_title} {next_title}")
+
+        if len(combined_title) > SECTION_HEADER_MAX_LENGTH:
+            return False
+
+        if current_title.endswith((".", "?", "!", ":")):
+            return False
+
+        if ":" in next_title:
+            return False
+
+        return self._is_all_caps_fragment(current_title) and self._is_all_caps_fragment(
+            next_title
+        )
+
+    def _merge_canonical_title(
+        self,
+        *,
+        current_section: DetectedSection,
+        next_section: DetectedSection,
+    ) -> str:
+        if current_section.canonical_title != current_section.title:
+            return current_section.canonical_title
+
+        return normalize_spaces(
+            f"{current_section.canonical_title} {next_section.canonical_title}"
+        )
+
+    def _merge_consumed_line_indices(
+        self,
+        *,
+        current_section: DetectedSection,
+        next_section: DetectedSection,
+    ) -> tuple[int, ...]:
+        current_line_indices = current_section.consumed_line_indices or (
+            current_section.line_index,
+        )
+        next_line_indices = next_section.consumed_line_indices or (
+            next_section.line_index,
+        )
+        return (*current_line_indices, *next_line_indices)
+
+    def _last_consumed_line_index(self, section: DetectedSection) -> int:
+        if section.consumed_line_indices:
+            return section.consumed_line_indices[-1]
+
+        return section.line_index
+
+    def _is_all_caps_fragment(self, text: str) -> bool:
+        has_letter = any(character.isalpha() for character in text)
+        return has_letter and text == text.upper()
 
     def _calculate_baseline_font_size(
         self,
