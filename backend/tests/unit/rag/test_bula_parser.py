@@ -448,6 +448,32 @@ def test_markdown_renderer_skips_repeated_section_headings() -> None:
     assert result.markdown.count("## COMPOSICAO") == 1
 
 
+@pytest.mark.anyio
+async def test_parser_omits_lines_from_dizeres_legais_onward() -> None:
+    extraction_result = build_extraction_result(
+        text=(
+            "COMPOSICAO\n"
+            "Cada comprimido contem dipirona.\n"
+            "INDICACOES\n"
+            "Este medicamento e indicado para dor.\n"
+            "3 - DIZERES LEGAIS\n"
+            "Registro MS 1.2345.6789\n"
+            "Farmaceutico responsavel: Exemplo."
+        ),
+        extraction_tier="pdfplumber",
+        is_sparse=False,
+    )
+    parser = BulaParser(first_handler=StaticHandler(extraction_result))
+
+    result = await parser.parse(pdf_bytes=b"%PDF-1.4", filename="dipirona.pdf")
+
+    assert result.success is True
+    assert "## COMPOSICAO" in result.markdown
+    assert "## INDICACOES" in result.markdown
+    assert "DIZERES LEGAIS" not in result.markdown
+    assert "Registro MS" not in result.markdown
+
+
 def test_metadata_extractor_keeps_existing_metadata_shape() -> None:
     lines = [
         ExtractedLine(text="DIPIRONA SODICA", page_number=1),

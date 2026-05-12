@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+import re
 
 from app.modules.rag.parsers.handlers import (
     ExtractedLine,
     ExtractionResult,
+    normalize_for_matching,
     ParserHandler,
     PdfplumberHandler,
     PyMuPDFHandler,
@@ -18,6 +20,9 @@ from app.modules.rag.parsers.section_detector import SectionDetector
 DEFAULT_FAILURE_ERROR = (
     "No text-based extraction tier produced enough content. "
     "OCR is not enabled in this parsing phase."
+)
+LEGAL_SECTION_PATTERN = re.compile(
+    r"^(?:[0-9]{1,2}|[IVXLCDM]+)?\b\W*DIZERES\s+LEGAIS\b"
 )
 
 
@@ -71,6 +76,7 @@ class BulaParser:
             )
 
         extracted_lines = self._collect_lines(extraction_result=extraction_result)
+        extracted_lines = self._trim_lines_from_legal_section(extracted_lines)
         detected_sections = self.section_detector.detect(extracted_lines)
         markdown_result = self.markdown_renderer.render(
             lines=extracted_lines,
@@ -115,6 +121,17 @@ class BulaParser:
             for line in extraction_result.text.splitlines()
             if line.strip()
         ]
+
+    def _trim_lines_from_legal_section(
+        self,
+        extracted_lines: list[ExtractedLine],
+    ) -> list[ExtractedLine]:
+        for line_index, extracted_line in enumerate(extracted_lines):
+            normalized_line = normalize_for_matching(extracted_line.text)
+            if LEGAL_SECTION_PATTERN.match(normalized_line):
+                return extracted_lines[:line_index]
+
+        return extracted_lines
 
     def _build_failure_parse_result(
         self,
