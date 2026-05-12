@@ -115,7 +115,7 @@ updates:
     reviewers:
       - "Yuussuke"
 
-  # Docker Compose services (root) - monitors postgres:15
+  # Docker Compose services (root)
   - package-ecosystem: "docker"
     directory: "/"
     schedule:
