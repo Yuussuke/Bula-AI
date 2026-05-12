@@ -2,7 +2,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Async-009688?logo=fastapi&logoColor=white)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 ![Tests](https://img.shields.io/badge/Tests-pytest-0A9EDC?logo=pytest&logoColor=white)
 
@@ -77,7 +77,7 @@ flowchart LR
 ## Tech Stack
 
 - **Backend:** Python 3.12, FastAPI (async)
-- **Database:** PostgreSQL 16 via the first-party `bula_ai_postgres` image
+- **Database:** PostgreSQL 18 via the first-party `bula_ai_postgres` image
 - **ORM and Migrations:** SQLAlchemy 2 async, Alembic
 - **Auth:** JWT, Argon2id-based password hashing
 - **AI and Retrieval:** LangChain, Maritaca API integration, Qdrant-ready retrieval architecture
@@ -147,7 +147,7 @@ Example production-style structured log:
 
    Docker will build the backend image and start both the API and the database.
    The PostgreSQL service uses the first-party GHCR image
-   `ghcr.io/yuussuke/bula_ai_postgres:0.8.1-pg16`. If the package visibility is
+   `ghcr.io/yuussuke/bula_ai_postgres:18`. If the package visibility is
    private, authenticate with `docker login ghcr.io` before running `make up`.
 
 ### Accessing the API
@@ -215,11 +215,13 @@ come with a DoS/memory review and a streaming object-storage strategy.
 ## PostgreSQL Image and Local Data
 
 Local development and CI use the first-party PostgreSQL image
-`ghcr.io/yuussuke/bula_ai_postgres:0.8.1-pg16`, which bundles pgvector support
-and PostgreSQL full-text-search capabilities needed by the later BM25 work.
+`ghcr.io/yuussuke/bula_ai_postgres:18`, which bundles pgvector, pgvectorscale,
+pg_textsearch, and Portuguese full-text-search capabilities needed by the later
+BM25 work.
 
 Use `make verify-postgres` after `make up` to confirm that the running database
-can create `vector` and `unaccent` extensions and execute Portuguese FTS.
+can create `vector`, `vectorscale`, `pg_textsearch`, and `unaccent` extensions
+and execute Portuguese FTS.
 
 When changing database image tags, prefer resetting the local database early:
 

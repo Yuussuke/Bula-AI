@@ -10,7 +10,7 @@ This project is Docker-first:
 
 - `DATABASE_URL` is injected into the `api` container by Docker Compose.
 - `SECRET_KEY` must be provided via your `.env` file (see `.env.example`).
-- The local PostgreSQL service uses `ghcr.io/yuussuke/bula_ai_postgres:0.8.1-pg16`.
+- The local PostgreSQL service uses `ghcr.io/yuussuke/bula_ai_postgres:18`.
   If the GHCR package is private, authenticate with `docker login ghcr.io`
   before starting the stack.
 
@@ -58,8 +58,9 @@ This usually happens when running commands outside Docker while using the Docker
 
 ## 5) PostgreSQL image and local reset
 
-The project uses a first-party PostgreSQL 16 image with pgvector and PostgreSQL
-full-text-search support. Verify the running database with:
+The project uses a first-party PostgreSQL 18 image with pgvector, pgvectorscale,
+pg_textsearch, and PostgreSQL full-text-search support. Verify the running
+database with:
 
 ```bash
 make verify-postgres
