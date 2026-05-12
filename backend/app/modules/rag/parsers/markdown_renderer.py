@@ -28,12 +28,21 @@ class MarkdownRenderer:
         sections_by_line_index = {
             section.line_index: section for section in detected_sections
         }
+        consumed_continuation_line_indices = {
+            consumed_line_index
+            for section in detected_sections
+            for consumed_line_index in section.consumed_line_indices
+            if consumed_line_index != section.line_index
+        }
         markdown_lines: list[str] = []
         rendered_sections: list["DetectedSection"] = []
         seen_section_keys: set[str] = set()
         current_markdown_offset = 0
 
         for line_index, extracted_line in enumerate(lines):
+            if line_index in consumed_continuation_line_indices:
+                continue
+
             clean_line = normalize_spaces(extracted_line.text)
             if not clean_line:
                 continue
@@ -97,6 +106,7 @@ class MarkdownRenderer:
             level=detected_section.level,
             page_number=detected_section.page_number,
             line_index=detected_section.line_index,
+            consumed_line_indices=detected_section.consumed_line_indices,
             char_start=char_start,
         )
 

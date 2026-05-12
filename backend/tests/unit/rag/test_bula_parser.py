@@ -249,6 +249,100 @@ def test_section_detector_detects_standard_numbered_and_visual_sections() -> Non
     assert [section.line_index for section in detected_sections] == [0, 1, 2]
 
 
+def test_section_detector_merges_wrapped_visual_heading_sections() -> None:
+    lines = [
+        ExtractedLine(
+            text="O QUE DEVO SABER ANTES DE USAR",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="ESTE MEDICAMENTO",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="Informe ao medico se estiver usando outros medicamentos.",
+            page_number=1,
+            average_font_size=12,
+        ),
+    ]
+    detector = SectionDetector()
+
+    detected_sections = detector.detect(lines)
+
+    assert len(detected_sections) == 1
+    assert (
+        detected_sections[0].title == "O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO"
+    )
+    assert detected_sections[0].line_index == 0
+    assert detected_sections[0].consumed_line_indices == (0, 1)
+
+
+def test_section_detector_merges_heading_wrapped_across_three_lines() -> None:
+    lines = [
+        ExtractedLine(
+            text="O QUE DEVO SABER ANTES",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="DE USAR ESTE",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="MEDICAMENTO",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="Informe ao medico se estiver usando outros medicamentos.",
+            page_number=1,
+            average_font_size=12,
+        ),
+    ]
+    detector = SectionDetector()
+
+    detected_sections = detector.detect(lines)
+
+    assert len(detected_sections) == 1
+    assert (
+        detected_sections[0].title == "O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO"
+    )
+    assert detected_sections[0].consumed_line_indices == (0, 1, 2)
+
+
+def test_section_detector_does_not_merge_wrapped_heading_after_question_mark() -> None:
+    lines = [
+        ExtractedLine(
+            text="QUEM DEVE AVALIAR ESTE RISCO?",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="ANTES DO USO",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+    ]
+    detector = SectionDetector()
+
+    detected_sections = detector.detect(lines)
+
+    assert [section.title for section in detected_sections] == [
+        "QUEM DEVE AVALIAR ESTE RISCO?",
+        "ANTES DO USO",
+    ]
+
+
 def test_markdown_renderer_builds_headings_and_section_offsets() -> None:
     lines = [
         ExtractedLine(text="COMPOSICAO", page_number=1),
@@ -291,6 +385,36 @@ def test_markdown_renderer_builds_headings_and_section_offsets() -> None:
     assert result.detected_sections[1].char_end == len(result.markdown)
 
 
+def test_markdown_renderer_skips_wrapped_heading_continuation_lines() -> None:
+    lines = [
+        ExtractedLine(text="O QUE DEVO SABER ANTES DE USAR", page_number=1),
+        ExtractedLine(text="ESTE MEDICAMENTO", page_number=1),
+        ExtractedLine(
+            text="Informe ao medico se estiver usando outro remedio.", page_number=1
+        ),
+    ]
+    detected_sections = [
+        DetectedSection(
+            title="O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO",
+            canonical_title="O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO",
+            level=3,
+            page_number=1,
+            line_index=0,
+            consumed_line_indices=(0, 1),
+        )
+    ]
+    renderer = MarkdownRenderer()
+
+    result = renderer.render(lines=lines, detected_sections=detected_sections)
+
+    assert result.markdown == (
+        "### O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO\n"
+        "Informe ao medico se estiver usando outro remedio."
+    )
+    assert result.markdown.count("###") == 1
+    assert "\nESTE MEDICAMENTO\n" not in result.markdown
+
+
 def test_markdown_renderer_skips_repeated_section_headings() -> None:
     lines = [
         ExtractedLine(text="COMPOSICAO", page_number=1),
@@ -322,6 +446,32 @@ def test_markdown_renderer_skips_repeated_section_headings() -> None:
     assert "## COMPOSICAO\nTexto da primeira composicao." in result.markdown
     assert "Texto depois da repeticao." in result.markdown
     assert result.markdown.count("## COMPOSICAO") == 1
+
+
+@pytest.mark.anyio
+async def test_parser_omits_lines_from_dizeres_legais_onward() -> None:
+    extraction_result = build_extraction_result(
+        text=(
+            "COMPOSICAO\n"
+            "Cada comprimido contem dipirona.\n"
+            "INDICACOES\n"
+            "Este medicamento e indicado para dor.\n"
+            "3 - DIZERES LEGAIS\n"
+            "Registro MS 1.2345.6789\n"
+            "Farmaceutico responsavel: Exemplo."
+        ),
+        extraction_tier="pdfplumber",
+        is_sparse=False,
+    )
+    parser = BulaParser(first_handler=StaticHandler(extraction_result))
+
+    result = await parser.parse(pdf_bytes=b"%PDF-1.4", filename="dipirona.pdf")
+
+    assert result.success is True
+    assert "## COMPOSICAO" in result.markdown
+    assert "## INDICACOES" in result.markdown
+    assert "DIZERES LEGAIS" not in result.markdown
+    assert "Registro MS" not in result.markdown
 
 
 def test_metadata_extractor_keeps_existing_metadata_shape() -> None:
