@@ -2,12 +2,14 @@
 
 ### Paciente
 
-### AMOXICILINA SUSPENSÃO ORAL 250 MG/5 ML CIMED INDÚSTRIA S.A.
+### AMOXICILINA SUSPENSÃO ORAL 250 MG/5 ML
+CIMED INDÚSTRIA S.A.
 
-## I - IDENTIFICAÇÃO DO MEDICAMENTO
+## IDENTIFICAÇÃO DO MEDICAMENTO
 amoxicilina
 Medicamento genérico, Lei n° 9.787, de 1999.
-Apresentações:
+
+### Apresentações:
 Pó para suspensão oral:
 50 mg/mL (equivalente a 250 mg/5 mL) - Embalagem contendo 1 frasco de 60 mL ou 150 mL acompanhado de copo
 dosador.
@@ -24,7 +26,7 @@ Veículo* q.s.p.................................................................
 *sacarose, aroma de baunilha, aroma de cereja, benzoato de sódio, vermelho de eritrosina dissódica, sacarina sódica,
 ciclamato de sódio, citrato de sódio, dióxido de silício e goma xantana.
 
-### II- INFORMAÇÕES AO PACIENTE
+### INFORMAÇÕES AO PACIENTE
 
 ## PARA QUE ESTE MEDICAMENTO É INDICADO?
 Amoxicilina, um antibiótico eficaz contra grande variedade de bactérias, é indicado para tratamento de infecções
@@ -57,8 +59,7 @@ médico fará um monitoramento e, se necessário, poderá sugerir ajustes na dos
 - se você já teve diarreia durante ou após o uso de antibióticos.
 O uso prolongado também pode resultar, ocasionalmente, em supercrescimento de microrganismos resistentes à
 amoxicilina.
-
-## Amoxicilina pode piorar algumas condições existentes ou causar efeitos colaterais graves, como reações alérgicas
+Amoxicilina pode piorar algumas condições existentes ou causar efeitos colaterais graves, como reações alérgicas
 severas, reações cutâneas severas, dor no peito, vômitos repetitivos dentro de 1 a 4 horas após a administração deste
 medicamento ou diarreia grave (colite pseudomembranosa). Você deve estar atento a determinados sintomas enquanto
 estiver fazendo uso de amoxicilina para ajudar a reduzir o risco de quaisquer problemas. Dependendo da gravidade dos
@@ -69,7 +70,8 @@ males que este medicamento pode me causar?) enquanto estiver tomando este medica
 seu médico imediatamente.
 Efeitos sobre a capacidade de dirigir veículos e de operar máquinas
 Não se observaram efeitos adversos sobre a capacidade de dirigir veículos e de operar máquinas.
-Gravidez e amamentação
+
+### Gravidez e amamentação
 Amoxicilina pode ser usado na gravidez desde que os benefícios potenciais sejam maiores que os riscos potenciais
 associados ao tratamento. Informe seu médico se você estiver grávida ou suspeitar que está grávida. Você não deve
 tomar este medicamento se estiver grávida, exceto se seu médico recomendar.
@@ -80,8 +82,7 @@ Este medicamento não deve ser utilizado por mulheres grávidas sem orientação
 Uso compatível com o aleitamento ou doação de leite humano. O uso desse medicamento não interfere no
 aleitamento do bebê.
 Uso em idosos, crianças e outros grupos de risco
-
-## As recomendações especiais se referem às dosagens (ver Posologia, em Como Devo Usar Este Medicamento?). Não há
+As recomendações especiais se referem às dosagens (ver Posologia, em Como Devo Usar Este Medicamento?). Não há
 contraindicação relativa a faixas etárias.
 
 ## Interações medicamentosas
@@ -89,6 +90,7 @@ Alguns medicamentos podem causar efeitos indesejáveis se você os ingerir duran
 deixe de avisar seu médico caso você esteja tomando:
 - medicamentos usados no tratamento de gota (probenecida ou alopurinol);
 - outros antibióticos;
+- pílulas anticoncepcionais (como acontece com outros antibióticos, talvez sejam necessárias precauções adicionais para
 evitar a gravidez);
 - anticoagulantes;
 - metotrexato (usado para tratar doenças como câncer e psoríase grave).
@@ -107,8 +109,9 @@ Atenção: Contém sacarina sódica e ciclamato de sódio (edulcorantes)
 
 ### ONDE, COMO E POR QUANTO TEMPO POSSO GUARDAR ESTE MEDICAMENTO?
 
-## Cuidados de armazenamento
-Manter fora do alcance das crianças
+### Cuidados de armazenamento
+
+### Manter fora do alcance das crianças
 Armazenar o produto em pó na embalagem original, em temperatura ambiente (de 15 ºC a 30 °C) e protegido da
 umidade.
 O produto tem prazo de validade de 24 meses a partir da data de fabricação, impressa na embalagem.
@@ -116,15 +119,19 @@ Após preparo da suspensão, armazenar em temperatura ambiente, sendo o produto 
 reconstituição.
 Número de lote e datas de fabricação e validade: vide embalagem.
 Não use medicamento com o prazo de validade vencido. Guarde-o em sua embalagem original.
-Aspecto físico/características organolépticas
+
+### Aspecto físico/características organolépticas
 Antes da reconstituição: Pó de coloração branca a levemente rosa, com odor característico de cereja e baunilha,
 homogêneo na cor e isento de material estranho.
 Após reconstituição: Suspensão rosa homogênea.
 Após 14 dias de reconstituição: Suspensão rosa homogênea.
 Antes de usar, observe o aspecto do medicamento. Caso ele esteja no prazo de validade e você observe alguma
 mudança no aspecto, consulte o farmacêutico para saber se poderá utilizá-lo.
+TODO MEDICAMENTO DEVE SER MANTIDO FORA DO ALCANCE DAS CRIANÇAS.
 
-### TODO MEDICAMENTO DEVE SER MANTIDO FORA DO ALCANCE DAS CRIANÇAS.
+## COMO DEVO USAR ESTE MEDICAMENTO?
+
+## Modo de usar
 Siga as orientações de seu médico sobre a maneira e a hora correta de tomar o medicamento. Ele vai decidir a
 quantidade diária que você precisa e o tempo durante o qual você deve usar o medicamento.
 Leia esta bula com cautela. Se você tiver alguma dúvida, fale com seu médico.
@@ -133,25 +140,24 @@ horários.
 Continue tomando este medicamento até o fim do tratamento prescrito pelo médico. Não pare somente porque se sente
 melhor.
 Preparo da suspensão
-
-### Verifique se o lacre da tampa está intacto antes do uso do produto.
-
-### Para soltar o pó que fica no fundo do frasco, agite-o antes de abri-lo. Isso facilitará a reconstituição.
-
-### Ponha água filtrada no frasco até a marca indicada e agite-o bem para misturar totalmente o pó com a água.
-
-### Se a mistura não atingir a marca indicada, espere a espuma baixar e complete (lentamente) com água filtrada. Agite
+1. Verifique se o lacre da tampa está intacto antes do uso do produto.
+2. Para soltar o pó que fica no fundo do frasco, agite-o antes de abri-lo. Isso facilitará a reconstituição.
+3. Ponha água filtrada no frasco até a marca indicada e agite-o bem para misturar totalmente o pó com a água.
+4. Se a mistura não atingir a marca indicada, espere a espuma baixar e complete (lentamente) com água filtrada. Agite
 de novo o frasco e espere a espuma baixar até que a solução atinja exatamente a marca indicada.
 Utilize o copo dosador para tomar o medicamento.
 A suspensão oral, após reconstituição, ficará estável por 14 dias à temperatura ambiente.
 Agite a suspensão oral antes de usá-la.
+
+## Posologia
 Dose para adultos e crianças acima de 40 kg
 Dose padrão: 250 mg três vezes ao dia (de 8 em 8 horas), podendo ser aumentada para 500 mg três vezes ao dia (de 8
 em 8 horas) nas infecções mais graves.
 Tratamento com dosagem alta (máximo recomendável de 6 g ao dia em doses divididas)
 Recomenda-se uma dose de 3g duas vezes ao dia (de 12 em 12 horas) nos casos que requerem tratamento de infecção
 respiratória purulenta (com a presença de pus) grave ou recorrente.
-Tratamento de curta duração
+
+### Tratamento de curta duração
 Gonorreia: dose única de 3 g.
 Erradicação de Helicobacter pylori em úlcera péptica (no duodeno ou no estômago)
 Para combater o Helicobacter (bactéria que ataca o estômago e o duodeno), recomenda-se o uso de amoxicilina no
@@ -160,7 +166,8 @@ lanzoprazol) e outro agente antimicrobiano (por exemplo claritromicina, metronid
 Dose para crianças abaixo de 40 kg
 Dose padrão para crianças: 20 a 50 mg/kg/dia em doses divididas (de 8 em 8 horas), até um máximo de 150 mg/kg/dia
 em doses divididas.
-Pacientes com insuficiência renal (dos rins)
+
+### Pacientes com insuficiência renal (dos rins)
 Na insuficiência renal, a eliminação do antibiótico é mais lenta. Conforme o grau dessa condição, seu médico pode
 indicar a redução da dose diária total de acordo com o esquema descrito a seguir.
 Adultos e crianças acima de 40 kg
@@ -171,10 +178,14 @@ Crianças abaixo de 40 kg
 - insuficiência leve: nenhuma alteração de dose;
 - insuficiência moderada: 15 mg/ kg duas vezes ao dia (de 12/12 horas); (no máximo de 500 mg duas vezes ao dia);
 - insuficiência grave: 15 mg/ kg uma vez ao dia (no máximo de 500 mg).
-Pacientes que recebem diálise peritoneal
+
+### Pacientes que recebem diálise peritoneal
+Usa-se a mesma posologia indicada para pacientes com insuficiência renal grave. A diálise peritoneal (processo de
 limpeza das substâncias tóxicas do organismo através do peritônio, membrana que envolve o abdômen) não remove a
 amoxicilina do corpo.
-Pacientes que recebem hemodiálise
+
+### Pacientes que recebem hemodiálise
+Usa-se a mesma posologia indicada para pacientes com insuficiência renal grave.
 A amoxicilina é removida do sangue por hemodiálise (processo que substitui os rins na filtragem sanguínea). Portanto,
 uma dose adicional (500 mg para adultos e crianças acima de 40 kg ou 15 mg/ kg para crianças abaixo de 40 kg) pode
 ser administrada durante e no final de cada diálise.
@@ -189,7 +200,11 @@ Não interrompa o tratamento sem o conhecimento de seu médico.
 Se você esquecer uma dose, tome-a assim que se lembrar, mas continue com o horário normal das demais. Só não tome
 duas doses com intervalo igual ou menor que 1 hora.
 Em caso de dúvidas, procure orientação do farmacêutico ou de seu médico, ou cirurgião-dentista.
+
+## QUAIS OS MALES QUE ESTE MEDICAMENTO PODE ME CAUSAR?
 Avise seu médico o mais cedo possível se você não se sentir bem durante o tratamento com amoxicilina.
+Assim como todo medicamento, amoxicilina pode provocar reações adversas, porém isso não ocorre com todas as
+pessoas. Os efeitos colaterais deste medicamento geralmente são leves. Dependendo da gravidade dos seus sintomas,
 seu médico pode solicitar a interrupção do tratamento com este medicamento.
 Reações comuns (ocorrem entre 1% e 10% dos pacientes que utilizam este medicamento):
 - Diarreia (várias evacuações amolecidas por dia) e enjoo; quando isso acontece, os sintomas normalmente são leves e
