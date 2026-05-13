@@ -3,7 +3,7 @@ name = "backend"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 dependencies = [
     "alembic>=1.18.4",
     "asyncpg>=0.31.0",
@@ -49,7 +49,7 @@ dev = [
 ]
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.14"
 files = ["app"]
 explicit_package_bases = true
 check_untyped_defs = true

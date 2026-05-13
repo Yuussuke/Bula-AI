@@ -18,7 +18,7 @@
 | Layer | Technology |
 |---|---|
 | **Monorepo layout** | `/backend`, `/frontend`, `/infra` at repo root |
-| **Backend language** | Python 3.12 |
+| **Backend language** | Python 3.14 |
 | **Backend framework** | FastAPI (async) |
 | **ORM** | SQLAlchemy 2 async + Alembic for migrations |
 | **Data validation** | Pydantic v2 |
