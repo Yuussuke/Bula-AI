@@ -1,6 +1,6 @@
 # Bula AI
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Async-009688?logo=fastapi&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18-4169E1?logo=postgresql&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
@@ -76,7 +76,7 @@ flowchart LR
 
 ## Tech Stack
 
-- **Backend:** Python 3.12, FastAPI (async)
+- **Backend:** Python 3.14, FastAPI (async)
 - **Database:** PostgreSQL 18 via the first-party `bula_ai_postgres` image
 - **ORM and Migrations:** SQLAlchemy 2 async, Alembic
 - **Auth:** JWT, Argon2id-based password hashing
