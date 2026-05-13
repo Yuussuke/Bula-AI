@@ -1,22 +1,17 @@
 ### dipirona
 
 ### monoidratada
-
-### Sanofi Medley Farmacêutica Ltda.
-
-### Solução oral
-
-### 50 mg/mL
+Sanofi Medley Farmacêutica Ltda.
+Solução oral
+50 mg/mL
 1
 dipirona monoidratada
 Medicamento Genérico, Lei nº 9.787, de 1999
 
 ### APRESENTAÇÃO
 Solução oral 50 mg/mL: frasco com 100 mL + copo medida.
-
-### USO ORAL.
-
-### USO ADULTO E PEDIÁTRICO ACIMA DE 3 MESES.
+USO ORAL.
+USO ADULTO E PEDIÁTRICO ACIMA DE 3 MESES.
 
 ## COMPOSIÇÃO
 Cada mL de solução oral contém:
@@ -43,7 +38,8 @@ paracetamol não resultaram em um maior efeito antipirético (Adam, 1994).
 Adam D, Stankov G. Treatment of fever in childhood. Eur J Pediatr 1994; 153: 394-402.
 
 ### CARACTERÍSTICAS FARMACOLÓGICAS
-Propriedades farmacodinâmicas
+
+### Propriedades farmacodinâmicas
 A dipirona é um derivado pirazolônico não narcótico com efeitos analgésico, antipirético e espasmolítico.
 A dipirona é uma pró-droga cuja metabolização gera a formação de vários metabólitos entre os quais há 2
 com propriedades analgésicas: 4-metil-aminoantipirina (4-MAA) e o 4-amino-antipirina (4-AA).
@@ -55,7 +51,8 @@ do sistema nervoso central seria o alvo específico e, mais recentemente, a prop
 uma outra isoforma da ciclo-oxigenase, a COX-3.
 Os efeitos analgésico e antipirético podem ser esperados em 30 a 60 minutos após a administração e
 geralmente duram cerca de 4 horas.
-Propriedades farmacocinéticas
+
+### Propriedades farmacocinéticas
 A farmacocinética da dipirona e de seus metabólitos não está completamente elucidada, mas as seguintes
 informações podem ser fornecidas:
 Após administração oral, a dipirona é completamente hidrolisada em sua porção ativa, 4-N-
@@ -90,13 +87,16 @@ administração oral de dose única, a meia-vida de MAA e FAA aumentou 3 vezes (
 AA e AAA este aumento não foi tão marcante.
 Os pacientes com insuficiência renal não foram extensivamente estudados até o momento. Os dados
 disponíveis indicam que a eliminação de alguns metabólitos (AAA e FAA) é reduzida.
-Dados de segurança pré-clínicos
-Toxicidade aguda
+
+### Dados de segurança pré-clínicos
+
+### Toxicidade aguda
 As doses mínimas letais de dipirona em camundongos e ratos são: aproximadamente 4000 mg/kg de peso
 corporal por via oral, aproximadamente 2300 mg de dipirona por kg de peso corporal ou 400 mg de MAA
 por kg de peso corporal por via intravenosa.
 Os sinais de intoxicação foram sedação, taquipneia e convulsões pré-morte.
-Toxicidade crônica
+
+### Toxicidade crônica
 As injeções intravenosas de dipirona em ratos (peso corporal 150 mg/kg por dia) e cães (50 mg/kg de peso
 corporal por dia) durante um período de 4 semanas foram toleradas.
 Foram realizados estudos de toxicidade oral crônica ao longo de um período de 6 meses em ratos e cães:
@@ -104,14 +104,19 @@ doses diárias de até 300 mg de peso corporal/kg em ratos e até 100 mg/kg de p
 não causaram sinais de intoxicação. Doses mais elevadas em ambas as espécies causaram alterações
 químicas do soro e hemossiderose no fígado e baço, também foram detectados sinais de anemia e toxicidade
 da medula óssea.
-Mutagenicidade
+
+### Mutagenicidade
 Estão descritos na literatura tanto resultados positivos bem como negativos. No entanto, estudos “in vitro”
 e “in vivo” com material específico grau Hoechst não deu indicação de um potencial mutagênico.
-Carcinogenicidade
+
+### Carcinogenicidade
 Estudos de tempo de vida com dipirona em ratos e camundongos NMRI não mostraram efeitos
 cancerígenos.
-Toxicidade reprodutiva
+
+### Toxicidade reprodutiva
 Estudos em ratos e coelhos não indicam potencial teratogênico.
+
+## CONTRAINDICAÇÕES
 Este medicamento não deve ser administrado a pacientes:
 - com hipersensibilidade à dipirona ou a qualquer um dos componentes da formulação ou a outras
 pirazolonas (ex.: fenazona, propifenazona, isopropilaminofenazona) ou a pirazolidinas (ex.: fenilbutazona,
@@ -125,15 +130,16 @@ naproxeno;
 - com porfiria hepática aguda intermitente (risco de indução de crises de porfiria);
 - com deficiência congênita da glicose-6-fosfato-desidrogenase (G6PD) (risco de hemólise);
 3
-
-## - gravidez e lactação (vide “Advertências e Precauções – Gravidez e Lactação”).
+- gravidez e lactação (vide “Advertências e Precauções – Gravidez e Lactação”).
 Este medicamento é contraindicado para menores de 3 meses de idade ou pesando menos de 5 kg.
 Este medicamento não deve ser usado por pessoas com síndrome de má-absorção de glicose-galactose
 ou insuficiência de sacarose-isomaltase.
-Agranulocitose:
-induzida pela dipirona é uma casualidade de origem imunoalérgica, durável por pelo
 
-## menos 1 semana. Embora essa reação seja muito rara, pode ser grave e fatal (vide “Reações adversas). Ela
+## ADVERTÊNCIAS E PRECAUÇÕES
+
+### Agranulocitose:
+induzida pela dipirona é uma casualidade de origem imunoalérgica, durável por pelo
+menos 1 semana. Embora essa reação seja muito rara, pode ser grave e fatal (vide “Reações adversas). Ela
 pode ocorrer mesmo após este medicamento ter sido utilizado anteriormente sem complicações. Não é dose
 dependente e pode ocorrer em qualquer momento durante o tratamento, mesmo logo após sua interrupção.
 Todos os pacientes devem ser instruídos a interromper o uso da medicação e procurar atendimento médico
@@ -144,15 +150,20 @@ agranulocitose podem passar despercebidos. Em pacientes que estão recebendo ter
 típicos de agranulocitose podem ser mascarados. Se qualquer sinal ou sintoma sugestivo de agranulocitose
 ocorrer, uma contagem completa de células sanguíneas (incluindo contagem diferencial de leucócitos) deve
 ser realizada com urgência, e o tratamento deve ser imediatamente interrompido enquanto se aguarda os
-Pancitopenia:
+resultados. Se confirmada, o tratamento não deve ser reintroduzido (vide “Contraindicações”).
+
+### Pancitopenia:
 em caso de pancitopenia o tratamento deve ser imediatamente descontinuado e uma
 completa monitorização sanguínea deve ser realizada até normalização dos valores. Todos os pacientes
 devem ser aconselhados a procurar atendimento médico imediato se desenvolverem sinais e sintomas
 sugestivos de discrasias do sangue (ex.: mal-estar geral, infecção, febre persistente, hematomas,
 sangramento, palidez) durante o uso de medicamentos contendo dipirona.
-Choque anafilático:
+
+### Choque anafilático:
 essa reação ocorre principalmente em pacientes sensíveis. Portanto, a dipirona deve
-Reações cutâneas graves adversas:
+ser usada com cautela em pacientes que apresentem alergia atópica ou asma (vide “Contraindicações”).
+
+### Reações cutâneas graves adversas:
 o tratamento com dipirona pode causar Reações Cutâneas Graves
 Adversas
 (RCGAD), incluindo síndrome de Stevens – Johnson (SSJ), Necrólise Epidérmica Tóxica (NET) e Reação
@@ -161,8 +172,11 @@ Se
 desenvolverem sinais ou sintomas de hipersensibilidade cutânea tais como erupções, exantema progressivo
 muitas vezes com bolhas ou lesões da mucosa, o tratamento com a dipirona deve ser descontinuado
 imediatamente e não deve ser retomado. Os pacientes devem ser avisados dos sinais e sintomas e
-Reações anafiláticas/anafilactoides
+acompanhados de perto para reações de pele (vide “Contraindicações”).
+
+### Reações anafiláticas/anafilactoides
 Em particular, os seguintes pacientes apresentam risco especial para possíveis reações anafiláticas graves
+relacionadas à dipirona (vide “Contraindicações”):
 - pacientes com síndrome da asma analgésica ou intolerância analgésica do tipo urticária-angioedema;
 - pacientes com asma brônquica, particularmente aqueles com rinossinusite poliposa concomitante;
 - pacientes com urticária crônica;
@@ -180,7 +194,9 @@ médica e recursos para tratamento de emergência devem estar disponíveis.
 Os pacientes que apresentaram uma reação anafilática ou outra reação imunológica a outras pirazolidas,
 pirazolidinas e outros analgésicos não narcóticos, também apresentam risco alto de responder de forma
 semelhante a dipirona monoidratada.
-Reações hipotensivas isoladas
+
+### Reações hipotensivas isoladas
+A administração de dipirona pode causar reações hipotensivas isoladas (vide “Reações Adversas”). Essas
 reações são possivelmente dose-dependentes e ocorrem com maior probabilidade após administração
 parenteral.
 Para evitar as reações hipotensivas graves desse tipo:
@@ -195,9 +211,9 @@ A dipirona só deve ser utilizada sob cuidadoso monitoramento hemodinâmico em p
 diminuição da pressão sanguínea deve ser evitada, tais como pacientes com doença cardíaca coronariana
 grave ou estenose dos vasos sanguíneos que irrigam o cérebro.
 A dipirona monoidratada deve ser utilizada sob orientação médica em pacientes com insuficiência renal ou
+hepática, uma vez que a taxa de eliminação é reduzida nestes pacientes (vide “Posologia e Modo de Usar”).
 
-## hepática, uma vez que a taxa de eliminação é reduzida nestes pacientes (vide “Posologia e Modo de Usar”).
-Lesão hepática induzida por drogas
+### Lesão hepática induzida por drogas
 Casos de hepatite aguda de padrão predominantemente hepatocelular foram relatados em pacientes tratados
 com dipirona com início de alguns dias a alguns meses após o início do tratamento. Os sinais e sintomas
 incluem enzimas hepáticas séricas elevadas com ou sem icterícia, frequentemente no contexto de outras
@@ -211,7 +227,8 @@ Os pacientes devem ser instruídos a entrar em contato com seu médico caso ocor
 de lesão hepática. Nesses pacientes, a dipirona deve ser interrompida e a função hepática avaliada.
 A dipirona não deve ser reintroduzida em pacientes com um episódio de lesão hepática durante o tratamento
 com dipirona para o qual nenhuma outra causa de lesão hepática foi determinada.
-Gravidez
+
+### Gravidez
 A dipirona atravessa a barreira placentária. Não existem evidências de que o medicamento seja prejudicial
 ao feto: a dipirona não apresentou efeitos teratogênicos em ratos e coelhos, e fetotoxicidade foi observada
 apenas com doses muito elevadas que foram tóxicas as mães. Entretanto, não existem dados clínicos
@@ -225,27 +242,34 @@ do ducto arterial e de complicações perinatais devido ao prejuízo da agregaç
 recém-nascido não pode ser excluída.
 Categoria de risco na gravidez: D. Este medicamento não deve ser utilizado por mulheres grávidas
 sem orientação médica. Informe imediatamente seu médico em caso de suspeita de gravidez.
-Lactação
+
+### Lactação
 Os metabólitos da dipirona são excretados no leite materno. A lactação deve ser evitada durante e por até
 48 horas após a administração deste medicamento.
 Uso criterioso no aleitamento ou na doação de leite humano.
 O uso deste medicamento no período da lactação depende da avaliação e acompanhamento do seu
 médico ou cirurgião-dentista.
 5
-Populações especiais
-Pacientes idosos:
+
+### Populações especiais
+
+### Pacientes idosos:
 deve-se considerar a possibilidade das funções hepática e renal estarem prejudicadas.
-Crianças:
+
+### Crianças:
 menores de 3 meses de idade ou pesando menos de 5 kg não devem ser tratadas com dipirona
 monoidratada solução oral. É recomendada supervisão médica quando se administra dipirona a crianças
 pequenas.
-Outros grupos de risco:
+
+### Outros grupos de risco:
+vide “Contraindicações” e “Advertências”.
 Alterações na capacidade de dirigir veículos e operar máquinas
 Para as doses recomendadas, nenhum efeito adverso na habilidade de se concentrar e reagir é conhecido.
 Entretanto, pelo menos com doses elevadas, deve-se levar em consideração que as habilidades para se
 concentrar e reagir podem estar prejudicadas, constituindo risco em situações em que estas habilidades são
 de importância especial (ex.: operar carros ou máquinas), especialmente quando álcool foi consumido.
-Sensibilidade cruzada
+
+### Sensibilidade cruzada
 Pacientes que apresentam reações anafilactoides à dipirona podem apresentar um risco especial para
 reações semelhantes a outros analgésicos não narcóticos.
 Pacientes que apresentam reações anafiláticas ou outras imunologicamente-mediadas, ou seja, reações
@@ -266,7 +290,8 @@ provavelmente baixa. A sensibilidade aos sulfitos ocorre mais frequentemente em 
 do que em não asmáticos.
 
 ## INTERAÇÕES MEDICAMENTOSAS
-Indução farmacocinética de enzimas metabolizadoras:
+
+### Indução farmacocinética de enzimas metabolizadoras:
 A dipirona pode induzir enzimas metabolizadoras, incluindo CYP2B6 e CYP3A4.
 A coadministração de dipirona com substratos do CYP2B6 e/ou CYP3A4, como bupropiona, efavirenz,
 metadona, ciclosporina, tacrolimo ou sertralina, pode causar uma redução nas concentrações plasmáticas
@@ -285,29 +310,38 @@ pacientes idosos. Portanto, esta combinação deve ser evitada.
 A dipirona pode reduzir o efeito do ácido acetilsalicílico na agregação plaquetária, quando tomado
 concomitantemente. Portanto, esta combinação deve ser usada com cautela em pacientes que tomam ácido
 acetil salicílico em baixas doses para proteção cardiovascular.
-Medicamento-alimentos:
+
+### Medicamento-alimentos:
 não há dados disponíveis até o momento sobre a interação entre alimentos e
 dipirona.
-Medicamento-exames laboratoriais:
+
+### Medicamento-exames laboratoriais:
 foram reportadas interferências em testes laboratoriais que utilizam
 reações de Trinder (por exemplo: testes para medir níveis séricos de creatinina, triglicérides, colesterol HDL
 e ácido úrico) em pacientes utilizando dipirona.
 
-## CUIDADOS DE ARMAZENAMENTO DO MEDICAMENTO
+### CUIDADOS DE ARMAZENAMENTO DO MEDICAMENTO
 Este medicamento deve ser mantido em temperatura ambiente (entre 15 e 30°C). Proteger da luz.
-Prazo de validade:
+
+### Prazo de validade:
 24 meses a partir da data de fabricação.
 Após aberto, válido por 90 dias.
 Número de lote e datas de fabricação e validade: vide embalagem.
 Não use medicamento com o prazo de validade vencido. Guarde-o em sua embalagem original.
-Características físicas e organolépticas
+
+### Características físicas e organolépticas
 Este medicamento se apresenta na forma de solução límpida rosa, viscosa, com sabor adocicado e aroma
 de framboesa.
 Antes de usar, observe o aspecto do medicamento.
 Todo medicamento deve ser mantido fora do alcance das crianças.
+
+## POSOLOGIA E MODO DE USAR
+
+## MODO DE USAR
 Recomenda-se que, para a administração da solução oral, seja utilizado o copo medida graduado que
 acompanha o frasco na embalagem (graduado para 2,5 mL - 5 mL - 7,5 mL e 10 mL).
-Instruções para uso do copo medida :
+
+### Instruções para uso do copo medida :
 1º passo:
 Retire a tampa externa.
 2º passo:
@@ -319,6 +353,8 @@ Administre o conteúdo do copo medida diretamente na boca da criança.
 Após a administração, lave o copo medida com água e guarde-o na respectiva caixa para que
 possa ser utilizado novamente.
 Não é necessário agitar o produto.
+
+## POSOLOGIA
 A princípio, a dose e a via de administração escolhidas dependem do efeito analgésico desejado e das
 condições do paciente. Em muitos casos, a administração oral ou retal é suficiente para obter analgesia
 satisfatória.
@@ -370,30 +406,37 @@ Dose máxima diária 70 (4 tomadas x 17,5 mL)
 Crianças menores de 3 meses de idade ou pesando menos de 5 kg não devem ser tratadas com dipirona
 monoidratada solução oral.
 Se o efeito de uma única dose for insuficiente ou após o efeito analgésico ter diminuído, a dose pode ser
+repetida respeitando-se a posologia e a dose máxima diária, conforme descrito acima.
 Não há estudos dos efeitos de dipirona monoidratada solução oral administrada por vias não recomendadas.
 Portanto, por segurança e para garantir a eficácia deste medicamento, a administração deve ser somente por
 via oral.
-Populações especiais
 Em pacientes com insuficiência renal ou hepática
 recomenda-se que o uso de altas doses de dipirona seja
 evitado, uma vez que a taxa de eliminação é reduzida nestes pacientes. Entretanto, para tratamento em curto
 prazo não é necessária redução da dose. Não existe experiência com o uso de dipirona em longo prazo em
 pacientes com insuficiência renal ou hepática.
-Em pacientes idosos e pacientes debilitados
+
+### Em pacientes idosos e pacientes debilitados
 deve-se considerar a possibilidade das funções hepática e
 renal estarem prejudicadas.
-Para pacientes diabéticos
+
+### Para pacientes diabéticos
 , recomenda-se a administração de comprimidos ou gotas ao invés de solução
 oral. Os carboidratos contidos em 5 mL de solução oral correspondem a 3,75 g de glicose.
+
+## REAÇÕES ADVERSAS
+As frequências das reações adversas estão listadas a seguir de acordo com a seguinte convenção:
 Reação muito comum ( ≥ 1/10)
 Reação comum ( ≥ 1/100 e < 1/10)
 Reação incomum ( ≥ 1/1.000 e < 1/100)
 Reação rara ( ≥ 1/10.000 e < 1/1.000)
 Reação muito rara (< 1/10.000)
-Distúrbios cardíacos
+
+### Distúrbios cardíacos
 Síndrome de Kounis (aparecimento simultâneo de eventos coronarianos agudos e reações alérgicas ou
 anafilactoides. Engloba conceitos como infarto alérgico e angina alérgica).
-Distúrbios do sistema imunológico
+
+### Distúrbios do sistema imunológico
 A dipirona pode causar choque anafilático, reações anafiláticas/anafilactoides que podem se tornar graves
 com risco à vida e, em alguns casos, serem fatais. Estas reações podem ocorrer mesmo após dipirona
 monoidratada solução oral ter sido utilizada previamente em muitas ocasiões sem complicações.
@@ -409,7 +452,8 @@ mesmo envolvendo a laringe), broncoespasmo grave, arritmias cardíacas, queda da
 (algumas vezes precedida por aumento da pressão sanguínea) e choque circulatório.
 Em pacientes com síndrome da asma analgésica, reações de intolerância aparecem tipicamente na forma de
 crises asmáticas.
-Distúrbios da pele e tecido subcutâneo
+
+### Distúrbios da pele e tecido subcutâneo
 Além das manifestações de mucosas e cutâneas de reações anafiláticas/anafilactoides mencionadas acima,
 podem ocorrer ocasionalmente erupções medicamentosas fixas; raramente exantema e, em casos isolados,
 síndrome de Stevens-Johnson (SSJ) (reação alérgica grave, envolvendo erupção cutânea na pele e mucosas)
@@ -417,34 +461,45 @@ ou síndrome de Lyell ou Necrólise Epidérmica Tóxica (NET) (síndrome bolhosa
 clinicamente por necrose em grandes áreas da epiderme. Confere ao paciente aspecto de grande
 queimadura). Reação Cutânea Associada à Eosinofilia e Sintomas Sistêmicos (DRESS) (manifestação rara
 induzida por hipersensibilidade aos medicamentos levando ao surgimento de erupções cutâneas, alterações
-Distúrbios do sangue e sistema linfático
+hematológicas [no sangue]) também foi relatada com frequência desconhecida (vide “Advertências e
+Precauções”).
+
+### Distúrbios do sangue e sistema linfático
+Anemia aplástica, agranulocitose (vide “Advertências e Precauções”) e pancitopenia, incluindo casos fatais,
 leucopenia e trombocitopenia. Estas reações são consideradas imunológicas por natureza. Elas podem
 ocorrer mesmo após este medicamento ter sido utilizada previamente em muitas ocasiões, sem
 complicações.
+Para os sinais típicos de agranulocitose, consulte a seção 5 (“Advertências e Precauções”). A taxa de
 sedimentação eritrocitária é extensivamente aumentada, enquanto que o aumento de nódulos linfáticos é
 tipicamente leve ou ausente.
 Os sinais típicos de trombocitopenia incluem uma maior tendência para sangramento e aparecimento de
 petéquias na pele e membranas mucosas.
-Distúrbios vasculares
+
+### Distúrbios vasculares
 Reações hipotensivas isoladas
 Podem ocorrer ocasionalmente após a administração, reações hipotensivas transitórias isoladas
 (possivelmente por mediação farmacológica e não acompanhadas por outros sinais de reações
 anafiláticas/anafilactoides); em casos raros, estas reações apresentam-se sob a forma de queda crítica da
 pressão sanguínea.
-Distúrbios renais e urinários
+
+### Distúrbios renais e urinários
 Em casos muito raros, especialmente em pacientes com histórico de doença renal, pode ocorrer piora aguda
 da função renal (insuficiência renal aguda), em alguns casos com oligúria, anúria ou proteinúria. Em casos
 isolados, pode ocorrer nefrite intersticial aguda.
 Uma coloração avermelhada pode ser observada algumas vezes na urina. Isso pode ocorrer devido à
 presença do metabólito ácido rubazônico, em baixas concentrações.
-Distúrbios gastrintestinais
+
+### Distúrbios gastrintestinais
 Foram reportados casos de sangramento gastrintestinal.
-Distúrbios hepatobiliares
+
+### Distúrbios hepatobiliares
 Lesão hepática induzida por medicamentos, incluindo hepatite aguda, icterícia, aumento das enzimas
+hepáticas podem ocorrer com frequência desconhecida (vide “Advertências e Precauções”).
 Em casos de eventos adversos, notifique pelo Sistema VigiMed, disponível no Portal da Anvisa.
 
 ### SUPERDOSE
-Sintomas
+
+### Sintomas
 Após superdose aguda foram registradas reações como: náuseas, vômito, dor abdominal, deficiência da
 função renal/insuficiência renal aguda (ex.: devido à nefrite intersticial) e, mais raramente, sintomas do
 sistema nervoso central (vertigem, sonolência, coma, convulsões) e queda da pressão sanguínea (algumas
@@ -452,7 +507,8 @@ vezes progredindo para choque) bem como arritmias cardíacas (taquicardia). Apó
 9
 muito elevadas, a excreção de um metabólito inofensivo (ácido rubazônico) pode provocar coloração
 avermelhada na urina.
-Tratamento
+
+### Tratamento
 Não existe antídoto específico conhecido para dipirona. Em caso de administração recente, deve-se limitar
 a absorção sistêmica adicional do princípio ativo por meio de procedimentos primários de desintoxicação,
 como lavagem gástrica ou aqueles que reduzem a absorção (ex.: carvão vegetal ativado). O principal

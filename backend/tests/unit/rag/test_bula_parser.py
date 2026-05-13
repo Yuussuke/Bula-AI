@@ -343,6 +343,199 @@ def test_section_detector_does_not_merge_wrapped_heading_after_question_mark() -
     ]
 
 
+def test_section_detector_does_not_promote_cross_reference_lines() -> None:
+    lines = [
+        ExtractedLine(
+            text=(
+                '- gravidez e lactação (vide "Advertências e Precauções - '
+                'Gravidez e Lactação").'
+            ),
+            page_number=1,
+            average_font_size=12,
+            max_font_size=16,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text=(
+                "menos 1 semana. Embora essa reação seja muito rara, pode ser grave "
+                'e fatal (vide "Reações adversas"). Ela'
+            ),
+            page_number=1,
+            average_font_size=12,
+            max_font_size=16,
+        ),
+        ExtractedLine(
+            text=(
+                "As recomendações especiais se referem às dosagens "
+                "(ver Posologia, em Como Devo Usar Este Medicamento?). Não há"
+            ),
+            page_number=1,
+            average_font_size=12,
+            max_font_size=16,
+        ),
+        ExtractedLine(
+            text='8. "Quais os males que este medicamento pode me causar?"',
+            page_number=1,
+            average_font_size=12,
+        ),
+        ExtractedLine(
+            text="1. Verifique se o lacre da tampa está intacto antes do uso.",
+            page_number=1,
+            average_font_size=12,
+        ),
+    ]
+    detector = SectionDetector()
+
+    detected_sections = detector.detect(lines)
+
+    assert detected_sections == []
+
+
+def test_section_detector_keeps_real_patient_question_headers() -> None:
+    lines = [
+        ExtractedLine(
+            text="4. O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO?",
+            page_number=1,
+            average_font_size=12,
+        ),
+        ExtractedLine(
+            text="8. QUAIS OS MALES QUE ESTE MEDICAMENTO PODE ME CAUSAR?",
+            page_number=1,
+            average_font_size=12,
+        ),
+        ExtractedLine(
+            text="COMPOSIÇÃO:",
+            page_number=1,
+            average_font_size=12,
+        ),
+    ]
+    detector = SectionDetector()
+
+    detected_sections = detector.detect(lines)
+
+    assert [section.title for section in detected_sections] == [
+        "O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO?",
+        "QUAIS OS MALES QUE ESTE MEDICAMENTO PODE ME CAUSAR?",
+        "COMPOSIÇÃO:",
+    ]
+    assert [section.level for section in detected_sections] == [2, 2, 2]
+
+
+def test_section_detector_promotes_bold_internal_subheadings() -> None:
+    lines = [
+        ExtractedLine(
+            text="5. ADVERTÊNCIAS E PRECAUÇÕES",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="Agranulocitose:",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text=("induzida pela dipirona é uma casualidade de origem imunoalérgica."),
+            page_number=1,
+            average_font_size=12,
+        ),
+        ExtractedLine(
+            text="Gravidez",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="A dipirona atravessa a barreira placentária.",
+            page_number=1,
+            average_font_size=12,
+        ),
+    ]
+    detector = SectionDetector()
+
+    detected_sections = detector.detect(lines)
+
+    assert [section.title for section in detected_sections] == [
+        "ADVERTÊNCIAS E PRECAUÇÕES",
+        "Agranulocitose:",
+        "Gravidez",
+    ]
+    assert [section.level for section in detected_sections] == [2, 3, 3]
+
+
+def test_section_detector_does_not_promote_bold_body_or_table_fragments() -> None:
+    lines = [
+        ExtractedLine(
+            text=(
+                "Este medicamento é contraindicado para menores de 3 meses de idade "
+                "ou pesando menos de 5 kg."
+            ),
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="Peso",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="(média de idade)",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="mg",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="1º passo:",
+            page_number=1,
+            average_font_size=12,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="Retire a tampa externa.",
+            page_number=1,
+            average_font_size=12,
+        ),
+    ]
+    detector = SectionDetector()
+
+    detected_sections = detector.detect(lines)
+
+    assert detected_sections == []
+
+
+def test_section_detector_does_not_promote_symbol_only_lines() -> None:
+    lines = [
+        ExtractedLine(
+            text="®",
+            page_number=1,
+            average_font_size=12,
+            max_font_size=18,
+            is_bold=True,
+        ),
+        ExtractedLine(
+            text="® ®",
+            page_number=1,
+            average_font_size=12,
+            max_font_size=18,
+            is_bold=True,
+        ),
+    ]
+    detector = SectionDetector()
+
+    detected_sections = detector.detect(lines)
+
+    assert detected_sections == []
+
+
 def test_markdown_renderer_builds_headings_and_section_offsets() -> None:
     lines = [
         ExtractedLine(text="COMPOSICAO", page_number=1),
@@ -448,15 +641,71 @@ def test_markdown_renderer_skips_repeated_section_headings() -> None:
     assert result.markdown.count("## COMPOSICAO") == 1
 
 
+def test_markdown_renderer_keeps_distinct_titles_with_same_canonical_section() -> None:
+    lines = [
+        ExtractedLine(text="POSOLOGIA E MODO DE USAR", page_number=1),
+        ExtractedLine(text="Instrucao inicial.", page_number=1),
+        ExtractedLine(text="MODO DE USAR", page_number=1),
+        ExtractedLine(text="Use o copo medida.", page_number=1),
+        ExtractedLine(text="POSOLOGIA", page_number=1),
+        ExtractedLine(text="A dose depende do peso.", page_number=1),
+    ]
+    detected_sections = [
+        DetectedSection(
+            title="POSOLOGIA E MODO DE USAR",
+            canonical_title="Posologia e modo de usar",
+            level=2,
+            page_number=1,
+            line_index=0,
+        ),
+        DetectedSection(
+            title="MODO DE USAR",
+            canonical_title="Posologia e modo de usar",
+            level=2,
+            page_number=1,
+            line_index=2,
+        ),
+        DetectedSection(
+            title="POSOLOGIA",
+            canonical_title="Posologia e modo de usar",
+            level=2,
+            page_number=1,
+            line_index=4,
+        ),
+    ]
+    renderer = MarkdownRenderer()
+
+    result = renderer.render(lines=lines, detected_sections=detected_sections)
+
+    assert result.sections == [
+        "POSOLOGIA E MODO DE USAR",
+        "MODO DE USAR",
+        "POSOLOGIA",
+    ]
+    assert "## MODO DE USAR" in result.markdown
+    assert "## POSOLOGIA\nA dose depende do peso." in result.markdown
+
+
 @pytest.mark.anyio
-async def test_parser_omits_lines_from_dizeres_legais_onward() -> None:
+@pytest.mark.parametrize(
+    "legal_marker",
+    [
+        "DIZERES LEGAIS",
+        "III - DIZERES LEGAIS",
+        "III- DIZERES LEGAIS",
+        "3 - DIZERES LEGAIS",
+    ],
+)
+async def test_parser_omits_lines_from_dizeres_legais_onward(
+    legal_marker: str,
+) -> None:
     extraction_result = build_extraction_result(
         text=(
             "COMPOSICAO\n"
             "Cada comprimido contem dipirona.\n"
             "INDICACOES\n"
             "Este medicamento e indicado para dor.\n"
-            "3 - DIZERES LEGAIS\n"
+            f"{legal_marker}\n"
             "Registro MS 1.2345.6789\n"
             "Farmaceutico responsavel: Exemplo."
         ),
@@ -472,6 +721,27 @@ async def test_parser_omits_lines_from_dizeres_legais_onward() -> None:
     assert "## INDICACOES" in result.markdown
     assert "DIZERES LEGAIS" not in result.markdown
     assert "Registro MS" not in result.markdown
+
+
+@pytest.mark.anyio
+async def test_parser_keeps_markdown_when_legal_marker_is_absent() -> None:
+    extraction_result = build_extraction_result(
+        text=(
+            "COMPOSICAO\n"
+            "Cada comprimido contem dipirona.\n"
+            "Alteração dos dizeres legais.\n"
+            "Texto clinico final que deve continuar presente."
+        ),
+        extraction_tier="pdfplumber",
+        is_sparse=False,
+    )
+    parser = BulaParser(first_handler=StaticHandler(extraction_result))
+
+    result = await parser.parse(pdf_bytes=b"%PDF-1.4", filename="dipirona.pdf")
+
+    assert result.success is True
+    assert "Alteração dos dizeres legais." in result.markdown
+    assert "Texto clinico final que deve continuar presente." in result.markdown
 
 
 def test_metadata_extractor_keeps_existing_metadata_shape() -> None:
