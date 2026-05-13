@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 
 from app.modules.rag.parsers.handlers import ExtractedLine, normalize_for_matching
 from app.modules.rag.parsers.markdown_renderer import (
@@ -13,6 +14,16 @@ from app.modules.rag.parsers.markdown_renderer import (
 
 
 SECTION_HEADER_MAX_LENGTH = 160
+BOLD_SUBHEADING_MAX_LENGTH = 72
+DISALLOWED_HEADING_PREFIXES = ("-", "–", "—", "•", "*", "(", "[", '"', "'", "“", "”")
+CROSS_REFERENCE_WORD_PATTERN = r"\b(?:VIDE|VER)\b"
+TABLE_FRAGMENT_TITLES = {
+    "MG",
+    "PESO",
+    "VP",
+    "VPS",
+    "VP E VPS",
+}
 
 
 @dataclass(frozen=True)
@@ -107,8 +118,10 @@ class SectionDetector:
         detected_sections: list[DetectedSection] = []
 
         for line_index, extracted_line in enumerate(lines):
+            next_line = lines[line_index + 1] if line_index + 1 < len(lines) else None
             section_candidate = self._detect_section_candidate(
                 extracted_line=extracted_line,
+                next_line=next_line,
                 baseline_font_size=baseline_font_size,
             )
 
@@ -262,11 +275,15 @@ class SectionDetector:
         self,
         *,
         extracted_line: ExtractedLine,
+        next_line: ExtractedLine | None,
         baseline_font_size: float | None,
     ) -> SectionCandidate | None:
         clean_line = normalize_spaces(extracted_line.text)
 
         if len(clean_line) > SECTION_HEADER_MAX_LENGTH:
+            return None
+
+        if self._has_disallowed_heading_prefix(clean_line):
             return None
 
         standard_section = self._match_standard_section(clean_line)
@@ -279,14 +296,21 @@ class SectionDetector:
 
         is_numbered_heading = has_heading_numbering(clean_line)
         if is_numbered_heading:
+            heading_title = strip_leading_numbering(clean_line)
+            if self._is_cross_reference_or_quoted_fragment(
+                heading_title
+            ) or self._looks_like_numbered_body_item(heading_title):
+                return None
+
             return SectionCandidate(
-                title=strip_leading_numbering(clean_line),
-                canonical_title=strip_leading_numbering(clean_line),
+                title=heading_title,
+                canonical_title=heading_title,
                 level=3,
             )
 
         is_visual_heading = self._is_visual_heading(
             extracted_line=extracted_line,
+            next_line=next_line,
             baseline_font_size=baseline_font_size,
         )
         if is_visual_heading:
@@ -299,10 +323,17 @@ class SectionDetector:
         return None
 
     def _match_standard_section(self, text: str) -> SectionDefinition | None:
-        normalized_text = normalize_for_matching(text)
+        if self._is_cross_reference_or_quoted_fragment(text):
+            return None
+
+        normalized_text = normalize_for_matching(strip_leading_numbering(text))
         for section_definition in SECTION_DEFINITIONS:
             has_matching_keyword = any(
-                keyword in normalized_text for keyword in section_definition.keywords
+                self._starts_with_section_keyword(
+                    normalized_text=normalized_text,
+                    keyword=keyword,
+                )
+                for keyword in section_definition.keywords
             )
             if has_matching_keyword:
                 return section_definition
@@ -313,17 +344,131 @@ class SectionDetector:
         self,
         *,
         extracted_line: ExtractedLine,
+        next_line: ExtractedLine | None,
         baseline_font_size: float | None,
     ) -> bool:
         clean_line = normalize_spaces(extracted_line.text)
+        if not any(character.isalnum() for character in clean_line):
+            return False
+
+        if self._is_cross_reference_or_quoted_fragment(clean_line):
+            return False
+
+        if clean_line.endswith((".", ",")):
+            return False
+
         has_heading_case = clean_line == clean_line.upper()
         is_short_enough = len(clean_line) <= 80
 
         if extracted_line.is_bold and is_short_enough and has_heading_case:
             return True
 
+        if self._is_bold_internal_subheading(
+            extracted_line=extracted_line,
+            next_line=next_line,
+        ):
+            return True
+
         if baseline_font_size is None or extracted_line.max_font_size is None:
             return False
 
         is_larger_than_body = extracted_line.max_font_size >= baseline_font_size + 1.5
-        return is_larger_than_body and is_short_enough
+        has_visual_emphasis = has_heading_case or extracted_line.is_bold
+        return is_larger_than_body and is_short_enough and has_visual_emphasis
+
+    def _starts_with_section_keyword(
+        self,
+        *,
+        normalized_text: str,
+        keyword: str,
+    ) -> bool:
+        return (
+            normalized_text == keyword
+            or normalized_text.startswith(f"{keyword} ")
+            or normalized_text.startswith(f"{keyword}:")
+            or normalized_text.startswith(f"{keyword}?")
+        )
+
+    def _has_disallowed_heading_prefix(self, text: str) -> bool:
+        stripped_text = text.lstrip()
+        return stripped_text.startswith(DISALLOWED_HEADING_PREFIXES)
+
+    def _is_cross_reference_or_quoted_fragment(self, text: str) -> bool:
+        stripped_text = text.lstrip()
+        if self._has_disallowed_heading_prefix(stripped_text):
+            return True
+
+        normalized_text = normalize_for_matching(stripped_text)
+        return re.search(CROSS_REFERENCE_WORD_PATTERN, normalized_text) is not None
+
+    def _looks_like_numbered_body_item(self, text: str) -> bool:
+        clean_text = normalize_spaces(text)
+        if clean_text.endswith((".", ",")):
+            return True
+
+        is_long_mixed_case_sentence = (
+            len(clean_text) > 90 and clean_text != clean_text.upper()
+        )
+        return is_long_mixed_case_sentence
+
+    def _is_bold_internal_subheading(
+        self,
+        *,
+        extracted_line: ExtractedLine,
+        next_line: ExtractedLine | None,
+    ) -> bool:
+        if not extracted_line.is_bold:
+            return False
+
+        clean_line = normalize_spaces(extracted_line.text)
+        if len(clean_line) > BOLD_SUBHEADING_MAX_LENGTH:
+            return False
+
+        normalized_line = normalize_for_matching(clean_line)
+        if normalized_line in TABLE_FRAGMENT_TITLES:
+            return False
+
+        if not self._starts_with_uppercase(clean_line):
+            return False
+
+        if not self._has_title_like_shape(clean_line):
+            return False
+
+        return self._has_following_body_or_subheading(next_line)
+
+    def _starts_with_uppercase(self, text: str) -> bool:
+        if text.lstrip()[0].isdigit():
+            return False
+
+        first_letter = next(
+            (character for character in text if character.isalpha()),
+            "",
+        )
+        return bool(first_letter) and first_letter == first_letter.upper()
+
+    def _has_title_like_shape(self, text: str) -> bool:
+        clean_text = normalize_spaces(text)
+        if clean_text.endswith(":"):
+            return True
+
+        word_count = len(clean_text.split())
+        return word_count <= 6 and not clean_text.endswith(("?", "!", ".", ","))
+
+    def _has_following_body_or_subheading(
+        self, next_line: ExtractedLine | None
+    ) -> bool:
+        if next_line is None:
+            return False
+
+        next_text = normalize_spaces(next_line.text)
+        if not next_text:
+            return False
+
+        normalized_next_text = normalize_for_matching(next_text)
+        if normalized_next_text in TABLE_FRAGMENT_TITLES:
+            return False
+
+        if next_text.isdigit() or len(next_text) <= 3:
+            return False
+
+        return True

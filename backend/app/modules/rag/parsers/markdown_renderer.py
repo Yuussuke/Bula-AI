@@ -49,7 +49,7 @@ class MarkdownRenderer:
 
             detected_section = sections_by_line_index.get(line_index)
             if detected_section is not None:
-                section_key = normalize_for_matching(detected_section.canonical_title)
+                section_key = build_section_dedupe_key(detected_section.title)
                 is_repeated_section = section_key in seen_section_keys
                 if not is_repeated_section:
                     if markdown_lines and markdown_lines[-1] != "":
@@ -138,9 +138,20 @@ def normalize_spaces(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip()
 
 
+def build_section_dedupe_key(value: str) -> str:
+    return normalize_for_matching(value).rstrip(":.? ")
+
+
+HEADING_NUMBERING_PATTERN = re.compile(r"^(?:[0-9]{1,2}|[IVXLCDM]+)\s*[\.\)\-]\s+\S")
+
+
 def has_heading_numbering(value: str) -> bool:
-    return re.match(r"^(?:[0-9]{1,2}|[IVXLCDM]+)[\.\)]\s+\S", value) is not None
+    return HEADING_NUMBERING_PATTERN.match(value) is not None
 
 
 def strip_leading_numbering(value: str) -> str:
-    return re.sub(r"^(?:[0-9]{1,2}|[IVXLCDM]+)[\.\)]\s+", "", value).strip()
+    return re.sub(
+        r"^(?:[0-9]{1,2}|[IVXLCDM]+)\s*[\.\)\-]\s+",
+        "",
+        value,
+    ).strip()
