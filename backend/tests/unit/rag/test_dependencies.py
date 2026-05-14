@@ -12,14 +12,17 @@ from app.core.config import (
     OpenRouterSettings,
     ProcessingSettings,
     QdrantSettings,
+    RAGIngestionSettings,
     Settings,
 )
 from app.modules.rag.base_chunker import BaseChunker
 from app.modules.rag.chunker import BulaChunker
+from app.modules.rag.debug_artifacts import RAGIngestionDebugArtifacts
 from app.modules.rag import dependencies as rag_dependencies
 from app.modules.rag import qdrant_client as qdrant_client_module
 from app.modules.rag.dependencies import (
     get_chunker,
+    get_ingestion_debug_artifacts,
     get_ingestion_service,
     get_qdrant_client,
 )
@@ -206,6 +209,39 @@ def test_create_qdrant_client_uses_qdrant_settings(
     }
 
 
+def test_rag_ingestion_settings_defaults() -> None:
+    settings = RAGIngestionSettings(_env_file=None)
+
+    assert settings.debug is False
+    assert settings.debug_path == "tmp/rag-ingestion-debug"
+
+
+def test_rag_ingestion_settings_reads_debug_env(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("RAG_INGESTION_DEBUG", "true")
+    monkeypatch.setenv("RAG_INGESTION_DEBUG_PATH", "custom-debug")
+
+    settings = RAGIngestionSettings(_env_file=None)
+
+    assert settings.debug is True
+    assert settings.debug_path == "custom-debug"
+
+
+def test_get_ingestion_debug_artifacts_uses_settings() -> None:
+    settings = build_settings()
+    settings.rag_ingestion = RAGIngestionSettings(
+        debug=True,
+        debug_path="custom-debug",
+    )
+
+    debug_artifacts = get_ingestion_debug_artifacts(settings=settings)
+
+    assert isinstance(debug_artifacts, RAGIngestionDebugArtifacts)
+    assert debug_artifacts.enabled is True
+    assert str(debug_artifacts.root_path) == "custom-debug"
+
+
 def test_get_qdrant_client_returns_lifespan_client() -> None:
     app = FastAPI()
     fake_client = cast(object, FakeQdrantClient())
@@ -300,6 +336,10 @@ def test_get_ingestion_service_receives_base_chunker() -> None:
     qdrant_store = cast(QdrantVectorStore, FakeQdrantStore())
     object_store = cast(object, FakeObjectStore())
     bula_repo = cast(object, FakeBulaRepository())
+    debug_artifacts = RAGIngestionDebugArtifacts(
+        enabled=False,
+        root_path="tmp/rag-ingestion-debug",
+    )
 
     service = get_ingestion_service(
         chunker=chunker,
@@ -308,6 +348,7 @@ def test_get_ingestion_service_receives_base_chunker() -> None:
         qdrant_store=qdrant_store,
         object_store=object_store,
         bula_repo=bula_repo,
+        debug_artifacts=debug_artifacts,
     )
 
     assert isinstance(service, RAGIngestionService)
@@ -315,3 +356,4 @@ def test_get_ingestion_service_receives_base_chunker() -> None:
     assert service.parser is parser
     assert service.embeddings is embeddings
     assert service.qdrant_store is qdrant_store
+    assert service.debug_artifacts is debug_artifacts

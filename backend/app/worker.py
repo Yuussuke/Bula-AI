@@ -21,6 +21,7 @@ from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.dependencies import (
     get_chunker,
     get_embeddings,
+    get_ingestion_debug_artifacts,
     get_llm_client,
     get_parser,
     get_qdrant_store,
@@ -60,6 +61,7 @@ async def create_worker() -> AsyncIterator[PgQueuer]:
     llm_client = get_llm_client(settings=worker_settings)
     chunker = get_chunker(llm=llm_client, settings=worker_settings)
     embeddings = get_embeddings(settings=worker_settings)
+    debug_artifacts = get_ingestion_debug_artifacts(settings=worker_settings)
     qdrant_client = create_qdrant_client(settings=worker_settings)
     qdrant_store = get_qdrant_store(
         qdrant_client=qdrant_client,
@@ -91,6 +93,7 @@ async def create_worker() -> AsyncIterator[PgQueuer]:
                     repository=StoredObjectRepository(db=db),
                 ),
                 bula_repo=BulaRepository(db=db),
+                debug_artifacts=debug_artifacts,
             )
             await service.ingest_bula(bula_id=bula_id)
 
@@ -118,7 +121,7 @@ async def mark_bula_ingestion_failed_after_retries(
 ) -> None:
     try:
         bula_id = extract_bula_id_from_job(job)
-    except (UnicodeDecodeError, ValueError):
+    except UnicodeDecodeError, ValueError:
         return
 
     error_message = build_error_message(exc)

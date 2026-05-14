@@ -92,6 +92,17 @@ class QdrantSettings(BaseSettings):
     )
 
 
+class RAGIngestionSettings(BaseSettings):
+    debug: bool = False
+    debug_path: str = "tmp/rag-ingestion-debug"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="RAG_INGESTION_",
+        extra="ignore",
+    )
+
+
 class DatabaseSettings(BaseSettings):
     database_url: str = "postgresql+asyncpg://bulaai:bulaai@postgres:5432/bulaai"
     sql_echo: bool = False
@@ -134,6 +145,7 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     embedding: EmbeddingSettings = Field(default_factory=EmbeddingSettings)
     ollama: OllamaSettings = Field(default_factory=OllamaSettings)
     qdrant: QdrantSettings = Field(default_factory=QdrantSettings)
+    rag_ingestion: RAGIngestionSettings = Field(default_factory=RAGIngestionSettings)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
