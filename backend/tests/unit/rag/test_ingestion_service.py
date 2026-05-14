@@ -6,8 +6,9 @@ from uuid import UUID
 import pytest
 
 from app.modules.bulas.models import Bula, BulaCorpus, BulaStatus
+from app.modules.rag.debug_artifacts import RAGIngestionDebugArtifacts
 from app.modules.rag.parsers.pdf_parser import ParseResult
-from app.modules.rag.schemas import ChunkResult, DocumentChunk
+from app.modules.rag.schemas import ChunkResult, ChunkingConfig, DocumentChunk
 from app.modules.rag.service import BulaIngestionError, RAGIngestionService
 from app.modules.storage.schemas import StoredObjectRef
 
@@ -79,11 +80,22 @@ class FakeParser:
 class FakeChunker:
     def __init__(self, chunks: list[DocumentChunk]) -> None:
         self.chunks = chunks
+        self.config = build_chunking_config()
 
     async def chunk_markdown(self, markdown: str, doc_id: str) -> ChunkResult:
         assert markdown.startswith("## Posologia")
         assert doc_id == str(BULA_ID)
         return ChunkResult(doc_id=doc_id, chunks=self.chunks)
+
+
+class FailingChunker:
+    def __init__(self) -> None:
+        self.config = build_chunking_config()
+
+    async def chunk_markdown(self, markdown: str, doc_id: str) -> ChunkResult:
+        _ = markdown
+        _ = doc_id
+        raise RuntimeError("chunking failed")
 
 
 class FakeEmbeddings:
@@ -110,6 +122,29 @@ class FakeQdrantStore:
             point.payload for point in points if isinstance(point.payload, dict)
         ]
         return len(points)
+
+
+class FakeDebugArtifacts(RAGIngestionDebugArtifacts):
+    def __init__(self) -> None:
+        super().__init__(enabled=True, root_path="unused")
+        self.calls: list[dict[str, object]] = []
+
+    async def write_run_artifacts(self, **kwargs: object) -> object:
+        self.calls.append(kwargs)
+        return None
+
+
+def build_chunking_config() -> ChunkingConfig:
+    return ChunkingConfig(
+        target_tokens=600,
+        min_tokens=200,
+        max_tokens=850,
+        overlap_ratio=0.12,
+        max_concurrency=4,
+        model="primary-model",
+        fallback_model="fallback-model",
+        is_llm_enabled=True,
+    )
 
 
 def build_bula(status: BulaStatus = BulaStatus.PENDING) -> Bula:
@@ -141,9 +176,10 @@ def build_service(
     *,
     repo: FakeBulaRepository,
     parser: FakeParser | None = None,
-    chunker: FakeChunker | None = None,
+    chunker: FakeChunker | FailingChunker | None = None,
     embeddings: FakeEmbeddings | None = None,
     qdrant_store: FakeQdrantStore | None = None,
+    debug_artifacts: RAGIngestionDebugArtifacts | None = None,
 ) -> RAGIngestionService:
     return RAGIngestionService(
         parser=parser or FakeParser(),
@@ -152,6 +188,7 @@ def build_service(
         qdrant_store=qdrant_store or FakeQdrantStore(),  # type: ignore[arg-type]
         object_store=FakeObjectStore(),  # type: ignore[arg-type]
         bula_repo=repo,  # type: ignore[arg-type]
+        debug_artifacts=debug_artifacts,
     )
 
 
@@ -179,28 +216,87 @@ async def test_ingest_bula_moves_pending_to_processing_then_ready() -> None:
 
 
 @pytest.mark.anyio
+async def test_ingest_bula_writes_success_debug_artifacts() -> None:
+    bula = build_bula()
+    repo = FakeBulaRepository(bula)
+    debug_artifacts = FakeDebugArtifacts()
+    service = build_service(repo=repo, debug_artifacts=debug_artifacts)
+
+    await service.ingest_bula(bula_id=BULA_ID)
+
+    assert len(debug_artifacts.calls) == 1
+    call = debug_artifacts.calls[0]
+    assert isinstance(call["run_id"], str)
+    assert call["doc_id"] == str(BULA_ID)
+    assert call["filename"] == "leaflet.pdf"
+    assert call["status"] == "success"
+    assert call["markdown"] == "## Posologia\nUse conforme orientacao medica."
+    assert isinstance(call["chunk_result"], ChunkResult)
+    assert isinstance(call["chunking_config"], ChunkingConfig)
+
+
+@pytest.mark.anyio
 async def test_ingest_bula_reraises_parser_error_without_marking_ready() -> None:
     bula = build_bula()
     repo = FakeBulaRepository(bula)
-    service = build_service(repo=repo, parser=FakeParser(success=False))
+    debug_artifacts = FakeDebugArtifacts()
+    service = build_service(
+        repo=repo,
+        parser=FakeParser(success=False),
+        debug_artifacts=debug_artifacts,
+    )
 
     with pytest.raises(ValueError, match="PDF parsing failed"):
         await service.ingest_bula(bula_id=BULA_ID)
 
     assert repo.statuses == [BulaStatus.PROCESSING]
     assert bula.status == BulaStatus.PROCESSING
+    assert len(debug_artifacts.calls) == 1
+    assert debug_artifacts.calls[0]["status"] == "parse_failed"
+    assert debug_artifacts.calls[0]["markdown"] is None
+    assert isinstance(debug_artifacts.calls[0]["error"], ValueError)
+
+
+@pytest.mark.anyio
+async def test_ingest_bula_writes_chunking_failure_debug_artifacts() -> None:
+    bula = build_bula()
+    repo = FakeBulaRepository(bula)
+    debug_artifacts = FakeDebugArtifacts()
+    service = build_service(
+        repo=repo,
+        chunker=FailingChunker(),
+        debug_artifacts=debug_artifacts,
+    )
+
+    with pytest.raises(RuntimeError, match="chunking failed"):
+        await service.ingest_bula(bula_id=BULA_ID)
+
+    assert len(debug_artifacts.calls) == 1
+    call = debug_artifacts.calls[0]
+    assert call["status"] == "chunking_failed"
+    assert call["markdown"] == "## Posologia\nUse conforme orientacao medica."
+    assert call["chunk_result"] is None
+    assert isinstance(call["error"], RuntimeError)
 
 
 @pytest.mark.anyio
 async def test_ingest_bula_raises_clear_error_when_no_chunks_are_generated() -> None:
     bula = build_bula()
     repo = FakeBulaRepository(bula)
-    service = build_service(repo=repo, chunker=FakeChunker([]))
+    debug_artifacts = FakeDebugArtifacts()
+    service = build_service(
+        repo=repo,
+        chunker=FakeChunker([]),
+        debug_artifacts=debug_artifacts,
+    )
 
     with pytest.raises(BulaIngestionError, match="No chunks"):
         await service.ingest_bula(bula_id=BULA_ID)
 
     assert repo.statuses == [BulaStatus.PROCESSING]
+    assert len(debug_artifacts.calls) == 1
+    assert debug_artifacts.calls[0]["status"] == "chunking_failed"
+    assert isinstance(debug_artifacts.calls[0]["chunk_result"], ChunkResult)
 
 
 @pytest.mark.anyio
