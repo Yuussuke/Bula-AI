@@ -23,7 +23,7 @@
 | **ORM** | SQLAlchemy 2 async + Alembic for migrations |
 | **Data validation** | Pydantic v2 |
 | **Auth** | JWT (PyJWT + Argon2id) |
-| **Relational DB** | PostgreSQL 16 |
+| **Relational DB** | PostgreSQL 18 |
 | **Vector DB** | Qdrant |
 | **LLM** | Maritaca Sabiá-3 API (OpenAI-compatible) |
 | **Embeddings** | HuggingFace `intfloat/multilingual-e5-large` |
