@@ -237,7 +237,9 @@ make reset-db
 
 This removes the Compose-managed database volume and reruns migrations. It is
 destructive for local data. The Compose volume is declared as `postgres_data`;
-Docker usually materializes it as `bula-ai_postgres_data`.
+Docker usually materializes it as `bula-ai_postgres_data`. PostgreSQL 18 mounts
+this volume at `/var/lib/postgresql`, letting the image create its
+major-version-specific data directory.
 
 ## Automated Dependency Updates
 
