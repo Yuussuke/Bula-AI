@@ -58,3 +58,15 @@ warn_return_any = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 pretty = true
+
+[tool.pytest.ini_options]
+norecursedirs = [
+    ".git",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".uv-cache",
+    ".venv",
+    "htmlcov",
+    "tmp",
+]

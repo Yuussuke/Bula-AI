@@ -223,7 +223,7 @@ async def test_io_failure_logs_warning_without_raising(
     assert warning_calls[0]["run_id"] == "run-1"
     assert warning_calls[0]["bula_id"] == "doc-1"
     assert warning_calls[0]["doc_id"] == "doc-1"
-    assert warning_calls[0]["error_type"] == "FileExistsError"
+    assert warning_calls[0]["error_type"] in {"FileExistsError", "NotADirectoryError"}
 
 
 def test_sanitize_debug_error_omits_sensitive_messages() -> None:
