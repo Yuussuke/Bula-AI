@@ -69,7 +69,8 @@ create-admin:
 reset-db:
 	$(COMPOSE) down -v && $(COMPOSE) up -d
 	$(COMPOSE) exec postgres sh -lc 'until pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"; do sleep 1; done'
-	$(MAKE) migrate
+	"$(MAKE)" migrate
+	"$(MAKE)" pgq-install
 
 # --- Tests and quality ---
 test:
