@@ -146,5 +146,5 @@ def _get_relevance_score(*, document: Document) -> float:
     score = document.metadata.get("score", 0.0)
     try:
         return float(score)
-    except (TypeError, ValueError):
+    except TypeError, ValueError:
         return 0.0

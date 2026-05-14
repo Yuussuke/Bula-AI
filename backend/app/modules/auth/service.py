@@ -211,7 +211,7 @@ class AuthService:
 
             user_id = int(subject)
 
-        except (jwt.PyJWTError, ValueError):
+        except jwt.PyJWTError, ValueError:
             logger.warning("token_validation_failed", reason="invalid_token")
             raise credentials_exception
 

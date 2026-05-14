@@ -16,6 +16,7 @@ from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.base_chunker import BaseChunker
 from app.modules.rag.chain import RAGChainFactory
 from app.modules.rag.chunker import BulaChunker
+from app.modules.rag.debug_artifacts import RAGIngestionDebugArtifacts
 from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.llm import OPENROUTER_BASE_URL, get_llm
 from app.modules.rag.parsers.pdf_parser import BulaParser
@@ -35,6 +36,15 @@ OPENROUTER_EMBEDDING_MODEL_HINT = "intfloat/multilingual-e5-large"
 
 def get_parser() -> BulaParser:
     return BulaParser(ocr_enabled=False)
+
+
+def get_ingestion_debug_artifacts(
+    settings: Settings = Depends(get_settings),
+) -> RAGIngestionDebugArtifacts:
+    return RAGIngestionDebugArtifacts(
+        enabled=settings.rag_ingestion.debug,
+        root_path=settings.rag_ingestion.debug_path,
+    )
 
 
 def get_embeddings(settings: Settings = Depends(get_settings)) -> EmbeddingAdapter:
@@ -161,6 +171,9 @@ def get_ingestion_service(
     qdrant_store: QdrantVectorStore = Depends(get_qdrant_store),
     object_store: ObjectStoreClient = Depends(get_object_store_client),
     bula_repo: BulaRepository = Depends(get_bula_repository),
+    debug_artifacts: RAGIngestionDebugArtifacts = Depends(
+        get_ingestion_debug_artifacts
+    ),
 ) -> RAGIngestionService:
     return RAGIngestionService(
         chunker=chunker,
@@ -169,6 +182,7 @@ def get_ingestion_service(
         qdrant_store=qdrant_store,
         object_store=object_store,
         bula_repo=bula_repo,
+        debug_artifacts=debug_artifacts,
     )
 
 

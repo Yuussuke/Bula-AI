@@ -207,6 +207,12 @@ resilience: `docker-compose.yml` runs it with `restart: always` and
 restarted by the supervisor instead of maintaining custom reconnect logic in the
 application process.
 
+For local or operator debugging, set `RAG_INGESTION_DEBUG=true` and optionally
+`RAG_INGESTION_DEBUG_PATH=tmp/rag-ingestion-debug` before starting the API and
+worker. Each ingestion run writes a manifest, parsed markdown, and chunking
+result artifacts under the configured path. These files can contain parsed bula
+text, so keep the path local/private and inspect warnings with `make logs`.
+
 Uploads are intentionally limited to 10 MB. Validation reads the PDF in chunks
 and stops once the configured limit is exceeded; after validation, the current
 local storage path reads the accepted file into memory. Raising this limit should
