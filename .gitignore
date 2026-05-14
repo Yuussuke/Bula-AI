@@ -17,6 +17,9 @@ build/
 
 # Logs
 *.log
+tmp/rag-ingestion-debug/
+backend/tmp/rag-ingestion-debug/
+backend/tmp/pytest-temp/
 
 # Test / coverage artefacts
 .coverage
