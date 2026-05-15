@@ -82,6 +82,7 @@ class OllamaSettings(BaseSettings):
 class QdrantSettings(BaseSettings):
     host: str = "qdrant"
     port: int = 6333
+    use_https: bool = False
     api_key: str | None = None
     timeout_seconds: int = 60
 
