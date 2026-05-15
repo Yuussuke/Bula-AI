@@ -194,6 +194,7 @@ def test_create_qdrant_client_uses_qdrant_settings(
     settings.qdrant = QdrantSettings(
         host="qdrant-test",
         port=6333,
+        use_https=True,
         api_key="qdrant-key",
         timeout_seconds=30,
     )
@@ -202,11 +203,76 @@ def test_create_qdrant_client_uses_qdrant_settings(
 
     assert isinstance(client, FakeQdrantClient)
     assert created_kwargs == {
-        "host": "qdrant-test",
-        "port": 6333,
+        "url": "https://qdrant-test:6333",
         "api_key": "qdrant-key",
         "timeout": 30,
     }
+
+
+@pytest.mark.parametrize(
+    ("qdrant_settings", "expected_url"),
+    [
+        (
+            QdrantSettings(host="qdrant", port=6333, use_https=False),
+            "http://qdrant:6333",
+        ),
+        (
+            QdrantSettings(host="localhost", port=6333, use_https=False),
+            "http://localhost:6333",
+        ),
+        (
+            QdrantSettings(
+                host="managed-qdrant.example.com",
+                port=6333,
+                use_https=True,
+            ),
+            "https://managed-qdrant.example.com:6333",
+        ),
+    ],
+)
+def test_build_qdrant_url_uses_configured_scheme(
+    qdrant_settings: QdrantSettings,
+    expected_url: str,
+) -> None:
+    qdrant_url = qdrant_client_module.build_qdrant_url(settings=qdrant_settings)
+
+    assert qdrant_url == expected_url
+
+
+def test_qdrant_settings_default_to_http(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv("QDRANT_USE_HTTPS", raising=False)
+
+    qdrant_settings = QdrantSettings(
+        host="qdrant",
+        port=6333,
+        _env_file=None,
+    )
+
+    assert qdrant_settings.use_https is False
+    assert (
+        qdrant_client_module.build_qdrant_url(settings=qdrant_settings)
+        == "http://qdrant:6333"
+    )
+
+
+def test_qdrant_settings_reads_use_https_env(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("QDRANT_USE_HTTPS", "true")
+
+    qdrant_settings = QdrantSettings(
+        host="managed-qdrant.example.com",
+        port=6333,
+        _env_file=None,
+    )
+
+    assert qdrant_settings.use_https is True
+    assert (
+        qdrant_client_module.build_qdrant_url(settings=qdrant_settings)
+        == "https://managed-qdrant.example.com:6333"
+    )
 
 
 def test_rag_ingestion_settings_defaults() -> None:
