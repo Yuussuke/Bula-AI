@@ -90,9 +90,7 @@ class RAGIngestionService:
             async with observer.stage("object_metadata") as stage:
                 file_address = bula.file_address or ""
                 if not file_address:
-                    raise BulaIngestionError(
-                        "Bula does not have a stored PDF address."
-                    )
+                    raise BulaIngestionError("Bula does not have a stored PDF address.")
 
                 stored_object_metadata = await self.object_store.get_metadata(
                     file_address

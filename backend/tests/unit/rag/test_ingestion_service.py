@@ -272,9 +272,7 @@ async def test_ingest_bula_logs_stage_timings_and_summary(
         "mark_ready",
     ]
     stage_logs = [
-        call
-        for call in info_calls
-        if call["event"] == "rag_ingestion_stage_finished"
+        call for call in info_calls if call["event"] == "rag_ingestion_stage_finished"
     ]
     summary_log = next(
         call for call in info_calls if call["event"] == "rag_ingestion_finished"
@@ -364,9 +362,7 @@ async def test_ingest_bula_logs_failed_parse_summary_without_sensitive_content(
         "write_debug_artifacts",
     ]
     stage_logs = [
-        call
-        for call in info_calls
-        if call["event"] == "rag_ingestion_stage_finished"
+        call for call in info_calls if call["event"] == "rag_ingestion_stage_finished"
     ]
     summary_log = next(
         call for call in info_calls if call["event"] == "rag_ingestion_finished"
