@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import re
+import time
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
@@ -161,6 +162,7 @@ class BaseChunker(ABC):
         section: MarkdownSection,
         doc_id: str,
     ) -> list[SectionChunkDraft]:
+        section_started_at = time.perf_counter()
         primary_failure: ChunkingAttemptFailure | None = None
         fallback_failure: ChunkingAttemptFailure | None = None
 
@@ -177,6 +179,7 @@ class BaseChunker(ABC):
                     section=section,
                     method="primary",
                     chunk_count=len(primary_chunks),
+                    duration_ms=self._elapsed_ms(section_started_at),
                 )
                 return primary_chunks
 
@@ -192,6 +195,7 @@ class BaseChunker(ABC):
                     section=section,
                     method="fallback",
                     chunk_count=len(fallback_chunks),
+                    duration_ms=self._elapsed_ms(section_started_at),
                 )
                 return fallback_chunks
 
@@ -201,6 +205,7 @@ class BaseChunker(ABC):
             section=section,
             method="heuristic",
             chunk_count=len(heuristic_chunks),
+            duration_ms=self._elapsed_ms(section_started_at),
             primary_failure=primary_failure,
             fallback_failure=fallback_failure,
         )
@@ -481,6 +486,7 @@ class BaseChunker(ABC):
         section: MarkdownSection,
         method: ChunkingMethod,
         chunk_count: int,
+        duration_ms: float,
         primary_failure: ChunkingAttemptFailure | None = None,
         fallback_failure: ChunkingAttemptFailure | None = None,
     ) -> None:
@@ -490,6 +496,7 @@ class BaseChunker(ABC):
             "section_title": section.title,
             "method": method,
             "chunk_count": chunk_count,
+            "duration_ms": duration_ms,
         }
         if method == "heuristic":
             log_fields.update(
@@ -511,7 +518,7 @@ class BaseChunker(ABC):
                 }
             )
 
-        logger.info("rag_section_chunked", **log_fields)
+        logger.debug("rag_section_chunked", **log_fields)
 
     def _is_text_present_in_section(
         self,
@@ -528,6 +535,9 @@ class BaseChunker(ABC):
 
     def _estimate_tokens(self, text: str) -> int:
         return self.token_estimator.estimate(text)
+
+    def _elapsed_ms(self, started_at: float) -> float:
+        return round((time.perf_counter() - started_at) * 1000, 2)
 
     def _overlap_tokens(self, *, max_tokens: int) -> int:
         if max_tokens <= 1:

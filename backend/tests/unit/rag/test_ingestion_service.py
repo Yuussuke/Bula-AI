@@ -6,6 +6,7 @@ from uuid import UUID
 import pytest
 
 from app.modules.bulas.models import Bula, BulaCorpus, BulaStatus
+from app.modules.rag import observability as observability_module
 from app.modules.rag.debug_artifacts import RAGIngestionDebugArtifacts
 from app.modules.rag.parsers.pdf_parser import ParseResult
 from app.modules.rag.schemas import ChunkResult, ChunkingConfig, DocumentChunk
@@ -236,6 +237,73 @@ async def test_ingest_bula_writes_success_debug_artifacts() -> None:
 
 
 @pytest.mark.anyio
+async def test_ingest_bula_logs_stage_timings_and_summary(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    info_calls: list[dict[str, object]] = []
+    debug_calls: list[dict[str, object]] = []
+
+    def record_info(event: str, **kwargs: object) -> None:
+        info_calls.append({"event": event, **kwargs})
+
+    def record_debug(event: str, **kwargs: object) -> None:
+        debug_calls.append({"event": event, **kwargs})
+
+    monkeypatch.setattr(observability_module.logger, "info", record_info)
+    monkeypatch.setattr(observability_module.logger, "debug", record_debug)
+
+    bula = build_bula()
+    repo = FakeBulaRepository(bula)
+    service = build_service(repo=repo)
+
+    await service.ingest_bula(bula_id=BULA_ID)
+
+    expected_stages = [
+        "bula_lookup",
+        "mark_processing",
+        "object_metadata",
+        "pdf_download",
+        "pdf_parse_to_markdown",
+        "chunk_markdown",
+        "write_debug_artifacts",
+        "embed_chunks",
+        "qdrant_ensure_collection",
+        "qdrant_upsert",
+        "mark_ready",
+    ]
+    stage_logs = [
+        call for call in info_calls if call["event"] == "rag_ingestion_stage_finished"
+    ]
+    summary_log = next(
+        call for call in info_calls if call["event"] == "rag_ingestion_finished"
+    )
+
+    assert [call["stage"] for call in stage_logs] == expected_stages
+    assert [call["stage"] for call in debug_calls] == expected_stages
+    assert all(call["stage_status"] == "succeeded" for call in stage_logs)
+    assert all(isinstance(call["duration_ms"], float) for call in stage_logs)
+    assert all(call["run_id"] == summary_log["run_id"] for call in stage_logs)
+    assert all(call["bula_id"] == str(BULA_ID) for call in stage_logs)
+    assert summary_log["bula_id"] == str(BULA_ID)
+    assert summary_log["doc_id"] == str(BULA_ID)
+    assert summary_log["ingestion_status"] == "succeeded"
+    assert isinstance(summary_log["total_duration_ms"], float)
+    assert list(summary_log["stage_durations_ms"].keys()) == expected_stages
+    assert summary_log["slowest_stage"] in expected_stages
+    assert (
+        summary_log["slowest_stage_duration_ms"]
+        == summary_log["stage_durations_ms"][summary_log["slowest_stage"]]
+    )
+    assert stage_logs[2]["pdf_size_bytes"] == 10
+    assert stage_logs[4]["extraction_tier"] == "fake"
+    assert stage_logs[4]["section_count"] == 1
+    assert stage_logs[5]["chunk_count"] == 1
+    assert stage_logs[7]["embedding_vector_count"] == 1
+    assert stage_logs[9]["qdrant_point_count"] == 1
+    assert stage_logs[9]["qdrant_collection"] == "bulaai_chunks"
+
+
+@pytest.mark.anyio
 async def test_ingest_bula_reraises_parser_error_without_marking_ready() -> None:
     bula = build_bula()
     repo = FakeBulaRepository(bula)
@@ -255,6 +323,70 @@ async def test_ingest_bula_reraises_parser_error_without_marking_ready() -> None
     assert debug_artifacts.calls[0]["status"] == "parse_failed"
     assert debug_artifacts.calls[0]["markdown"] is None
     assert isinstance(debug_artifacts.calls[0]["error"], ValueError)
+
+
+@pytest.mark.anyio
+async def test_ingest_bula_logs_failed_parse_summary_without_sensitive_content(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    info_calls: list[dict[str, object]] = []
+    debug_calls: list[dict[str, object]] = []
+
+    def record_info(event: str, **kwargs: object) -> None:
+        info_calls.append({"event": event, **kwargs})
+
+    def record_debug(event: str, **kwargs: object) -> None:
+        debug_calls.append({"event": event, **kwargs})
+
+    monkeypatch.setattr(observability_module.logger, "info", record_info)
+    monkeypatch.setattr(observability_module.logger, "debug", record_debug)
+
+    bula = build_bula()
+    repo = FakeBulaRepository(bula)
+    debug_artifacts = FakeDebugArtifacts()
+    service = build_service(
+        repo=repo,
+        parser=FakeParser(success=False),
+        debug_artifacts=debug_artifacts,
+    )
+
+    with pytest.raises(ValueError, match="PDF parsing failed"):
+        await service.ingest_bula(bula_id=BULA_ID)
+
+    expected_stages = [
+        "bula_lookup",
+        "mark_processing",
+        "object_metadata",
+        "pdf_download",
+        "pdf_parse_to_markdown",
+        "write_debug_artifacts",
+    ]
+    stage_logs = [
+        call for call in info_calls if call["event"] == "rag_ingestion_stage_finished"
+    ]
+    summary_log = next(
+        call for call in info_calls if call["event"] == "rag_ingestion_finished"
+    )
+    parse_stage_log = next(
+        call for call in stage_logs if call["stage"] == "pdf_parse_to_markdown"
+    )
+
+    assert [call["stage"] for call in stage_logs] == expected_stages
+    assert list(summary_log["stage_durations_ms"].keys()) == expected_stages
+    assert parse_stage_log["stage_status"] == "failed"
+    assert parse_stage_log["error_type"] == "ValueError"
+    assert summary_log["ingestion_status"] == "failed"
+    assert summary_log["error_type"] == "ValueError"
+    assert isinstance(summary_log["total_duration_ms"], float)
+    assert summary_log["slowest_stage"] in expected_stages
+
+    log_output = repr(info_calls + debug_calls)
+    assert "pdf_bytes" not in log_output
+    assert "%PDF-1.4" not in log_output
+    assert "Use conforme orientacao medica" not in log_output
+    assert "chunk_text" not in log_output
+    assert "Custom chunking instruction" not in log_output
+    assert "api_key" not in log_output
 
 
 @pytest.mark.anyio

@@ -197,17 +197,17 @@ async def test_heuristic_fallback_logs_safe_model_failure_context(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     warning_calls: list[dict[str, object]] = []
-    info_calls: list[dict[str, object]] = []
+    debug_calls: list[dict[str, object]] = []
     section_text = "Use conforme orientacao medica."
 
     def record_warning(event: str, **kwargs: object) -> None:
         warning_calls.append({"event": event, **kwargs})
 
-    def record_info(event: str, **kwargs: object) -> None:
-        info_calls.append({"event": event, **kwargs})
+    def record_debug(event: str, **kwargs: object) -> None:
+        debug_calls.append({"event": event, **kwargs})
 
     monkeypatch.setattr(base_chunker_module.logger, "warning", record_warning)
-    monkeypatch.setattr(base_chunker_module.logger, "info", record_info)
+    monkeypatch.setattr(base_chunker_module.logger, "debug", record_debug)
 
     chunker, _ = build_chunker(
         responses=[
@@ -223,7 +223,7 @@ async def test_heuristic_fallback_logs_safe_model_failure_context(
 
     heuristic_log = next(
         call
-        for call in info_calls
+        for call in debug_calls
         if call["event"] == "rag_section_chunked" and call["method"] == "heuristic"
     )
     assert result.chunks[0].method == "heuristic"
@@ -245,8 +245,9 @@ async def test_heuristic_fallback_logs_safe_model_failure_context(
     assert heuristic_log["fallback_error_type"] == "RuntimeError"
     assert heuristic_log["primary_failure_reason"] == "model_call_failed"
     assert heuristic_log["fallback_failure_reason"] == "model_call_failed"
+    assert isinstance(heuristic_log["duration_ms"], float)
     logged_values = " ".join(
-        str(value) for call in warning_calls + info_calls for value in call.values()
+        str(value) for call in warning_calls + debug_calls for value in call.values()
     )
     assert section_text not in logged_values
     assert "leaked raw text" not in logged_values
