@@ -213,6 +213,62 @@ worker. Each ingestion run writes a manifest, parsed markdown, and chunking
 result artifacts under the configured path. These files can contain parsed bula
 text, so keep the path local/private and inspect warnings with `make logs`.
 
+### RAG ingestion observability
+
+The PGQueuer ingestion worker emits structured logs for every RAG ingestion run.
+Use `make logs` and filter by `run_id` or `bula_id` when multiple PDFs are being
+processed at the same time.
+
+Stable events:
+
+- `rag_ingestion_started`: one log at the beginning of a run.
+- `rag_ingestion_stage_started`: DEBUG-only marker for a stage start.
+- `rag_ingestion_stage_finished`: one log per completed or failed stage.
+- `rag_ingestion_finished`: final summary, emitted on success and failure.
+
+Stable fields:
+
+- Correlation: `log_schema_version`, `run_id`, `bula_id`, `doc_id`.
+- Stage timing: `stage`, `stage_status`, `duration_ms`.
+- Final summary: `ingestion_status`, `total_duration_ms`,
+  `stage_durations_ms`, `slowest_stage`, `slowest_stage_duration_ms`.
+- Safe counters/context: `pdf_size_bytes`, `extraction_tier`, `section_count`,
+  `chunk_count`, `embedding_vector_count`, `qdrant_point_count`,
+  `qdrant_collection`, `error_type`.
+
+Example final summary:
+
+```json
+{
+  "event": "rag_ingestion_finished",
+  "run_id": "7b0f1c48-5c47-4bc7-845d-2b784f97b0bd",
+  "bula_id": "11111111-1111-1111-1111-111111111111",
+  "ingestion_status": "succeeded",
+  "total_duration_ms": 5832.91,
+  "stage_durations_ms": {
+    "bula_lookup": 12.42,
+    "mark_processing": 18.35,
+    "object_metadata": 9.11,
+    "pdf_download": 22.6,
+    "pdf_parse_to_markdown": 741.84,
+    "chunk_markdown": 3170.02,
+    "write_debug_artifacts": 4.18,
+    "embed_chunks": 1420.77,
+    "qdrant_ensure_collection": 28.53,
+    "qdrant_upsert": 381.09,
+    "mark_ready": 24.0
+  },
+  "slowest_stage": "chunk_markdown",
+  "slowest_stage_duration_ms": 3170.02
+}
+```
+
+To answer "which step dominated this run?", inspect `slowest_stage` first, then
+compare the ordered `stage_durations_ms` object for the full profile. The logs
+intentionally do not include API keys, PDF bytes, parsed markdown, prompts, raw
+model responses, or chunk text. Set `LOG_LEVEL=DEBUG` only when you need
+per-section chunking details such as `rag_section_chunked`.
+
 Uploads are intentionally limited to 10 MB. Validation reads the PDF in chunks
 and stops once the configured limit is exceeded; after validation, the current
 local storage path reads the accepted file into memory. Raising this limit should
