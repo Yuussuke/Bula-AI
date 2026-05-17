@@ -19,10 +19,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
+# OPTFLAGS="" matches pgvector/pgvector official images: default -march=native breaks
+# vector.so on arm64 (segfault on CREATE EXTENSION vector).
 RUN cd /tmp \
     && git clone --branch ${PGVECTOR_VERSION} --depth 1 https://github.com/pgvector/pgvector.git \
     && cd pgvector \
-    && make \
+    && make OPTFLAGS="" \
     && make install
 
 RUN cd /tmp \
