@@ -15,7 +15,7 @@ dependencies = [
     "langchain-ollama>=0.2.0",
     "langchain-openai>=0.2.0",
     "langchain-text-splitters>=1.1.2",
-    "openai>=2.36.0",
+    "openai>=2.37.0",
     "orjson>=3.11.9",
     "pdfplumber>=0.11.9",
     "pgqueuer>=0.26.0",
@@ -24,12 +24,12 @@ dependencies = [
     "pyjwt>=2.12.1",
     "pymupdf>=1.27.2.3",
     "pypdf>=6.11.0",
-    "python-multipart>=0.0.28",
+    "python-multipart>=0.0.29",
     "qdrant-client>=1.18.0,<1.19",
     "slowapi>=0.1.9",
     "sqlalchemy>=2.0.49",
     "structlog>=25.5.0",
-    "tiktoken>=0.12.0",
+    "tiktoken>=0.13.0",
     "uvicorn[standard]>=0.46.0",
 ]
 
@@ -44,7 +44,7 @@ dev = [
     "pytest-asyncio>=1.3.0",
     "pytest-cov>=6.0.0",
     "rich>=15.0.0",
-    "ruff>=0.15.12",
+    "ruff>=0.15.13",
     "sacrebleu>=2.6.0",
 ]
 
