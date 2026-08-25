@@ -45,6 +45,9 @@ class ProcessingSettings(BaseSettings):
     chunk_max_tokens: int = 850
     chunk_overlap_ratio: float = 0.12
     chunk_max_concurrency: int = 4
+    chunk_batch_enabled: bool = True
+    chunk_batch_max_tokens: int = 3000
+    chunk_batch_max_sections: int = 8
     tokenizer_encoding: str | None = "cl100k_base"
 
     model_config = SettingsConfigDict(
