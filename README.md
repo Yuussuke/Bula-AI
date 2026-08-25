@@ -213,6 +213,16 @@ worker. Each ingestion run writes a manifest, parsed markdown, and chunking
 result artifacts under the configured path. These files can contain parsed bula
 text, so keep the path local/private and inspect warnings with `make logs`.
 
+Small adjacent Markdown sections are grouped into fewer semantic chunking
+requests by default. `PROCESSING_CHUNK_BATCH_MAX_TOKENS` controls the estimated
+source-token budget for a combined request, while
+`PROCESSING_CHUNK_BATCH_MAX_SECTIONS` limits response complexity. A section that
+already exceeds the token budget remains a standalone request. Set
+`PROCESSING_CHUNK_BATCH_ENABLED=false` to compare against the legacy
+one-section-per-request behavior. If both batch models fail validation, the
+worker retries each section through the existing primary, fallback, and
+heuristic flow.
+
 ### RAG ingestion observability
 
 The PGQueuer ingestion worker emits structured logs for every RAG ingestion run.
@@ -233,8 +243,9 @@ Stable fields:
 - Final summary: `ingestion_status`, `total_duration_ms`,
   `stage_durations_ms`, `slowest_stage`, `slowest_stage_duration_ms`.
 - Safe counters/context: `pdf_size_bytes`, `extraction_tier`, `section_count`,
-  `chunk_count`, `embedding_vector_count`, `qdrant_point_count`,
-  `qdrant_collection`, `error_type`.
+  `batch_count`, `model_call_count`, `batch_fallback_count`, `chunk_count`,
+  `embedding_vector_count`, `qdrant_point_count`, `qdrant_collection`,
+  `error_type`.
 
 Example final summary:
 
@@ -267,7 +278,8 @@ To answer "which step dominated this run?", inspect `slowest_stage` first, then
 compare the ordered `stage_durations_ms` object for the full profile. The logs
 intentionally do not include API keys, PDF bytes, parsed markdown, prompts, raw
 model responses, or chunk text. Set `LOG_LEVEL=DEBUG` only when you need
-per-section chunking details such as `rag_section_chunked`.
+per-section or per-batch chunking details such as `rag_section_chunked` and
+`rag_chunking_batch_completed`.
 
 Uploads are intentionally limited to 10 MB. Validation reads the PDF in chunks
 and stops once the configured limit is exceeded; after validation, the current
