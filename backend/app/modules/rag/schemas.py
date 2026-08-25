@@ -12,6 +12,9 @@ class ChunkingConfig(BaseModel):
     max_tokens: int = Field(default=850, gt=0)
     overlap_ratio: float = Field(default=0.12, ge=0, lt=1)
     max_concurrency: int = Field(default=4, gt=0)
+    is_batching_enabled: bool = True
+    batch_max_tokens: int = Field(default=3000, gt=0)
+    batch_max_sections: int = Field(default=8, gt=0)
     model: str
     fallback_model: str
     is_llm_enabled: bool = True
@@ -25,6 +28,14 @@ class ChunkProposal(BaseModel):
 
 class ChunkProposals(BaseModel):
     chunks: list[ChunkProposal]
+
+
+class BatchChunkProposal(ChunkProposal):
+    section_index: int = Field(ge=0)
+
+
+class BatchChunkProposals(BaseModel):
+    chunks: list[BatchChunkProposal]
 
 
 class DocumentChunk(BaseModel):

@@ -128,6 +128,9 @@ async def test_enabled_debug_artifacts_write_manifest_markdown_and_chunks() -> N
     ]
     assert manifest["chunks_json_size_bytes"] == len(chunks_path.read_bytes())
     assert manifest["chunk_methods"] == ["heuristic"]
+    assert manifest["chunking_config"]["is_batching_enabled"] is True
+    assert manifest["chunking_config"]["batch_max_tokens"] == 3000
+    assert manifest["chunking_config"]["batch_max_sections"] == 8
 
 
 @pytest.mark.anyio

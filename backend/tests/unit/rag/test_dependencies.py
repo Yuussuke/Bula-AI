@@ -355,6 +355,22 @@ def test_get_chunker_returns_bula_chunker_as_base_chunker() -> None:
     assert isinstance(chunker.token_estimator, TiktokenTokenEstimator)
 
 
+def test_get_chunker_uses_batch_processing_settings() -> None:
+    fake_llm = cast(AsyncOpenAI, FakeOpenAIClient())
+    settings = build_settings()
+    settings.processing = ProcessingSettings(
+        chunk_batch_enabled=False,
+        chunk_batch_max_tokens=2400,
+        chunk_batch_max_sections=6,
+    )
+
+    chunker = get_chunker(llm=fake_llm, settings=settings)
+
+    assert chunker.config.is_batching_enabled is False
+    assert chunker.config.batch_max_tokens == 2400
+    assert chunker.config.batch_max_sections == 6
+
+
 def test_get_chunker_uses_heuristic_token_estimator_when_encoding_is_blank() -> None:
     fake_llm = cast(AsyncOpenAI, FakeOpenAIClient())
     settings = build_settings()
