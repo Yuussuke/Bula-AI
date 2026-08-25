@@ -143,6 +143,11 @@ class RAGIngestionService:
                             "section_count",
                             len(parse_result.sections),
                         ),
+                        batch_count=chunk_result.metadata.get("batch_count"),
+                        model_call_count=chunk_result.metadata.get("model_call_count"),
+                        batch_fallback_count=chunk_result.metadata.get(
+                            "batch_fallback_count"
+                        ),
                         chunk_count=len(chunk_result.chunks),
                     )
 
