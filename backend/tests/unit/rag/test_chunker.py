@@ -1,6 +1,6 @@
 import json
 from types import SimpleNamespace
-from typing import cast
+from typing import Sequence, cast
 
 import pytest
 from openai import AsyncOpenAI
@@ -24,6 +24,10 @@ class DummyChunker(BaseChunker):
 
     def user_prompt(self, *, section: MarkdownSection) -> str:
         return f"Custom chunking instruction for {section.title}:\n{section.text}"
+
+    def batch_user_prompt(self, *, sections: Sequence[MarkdownSection]) -> str:
+        section_identifiers = ", ".join(str(section.index) for section in sections)
+        return f"Custom batch chunking instruction for: {section_identifiers}"
 
 
 class FakeCompletions:
@@ -87,6 +91,24 @@ def build_chunk_response(*, chunk_text: str, chunk_title: str = "POSOLOGIA") -> 
     )
 
 
+def build_batch_chunk_response(
+    *proposals: tuple[int, str, str],
+) -> str:
+    return json.dumps(
+        {
+            "chunks": [
+                {
+                    "section_index": section_index,
+                    "chunk_text": chunk_text,
+                    "chunk_title": chunk_title,
+                    "reason": None,
+                }
+                for section_index, chunk_text, chunk_title in proposals
+            ]
+        }
+    )
+
+
 def build_chunker(
     *,
     responses: list[str | Exception] | None = None,
@@ -142,6 +164,267 @@ def test_bula_chunker_user_prompt_preserves_medical_safety_instructions() -> Non
     assert "nao adicione" in prompt
     assert "corrija ou complete nenhuma informacao medica" in prompt
     assert section.text in prompt
+
+
+def test_bula_chunker_batch_prompt_keeps_sections_independent() -> None:
+    fake_client = FakeOpenAIClient(responses=[])
+    chunker = BulaChunker(
+        llm=cast(AsyncOpenAI, fake_client),
+        config=build_config(),
+    )
+    sections = [
+        MarkdownSection(index=0, title="POSOLOGIA", text="Dose diaria."),
+        MarkdownSection(index=1, title="CONTRAINDICACOES", text="Nao utilizar."),
+    ]
+
+    prompt = chunker.batch_user_prompt(sections=sections)
+    serialized_sections = json.loads(prompt.rsplit("\n\n", maxsplit=1)[1])
+
+    assert "nunca misture conteudo de secoes diferentes" in prompt
+    assert "Use somente trechos copiados" in prompt
+    assert serialized_sections == [
+        {
+            "section_index": 0,
+            "section_title": "POSOLOGIA",
+            "section_text": "Dose diaria.",
+        },
+        {
+            "section_index": 1,
+            "section_title": "CONTRAINDICACOES",
+            "section_text": "Nao utilizar.",
+        },
+    ]
+
+
+@pytest.mark.anyio
+async def test_small_adjacent_sections_share_one_model_request() -> None:
+    markdown = (
+        "## COMPOSICAO\nContem dipirona.\n\n"
+        "## INDICACOES\nAlivia a dor.\n\n"
+        "## POSOLOGIA\nUse uma dose.\n\n"
+        "## CUIDADOS\nSiga orientacao."
+    )
+    chunker, fake_client = build_chunker(
+        responses=[
+            build_batch_chunk_response(
+                (2, "Use uma dose.", "Dose"),
+                (0, "Contem dipirona.", "Composicao"),
+                (3, "Siga orientacao.", "Cuidados"),
+                (1, "Alivia a dor.", "Indicacoes"),
+            )
+        ],
+        config=build_config(
+            max_concurrency=1,
+            batch_max_tokens=100,
+            batch_max_sections=8,
+        ),
+        token_estimator=WordTokenEstimator(),
+    )
+
+    result = await chunker.chunk_markdown(markdown=markdown, doc_id="bula-123")
+
+    assert len(fake_client.completions.requests) == 1
+    assert result.metadata["section_count"] == 4
+    assert result.metadata["batch_count"] == 1
+    assert result.metadata["batched_section_count"] == 4
+    assert result.metadata["model_call_count"] == 1
+    assert [chunk.section_title for chunk in result.chunks] == [
+        "COMPOSICAO",
+        "INDICACOES",
+        "POSOLOGIA",
+        "CUIDADOS",
+    ]
+    assert [chunk.text for chunk in result.chunks] == [
+        "Contem dipirona.",
+        "Alivia a dor.",
+        "Use uma dose.",
+        "Siga orientacao.",
+    ]
+
+
+@pytest.mark.anyio
+async def test_batch_limits_split_sections_into_multiple_requests() -> None:
+    markdown = (
+        "## A\nTexto A.\n\n"
+        "## B\nTexto B.\n\n"
+        "## C\nTexto C.\n\n"
+        "## D\nTexto D.\n\n"
+        "## E\nTexto E."
+    )
+    chunker, fake_client = build_chunker(
+        responses=[
+            build_batch_chunk_response(
+                (0, "Texto A.", "A"),
+                (1, "Texto B.", "B"),
+            ),
+            build_batch_chunk_response(
+                (2, "Texto C.", "C"),
+                (3, "Texto D.", "D"),
+            ),
+            build_chunk_response(chunk_text="Texto E.", chunk_title="E"),
+        ],
+        config=build_config(
+            max_concurrency=1,
+            batch_max_tokens=100,
+            batch_max_sections=2,
+        ),
+        token_estimator=WordTokenEstimator(),
+    )
+
+    result = await chunker.chunk_markdown(markdown=markdown, doc_id="bula-123")
+
+    assert len(fake_client.completions.requests) == 3
+    assert result.metadata["batch_count"] == 3
+    assert result.metadata["model_call_count"] == 3
+    assert [chunk.section_title for chunk in result.chunks] == ["A", "B", "C", "D", "E"]
+
+
+@pytest.mark.anyio
+async def test_batch_token_budget_splits_adjacent_sections() -> None:
+    markdown = "## A\nTexto A.\n\n## B\nTexto B.\n\n## C\nTexto C."
+    chunker, fake_client = build_chunker(
+        responses=[
+            build_batch_chunk_response(
+                (0, "Texto A.", "A"),
+                (1, "Texto B.", "B"),
+            ),
+            build_chunk_response(chunk_text="Texto C.", chunk_title="C"),
+        ],
+        config=build_config(
+            max_concurrency=1,
+            batch_max_tokens=8,
+            batch_max_sections=8,
+        ),
+        token_estimator=WordTokenEstimator(),
+    )
+
+    result = await chunker.chunk_markdown(markdown=markdown, doc_id="bula-123")
+
+    assert len(fake_client.completions.requests) == 2
+    assert result.metadata["batch_count"] == 2
+    assert [chunk.section_title for chunk in result.chunks] == ["A", "B", "C"]
+
+
+@pytest.mark.anyio
+async def test_batching_reduces_calls_for_same_document_without_changing_output() -> (
+    None
+):
+    markdown = "## A\nTexto A.\n\n## B\nTexto B.\n\n## C\nTexto C."
+    batched_chunker, batched_client = build_chunker(
+        responses=[
+            build_batch_chunk_response(
+                (0, "Texto A.", "A"),
+                (1, "Texto B.", "B"),
+                (2, "Texto C.", "C"),
+            )
+        ],
+        config=build_config(max_concurrency=1),
+    )
+    legacy_chunker, legacy_client = build_chunker(
+        responses=[
+            build_chunk_response(chunk_text="Texto A.", chunk_title="A"),
+            build_chunk_response(chunk_text="Texto B.", chunk_title="B"),
+            build_chunk_response(chunk_text="Texto C.", chunk_title="C"),
+        ],
+        config=build_config(
+            is_batching_enabled=False,
+            max_concurrency=1,
+        ),
+    )
+
+    batched_result = await batched_chunker.chunk_markdown(
+        markdown=markdown,
+        doc_id="bula-123",
+    )
+    legacy_result = await legacy_chunker.chunk_markdown(
+        markdown=markdown,
+        doc_id="bula-123",
+    )
+
+    assert len(batched_client.completions.requests) == 1
+    assert len(legacy_client.completions.requests) == 3
+    assert batched_result.metadata["model_call_count"] == 1
+    assert legacy_result.metadata["model_call_count"] == 3
+    assert [(chunk.section_title, chunk.text) for chunk in batched_result.chunks] == [
+        (chunk.section_title, chunk.text) for chunk in legacy_result.chunks
+    ]
+
+
+@pytest.mark.anyio
+async def test_batch_response_cannot_mix_text_between_sections() -> None:
+    markdown = "## POSOLOGIA\nDose diaria.\n\n## CUIDADOS\nNao exceda a dose."
+    chunker, fake_client = build_chunker(
+        responses=[
+            build_batch_chunk_response(
+                (0, "Nao exceda a dose.", "Resposta invalida"),
+                (1, "Nao exceda a dose.", "Cuidados"),
+            ),
+            build_batch_chunk_response(
+                (0, "Dose diaria.", "Posologia"),
+                (1, "Nao exceda a dose.", "Cuidados"),
+            ),
+        ],
+        config=build_config(max_concurrency=1),
+    )
+
+    result = await chunker.chunk_markdown(markdown=markdown, doc_id="bula-123")
+
+    assert [request["model"] for request in fake_client.completions.requests] == [
+        "primary-model",
+        "fallback-model",
+    ]
+    assert all(chunk.method == "fallback" for chunk in result.chunks)
+    assert [chunk.section_title for chunk in result.chunks] == [
+        "POSOLOGIA",
+        "CUIDADOS",
+    ]
+
+
+@pytest.mark.anyio
+async def test_failed_batch_retries_each_section_individually(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    warning_calls: list[dict[str, object]] = []
+
+    def record_warning(event: str, **kwargs: object) -> None:
+        warning_calls.append({"event": event, **kwargs})
+
+    monkeypatch.setattr(base_chunker_module.logger, "warning", record_warning)
+    chunker, fake_client = build_chunker(
+        responses=[
+            RuntimeError("batch primary leaked Dose diaria."),
+            RuntimeError("batch fallback leaked Dose diaria."),
+            build_chunk_response(chunk_text="Dose diaria.", chunk_title="Posologia"),
+            build_chunk_response(chunk_text="Nao exceda.", chunk_title="Cuidados"),
+        ],
+        config=build_config(max_concurrency=1),
+    )
+    markdown = "## POSOLOGIA\nDose diaria.\n\n## CUIDADOS\nNao exceda."
+
+    result = await chunker.chunk_markdown(markdown=markdown, doc_id="bula-123")
+
+    assert [request["model"] for request in fake_client.completions.requests] == [
+        "primary-model",
+        "fallback-model",
+        "primary-model",
+        "primary-model",
+    ]
+    assert result.metadata["model_call_count"] == 4
+    assert result.metadata["batch_fallback_count"] == 1
+    assert all(chunk.method == "primary" for chunk in result.chunks)
+    split_log = next(
+        call
+        for call in warning_calls
+        if call["event"] == "rag_chunking_batch_falling_back_to_sections"
+    )
+    assert split_log["batch_index"] == 0
+    assert split_log["section_indices"] == [0, 1]
+    assert split_log["section_count"] == 2
+    logged_values = " ".join(
+        str(value) for call in warning_calls for value in call.values()
+    )
+    assert "Dose diaria" not in logged_values
+    assert "leaked" not in logged_values
 
 
 @pytest.mark.anyio
