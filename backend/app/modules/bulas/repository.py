@@ -74,6 +74,19 @@ class BulaRepository:
         result = await self.db.execute(statement)
         return result.scalar_one_or_none()
 
+    async def get_by_file_address_and_corpus(
+        self,
+        *,
+        file_address: str,
+        corpus: BulaCorpus,
+    ) -> Bula | None:
+        statement = select(Bula).where(
+            Bula.file_address == file_address,
+            Bula.corpus == corpus,
+        )
+        result = await self.db.execute(statement)
+        return result.scalars().first()
+
     async def update_ingestion_status(
         self,
         *,

@@ -6,7 +6,7 @@ POSTGRES_IMAGE_TAG := 18
 POSTGRES_IMAGE := $(POSTGRES_IMAGE_NAME):$(POSTGRES_IMAGE_TAG)
 POSTGRES_IMAGE_CONTEXT := docker/bula_ai_postgres
 
-.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate pgq-install pgq-upgrade pgq-verify verify-postgres makemigrations create-admin test test-unit test-integration test-cov lint typecheck format reset-db help dependencies add-dependency
+.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate pgq-install pgq-upgrade pgq-verify verify-postgres makemigrations create-admin download-anvisa-bulas seed-system-bulas test test-unit test-integration test-cov lint typecheck format reset-db help dependencies add-dependency
 
 # --- Docker ---
 build:
@@ -65,6 +65,12 @@ makemigrations:
 
 create-admin:
 	$(COMPOSE) exec -e ADMIN_PASSWORD api uv run python -m app.scripts.create_admin $(ARGS)
+
+download-anvisa-bulas:
+	cd backend && uv run python -m scripts.download_bulas $(ARGS)
+
+seed-system-bulas:
+	$(COMPOSE) exec api uv run python -m app.scripts.seed_system_bulas $(ARGS)
 
 reset-db:
 	$(COMPOSE) down -v && $(COMPOSE) up -d
@@ -129,6 +135,8 @@ help:
 	@echo "  make verify-postgres - Verify extensions and FTS in the running PostgreSQL service"
 	@echo "  make makemigrations - Generate a new migration (use MSG=\"...\")"
 	@echo "  make create-admin   - Create an admin user inside the api container (optional ARGS=\"...\")"
+	@echo "  make download-anvisa-bulas - Download ANVISA PDFs and generate a manifest"
+	@echo "  make seed-system-bulas - Seed downloaded PDFs into the system corpus"
 	@echo "  make reset-db       - Destroy volumes and remigrate from scratch"
 	@echo "  make test           - Run the test suite"
 	@echo "  make test-unit      - Run backend unit tests"
