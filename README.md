@@ -188,6 +188,8 @@ Main files:
 - Verify PGQueuer objects: `make pgq-verify`
 - Verify PostgreSQL extensions and FTS: `make verify-postgres`
 - Create an admin user: `make create-admin ARGS="--email admin@example.com --full-name 'Admin User'"`
+- Download the ANVISA system corpus: `make download-anvisa-bulas ARGS="--headless"`
+- Preview the system seed: `make seed-system-bulas ARGS="--admin-email admin@example.com --dry-run"`
 - Run tests: `make test`
 - Run tests with coverage: `make test-cov`
 - Lint: `make lint`
@@ -222,6 +224,53 @@ already exceeds the token budget remains a standalone request. Set
 one-section-per-request behavior. If both batch models fail validation, the
 worker retries each section through the existing primary, fallback, and
 heuristic flow.
+
+### ANVISA system corpus
+
+The system corpus is populated through two explicit operator commands. The
+downloader runs on the host because Playwright is a development dependency; the
+seed runs inside the API container so it uses the same PostgreSQL object store
+and PGQueuer configuration as the application.
+
+Install the downloader dependency and its browser once:
+
+```bash
+cd backend
+uv sync --dev
+uv run playwright install chromium
+cd ..
+```
+
+Download the configured public patient leaflets and generate their manifest:
+
+```bash
+make download-anvisa-bulas ARGS="--headless"
+```
+
+Use `--limit 5` for a small validation run. The default output is
+`backend/tmp/anvisa-bulas/`, which is ignored by Git because downloaded PDFs
+must not be committed. Its `manifest.json` records each filename, medication,
+manufacturer, ANVISA source URL, content size, and SHA-256 checksum.
+
+With the API, worker, database, and queue running, preview the database changes:
+
+```bash
+make seed-system-bulas ARGS="--admin-email admin@example.com --dry-run"
+```
+
+Then execute the seed:
+
+```bash
+make seed-system-bulas ARGS="--admin-email admin@example.com"
+```
+
+The owner must already be an active administrator. The command validates each
+PDF against the manifest and the 10 MB upload limit, creates bulas with
+`corpus=system`, and enqueues the normal `ingest_bula` job. The worker uses batch
+chunking by default and writes vectors to the shared `bulaai_chunks` collection.
+Running the seed again is safe: matching SHA-256 objects are reused, and a
+matching system bula is reported as skipped. The final summary reports planned,
+inserted, skipped, queued, and failed documents.
 
 ### RAG ingestion observability
 
