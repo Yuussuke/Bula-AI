@@ -109,6 +109,30 @@ async def test_identical_content_creates_distinct_object_addresses(
 
 
 @pytest.mark.anyio
+async def test_find_by_checksum_returns_existing_object_metadata(
+    object_store_client: PgObjectStoreClient,
+) -> None:
+    content = b"content identified by checksum"
+    checksum = hashlib.sha256(content).hexdigest()
+    address = await object_store_client.put_bytes(data=content, filename="known.pdf")
+
+    stored_object = await object_store_client.find_by_sha256_checksum(checksum)
+
+    assert stored_object is not None
+    assert stored_object.object_address == address
+    assert stored_object.sha256_checksum == checksum
+
+
+@pytest.mark.anyio
+async def test_find_by_checksum_returns_none_for_unknown_content(
+    object_store_client: PgObjectStoreClient,
+) -> None:
+    stored_object = await object_store_client.find_by_sha256_checksum("0" * 64)
+
+    assert stored_object is None
+
+
+@pytest.mark.anyio
 async def test_put_file_persists_upload_file_content(
     object_store_client: PgObjectStoreClient,
 ) -> None:
