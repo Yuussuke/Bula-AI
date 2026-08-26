@@ -223,6 +223,11 @@ one-section-per-request behavior. If both batch models fail validation, the
 worker retries each section through the existing primary, fallback, and
 heuristic flow.
 
+Each OpenRouter chunking request has an explicit timeout configured through
+`OPENROUTER_CHUNK_TIMEOUT_SECONDS` (60 seconds by default). SDK-level retries are
+disabled by default with `OPENROUTER_CHUNK_MAX_RETRIES=0` because the chunker
+already owns the primary, fallback-model, and heuristic recovery policy.
+
 ### RAG ingestion observability
 
 The PGQueuer ingestion worker emits structured logs for every RAG ingestion run.
