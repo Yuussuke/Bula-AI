@@ -280,18 +280,21 @@ def test_rag_ingestion_settings_defaults() -> None:
 
     assert settings.debug is False
     assert settings.debug_path == "tmp/rag-ingestion-debug"
+    assert settings.stale_job_retry_after_seconds == 300
 
 
-def test_rag_ingestion_settings_reads_debug_env(
+def test_rag_ingestion_settings_reads_env(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("RAG_INGESTION_DEBUG", "true")
     monkeypatch.setenv("RAG_INGESTION_DEBUG_PATH", "custom-debug")
+    monkeypatch.setenv("RAG_INGESTION_STALE_JOB_RETRY_AFTER_SECONDS", "90")
 
     settings = RAGIngestionSettings(_env_file=None)
 
     assert settings.debug is True
     assert settings.debug_path == "custom-debug"
+    assert settings.stale_job_retry_after_seconds == 90
 
 
 def test_get_ingestion_debug_artifacts_uses_settings() -> None:
