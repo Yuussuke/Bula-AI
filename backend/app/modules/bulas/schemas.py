@@ -3,7 +3,14 @@ from pathlib import PurePosixPath, PureWindowsPath
 from typing import Literal
 from uuid import UUID
 
-from pydantic import AnyHttpUrl, BaseModel, ConfigDict, Field, field_validator
+from pydantic import (
+    AnyHttpUrl,
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    model_validator,
+)
 
 from app.modules.bulas.models import BulaCorpus, BulaStatus
 
@@ -54,13 +61,57 @@ class BulaStatusResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class SystemBulaManifestReview(BaseModel):
+    status: Literal["pending", "approved"] = "pending"
+    reviewed_by: str | None = None
+    reviewed_at: datetime | None = None
+    notes: str | None = None
+
+    @model_validator(mode="after")
+    def validate_approval_metadata(self) -> "SystemBulaManifestReview":
+        if self.status == "approved" and (
+            self.reviewed_by is None or self.reviewed_at is None
+        ):
+            raise ValueError(
+                "Approved manifest entries require reviewed_by and reviewed_at."
+            )
+        if self.status == "pending" and (
+            self.reviewed_by is not None or self.reviewed_at is not None
+        ):
+            raise ValueError(
+                "Pending manifest entries cannot contain approval metadata."
+            )
+        return self
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+
 class SystemBulaManifestEntry(BaseModel):
-    drug_name: str = Field(min_length=1)
-    manufacturer: str | None = None
-    source_url: AnyHttpUrl
+    target_id: str = Field(min_length=1, pattern=r"^[a-z0-9][a-z0-9_-]*$")
+    active_ingredient: str = Field(min_length=1)
+    product_name: str = Field(min_length=1)
+    strength: str = Field(min_length=1)
+    pharmaceutical_form: str = Field(min_length=1)
+    presentation: str = Field(min_length=1)
+    audience: Literal["patient", "professional"]
+    manufacturer: str = Field(min_length=1)
+    company_tax_id: str = Field(min_length=1)
+    anvisa_product_id: int = Field(gt=0)
+    registration_number: str = Field(min_length=1)
+    process_number: str = Field(min_length=1)
+    expedition_number: str = Field(min_length=1)
+    transaction_number: str = Field(min_length=1)
+    source_record_id: str = Field(pattern=r"^[0-9]+$")
+    canonical_source_url: AnyHttpUrl
+    source_published_at: datetime
+    source_updated_at: datetime | None = None
+    search_query: str = Field(min_length=1)
+    downloader_version: str = Field(min_length=1)
+    downloaded_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     filename: str
     sha256_checksum: str = Field(pattern=r"^[0-9a-f]{64}$")
     content_size_bytes: int = Field(gt=0)
+    review: SystemBulaManifestReview = Field(default_factory=SystemBulaManifestReview)
 
     @field_validator("filename")
     @classmethod
@@ -78,9 +129,28 @@ class SystemBulaManifestEntry(BaseModel):
 
 
 class SystemBulaManifest(BaseModel):
-    schema_version: Literal[1] = 1
+    schema_version: Literal[2] = 2
     generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     documents: list[SystemBulaManifestEntry] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_unique_document_identities(self) -> "SystemBulaManifest":
+        filenames = [document.filename.casefold() for document in self.documents]
+        if len(filenames) != len(set(filenames)):
+            raise ValueError("Manifest contains duplicate PDF filenames.")
+
+        target_ids = [document.target_id for document in self.documents]
+        if len(target_ids) != len(set(target_ids)):
+            raise ValueError("Manifest contains duplicate target IDs.")
+
+        source_identities = [
+            (document.source_record_id, document.audience)
+            for document in self.documents
+        ]
+        if len(source_identities) != len(set(source_identities)):
+            raise ValueError("Manifest contains duplicate source identities.")
+
+        return self
 
 
 class SystemBulaSeedCandidate(BaseModel):

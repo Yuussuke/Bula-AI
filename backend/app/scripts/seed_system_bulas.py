@@ -28,7 +28,7 @@ from app.modules.storage.client import PgObjectStoreClient
 from app.modules.storage.repository import StoredObjectRepository
 
 
-DEFAULT_INPUT_DIRECTORY = Path("tmp/anvisa-bulas")
+DEFAULT_INPUT_DIRECTORY = Path("tmp/anvisa-bulas-v2")
 DEFAULT_MANIFEST_FILENAME = "manifest.json"
 
 
@@ -102,6 +102,18 @@ def load_seed_candidates(arguments: SeedArguments) -> list[SystemBulaSeedCandida
     manifest_entries = manifest.documents
     if arguments.limit is not None:
         manifest_entries = manifest_entries[: arguments.limit]
+
+    pending_review_entries = [
+        entry.filename
+        for entry in manifest_entries
+        if entry.review.status != "approved"
+    ]
+    if pending_review_entries:
+        pending_filenames = ", ".join(pending_review_entries)
+        raise ValueError(
+            "System seed requires human-approved manifest entries. "
+            f"Pending review: {pending_filenames}"
+        )
 
     resolved_input_directory = arguments.input_directory.resolve()
     candidates: list[SystemBulaSeedCandidate] = []

@@ -7,6 +7,7 @@ from fastapi import HTTPException, UploadFile, status
 from app.modules.auth.models import UserRole
 from app.modules.auth.repository import UserRepository
 from app.modules.bulas.models import Bula, BulaCorpus
+from app.modules.bulas.helpers import InvalidPdfError, validate_pdf_bytes
 from app.modules.bulas.queue import BulaIngestionQueue
 from app.modules.bulas.repository import BulaRepository
 from app.modules.bulas.schemas import (
@@ -316,10 +317,10 @@ class SystemBulaSeedService:
         try:
             bula = await self.bula_repository.create_bula(
                 user_id=admin_user_id,
-                drug_name=manifest_entry.drug_name,
+                drug_name=manifest_entry.product_name,
                 manufacturer=manifest_entry.manufacturer,
                 file_address=object_address,
-                file_url=str(manifest_entry.source_url),
+                file_url=str(manifest_entry.canonical_source_url),
                 corpus=BulaCorpus.SYSTEM,
             )
         except Exception:
@@ -343,11 +344,13 @@ class SystemBulaSeedService:
         manifest_entry = candidate.manifest_entry
         content = candidate.content
 
-        if not content.startswith(PDF_MAGIC_BYTES):
-            raise ValueError("The file does not have a valid PDF signature.")
-
-        if len(content) > self.max_upload_size_bytes:
-            raise ValueError("The PDF exceeds the maximum upload size.")
+        try:
+            validate_pdf_bytes(
+                content,
+                max_size_bytes=self.max_upload_size_bytes,
+            )
+        except InvalidPdfError as exc:
+            raise ValueError(str(exc)) from exc
 
         if len(content) != manifest_entry.content_size_bytes:
             raise ValueError("The PDF size does not match the manifest.")
