@@ -21,6 +21,7 @@ tmp/rag-ingestion-debug/
 backend/tmp/rag-ingestion-debug/
 backend/tmp/pytest-temp/
 backend/tmp/anvisa-bulas/
+backend/tmp/anvisa-bulas-v2/
 
 # Test / coverage artefacts
 .coverage

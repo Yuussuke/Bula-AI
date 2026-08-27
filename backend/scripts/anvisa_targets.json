@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "targets": [
+    {
+      "target_id": "amoxicilina-clavulanato-500mg-125mg-comprimido-ems",
+      "search_query": "AMOXICILINA + CLAVULANATO DE POTASSIO",
+      "active_ingredient": "amoxicilina + clavulanato de potassio",
+      "product_name": "AMOXICILINA + CLAVULANATO DE POTASSIO",
+      "strength": "500 mg + 125 mg",
+      "pharmaceutical_form": "comprimido revestido",
+      "presentation": "embalagens com 12, 18, 21, 30 ou 42 unidades",
+      "audience": "patient",
+      "manufacturer": "EMS S/A",
+      "company_tax_id": "57507378000365",
+      "anvisa_product_id": 124891,
+      "registration_number": "102350532",
+      "process_number": "253510242290107",
+      "expedition_number": "0186508263",
+      "transaction_number": "2551962026",
+      "source_record_id": "35934920",
+      "expected_pdf_terms": [
+        "amoxicilina + clavulanato de potássio",
+        "500 mg + 125 mg",
+        "comprimido revestido"
+      ]
+    }
+  ]
+}
