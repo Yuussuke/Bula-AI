@@ -188,7 +188,8 @@ Main files:
 - Verify PGQueuer objects: `make pgq-verify`
 - Verify PostgreSQL extensions and FTS: `make verify-postgres`
 - Create an admin user: `make create-admin ARGS="--email admin@example.com --full-name 'Admin User'"`
-- Download the ANVISA system corpus: `make download-anvisa-bulas ARGS="--headless"`
+- Discover ANVISA records: `make download-anvisa-bulas ARGS="--headless --discover Amoxicilina"`
+- Download pinned ANVISA targets: `make download-anvisa-bulas ARGS="--headless --targets scripts/anvisa_targets.json --limit 1"`
 - Preview the system seed: `make seed-system-bulas ARGS="--admin-email admin@example.com --dry-run"`
 - Run tests: `make test`
 - Run tests with coverage: `make test-cov`
@@ -232,6 +233,89 @@ Each OpenRouter chunking request has an explicit timeout configured through
 `OPENROUTER_CHUNK_TIMEOUT_SECONDS` (60 seconds by default). SDK-level retries are
 disabled by default with `OPENROUTER_CHUNK_MAX_RETRIES=0` because the chunker
 already owns the primary, fallback-model, and heuristic recovery policy.
+
+### ANVISA system corpus
+
+The system corpus uses an explicit discovery, selection, download, human review,
+and seed workflow. The downloader runs on the host because Playwright is a
+development dependency; the seed runs inside the API container.
+
+Install the downloader dependency and its browser once:
+
+```bash
+cd backend
+uv sync --dev
+uv run playwright install chromium
+cd ..
+```
+
+First discover the records returned by ANVISA without downloading a PDF:
+
+```bash
+make download-anvisa-bulas ARGS="--headless --discover Amoxicilina"
+```
+
+Discovery excludes the short-lived protected download tokens. It shows the
+stable patient/professional source record IDs together with the ANVISA product
+ID, registration, process, expedition, transaction, manufacturer, and source
+timestamps. Never select a result using only an active ingredient or the newest
+record from a manufacturer.
+
+The repository contains one pinned candidate in
+`backend/scripts/anvisa_targets.json` for the initial reviewed seed. Verify its
+exact product, strength, pharmaceutical form, presentation, audience, and source
+record in the official Bulário before use. Use
+`backend/scripts/anvisa_targets.example.json` only when adding another target.
+The configured `expected_pdf_terms` must identify the product, strength, and
+form in the selected PDF.
+
+Download only the pinned targets and generate manifest schema version 2:
+
+```bash
+make download-anvisa-bulas ARGS="--headless --targets scripts/anvisa_targets.json --limit 1"
+```
+
+PDFs and the generated manifest are stored in
+`backend/tmp/anvisa-bulas-v2/`, an ignored directory. The separate v2 directory
+keeps legacy schema-version-1 downloads untouched and prevents them from being
+resumed accidentally. Downloads are written to `.pdf.part`, parsed with the
+same 10 MB limit used by uploads, checked for the configured identity terms,
+and atomically moved into place. The manifest is also written atomically.
+
+The manifest records the exact regulatory identity, canonical ANVISA query,
+local filename, byte length, SHA-256 checksum, timestamps, downloader version,
+and review status. A file is reused only when its target and source identity
+match the current result and its parsed bytes match the manifest. Changed
+sources, missing files, checksum mismatches, partial files, corrupt PDFs,
+duplicate filenames, and conflicting source identities are rejected or freshly
+downloaded. Schema version 1 manifests are intentionally rejected.
+
+Every new or changed download has `review.status` set to `pending`. Inspect the
+PDF and manifest, then replace its review object with:
+
+```json
+{
+  "status": "approved",
+  "reviewed_by": "reviewer@example.com",
+  "reviewed_at": "2026-08-26T21:00:00Z",
+  "notes": "Identity and presentation checked against the official Bulário."
+}
+```
+
+Approval applies to the exact checksum and source identity. Safe resume keeps
+the approval; any fresh download resets it to pending.
+
+With the API, worker, database, and queue running, preview one reviewed entry:
+
+```bash
+make seed-system-bulas ARGS="--admin-email admin@example.com --dry-run --limit 1"
+```
+
+Then execute the same reviewed seed without `--dry-run`. The owner must already
+be an active administrator. The command refuses pending entries, parses each
+PDF, validates its size and checksum, creates bulas with `corpus=system`, and
+enqueues the normal `ingest_bula` job. The exact ANVISA product name is stored
+as the bula name and the canonical ANVISA query as its source URL.
 
 ### RAG ingestion observability
 
