@@ -138,6 +138,8 @@ def get_llm_client(settings: Settings = Depends(get_settings)) -> AsyncOpenAI:
     return AsyncOpenAI(
         base_url=OPENROUTER_BASE_URL,
         api_key=api_key or MISSING_OPENROUTER_API_KEY,
+        timeout=settings.openrouter.chunk_timeout_seconds,
+        max_retries=settings.openrouter.chunk_max_retries,
     )
 
 

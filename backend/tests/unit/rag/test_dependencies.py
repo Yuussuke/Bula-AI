@@ -92,6 +92,42 @@ def build_settings(
     )
 
 
+def test_get_llm_client_bounds_chunking_requests(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    created_kwargs: dict[str, object] = {}
+
+    def fake_async_openai(**kwargs: object) -> FakeOpenAIClient:
+        created_kwargs.update(kwargs)
+        return FakeOpenAIClient()
+
+    monkeypatch.setattr(rag_dependencies, "AsyncOpenAI", fake_async_openai)
+    settings = build_settings()
+    settings.openrouter = OpenRouterSettings(
+        api_key="openrouter-test-key",
+        chunk_timeout_seconds=45,
+        chunk_max_retries=0,
+    )
+
+    llm_client = rag_dependencies.get_llm_client(settings=settings)
+
+    assert isinstance(llm_client, FakeOpenAIClient)
+    assert created_kwargs["timeout"] == 45
+    assert created_kwargs["max_retries"] == 0
+
+
+def test_openrouter_settings_reads_chunk_request_limits_from_env(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("OPENROUTER_CHUNK_TIMEOUT_SECONDS", "30")
+    monkeypatch.setenv("OPENROUTER_CHUNK_MAX_RETRIES", "1")
+
+    openrouter_settings = OpenRouterSettings(_env_file=None)
+
+    assert openrouter_settings.chunk_timeout_seconds == 30
+    assert openrouter_settings.chunk_max_retries == 1
+
+
 def test_get_embeddings_uses_openrouter_provider(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

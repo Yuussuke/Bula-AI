@@ -30,6 +30,8 @@ class OpenRouterSettings(BaseSettings):
     chat_model: str = "openai/gpt-5.4-mini"
     chunk_model: str = "google/gemini-3-flash-preview"
     chunk_fallback_model: str = "deepseek/deepseek-chat"
+    chunk_timeout_seconds: int = Field(default=60, gt=0)
+    chunk_max_retries: int = Field(default=0, ge=0)
     require_zdr: bool = True
 
     model_config = SettingsConfigDict(
