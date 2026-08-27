@@ -188,6 +188,8 @@ Main files:
 - Verify PGQueuer objects: `make pgq-verify`
 - Verify PostgreSQL extensions and FTS: `make verify-postgres`
 - Create an admin user: `make create-admin ARGS="--email admin@example.com --full-name 'Admin User'"`
+- Download the ANVISA system corpus: `make download-anvisa-bulas ARGS="--headless"`
+- Preview the system seed: `make seed-system-bulas ARGS="--admin-email admin@example.com --dry-run"`
 - Run tests: `make test`
 - Run tests with coverage: `make test-cov`
 - Lint: `make lint`
@@ -205,7 +207,10 @@ The ingestion worker relies on the Compose restart policy for database listener
 resilience: `docker-compose.yml` runs it with `restart: always` and
 `--shutdown-on-listener-failure`, so a broken PGQueuer listener exits and is
 restarted by the supervisor instead of maintaining custom reconnect logic in the
-application process.
+application process. Jobs left in `picked` state by an interrupted worker become
+eligible for another worker after
+`RAG_INGESTION_STALE_JOB_RETRY_AFTER_SECONDS` (five minutes by default). Active
+jobs send heartbeats and are not reclaimed while they continue processing.
 
 For local or operator debugging, set `RAG_INGESTION_DEBUG=true` and optionally
 `RAG_INGESTION_DEBUG_PATH=tmp/rag-ingestion-debug` before starting the API and

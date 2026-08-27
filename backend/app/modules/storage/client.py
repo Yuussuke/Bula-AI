@@ -33,6 +33,13 @@ class ObjectStoreClient(ABC):
         """Return object metadata for an existing address."""
 
     @abstractmethod
+    async def find_by_sha256_checksum(
+        self,
+        sha256_checksum: str,
+    ) -> StoredObjectRef | None:
+        """Return metadata for existing content with the same SHA-256 checksum."""
+
+    @abstractmethod
     async def exists(self, address: str) -> bool:
         """Return whether an object exists at the given address."""
 
@@ -79,6 +86,16 @@ class PgObjectStoreClient(ObjectStoreClient):
         stored_object = await self.repository.get_by_object_address(address)
         if stored_object is None:
             raise StoredObjectNotFoundError(address)
+
+        return self._build_metadata(stored_object)
+
+    async def find_by_sha256_checksum(
+        self,
+        sha256_checksum: str,
+    ) -> StoredObjectRef | None:
+        stored_object = await self.repository.get_by_sha256_checksum(sha256_checksum)
+        if stored_object is None:
+            return None
 
         return self._build_metadata(stored_object)
 

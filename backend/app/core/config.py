@@ -101,6 +101,7 @@ class QdrantSettings(BaseSettings):
 class RAGIngestionSettings(BaseSettings):
     debug: bool = False
     debug_path: str = "tmp/rag-ingestion-debug"
+    stale_job_retry_after_seconds: int = Field(default=300, gt=0)
 
     model_config = SettingsConfigDict(
         env_file=".env",

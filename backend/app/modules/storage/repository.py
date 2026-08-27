@@ -70,6 +70,19 @@ class StoredObjectRepository:
         result = await self.db.execute(statement)
         return result.scalar_one_or_none()
 
+    async def get_by_sha256_checksum(
+        self,
+        sha256_checksum: str,
+    ) -> StoredObject | None:
+        statement = (
+            select(StoredObject)
+            .where(StoredObject.sha256_checksum == sha256_checksum)
+            .order_by(StoredObject.created_at.asc())
+            .limit(1)
+        )
+        result = await self.db.execute(statement)
+        return result.scalar_one_or_none()
+
     async def object_exists(self, object_address: str) -> bool:
         statement = select(StoredObject.id).where(
             StoredObject.object_address == object_address

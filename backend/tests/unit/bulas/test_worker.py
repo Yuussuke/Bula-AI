@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 from typing import cast
 from uuid import UUID
+from datetime import timedelta
 
 import pytest
 from pgqueuer.models import Job
@@ -8,6 +9,7 @@ from pgqueuer.models import Job
 from app.modules.bulas.models import Bula, BulaCorpus, BulaStatus
 from app.worker import (
     build_error_message,
+    build_stale_job_retry_timer,
     mark_bula_ingestion_failed_after_retries,
 )
 
@@ -56,6 +58,12 @@ class FakeBulaRepository:
         bula.status = status
         bula.error_message = error_message
         return bula
+
+
+def test_build_stale_job_retry_timer_enables_recovery_after_configured_delay() -> None:
+    retry_timer = build_stale_job_retry_timer(retry_after_seconds=300)
+
+    assert retry_timer == timedelta(minutes=5)
 
 
 def test_build_error_message_prefers_original_exception_cause() -> None:
