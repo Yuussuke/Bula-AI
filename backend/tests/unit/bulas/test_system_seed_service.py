@@ -1,4 +1,5 @@
 import hashlib
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, Mock
 from uuid import UUID
 
@@ -8,6 +9,7 @@ from app.modules.auth.models import UserRole
 from app.modules.bulas.models import BulaCorpus
 from app.modules.bulas.schemas import (
     SystemBulaManifestEntry,
+    SystemBulaManifestReview,
     SystemBulaSeedCandidate,
 )
 from app.modules.bulas.service import (
@@ -15,20 +17,43 @@ from app.modules.bulas.service import (
     SystemBulaSeedService,
 )
 from app.modules.storage.schemas import StoredObjectRef
+from tests.pdf_factory import build_pdf_bytes
 
 
-PDF_CONTENT = b"%PDF-1.4\nexample leaflet\n%%EOF"
+PDF_CONTENT = build_pdf_bytes("Dipirona 500 mg comprimido")
 
 
 def build_candidate(*, content: bytes = PDF_CONTENT) -> SystemBulaSeedCandidate:
     return SystemBulaSeedCandidate(
         manifest_entry=SystemBulaManifestEntry(
-            drug_name="Dipirona",
+            target_id="dipirona-500mg-tablet",
+            active_ingredient="dipirona monoidratada",
+            product_name="DIPIRONA",
+            strength="500 mg",
+            pharmaceutical_form="comprimido",
+            presentation="caixa com 10 comprimidos",
+            audience="patient",
             manufacturer="Example Pharma",
-            source_url="https://consultas.anvisa.gov.br/documento.pdf",
+            company_tax_id="00000000000100",
+            anvisa_product_id=10,
+            registration_number="123456789",
+            process_number="process-1",
+            expedition_number="987654",
+            transaction_number="transaction-1",
+            source_record_id="111",
+            canonical_source_url="https://consultas.anvisa.gov.br/documento.pdf",
+            source_published_at="2026-08-20T10:00:00-03:00",
+            source_updated_at="2026-08-21T10:00:00-03:00",
+            search_query="Dipirona",
+            downloader_version="2.0",
             filename="dipirona.pdf",
             sha256_checksum=hashlib.sha256(content).hexdigest(),
             content_size_bytes=len(content),
+            review=SystemBulaManifestReview(
+                status="approved",
+                reviewed_by="reviewer@example.com",
+                reviewed_at=datetime.now(UTC),
+            ),
         ),
         content=content,
     )
@@ -91,7 +116,7 @@ async def test_seed_creates_system_bula_and_enqueues_ingestion() -> None:
     assert summary.failed == 0
     bulas.create_bula.assert_awaited_once_with(
         user_id=42,
-        drug_name="Dipirona",
+        drug_name="DIPIRONA",
         manufacturer="Example Pharma",
         file_address="stored_objects/dipirona",
         file_url="https://consultas.anvisa.gov.br/documento.pdf",
