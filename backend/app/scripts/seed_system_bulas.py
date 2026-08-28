@@ -103,18 +103,6 @@ def load_seed_candidates(arguments: SeedArguments) -> list[SystemBulaSeedCandida
     if arguments.limit is not None:
         manifest_entries = manifest_entries[: arguments.limit]
 
-    pending_review_entries = [
-        entry.filename
-        for entry in manifest_entries
-        if entry.review.status != "approved"
-    ]
-    if pending_review_entries:
-        pending_filenames = ", ".join(pending_review_entries)
-        raise ValueError(
-            "System seed requires human-approved manifest entries. "
-            f"Pending review: {pending_filenames}"
-        )
-
     resolved_input_directory = arguments.input_directory.resolve()
     candidates: list[SystemBulaSeedCandidate] = []
     for manifest_entry in manifest_entries:

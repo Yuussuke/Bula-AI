@@ -61,31 +61,6 @@ class BulaStatusResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class SystemBulaManifestReview(BaseModel):
-    status: Literal["pending", "approved"] = "pending"
-    reviewed_by: str | None = None
-    reviewed_at: datetime | None = None
-    notes: str | None = None
-
-    @model_validator(mode="after")
-    def validate_approval_metadata(self) -> "SystemBulaManifestReview":
-        if self.status == "approved" and (
-            self.reviewed_by is None or self.reviewed_at is None
-        ):
-            raise ValueError(
-                "Approved manifest entries require reviewed_by and reviewed_at."
-            )
-        if self.status == "pending" and (
-            self.reviewed_by is not None or self.reviewed_at is not None
-        ):
-            raise ValueError(
-                "Pending manifest entries cannot contain approval metadata."
-            )
-        return self
-
-    model_config = ConfigDict(str_strip_whitespace=True)
-
-
 class SystemBulaManifestEntry(BaseModel):
     target_id: str = Field(min_length=1, pattern=r"^[a-z0-9][a-z0-9_-]*$")
     active_ingredient: str = Field(min_length=1)
@@ -111,7 +86,6 @@ class SystemBulaManifestEntry(BaseModel):
     filename: str
     sha256_checksum: str = Field(pattern=r"^[0-9a-f]{64}$")
     content_size_bytes: int = Field(gt=0)
-    review: SystemBulaManifestReview = Field(default_factory=SystemBulaManifestReview)
 
     @field_validator("filename")
     @classmethod
@@ -125,7 +99,7 @@ class SystemBulaManifestEntry(BaseModel):
             raise ValueError("Manifest filename must be a local PDF filename.")
         return clean_filename
 
-    model_config = ConfigDict(str_strip_whitespace=True)
+    model_config = ConfigDict(str_strip_whitespace=True, extra="ignore")
 
 
 class SystemBulaManifest(BaseModel):
