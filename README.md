@@ -236,9 +236,9 @@ already owns the primary, fallback-model, and heuristic recovery policy.
 
 ### ANVISA system corpus
 
-The system corpus uses an explicit discovery, selection, download, human review,
-and seed workflow. The downloader runs on the host because Playwright is a
-development dependency; the seed runs inside the API container.
+The system corpus uses an explicit discovery, selection, download, operator
+validation, and seed workflow. The downloader runs on the host because
+Playwright is a development dependency; the seed runs inside the API container.
 
 Install the downloader dependency and its browser once:
 
@@ -262,7 +262,7 @@ timestamps. Never select a result using only an active ingredient or the newest
 record from a manufacturer.
 
 The repository contains one pinned candidate in
-`backend/scripts/anvisa_targets.json` for the initial reviewed seed. Verify its
+`backend/scripts/anvisa_targets.json` for the initial system seed. Verify its
 exact product, strength, pharmaceutical form, presentation, audience, and source
 record in the official Bulário before use. Use
 `backend/scripts/anvisa_targets.example.json` only when adding another target.
@@ -283,39 +283,32 @@ same 10 MB limit used by uploads, checked for the configured identity terms,
 and atomically moved into place. The manifest is also written atomically.
 
 The manifest records the exact regulatory identity, canonical ANVISA query,
-local filename, byte length, SHA-256 checksum, timestamps, downloader version,
-and review status. A file is reused only when its target and source identity
-match the current result and its parsed bytes match the manifest. Changed
-sources, missing files, checksum mismatches, partial files, corrupt PDFs,
-duplicate filenames, and conflicting source identities are rejected or freshly
-downloaded. Schema version 1 manifests are intentionally rejected.
+local filename, byte length, SHA-256 checksum, timestamps, and downloader
+version. A file is reused only when its target and source identity match the
+current result and its parsed bytes match the manifest. Changed sources, missing
+files, checksum mismatches, partial files, corrupt PDFs, duplicate filenames,
+and conflicting source identities are rejected or freshly downloaded. Schema
+version 1 manifests are intentionally rejected. Legacy `review` metadata in a
+schema-version-2 manifest is accepted but ignored.
 
-Every new or changed download has `review.status` set to `pending`. Inspect the
-PDF and manifest, then replace its review object with:
+Running the seed is the administrator's deliberate enqueue action. Before doing
+so, the operator must inspect the selected manifest entry and PDF in the
+official Bulário and confirm the product, strength, pharmaceutical form,
+presentation, audience, manufacturer, registration, and source record. There is
+no separate approval command or review-state edit in the local system-corpus
+workflow.
 
-```json
-{
-  "status": "approved",
-  "reviewed_by": "reviewer@example.com",
-  "reviewed_at": "2026-08-26T21:00:00Z",
-  "notes": "Identity and presentation checked against the official Bulário."
-}
-```
-
-Approval applies to the exact checksum and source identity. Safe resume keeps
-the approval; any fresh download resets it to pending.
-
-With the API, worker, database, and queue running, preview one reviewed entry:
+With the API, worker, database, and queue running, preview one validated entry:
 
 ```bash
 make seed-system-bulas ARGS="--admin-email admin@example.com --dry-run --limit 1"
 ```
 
-Then execute the same reviewed seed without `--dry-run`. The owner must already
-be an active administrator. The command refuses pending entries, parses each
-PDF, validates its size and checksum, creates bulas with `corpus=system`, and
-enqueues the normal `ingest_bula` job. The exact ANVISA product name is stored
-as the bula name and the canonical ANVISA query as its source URL.
+Then execute the same operator-validated seed without `--dry-run`. The owner
+must already be an active administrator. The command parses each PDF, validates
+its size and checksum, creates bulas with `corpus=system`, and enqueues the
+normal `ingest_bula` job. The exact ANVISA product name is stored as the bula
+name and the canonical ANVISA query as its source URL.
 
 ### RAG ingestion observability
 
