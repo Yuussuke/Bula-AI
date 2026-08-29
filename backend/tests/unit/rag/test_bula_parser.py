@@ -845,3 +845,34 @@ def test_metadata_extractor_uses_filename_as_low_priority_drug_name() -> None:
     assert metadata["drug_name"] == "bula dipirona sodica"
     assert metadata["drug_name_source"] == "filename_best_effort"
     assert metadata["manufacturer"] is None
+
+
+@pytest.mark.parametrize(
+    ("marker_line", "following_lines"),
+    [
+        ("REGISTRADO POR: EMPRESA", ["Sanofi Medley Farmacêutica Ltda."]),
+        ("REGISTRADO POR:", ["EMPRESA:", "Sanofi Medley Farmacêutica Ltda."]),
+    ],
+)
+def test_metadata_extractor_skips_manufacturer_placeholders(
+    marker_line: str,
+    following_lines: list[str],
+) -> None:
+    lines = [
+        ExtractedLine(text=marker_line, page_number=1),
+        *[
+            ExtractedLine(text=following_line, page_number=1)
+            for following_line in following_lines
+        ],
+    ]
+
+    metadata = MetadataExtractor().extract(
+        lines=lines,
+        filename="dipirona.pdf",
+        markdown_sections=[],
+        detected_sections=[],
+        quality_signals={},
+        front_matter={"manufacturer": "EMPRESA"},
+    )
+
+    assert metadata["manufacturer"] == "Sanofi Medley Farmacêutica Ltda."
