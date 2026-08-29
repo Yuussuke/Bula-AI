@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from io import BytesIO
 import importlib
+import re
 from typing import Any
 import unicodedata
 
@@ -31,6 +32,8 @@ class ExtractedLine:
     average_font_size: float | None = None
     max_font_size: float | None = None
     is_bold: bool = False
+    is_paragraph_break: bool = False
+    markdown_heading_level: int | None = None
 
 
 @dataclass
@@ -46,6 +49,9 @@ class ExtractionResult:
     extraction_tier: str
     pages: list[ExtractedPage]
     quality_signals: dict[str, object]
+    converter_name: str | None = None
+    converter_version: str | None = None
+    extraction_decision: str | None = None
     error: str | None = None
 
 
@@ -150,22 +156,50 @@ class ParserHandler(ABC):
         quality_signals = self._build_quality_signals(text)
         return bool(quality_signals["is_sparse"])
 
-    def _build_failure_result(self, error: str) -> ExtractionResult:
+    def _build_failure_result(
+        self,
+        error: str,
+        *,
+        converter_name: str | None = None,
+        converter_version: str | None = None,
+        extraction_decision: str | None = None,
+    ) -> ExtractionResult:
         return ExtractionResult(
             text="",
             extraction_tier=self.extraction_tier,
             pages=[],
             quality_signals=self._build_quality_signals(""),
+            converter_name=converter_name,
+            converter_version=converter_version,
+            extraction_decision=extraction_decision,
             error=error,
         )
 
-    def _build_success_result(self, pages: list[ExtractedPage]) -> ExtractionResult:
+    def _build_success_result(
+        self,
+        pages: list[ExtractedPage],
+        *,
+        converter_name: str | None = None,
+        converter_version: str | None = None,
+        extraction_decision: str | None = None,
+    ) -> ExtractionResult:
         text = "\n".join(page.text for page in pages if page.text.strip())
+        quality_signals = self._build_quality_signals(text)
+        quality_signals.update(
+            {
+                "converter_name": converter_name,
+                "converter_version": converter_version,
+                "extraction_decision": extraction_decision,
+            }
+        )
         return ExtractionResult(
             text=text,
             extraction_tier=self.extraction_tier,
             pages=pages,
-            quality_signals=self._build_quality_signals(text),
+            quality_signals=quality_signals,
+            converter_name=converter_name,
+            converter_version=converter_version,
+            extraction_decision=extraction_decision,
         )
 
     def _build_lines_from_text(
@@ -256,6 +290,149 @@ class PdfplumberHandler(ParserHandler):
                     is_bold=has_bold_font(font_names=font_names),
                 )
             )
+
+        return extracted_lines
+
+
+class PyMuPDF4LLMHandler(ParserHandler):
+    """Extract selectable PDF text with PyMuPDF4LLM's modern layout engine."""
+
+    extraction_tier = "pymupdf4llm_native"
+    converter_name = "pymupdf4llm"
+    extraction_decision = "native_text"
+
+    def _extract(self, pdf_bytes: bytes, filename: str) -> ExtractionResult:
+        try:
+            pymupdf4llm_module = get_pymupdf4llm_module()
+            converter_version = str(pymupdf4llm_module.version)
+        except Exception as exc:
+            return self._build_failure_result(
+                error=f"PyMuPDF4LLM is unavailable for {filename}: {exc}",
+                converter_name=self.converter_name,
+                extraction_decision=self.extraction_decision,
+            )
+
+        try:
+            pymupdf_module = get_pymupdf_module()
+            document = pymupdf_module.open(stream=pdf_bytes, filetype="pdf")
+        except Exception as exc:
+            return self._build_failure_result(
+                error=f"PyMuPDF4LLM failed to open {filename}: {exc}",
+                converter_name=self.converter_name,
+                converter_version=converter_version,
+                extraction_decision=self.extraction_decision,
+            )
+
+        try:
+            page_chunks = pymupdf4llm_module.to_markdown(
+                document,
+                page_chunks=True,
+                use_ocr=False,
+                force_ocr=False,
+                show_progress=False,
+                write_images=False,
+                embed_images=False,
+            )
+            pages = self._build_pages(page_chunks=page_chunks)
+        except Exception as exc:
+            return self._build_failure_result(
+                error=f"PyMuPDF4LLM failed to extract text from {filename}: {exc}",
+                converter_name=self.converter_name,
+                converter_version=converter_version,
+                extraction_decision=self.extraction_decision,
+            )
+        finally:
+            document.close()
+
+        return self._build_success_result(
+            pages=pages,
+            converter_name=self.converter_name,
+            converter_version=converter_version,
+            extraction_decision=self.extraction_decision,
+        )
+
+    def _build_pages(self, *, page_chunks: object) -> list[ExtractedPage]:
+        if not isinstance(page_chunks, list):
+            raise TypeError("PyMuPDF4LLM page_chunks output must be a list.")
+
+        pages: list[ExtractedPage] = []
+        for page_index, page_chunk in enumerate(page_chunks):
+            if not isinstance(page_chunk, dict):
+                raise TypeError("PyMuPDF4LLM page chunk must be a mapping.")
+
+            page_text = str(page_chunk.get("text", ""))
+            page_number = self._get_page_number(
+                page_chunk=page_chunk,
+                fallback_page_number=page_index + 1,
+            )
+            pages.append(
+                ExtractedPage(
+                    page_number=page_number,
+                    text=page_text,
+                    lines=self._build_markdown_lines(
+                        text=page_text,
+                        page_number=page_number,
+                    ),
+                )
+            )
+
+        return pages
+
+    def _get_page_number(
+        self,
+        *,
+        page_chunk: dict[object, object],
+        fallback_page_number: int,
+    ) -> int:
+        metadata = page_chunk.get("metadata")
+        if not isinstance(metadata, dict):
+            return fallback_page_number
+
+        page_number = metadata.get("page_number")
+        if not isinstance(page_number, int) or page_number < 1:
+            return fallback_page_number
+
+        return page_number
+
+    def _build_markdown_lines(
+        self,
+        *,
+        text: str,
+        page_number: int,
+    ) -> list[ExtractedLine]:
+        extracted_lines: list[ExtractedLine] = []
+        previous_line_was_break = False
+
+        for raw_line in text.splitlines():
+            clean_line = raw_line.strip()
+            if not clean_line:
+                if extracted_lines and not previous_line_was_break:
+                    extracted_lines.append(
+                        ExtractedLine(
+                            text="",
+                            page_number=page_number,
+                            is_paragraph_break=True,
+                        )
+                    )
+                previous_line_was_break = True
+                continue
+
+            heading_level, line_without_heading = extract_markdown_heading(clean_line)
+            line_without_emphasis, is_bold = strip_markdown_emphasis(
+                line_without_heading
+            )
+            extracted_lines.append(
+                ExtractedLine(
+                    text=line_without_emphasis,
+                    page_number=page_number,
+                    is_bold=is_bold or heading_level is not None,
+                    markdown_heading_level=heading_level,
+                )
+            )
+            previous_line_was_break = False
+
+        while extracted_lines and extracted_lines[-1].is_paragraph_break:
+            extracted_lines.pop()
 
         return extracted_lines
 
@@ -400,7 +577,33 @@ def get_pdfplumber_module() -> Any:
 
 
 def get_pymupdf_module() -> Any:
-    return importlib.import_module("fitz")
+    return importlib.import_module("pymupdf")
+
+
+def get_pymupdf4llm_module() -> Any:
+    return importlib.import_module("pymupdf4llm")
+
+
+def extract_markdown_heading(value: str) -> tuple[int | None, str]:
+    heading_match = re.match(r"^(#{1,6})\s+(.+)$", value)
+    if heading_match is None:
+        return None, value
+
+    return len(heading_match.group(1)), heading_match.group(2).strip()
+
+
+def strip_markdown_emphasis(value: str) -> tuple[str, bool]:
+    clean_value = value.strip()
+    is_bold = False
+
+    while len(clean_value) >= 4 and (
+        (clean_value.startswith("**") and clean_value.endswith("**"))
+        or (clean_value.startswith("__") and clean_value.endswith("__"))
+    ):
+        clean_value = clean_value[2:-2].strip()
+        is_bold = True
+
+    return clean_value, is_bold
 
 
 def has_bold_font(*, font_names: list[str]) -> bool:

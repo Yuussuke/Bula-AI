@@ -40,6 +40,15 @@ class MarkdownRenderer:
         current_markdown_offset = 0
 
         for line_index, extracted_line in enumerate(lines):
+            if extracted_line.is_paragraph_break:
+                if markdown_lines and markdown_lines[-1] != "":
+                    current_markdown_offset = append_markdown_line(
+                        markdown_lines=markdown_lines,
+                        line="",
+                        current_offset=current_markdown_offset,
+                    )
+                continue
+
             if line_index in consumed_continuation_line_indices:
                 continue
 

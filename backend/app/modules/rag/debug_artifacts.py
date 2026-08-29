@@ -15,7 +15,7 @@ from app.modules.rag.schemas import ChunkResult, ChunkingConfig
 
 logger = structlog.get_logger(__name__)
 
-RAG_DEBUG_ARTIFACTS_SCHEMA_VERSION = 1
+RAG_DEBUG_ARTIFACTS_SCHEMA_VERSION = 2
 MAX_DEBUG_ERROR_MESSAGE_LENGTH = 300
 UNSUPPORTED_DEBUG_VALUE = "[unsupported_debug_value]"
 SENSITIVE_METADATA_KEY_FRAGMENTS = (
@@ -235,6 +235,27 @@ class RAGIngestionDebugArtifacts:
             "status": status,
             "extraction_tier": (
                 parse_result.extraction_tier if parse_result is not None else None
+            ),
+            "parser_version": (
+                parse_result.parser_version if parse_result is not None else None
+            ),
+            "converter": {
+                "name": (
+                    parse_result.converter_name if parse_result is not None else None
+                ),
+                "version": (
+                    parse_result.converter_version if parse_result is not None else None
+                ),
+                "extraction_decision": (
+                    parse_result.extraction_decision
+                    if parse_result is not None
+                    else None
+                ),
+            },
+            "cleanup_summary": sanitize_debug_metadata(
+                parse_result.cleanup_summary
+                if parse_result is not None and parse_result.cleanup_summary is not None
+                else {}
             ),
             "section_count": len(parse_result.sections) if parse_result else 0,
             "chunk_count": len(chunk_result.chunks) if chunk_result else 0,

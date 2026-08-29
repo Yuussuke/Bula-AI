@@ -32,6 +32,11 @@ def build_parse_result() -> ParseResult:
         sections=["Posologia"],
         extraction_tier="fake",
         success=True,
+        parser_version="native_markdown_v1",
+        converter_name="pymupdf4llm",
+        converter_version="test-converter-version",
+        extraction_decision="native_text",
+        cleanup_summary={"removed_page_number_count": 2},
     )
 
 
@@ -116,6 +121,13 @@ async def test_enabled_debug_artifacts_write_manifest_markdown_and_chunks() -> N
     assert manifest["run_id"] == "run-1"
     assert datetime.fromisoformat(manifest["created_at"]).tzinfo is not None
     assert manifest["status"] == "success"
+    assert manifest["parser_version"] == "native_markdown_v1"
+    assert manifest["converter"] == {
+        "name": "pymupdf4llm",
+        "version": "test-converter-version",
+        "extraction_decision": "native_text",
+    }
+    assert manifest["cleanup_summary"] == {"removed_page_number_count": 2}
     assert manifest["artifacts"] == {
         "manifest": "manifest.json",
         "parsed_markdown": "parsed_markdown.md",

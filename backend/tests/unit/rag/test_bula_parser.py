@@ -179,8 +179,8 @@ async def test_parser_returns_failure_when_all_tiers_are_sparse() -> None:
 
 @pytest.mark.anyio
 async def test_parser_converts_text_pdf_to_structured_markdown() -> None:
-    pdf_bytes = build_text_pdf(
-        [
+    extracted_text = "\n".join(
+        (
             "IDENTIFICACAO DO MEDICAMENTO",
             "DIPIRONA SODICA",
             "Registrado por: Exemplo Farmaceutica S.A.",
@@ -190,20 +190,30 @@ async def test_parser_converts_text_pdf_to_structured_markdown() -> None:
             "Este medicamento e indicado para dor e febre.",
             "POSOLOGIA E MODO DE USAR",
             "Use conforme orientacao da bula e do profissional de saude.",
-        ]
+        )
     )
-    parser = BulaParser()
+    extraction_result = build_extraction_result(
+        text=extracted_text,
+        extraction_tier="pymupdf4llm_native",
+        is_sparse=False,
+    )
+    extraction_result.converter_name = "pymupdf4llm"
+    extraction_result.converter_version = "test-version"
+    extraction_result.extraction_decision = "native_text"
+    parser = BulaParser(first_handler=StaticHandler(extraction_result))
 
-    result = await parser.parse(pdf_bytes=pdf_bytes, filename="dipirona.pdf")
+    result = await parser.parse(pdf_bytes=b"%PDF-1.4", filename="dipirona.pdf")
 
     assert result.success is True
     assert result.markdown
-    assert result.extraction_tier == "pdfplumber"
-    assert "## IDENTIFICACAO DO MEDICAMENTO" in result.markdown
+    assert result.extraction_tier == "pymupdf4llm_native"
+    assert result.converter_name == "pymupdf4llm"
+    assert result.extraction_decision == "native_text"
+    assert "## IDENTIFICACAO DO MEDICAMENTO" not in result.markdown
+    assert 'product: "DIPIRONA SODICA"' in result.markdown
     assert "## COMPOSICAO" in result.markdown
     assert "## POSOLOGIA E MODO DE USAR" in result.markdown
     assert result.sections == [
-        "IDENTIFICACAO DO MEDICAMENTO",
         "COMPOSICAO",
         "INDICACOES",
         "POSOLOGIA E MODO DE USAR",
@@ -212,6 +222,28 @@ async def test_parser_converts_text_pdf_to_structured_markdown() -> None:
     assert result.metadata["manufacturer"] == "Exemplo Farmaceutica S.A."
     assert result.metadata["sections_present"] == result.sections
     assert isinstance(result.metadata["section_metadata"], list)
+
+
+@pytest.mark.anyio
+async def test_default_parser_uses_modern_native_converter() -> None:
+    pdf_bytes = build_text_pdf(
+        [
+            "COMPOSICAO",
+            "Cada comprimido contem dipirona sodica monoidratada.",
+            "INDICACOES",
+            "Este medicamento e indicado para dor e febre.",
+            "POSOLOGIA E MODO DE USAR",
+            "Use conforme orientacao da bula e do profissional de saude.",
+        ]
+    )
+
+    result = await BulaParser().parse(pdf_bytes=pdf_bytes, filename="dipirona.pdf")
+
+    assert result.success is True
+    assert result.extraction_tier == "pymupdf4llm_native"
+    assert result.converter_name == "pymupdf4llm"
+    assert result.converter_version is not None
+    assert result.extraction_decision == "native_text"
 
 
 def test_get_parser_returns_bula_parser() -> None:
@@ -775,23 +807,24 @@ def test_metadata_extractor_keeps_existing_metadata_shape() -> None:
         quality_signals=quality_signals,
     )
 
-    assert metadata == {
-        "drug_name": "DIPIRONA SODICA",
-        "drug_name_source": "text",
-        "manufacturer": "Exemplo Farmaceutica S.A.",
-        "sections_present": ["COMPOSICAO"],
-        "section_metadata": [
-            {
-                "title": "COMPOSICAO",
-                "canonical_title": "Composicao",
-                "level": 2,
-                "page_number": 1,
-                "char_start": 0,
-                "char_end": 42,
-            }
-        ],
-        "quality_signals": quality_signals,
-    }
+    assert metadata["drug_name"] == "DIPIRONA SODICA"
+    assert metadata["drug_name_source"] == "text"
+    assert metadata["manufacturer"] == "Exemplo Farmaceutica S.A."
+    assert metadata["front_matter"] == {}
+    assert metadata["parser_version"] is None
+    assert metadata["cleanup_summary"] == {}
+    assert metadata["sections_present"] == ["COMPOSICAO"]
+    assert metadata["section_metadata"] == [
+        {
+            "title": "COMPOSICAO",
+            "canonical_title": "Composicao",
+            "level": 2,
+            "page_number": 1,
+            "char_start": 0,
+            "char_end": 42,
+        }
+    ]
+    assert metadata["quality_signals"] == quality_signals
 
 
 def test_metadata_extractor_uses_filename_as_low_priority_drug_name() -> None:
@@ -812,3 +845,34 @@ def test_metadata_extractor_uses_filename_as_low_priority_drug_name() -> None:
     assert metadata["drug_name"] == "bula dipirona sodica"
     assert metadata["drug_name_source"] == "filename_best_effort"
     assert metadata["manufacturer"] is None
+
+
+@pytest.mark.parametrize(
+    ("marker_line", "following_lines"),
+    [
+        ("REGISTRADO POR: EMPRESA", ["Sanofi Medley Farmacêutica Ltda."]),
+        ("REGISTRADO POR:", ["EMPRESA:", "Sanofi Medley Farmacêutica Ltda."]),
+    ],
+)
+def test_metadata_extractor_skips_manufacturer_placeholders(
+    marker_line: str,
+    following_lines: list[str],
+) -> None:
+    lines = [
+        ExtractedLine(text=marker_line, page_number=1),
+        *[
+            ExtractedLine(text=following_line, page_number=1)
+            for following_line in following_lines
+        ],
+    ]
+
+    metadata = MetadataExtractor().extract(
+        lines=lines,
+        filename="dipirona.pdf",
+        markdown_sections=[],
+        detected_sections=[],
+        quality_signals={},
+        front_matter={"manufacturer": "EMPRESA"},
+    )
+
+    assert metadata["manufacturer"] == "Sanofi Medley Farmacêutica Ltda."
