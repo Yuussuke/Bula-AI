@@ -6,12 +6,14 @@ import argparse
 import asyncio
 from collections import Counter
 from collections.abc import Sequence
+from dataclasses import dataclass
 import hashlib
 import json
 from pathlib import Path
 import re
 import subprocess
 import sys
+import tempfile
 import time
 from typing import Literal
 
@@ -40,6 +42,17 @@ DOSAGE_SIGNAL_PATTERN = re.compile(
 HEADING_PATTERN = re.compile(r"^#{1,6}\s+", re.MULTILINE)
 PAGE_NUMBER_PATTERN = re.compile(r"^\s*\d{1,3}\s*$", re.MULTILINE)
 DEFAULT_OUTPUT_PATH = Path("tmp/parser-benchmark/results.json")
+
+
+@dataclass(frozen=True)
+class MeasuredProcessResult:
+    """Captured worker output and resource measurements."""
+
+    return_code: int
+    stdout: str
+    stderr: str
+    peak_process_tree_rss_bytes: int
+    wall_time_seconds: float
 
 
 class PassthroughDocumentCleaner(BulaDocumentCleaner):
@@ -230,39 +243,59 @@ def run_measured_worker(
         "--worker-output",
         str(worker_output_path.resolve()),
     ]
-    started_at = time.perf_counter()
-    process = subprocess.Popen(
-        command,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=True,
-    )
-    process_handle = psutil.Process(process.pid)
-    peak_process_tree_rss_bytes = 0
-
-    while process.poll() is None:
-        peak_process_tree_rss_bytes = max(
-            peak_process_tree_rss_bytes,
-            get_process_tree_rss_bytes(process_handle),
-        )
-        time.sleep(0.05)
-
-    stdout, stderr = process.communicate()
-    controller_wall_time_seconds = time.perf_counter() - started_at
-    if process.returncode != 0:
+    measured_process = run_process_with_rss_measurement(command)
+    if measured_process.return_code != 0:
         raise RuntimeError(
             f"Benchmark worker failed for {pdf_path.name} ({variant}). "
-            f"stdout={stdout.strip()!r} stderr={stderr.strip()!r}"
+            f"stdout={measured_process.stdout.strip()!r} "
+            f"stderr={measured_process.stderr.strip()!r}"
         )
 
     result = json.loads(worker_output_path.read_text(encoding="utf-8"))
-    result["process_tree_peak_rss_bytes"] = peak_process_tree_rss_bytes
+    result["process_tree_peak_rss_bytes"] = measured_process.peak_process_tree_rss_bytes
     result["controller_wall_time_seconds"] = round(
-        controller_wall_time_seconds,
+        measured_process.wall_time_seconds,
         6,
     )
     worker_output_path.unlink(missing_ok=True)
     return result
+
+
+def run_process_with_rss_measurement(command: Sequence[str]) -> MeasuredProcessResult:
+    """Run a worker without bounded OS pipes blocking verbose child output."""
+    started_at = time.perf_counter()
+    with (
+        tempfile.TemporaryFile(mode="w+", encoding="utf-8") as stdout_file,
+        tempfile.TemporaryFile(mode="w+", encoding="utf-8") as stderr_file,
+    ):
+        process = subprocess.Popen(
+            command,
+            stdout=stdout_file,
+            stderr=stderr_file,
+            text=True,
+        )
+        process_handle = psutil.Process(process.pid)
+        peak_process_tree_rss_bytes = 0
+
+        while process.poll() is None:
+            peak_process_tree_rss_bytes = max(
+                peak_process_tree_rss_bytes,
+                get_process_tree_rss_bytes(process_handle),
+            )
+            time.sleep(0.05)
+
+        return_code = process.wait()
+        wall_time_seconds = time.perf_counter() - started_at
+        stdout_file.seek(0)
+        stderr_file.seek(0)
+
+        return MeasuredProcessResult(
+            return_code=return_code,
+            stdout=stdout_file.read(),
+            stderr=stderr_file.read(),
+            peak_process_tree_rss_bytes=peak_process_tree_rss_bytes,
+            wall_time_seconds=wall_time_seconds,
+        )
 
 
 def get_process_tree_rss_bytes(process: psutil.Process) -> int:

@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from pathlib import Path
+import sys
 
 import pytest
 
 from scripts.benchmark_pdf_markdown import (
     extract_dosage_signals,
     multiset_token_recall,
+    run_process_with_rss_measurement,
     set_recall,
     validate_pdf_paths,
 )
@@ -41,3 +43,23 @@ def test_dosage_recall_does_not_penalize_removed_page_duplicates() -> None:
     )
 
     assert recall == 1.0
+
+
+def test_worker_measurement_drains_large_stdout_and_stderr_without_hanging() -> None:
+    output_size_bytes = 2 * 1024 * 1024
+    command = [
+        sys.executable,
+        "-c",
+        (
+            "import sys; "
+            f"sys.stdout.write('o' * {output_size_bytes}); "
+            f"sys.stderr.write('e' * {output_size_bytes})"
+        ),
+    ]
+
+    result = run_process_with_rss_measurement(command)
+
+    assert result.return_code == 0
+    assert len(result.stdout) == output_size_bytes
+    assert len(result.stderr) == output_size_bytes
+    assert result.wall_time_seconds >= 0
