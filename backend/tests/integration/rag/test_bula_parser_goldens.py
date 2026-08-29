@@ -59,6 +59,9 @@ async def test_bula_parser_matches_golden_markdown(fixture: GoldenFixture) -> No
 
     assert result.success is True
 
+    if fixture.name == "dipirona_sanofi_medley_solucao_oral":
+        assert_dipirona_native_markdown_contract(result)
+
     hypothesis_markdown = result.markdown.strip()
     bleu_score = corpus_bleu(
         [hypothesis_markdown],
@@ -81,6 +84,67 @@ async def test_bula_parser_matches_golden_markdown(fixture: GoldenFixture) -> No
         f"token_f1={token_f1:.4f}, combined={combined_score:.4f}. "
         "Thresholds are relaxed parser-regression baselines, not final quality "
         "targets; recalibrate them after intentional reference refreshes."
+    )
+
+
+def assert_dipirona_native_markdown_contract(result: object) -> None:
+    from app.modules.rag.parsers.pdf_parser import ParseResult
+
+    assert isinstance(result, ParseResult)
+    assert result.extraction_tier == "pymupdf4llm_native"
+    assert result.converter_name == "pymupdf4llm"
+    assert result.converter_version is not None
+    assert result.extraction_decision == "native_text"
+    assert result.metadata["manufacturer"] == "Sanofi Medley Farmacêutica Ltda."
+    assert result.metadata["front_matter"] == {
+        "product": "dipirona monoidratada",
+        "manufacturer": "Sanofi Medley Farmacêutica Ltda.",
+        "dosage_form": "Solução oral",
+        "strength": "50 mg/mL",
+        "presentation": "Solução oral 50 mg/mL: frasco com 100 mL + copo medida.",
+        "audience": "USO ORAL. USO ADULTO E PEDIÁTRICO ACIMA DE 3 MESES.",
+    }
+    assert "## dipirona" not in result.markdown
+    assert "## monoidratada" not in result.markdown
+    assert not any(line.strip().isdigit() for line in result.markdown.splitlines())
+    assert "início da ação" in result.markdown
+    assert "sistema imunológico" in result.markdown
+    assert "13,2-22,3 mg/kg" in result.markdown
+    assert (
+        "| Peso (média de idade) | Dose | Solução oral (em mL)* | mg |"
+        in result.markdown
+    )
+    assert (
+        "| 5 a 8 kg (3 a 11 meses) | Dose única | 1,25 a 2,5 | 62,5 a 125 |"
+        in result.markdown
+    )
+    assert (
+        "| 5 a 8 kg (3 a 11 meses) | Dose máxima diária | "
+        "10(4 tomadas x 2,5 mL) | 500 |" in result.markdown
+    )
+
+    section_metadata = result.metadata["section_metadata"]
+    assert isinstance(section_metadata, list)
+    canonical_sections = {
+        section["canonical_title"]
+        for section in section_metadata
+        if isinstance(section, dict)
+    }
+    assert {
+        "Composicao",
+        "Indicacoes",
+        "Contraindicacoes",
+        "Advertencias e precaucoes",
+        "Interacoes medicamentosas",
+        "Armazenamento",
+        "Posologia e modo de usar",
+        "Reacoes adversas",
+        "Superdose",
+    }.issubset(canonical_sections)
+    assert all(
+        isinstance(section.get("page_number"), int)
+        for section in section_metadata
+        if isinstance(section, dict)
     )
 
 
