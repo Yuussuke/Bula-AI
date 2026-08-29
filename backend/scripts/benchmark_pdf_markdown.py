@@ -42,6 +42,7 @@ DOSAGE_SIGNAL_PATTERN = re.compile(
 HEADING_PATTERN = re.compile(r"^#{1,6}\s+", re.MULTILINE)
 PAGE_NUMBER_PATTERN = re.compile(r"^\s*\d{1,3}\s*$", re.MULTILINE)
 DEFAULT_OUTPUT_PATH = Path("tmp/parser-benchmark/results.json")
+PROCESS_INSPECTION_ERRORS = (psutil.NoSuchProcess, psutil.AccessDenied)
 
 
 @dataclass(frozen=True)
@@ -302,14 +303,14 @@ def get_process_tree_rss_bytes(process: psutil.Process) -> int:
     processes = [process]
     try:
         processes.extend(process.children(recursive=True))
-    except psutil.NoSuchProcess, psutil.AccessDenied:
+    except PROCESS_INSPECTION_ERRORS:
         pass
 
     total_rss_bytes = 0
     for current_process in processes:
         try:
             total_rss_bytes += current_process.memory_info().rss
-        except psutil.NoSuchProcess, psutil.AccessDenied:
+        except PROCESS_INSPECTION_ERRORS:
             continue
     return total_rss_bytes
 
