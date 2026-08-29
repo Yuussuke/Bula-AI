@@ -1,5 +1,5 @@
-from datetime import UTC, datetime
 import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -8,7 +8,6 @@ from pydantic import ValidationError
 from app.modules.bulas.schemas import (
     SystemBulaManifest,
     SystemBulaManifestEntry,
-    SystemBulaManifestReview,
 )
 from app.scripts.seed_system_bulas import (
     SeedArguments,
@@ -22,17 +21,7 @@ def build_manifest_entry(
     *,
     content: bytes,
     filename: str = "dipirona.pdf",
-    is_approved: bool = True,
 ) -> SystemBulaManifestEntry:
-    review = (
-        SystemBulaManifestReview(
-            status="approved",
-            reviewed_by="reviewer@example.com",
-            reviewed_at=datetime.now(UTC),
-        )
-        if is_approved
-        else SystemBulaManifestReview()
-    )
     return SystemBulaManifestEntry(
         target_id="dipirona-500mg-tablet",
         active_ingredient="dipirona monoidratada",
@@ -60,7 +49,6 @@ def build_manifest_entry(
         filename=filename,
         sha256_checksum=hashlib.sha256(content).hexdigest(),
         content_size_bytes=len(content),
-        review=review,
     )
 
 
@@ -74,7 +62,9 @@ def build_arguments(tmp_path: Path) -> SeedArguments:
     )
 
 
-def test_load_seed_candidates_reads_human_approved_pdf(tmp_path: Path) -> None:
+def test_load_seed_candidates_reads_operator_selected_pdf_without_review(
+    tmp_path: Path,
+) -> None:
     pdf_content = build_pdf_bytes("Dipirona 500 mg comprimido")
     pdf_path = tmp_path / "dipirona.pdf"
     pdf_path.write_bytes(pdf_content)
@@ -91,18 +81,41 @@ def test_load_seed_candidates_reads_human_approved_pdf(tmp_path: Path) -> None:
     assert candidates[0].manifest_entry.product_name == "DIPIRONA"
 
 
-def test_load_seed_candidates_rejects_pending_review(tmp_path: Path) -> None:
+@pytest.mark.parametrize("review_status", ["pending", "approved"])
+def test_load_seed_candidates_ignores_legacy_review_metadata(
+    tmp_path: Path,
+    review_status: str,
+) -> None:
     pdf_content = build_pdf_bytes("Dipirona 500 mg comprimido")
     (tmp_path / "dipirona.pdf").write_bytes(pdf_content)
-    manifest = SystemBulaManifest(
-        documents=[build_manifest_entry(content=pdf_content, is_approved=False)]
+    manifest = SystemBulaManifest(documents=[build_manifest_entry(content=pdf_content)])
+    manifest_payload = manifest.model_dump(mode="json")
+    manifest_payload["documents"][0]["review"] = {
+        "status": review_status,
+        "reviewed_by": "legacy-reviewer@example.com",
+        "reviewed_at": "2026-08-26T21:00:00Z",
+    }
+    (tmp_path / "manifest.json").write_text(
+        json.dumps(manifest_payload),
+        encoding="utf-8",
     )
+
+    candidates = load_seed_candidates(build_arguments(tmp_path))
+
+    assert len(candidates) == 1
+    assert candidates[0].content == pdf_content
+    assert "review" not in candidates[0].manifest_entry.model_dump()
+
+
+def test_load_seed_candidates_rejects_missing_pdf(tmp_path: Path) -> None:
+    pdf_content = build_pdf_bytes("Dipirona 500 mg comprimido")
+    manifest = SystemBulaManifest(documents=[build_manifest_entry(content=pdf_content)])
     (tmp_path / "manifest.json").write_text(
         manifest.model_dump_json(),
         encoding="utf-8",
     )
 
-    with pytest.raises(ValueError, match="human-approved"):
+    with pytest.raises(FileNotFoundError):
         load_seed_candidates(build_arguments(tmp_path))
 
 

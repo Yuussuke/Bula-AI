@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Download explicitly reviewed ANVISA leaflet targets with auditable provenance."""
+"""Download explicitly pinned ANVISA leaflet targets with auditable provenance."""
 
 from __future__ import annotations
 
@@ -24,7 +24,6 @@ from app.modules.bulas.helpers import InvalidPdfError, validate_pdf_bytes
 from app.modules.bulas.schemas import (
     SystemBulaManifest,
     SystemBulaManifestEntry,
-    SystemBulaManifestReview,
 )
 
 logging.basicConfig(
@@ -357,7 +356,6 @@ class AnvisaBulaDownloader:
                 record=record,
                 filename=filename,
                 pdf_bytes=pdf_bytes,
-                review=SystemBulaManifestReview(),
             ),
             file_path=file_path,
             was_reused=False,
@@ -536,7 +534,6 @@ class AnvisaBulaDownloader:
         record: AnvisaBulaRecord,
         filename: str,
         pdf_bytes: bytes,
-        review: SystemBulaManifestReview,
     ) -> SystemBulaManifestEntry:
         return SystemBulaManifestEntry(
             target_id=target.target_id,
@@ -563,7 +560,6 @@ class AnvisaBulaDownloader:
             filename=filename,
             sha256_checksum=hashlib.sha256(pdf_bytes).hexdigest(),
             content_size_bytes=len(pdf_bytes),
-            review=review,
         )
 
     def _build_filename(self, *, target: AnvisaBulaTarget) -> str:
@@ -622,7 +618,7 @@ def positive_integer(value: str) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Download exact, reviewed public leaflet targets from ANVISA.",
+        description="Download exact, pinned public leaflet targets from ANVISA.",
     )
     parser.add_argument("--proxy", help="Optional HTTP or SOCKS5 proxy URL.")
     parser.add_argument(

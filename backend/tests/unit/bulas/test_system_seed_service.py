@@ -1,5 +1,4 @@
 import hashlib
-from datetime import UTC, datetime
 from unittest.mock import AsyncMock, Mock
 from uuid import UUID
 
@@ -7,11 +6,7 @@ import pytest
 
 from app.modules.auth.models import UserRole
 from app.modules.bulas.models import BulaCorpus
-from app.modules.bulas.schemas import (
-    SystemBulaManifestEntry,
-    SystemBulaManifestReview,
-    SystemBulaSeedCandidate,
-)
+from app.modules.bulas.schemas import SystemBulaManifestEntry, SystemBulaSeedCandidate
 from app.modules.bulas.service import (
     SystemBulaSeedConfigurationError,
     SystemBulaSeedService,
@@ -49,11 +44,6 @@ def build_candidate(*, content: bytes = PDF_CONTENT) -> SystemBulaSeedCandidate:
             filename="dipirona.pdf",
             sha256_checksum=hashlib.sha256(content).hexdigest(),
             content_size_bytes=len(content),
-            review=SystemBulaManifestReview(
-                status="approved",
-                reviewed_by="reviewer@example.com",
-                reviewed_at=datetime.now(UTC),
-            ),
         ),
         content=content,
     )
@@ -206,6 +196,42 @@ async def test_seed_reports_invalid_checksum_and_continues() -> None:
     assert summary.failed == 1
     assert summary.failures[0].filename == "dipirona.pdf"
     assert "checksum" in summary.failures[0].reason.lower()
+    storage.find_by_sha256_checksum.assert_not_awaited()
+    bulas.create_bula.assert_not_awaited()
+    queue.enqueue_bula_ingestion.assert_not_awaited()
+
+
+@pytest.mark.anyio
+async def test_seed_rejects_malformed_pdf_before_queue_side_effect() -> None:
+    candidate = build_candidate(content=b"%PDF-1.4 incomplete")
+    service, _, bulas, storage, queue = build_seed_service()
+
+    summary = await service.seed_documents(
+        admin_email="admin@example.com",
+        candidates=[candidate],
+        is_dry_run=False,
+    )
+
+    assert summary.failed == 1
+    storage.find_by_sha256_checksum.assert_not_awaited()
+    bulas.create_bula.assert_not_awaited()
+    queue.enqueue_bula_ingestion.assert_not_awaited()
+
+
+@pytest.mark.anyio
+async def test_seed_rejects_size_mismatch_before_queue_side_effect() -> None:
+    candidate = build_candidate()
+    candidate.manifest_entry.content_size_bytes += 1
+    service, _, bulas, storage, queue = build_seed_service()
+
+    summary = await service.seed_documents(
+        admin_email="admin@example.com",
+        candidates=[candidate],
+        is_dry_run=False,
+    )
+
+    assert summary.failed == 1
+    assert "size" in summary.failures[0].reason.lower()
     storage.find_by_sha256_checksum.assert_not_awaited()
     bulas.create_bula.assert_not_awaited()
     queue.enqueue_bula_ingestion.assert_not_awaited()

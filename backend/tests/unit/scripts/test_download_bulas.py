@@ -1,5 +1,4 @@
 import base64
-from datetime import UTC, datetime
 import hashlib
 import json
 from pathlib import Path
@@ -10,11 +9,7 @@ import pytest
 from playwright.async_api import Page
 from pydantic import ValidationError
 
-from app.modules.bulas.schemas import (
-    SystemBulaManifest,
-    SystemBulaManifestEntry,
-    SystemBulaManifestReview,
-)
+from app.modules.bulas.schemas import SystemBulaManifest, SystemBulaManifestEntry
 from scripts import download_bulas
 from scripts.download_bulas import (
     AnvisaBulaDownloader,
@@ -96,26 +91,6 @@ def build_downloader(tmp_path: Path) -> AnvisaBulaDownloader:
     )
 
 
-def approve_manifest(manifest_path: Path) -> None:
-    manifest = SystemBulaManifest.model_validate_json(
-        manifest_path.read_text(encoding="utf-8")
-    )
-    approved_document = manifest.documents[0].model_copy(
-        update={
-            "review": SystemBulaManifestReview(
-                status="approved",
-                reviewed_by="reviewer@example.com",
-                reviewed_at=datetime.now(UTC),
-            )
-        }
-    )
-    approved_manifest = SystemBulaManifest(documents=[approved_document])
-    manifest_path.write_text(
-        approved_manifest.model_dump_json(indent=2),
-        encoding="utf-8",
-    )
-
-
 @pytest.mark.anyio
 async def test_downloader_selects_exact_record_among_same_manufacturer_results(
     tmp_path: Path,
@@ -144,7 +119,7 @@ async def test_downloader_selects_exact_record_among_same_manufacturer_results(
     assert result.was_reused is False
     assert result.manifest_entry.source_record_id == "111"
     assert result.manifest_entry.registration_number == "123456789"
-    assert result.manifest_entry.review.status == "pending"
+    assert "review" not in result.manifest_entry.model_dump()
     assert result.file_path.name == "dipirona-500mg-tablet__111__patient.pdf"
     assert result.file_path.read_bytes() == pdf_content
     assert not result.file_path.with_suffix(".pdf.part").exists()
@@ -166,7 +141,6 @@ async def test_downloader_reuses_only_manifest_verified_pdf(
         AsyncMock(return_value=pdf_content),
     )
     await initial_downloader.download_targets([target])
-    approve_manifest(tmp_path / "manifest.json")
 
     downloader = build_downloader(tmp_path)
     downloader.fetch_all_results = AsyncMock(return_value=[record])
@@ -177,7 +151,6 @@ async def test_downloader_reuses_only_manifest_verified_pdf(
     result = results[target.target_id]
     assert result is not None
     assert result.was_reused is True
-    assert result.manifest_entry.review.status == "approved"
     assert (
         result.manifest_entry.sha256_checksum == hashlib.sha256(pdf_content).hexdigest()
     )
@@ -185,7 +158,7 @@ async def test_downloader_reuses_only_manifest_verified_pdf(
 
 
 @pytest.mark.anyio
-async def test_changed_source_id_forces_fresh_download_and_pending_review(
+async def test_changed_source_id_forces_fresh_download(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -200,7 +173,6 @@ async def test_changed_source_id_forces_fresh_download_and_pending_review(
         AsyncMock(return_value=old_pdf),
     )
     await downloader.download_targets([old_target])
-    approve_manifest(tmp_path / "manifest.json")
 
     new_target = build_target(source_record_id="222")
     new_record = build_record(source_record_id="222")
@@ -216,7 +188,6 @@ async def test_changed_source_id_forces_fresh_download_and_pending_review(
     assert result is not None
     assert result.was_reused is False
     assert result.manifest_entry.source_record_id == "222"
-    assert result.manifest_entry.review.status == "pending"
     assert (
         len(
             SystemBulaManifest.model_validate_json(
@@ -294,6 +265,26 @@ async def test_ambiguous_duplicate_api_records_are_rejected(
     downloader = build_downloader(tmp_path)
     record = build_record()
     downloader.fetch_all_results = AsyncMock(return_value=[record, record])
+    download_mock = AsyncMock()
+    monkeypatch.setattr(download_bulas, "browser_pdf", download_mock)
+
+    result = (await downloader.download_targets([build_target()]))[
+        "dipirona-500mg-tablet"
+    ]
+
+    assert result is None
+    download_mock.assert_not_awaited()
+
+
+@pytest.mark.anyio
+async def test_source_record_mismatch_is_rejected(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    downloader = build_downloader(tmp_path)
+    downloader.fetch_all_results = AsyncMock(
+        return_value=[build_record(source_record_id="222")]
+    )
     download_mock = AsyncMock()
     monkeypatch.setattr(download_bulas, "browser_pdf", download_mock)
 
