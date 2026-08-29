@@ -34,7 +34,7 @@ def build_parse_result() -> ParseResult:
         success=True,
         parser_version="native_markdown_v1",
         converter_name="pymupdf4llm",
-        converter_version="1.27.2.3",
+        converter_version="test-converter-version",
         extraction_decision="native_text",
         cleanup_summary={"removed_page_number_count": 2},
     )
@@ -124,7 +124,7 @@ async def test_enabled_debug_artifacts_write_manifest_markdown_and_chunks() -> N
     assert manifest["parser_version"] == "native_markdown_v1"
     assert manifest["converter"] == {
         "name": "pymupdf4llm",
-        "version": "1.27.2.3",
+        "version": "test-converter-version",
         "extraction_decision": "native_text",
     }
     assert manifest["cleanup_summary"] == {"removed_page_number_count": 2}
