@@ -160,7 +160,8 @@ class SectionDetector:
         lines: list[ExtractedLine],
         current_line_index: int,
     ) -> ExtractedLine | None:
-        for next_line in lines[current_line_index + 1 :]:
+        for next_line_index in range(current_line_index + 1, len(lines)):
+            next_line = lines[next_line_index]
             if next_line.text.strip():
                 return next_line
 
