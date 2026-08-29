@@ -84,7 +84,10 @@ SECTION_DEFINITIONS = (
     ),
     SectionDefinition(
         canonical_title="Interacoes medicamentosas",
-        keywords=("INTERACOES MEDICAMENTOSAS",),
+        keywords=(
+            "INTERACOES MEDICAMENTOSAS",
+            "ESTE MEDICAMENTO PODE INTERAGIR",
+        ),
     ),
     SectionDefinition(
         canonical_title="Reacoes adversas",
@@ -106,7 +109,15 @@ SECTION_DEFINITIONS = (
         canonical_title="Armazenamento",
         keywords=(
             "ARMAZENAMENTO",
+            "CUIDADOS DE ARMAZENAMENTO",
             "ONDE COMO E POR QUANTO TEMPO",
+        ),
+    ),
+    SectionDefinition(
+        canonical_title="Superdose",
+        keywords=(
+            "SUPERDOSE",
+            "O QUE FAZER SE ALGUEM USAR UMA QUANTIDADE MAIOR",
         ),
     ),
 )
@@ -118,7 +129,10 @@ class SectionDetector:
         detected_sections: list[DetectedSection] = []
 
         for line_index, extracted_line in enumerate(lines):
-            next_line = lines[line_index + 1] if line_index + 1 < len(lines) else None
+            next_line = self._get_next_content_line(
+                lines=lines,
+                current_line_index=line_index,
+            )
             section_candidate = self._detect_section_candidate(
                 extracted_line=extracted_line,
                 next_line=next_line,
@@ -139,6 +153,18 @@ class SectionDetector:
             )
 
         return self._merge_adjacent_wrapped_heading_sections(detected_sections)
+
+    def _get_next_content_line(
+        self,
+        *,
+        lines: list[ExtractedLine],
+        current_line_index: int,
+    ) -> ExtractedLine | None:
+        for next_line in lines[current_line_index + 1 :]:
+            if next_line.text.strip():
+                return next_line
+
+        return None
 
     def _merge_adjacent_wrapped_heading_sections(
         self,

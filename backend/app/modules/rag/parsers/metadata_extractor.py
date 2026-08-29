@@ -18,16 +18,34 @@ class MetadataExtractor:
         markdown_sections: list[str],
         detected_sections: list[DetectedSection],
         quality_signals: dict[str, object],
+        front_matter: dict[str, str] | None = None,
+        parser_version: str | None = None,
+        cleanup_summary: dict[str, object] | None = None,
     ) -> dict[str, object]:
-        drug_name, drug_name_source = self._extract_drug_name(
-            extracted_lines=lines,
-            filename=filename,
-        )
+        safe_front_matter = front_matter or {}
+        front_matter_product = safe_front_matter.get("product")
+        drug_name: str | None
+        drug_name_source: str | None
+        if front_matter_product is not None:
+            drug_name = front_matter_product
+            drug_name_source = "front_matter"
+        else:
+            drug_name, drug_name_source = self._extract_drug_name(
+                extracted_lines=lines,
+                filename=filename,
+            )
+
+        manufacturer = safe_front_matter.get("manufacturer")
+        if manufacturer is None:
+            manufacturer = self._extract_manufacturer(lines)
 
         return {
             "drug_name": drug_name,
             "drug_name_source": drug_name_source,
-            "manufacturer": self._extract_manufacturer(lines),
+            "manufacturer": manufacturer,
+            "front_matter": safe_front_matter,
+            "parser_version": parser_version,
+            "cleanup_summary": cleanup_summary or {},
             "sections_present": markdown_sections,
             "section_metadata": [
                 {
@@ -94,7 +112,8 @@ class MetadataExtractor:
             "REGISTRADO POR",
             "FABRICADO POR",
             "DETENTOR DO REGISTRO",
-            "EMPRESA",
+            "TITULAR DO REGISTRO",
+            "IMPORTADO POR",
         )
 
         for index, extracted_line in enumerate(extracted_lines):

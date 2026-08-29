@@ -4,6 +4,7 @@ from app.modules.rag.parsers.handlers import (
     ExtractionResult,
     ParserHandler,
     PdfplumberHandler,
+    PyMuPDF4LLMHandler,
     PyMuPDFHandler,
 )
 from app.modules.rag.parsers.markdown_renderer import (
@@ -30,6 +31,7 @@ __all__ = [
     "ParseResult",
     "ParserHandler",
     "PdfplumberHandler",
+    "PyMuPDF4LLMHandler",
     "PyMuPDFHandler",
     "SectionDetector",
 ]
