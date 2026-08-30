@@ -225,14 +225,50 @@ source-token budget for a combined request, while
 `PROCESSING_CHUNK_BATCH_MAX_SECTIONS` limits response complexity. A section that
 already exceeds the token budget remains a standalone request. Set
 `PROCESSING_CHUNK_BATCH_ENABLED=false` to compare against the legacy
-one-section-per-request behavior. If both batch models fail validation, the
-worker retries each section through the existing primary, fallback, and
-heuristic flow.
+one-section-per-request behavior.
+
+The model only proposes source-text boundaries. Before any chunk can reach the
+embedding stage, the worker normalizes whitespace, reconstructs source spans,
+and requires complete ordered coverage exactly once for every section. Chunk
+titles come from the nearest validated Markdown heading, never from model
+output. Unknown text, omissions, duplicate/reordered/overlapping spans, strict
+JSON failures, truncation, provider errors, and timeouts all route directly to
+the local deterministic Markdown splitter. There is no secondary semantic
+model in this recovery path.
+
+The deterministic splitter keeps Markdown tables and bullet items together
+when they fit. Oversized tables split between rows with their header repeated;
+oversized lists split between items. `PROCESSING_CHUNK_MAX_TOKENS` remains the
+absolute final chunk limit, and no text is truncated to meet it.
 
 Each OpenRouter chunking request has an explicit timeout configured through
 `OPENROUTER_CHUNK_TIMEOUT_SECONDS` (60 seconds by default). SDK-level retries are
-disabled by default with `OPENROUTER_CHUNK_MAX_RETRIES=0` because the chunker
-already owns the primary, fallback-model, and heuristic recovery policy.
+disabled by default with `OPENROUTER_CHUNK_MAX_RETRIES=0`. The deadline wraps
+only the provider request; validation and deterministic fallback run locally
+outside its cancellation scope. A failed batch falls back section by section in
+the original source order without another provider request.
+
+Semantic chunking defaults to the versioned `retrieval_v3` contract with
+`google/gemini-3.1-flash-lite`, temperature `0`, seed `17`, and a 5,000-token
+output cap. OpenRouter requests require supported parameters, ZDR routing, and
+`data_collection=deny`; prompt/request bodies are never written to logs or
+debug manifests. Model calls run sequentially until a later benchmark justifies
+bounded concurrency. The local deterministic splitter is the only fallback.
+
+Before manually reviewing three or four complete ingestions, compare the new
+default against the former Gemini path on the six focused Dipirona/Amoxicilina
+sections. This command uses the same prompt, request builder, validator,
+fallback, diagnostics, parser, and configured embedding provider as the worker:
+
+```bash
+make benchmark-semantic-chunking
+```
+
+The ignored report at
+`backend/tmp/semantic-chunking-benchmark/results.json` records source validity,
+critical dosage/list preservation, latency, provider-reported usage/cost,
+fallback rate, embedding vector count, and the generated chunks for manual
+inspection. It contains no API key, provider request body, or prompt text.
 
 ### ANVISA system corpus
 
