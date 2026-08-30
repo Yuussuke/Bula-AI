@@ -71,7 +71,6 @@ def build_settings(
     *,
     api_key: str | None = "openrouter-test-key",
     chunk_model: str = "primary-model",
-    chunk_fallback_model: str = "fallback-model",
     require_zdr: bool = True,
 ) -> Settings:
     return Settings(
@@ -79,7 +78,6 @@ def build_settings(
         openrouter=OpenRouterSettings(
             api_key=api_key,
             chunk_model=chunk_model,
-            chunk_fallback_model=chunk_fallback_model,
             require_zdr=require_zdr,
         ),
         processing=ProcessingSettings(
@@ -87,7 +85,6 @@ def build_settings(
             chunk_min_tokens=1,
             chunk_max_tokens=50,
             chunk_overlap_ratio=0.0,
-            chunk_max_concurrency=2,
         ),
     )
 
@@ -126,6 +123,14 @@ def test_openrouter_settings_reads_chunk_request_limits_from_env(
 
     assert openrouter_settings.chunk_timeout_seconds == 30
     assert openrouter_settings.chunk_max_retries == 1
+
+
+def test_chunking_settings_default_to_issue_77_model_and_no_overlap() -> None:
+    openrouter_settings = OpenRouterSettings(_env_file=None)
+    processing_settings = ProcessingSettings(_env_file=None)
+
+    assert openrouter_settings.chunk_model == "google/gemini-3.1-flash-lite"
+    assert processing_settings.chunk_overlap_ratio == 0.0
 
 
 def test_get_embeddings_uses_openrouter_provider(
@@ -391,6 +396,11 @@ def test_get_chunker_returns_bula_chunker_as_base_chunker() -> None:
     assert isinstance(chunker, BulaChunker)
     assert chunker.llm is fake_llm
     assert chunker.config.is_llm_enabled is True
+    assert chunker.config.request_timeout_seconds == 60
+    assert chunker.config.prompt_version == "retrieval_v3"
+    assert chunker.config.seed == 17
+    assert chunker.config.max_output_tokens == 5000
+    assert chunker.config.provider_zdr is True
     assert isinstance(chunker.token_estimator, TiktokenTokenEstimator)
 
 
@@ -437,11 +447,11 @@ def test_get_chunker_rejects_free_primary_model_when_zdr_is_required() -> None:
         get_chunker(llm=fake_llm, settings=settings)
 
 
-def test_get_chunker_rejects_free_fallback_model_when_zdr_is_required() -> None:
+def test_get_chunker_rejects_disabling_zdr_for_semantic_chunking() -> None:
     fake_llm = cast(AsyncOpenAI, FakeOpenAIClient())
-    settings = build_settings(chunk_fallback_model="provider/fallback:free")
+    settings = build_settings(require_zdr=False)
 
-    with pytest.raises(ValueError, match="Free model variants"):
+    with pytest.raises(ValueError, match="requires OpenRouter ZDR"):
         get_chunker(llm=fake_llm, settings=settings)
 
 

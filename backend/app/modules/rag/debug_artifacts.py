@@ -15,7 +15,7 @@ from app.modules.rag.schemas import ChunkResult, ChunkingConfig
 
 logger = structlog.get_logger(__name__)
 
-RAG_DEBUG_ARTIFACTS_SCHEMA_VERSION = 2
+RAG_DEBUG_ARTIFACTS_SCHEMA_VERSION = 4
 MAX_DEBUG_ERROR_MESSAGE_LENGTH = 300
 UNSUPPORTED_DEBUG_VALUE = "[unsupported_debug_value]"
 SENSITIVE_METADATA_KEY_FRAGMENTS = (
@@ -24,6 +24,10 @@ SENSITIVE_METADATA_KEY_FRAGMENTS = (
     "secret",
     "password",
     "authorization",
+    "payload",
+    "prompt",
+    "request_body",
+    "response_body",
     "pdf_bytes",
     "file_bytes",
     "storage_address",
@@ -260,6 +264,17 @@ class RAGIngestionDebugArtifacts:
             "section_count": len(parse_result.sections) if parse_result else 0,
             "chunk_count": len(chunk_result.chunks) if chunk_result else 0,
             "chunk_methods": self._build_chunk_methods(chunk_result=chunk_result),
+            "chunk_validation": self._build_chunk_diagnostic_metadata(
+                chunk_result=chunk_result,
+                metadata_key="validation",
+            ),
+            "chunk_fallback": self._build_chunk_diagnostic_metadata(
+                chunk_result=chunk_result,
+                metadata_key="fallback",
+            ),
+            "semantic_chunking": self._build_semantic_chunking_metadata(
+                chunk_result=chunk_result,
+            ),
             "artifacts_written": artifacts_written,
             "artifacts": artifacts,
             "parser_metadata": sanitize_debug_metadata(
@@ -299,6 +314,21 @@ class RAGIngestionDebugArtifacts:
 
         return sorted({chunk.method for chunk in chunk_result.chunks})
 
+    def _build_chunk_diagnostic_metadata(
+        self,
+        *,
+        chunk_result: ChunkResult | None,
+        metadata_key: str,
+    ) -> dict[str, object]:
+        if chunk_result is None:
+            return {}
+
+        metadata_value = chunk_result.metadata.get(metadata_key)
+        if not isinstance(metadata_value, Mapping):
+            return {}
+
+        return sanitize_debug_metadata(metadata_value)
+
     def _build_chunking_config_metadata(
         self,
         *,
@@ -312,14 +342,138 @@ class RAGIngestionDebugArtifacts:
             "min_tokens": chunking_config.min_tokens,
             "max_tokens": chunking_config.max_tokens,
             "overlap_ratio": chunking_config.overlap_ratio,
-            "max_concurrency": chunking_config.max_concurrency,
             "is_batching_enabled": chunking_config.is_batching_enabled,
             "batch_max_tokens": chunking_config.batch_max_tokens,
             "batch_max_sections": chunking_config.batch_max_sections,
             "model": chunking_config.model,
-            "fallback_model": chunking_config.fallback_model,
+            "prompt_version": chunking_config.prompt_version,
+            "temperature": chunking_config.temperature,
+            "seed": chunking_config.seed,
+            "max_output_tokens": chunking_config.max_output_tokens,
+            "provider": {
+                "zdr": chunking_config.provider_zdr,
+                "data_collection": chunking_config.provider_data_collection,
+                "require_parameters": chunking_config.provider_require_parameters,
+                "allow_fallbacks": chunking_config.provider_allow_fallbacks,
+            },
+            "inference_mode": "sequential",
             "is_llm_enabled": chunking_config.is_llm_enabled,
+            "request_timeout_seconds": chunking_config.request_timeout_seconds,
         }
+
+    def _build_semantic_chunking_metadata(
+        self,
+        *,
+        chunk_result: ChunkResult | None,
+    ) -> dict[str, object]:
+        if chunk_result is None:
+            return {}
+
+        metadata = chunk_result.metadata.get("semantic_chunking")
+        if not isinstance(metadata, Mapping):
+            return {}
+
+        return {
+            "model": self._safe_scalar(metadata.get("model")),
+            "prompt_version": self._safe_scalar(metadata.get("prompt_version")),
+            "temperature": self._safe_scalar(metadata.get("temperature")),
+            "seed": self._safe_scalar(metadata.get("seed")),
+            "max_output_tokens": self._safe_scalar(metadata.get("max_output_tokens")),
+            "provider": self._allowlisted_mapping(
+                metadata.get("provider"),
+                allowed_keys=(
+                    "zdr",
+                    "data_collection",
+                    "require_parameters",
+                    "allow_fallbacks",
+                ),
+            ),
+            "inference_mode": self._safe_scalar(metadata.get("inference_mode")),
+            "request_count": self._safe_scalar(metadata.get("request_count")),
+            "latency_ms": self._allowlisted_mapping(
+                metadata.get("latency_ms"),
+                allowed_keys=("total", "average"),
+            ),
+            "usage": self._allowlisted_mapping(
+                metadata.get("usage"),
+                allowed_keys=(
+                    "prompt_tokens",
+                    "completion_tokens",
+                    "total_tokens",
+                    "cost_usd",
+                ),
+            ),
+            "requests": self._allowlisted_request_diagnostics(metadata.get("requests")),
+        }
+
+    def _allowlisted_request_diagnostics(self, value: object) -> list[object]:
+        if not isinstance(value, Sequence) or isinstance(
+            value, str | bytes | bytearray
+        ):
+            return []
+
+        request_diagnostics: list[object] = []
+        for request in value:
+            if not isinstance(request, Mapping):
+                continue
+
+            request_diagnostics.append(
+                {
+                    "model": self._safe_scalar(request.get("model")),
+                    "prompt_version": self._safe_scalar(request.get("prompt_version")),
+                    "temperature": self._safe_scalar(request.get("temperature")),
+                    "seed": self._safe_scalar(request.get("seed")),
+                    "max_output_tokens": self._safe_scalar(
+                        request.get("max_output_tokens")
+                    ),
+                    "provider": self._allowlisted_mapping(
+                        request.get("provider"),
+                        allowed_keys=(
+                            "zdr",
+                            "data_collection",
+                            "require_parameters",
+                            "allow_fallbacks",
+                        ),
+                    ),
+                    "latency_ms": self._safe_scalar(request.get("latency_ms")),
+                    "usage": self._allowlisted_mapping(
+                        request.get("usage"),
+                        allowed_keys=(
+                            "prompt_tokens",
+                            "completion_tokens",
+                            "total_tokens",
+                            "cost_usd",
+                        ),
+                    ),
+                    "validation_outcome": self._safe_scalar(
+                        request.get("validation_outcome")
+                    ),
+                    "fallback_reason": self._safe_scalar(
+                        request.get("fallback_reason")
+                    ),
+                }
+            )
+        return request_diagnostics
+
+    def _allowlisted_mapping(
+        self,
+        value: object,
+        *,
+        allowed_keys: Sequence[str],
+    ) -> dict[str, object]:
+        if not isinstance(value, Mapping):
+            return {}
+
+        return {
+            key: self._safe_scalar(value.get(key))
+            for key in allowed_keys
+            if key in value
+        }
+
+    def _safe_scalar(self, value: object) -> str | int | float | bool | None:
+        if isinstance(value, str | int | float | bool) or value is None:
+            return value
+        return None
 
     def _serialize_json(self, payload: object) -> str:
         return json.dumps(payload, ensure_ascii=False, indent=2)

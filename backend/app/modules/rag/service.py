@@ -148,6 +148,11 @@ class RAGIngestionService:
                         batch_fallback_count=chunk_result.metadata.get(
                             "batch_fallback_count"
                         ),
+                        chunk_validation=chunk_result.metadata.get("validation"),
+                        chunk_fallback=chunk_result.metadata.get("fallback"),
+                        semantic_chunking=chunk_result.metadata.get(
+                            "semantic_chunking"
+                        ),
                         chunk_count=len(chunk_result.chunks),
                     )
 

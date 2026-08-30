@@ -49,9 +49,63 @@ def build_chunk_result() -> ChunkResult:
         chunk_title="Posologia",
         section_title="Posologia",
         token_estimate=8,
-        method="heuristic",
+        method="deterministic",
     )
-    return ChunkResult(doc_id="doc-1", chunks=[chunk])
+    return ChunkResult(
+        doc_id="doc-1",
+        chunks=[chunk],
+        metadata={
+            "validation": {
+                "passed_section_count": 0,
+                "failed_section_count": 1,
+                "provider_payload": "must not leak",
+            },
+            "fallback": {
+                "count": 1,
+                "reasons": {"invalid_json": 1},
+                "prompt": "must not leak",
+            },
+            "semantic_chunking": {
+                "model": "google/gemini-3.1-flash-lite",
+                "prompt_version": "retrieval_v3",
+                "temperature": 0,
+                "seed": 17,
+                "max_output_tokens": 5000,
+                "provider": {
+                    "zdr": True,
+                    "data_collection": "deny",
+                    "require_parameters": True,
+                    "allow_fallbacks": True,
+                    "request_body": "must not leak",
+                },
+                "inference_mode": "sequential",
+                "request_count": 1,
+                "latency_ms": {"total": 21.5, "average": 21.5},
+                "usage": {
+                    "prompt_tokens": 100,
+                    "completion_tokens": 20,
+                    "total_tokens": 120,
+                    "cost_usd": 0.001,
+                },
+                "requests": [
+                    {
+                        "model": "google/gemini-3.1-flash-lite",
+                        "prompt_version": "retrieval_v3",
+                        "temperature": 0,
+                        "seed": 17,
+                        "max_output_tokens": 5000,
+                        "provider": {"zdr": True},
+                        "latency_ms": 21.5,
+                        "usage": {"total_tokens": 120, "cost_usd": 0.001},
+                        "validation_outcome": "failed",
+                        "fallback_reason": "invalid_json",
+                        "response_body": "must not leak",
+                    }
+                ],
+                "provider_payload": "must not leak",
+            },
+        },
+    )
 
 
 def build_chunking_config() -> ChunkingConfig:
@@ -60,9 +114,7 @@ def build_chunking_config() -> ChunkingConfig:
         min_tokens=200,
         max_tokens=850,
         overlap_ratio=0.12,
-        max_concurrency=4,
         model="primary-model",
-        fallback_model="fallback-model",
         is_llm_enabled=True,
     )
 
@@ -139,10 +191,37 @@ async def test_enabled_debug_artifacts_write_manifest_markdown_and_chunks() -> N
         "manifest",
     ]
     assert manifest["chunks_json_size_bytes"] == len(chunks_path.read_bytes())
-    assert manifest["chunk_methods"] == ["heuristic"]
+    assert manifest["chunk_methods"] == ["deterministic"]
+    assert manifest["chunk_validation"] == {
+        "passed_section_count": 0,
+        "failed_section_count": 1,
+    }
+    assert manifest["chunk_fallback"] == {
+        "count": 1,
+        "reasons": {"invalid_json": 1},
+    }
+    assert manifest["semantic_chunking"]["prompt_version"] == "retrieval_v3"
+    assert manifest["semantic_chunking"]["usage"]["total_tokens"] == 120
+    assert (
+        manifest["semantic_chunking"]["requests"][0]["validation_outcome"] == "failed"
+    )
+    assert "provider_payload" not in manifest["semantic_chunking"]
+    assert "request_body" not in manifest["semantic_chunking"]["provider"]
+    assert "response_body" not in manifest["semantic_chunking"]["requests"][0]
     assert manifest["chunking_config"]["is_batching_enabled"] is True
     assert manifest["chunking_config"]["batch_max_tokens"] == 3000
     assert manifest["chunking_config"]["batch_max_sections"] == 8
+    assert manifest["chunking_config"]["request_timeout_seconds"] == 60
+    assert manifest["chunking_config"]["prompt_version"] == "retrieval_v3"
+    assert manifest["chunking_config"]["seed"] == 17
+    assert manifest["chunking_config"]["max_output_tokens"] == 5000
+    assert manifest["chunking_config"]["provider"] == {
+        "zdr": True,
+        "data_collection": "deny",
+        "require_parameters": True,
+        "allow_fallbacks": True,
+    }
+    assert manifest["chunking_config"]["inference_mode"] == "sequential"
 
 
 @pytest.mark.anyio
@@ -264,6 +343,8 @@ def test_sanitize_debug_metadata_removes_sensitive_and_unsupported_values() -> N
     raw_metadata = {
         "safe": "value",
         "token": "secret",
+        "provider_payload": {"raw": "secret"},
+        "prompt": "source text",
         "nested": {
             "password": "secret",
             "value": 1,

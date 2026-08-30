@@ -24,6 +24,7 @@ backend/tmp/anvisa-bulas/
 backend/tmp/anvisa-bulas-v2/
 backend/tmp/parser-benchmark/
 backend/tmp/parser-benchmark-targets.json
+backend/tmp/semantic-chunking-benchmark/
 
 # Test / coverage artefacts
 .coverage
