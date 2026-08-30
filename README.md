@@ -188,6 +188,9 @@ Main files:
 - Verify PGQueuer objects: `make pgq-verify`
 - Verify PostgreSQL extensions and FTS: `make verify-postgres`
 - Create an admin user: `make create-admin ARGS="--email admin@example.com --full-name 'Admin User'"`
+- Discover ANVISA records: `make download-anvisa-bulas ARGS="--headless --discover Amoxicilina"`
+- Download pinned ANVISA targets: `make download-anvisa-bulas ARGS="--headless --targets scripts/anvisa_targets.json --limit 1"`
+- Preview the system seed: `make seed-system-bulas ARGS="--admin-email admin@example.com --dry-run"`
 - Run tests: `make test`
 - Run tests with coverage: `make test-cov`
 - Lint: `make lint`
@@ -205,13 +208,143 @@ The ingestion worker relies on the Compose restart policy for database listener
 resilience: `docker-compose.yml` runs it with `restart: always` and
 `--shutdown-on-listener-failure`, so a broken PGQueuer listener exits and is
 restarted by the supervisor instead of maintaining custom reconnect logic in the
-application process.
+application process. Jobs left in `picked` state by an interrupted worker become
+eligible for another worker after
+`RAG_INGESTION_STALE_JOB_RETRY_AFTER_SECONDS` (five minutes by default). Active
+jobs send heartbeats and are not reclaimed while they continue processing.
 
 For local or operator debugging, set `RAG_INGESTION_DEBUG=true` and optionally
 `RAG_INGESTION_DEBUG_PATH=tmp/rag-ingestion-debug` before starting the API and
 worker. Each ingestion run writes a manifest, parsed markdown, and chunking
 result artifacts under the configured path. These files can contain parsed bula
 text, so keep the path local/private and inspect warnings with `make logs`.
+
+Small adjacent Markdown sections are grouped into fewer semantic chunking
+requests by default. `PROCESSING_CHUNK_BATCH_MAX_TOKENS` controls the estimated
+source-token budget for a combined request, while
+`PROCESSING_CHUNK_BATCH_MAX_SECTIONS` limits response complexity. A section that
+already exceeds the token budget remains a standalone request. Set
+`PROCESSING_CHUNK_BATCH_ENABLED=false` to compare against the legacy
+one-section-per-request behavior.
+
+The model only proposes source-text boundaries. Before any chunk can reach the
+embedding stage, the worker normalizes whitespace, reconstructs source spans,
+and requires complete ordered coverage exactly once for every section. Chunk
+titles come from the nearest validated Markdown heading, never from model
+output. Unknown text, omissions, duplicate/reordered/overlapping spans, strict
+JSON failures, truncation, provider errors, and timeouts all route directly to
+the local deterministic Markdown splitter. There is no secondary semantic
+model in this recovery path.
+
+The deterministic splitter keeps Markdown tables and bullet items together
+when they fit. Oversized tables split between rows with their header repeated;
+oversized lists split between items. `PROCESSING_CHUNK_MAX_TOKENS` remains the
+absolute final chunk limit, and no text is truncated to meet it.
+
+Each OpenRouter chunking request has an explicit timeout configured through
+`OPENROUTER_CHUNK_TIMEOUT_SECONDS` (60 seconds by default). SDK-level retries are
+disabled by default with `OPENROUTER_CHUNK_MAX_RETRIES=0`. The deadline wraps
+only the provider request; validation and deterministic fallback run locally
+outside its cancellation scope. A failed batch falls back section by section in
+the original source order without another provider request.
+
+Semantic chunking defaults to the versioned `retrieval_v3` contract with
+`google/gemini-3.1-flash-lite`, temperature `0`, seed `17`, and a 5,000-token
+output cap. OpenRouter requests require supported parameters, ZDR routing, and
+`data_collection=deny`; prompt/request bodies are never written to logs or
+debug manifests. Model calls run sequentially until a later benchmark justifies
+bounded concurrency. The local deterministic splitter is the only fallback.
+
+Before manually reviewing three or four complete ingestions, compare the new
+default against the former Gemini path on the six focused Dipirona/Amoxicilina
+sections. This command uses the same prompt, request builder, validator,
+fallback, diagnostics, parser, and configured embedding provider as the worker:
+
+```bash
+make benchmark-semantic-chunking
+```
+
+The ignored report at
+`backend/tmp/semantic-chunking-benchmark/results.json` records source validity,
+critical dosage/list preservation, latency, provider-reported usage/cost,
+fallback rate, embedding vector count, and the generated chunks for manual
+inspection. It contains no API key, provider request body, or prompt text.
+
+### ANVISA system corpus
+
+The system corpus uses an explicit discovery, selection, download, operator
+validation, and seed workflow. The downloader runs on the host because
+Playwright is a development dependency; the seed runs inside the API container.
+
+Install the downloader dependency and its browser once:
+
+```bash
+cd backend
+uv sync --dev
+uv run playwright install chromium
+cd ..
+```
+
+First discover the records returned by ANVISA without downloading a PDF:
+
+```bash
+make download-anvisa-bulas ARGS="--headless --discover Amoxicilina"
+```
+
+Discovery excludes the short-lived protected download tokens. It shows the
+stable patient/professional source record IDs together with the ANVISA product
+ID, registration, process, expedition, transaction, manufacturer, and source
+timestamps. Never select a result using only an active ingredient or the newest
+record from a manufacturer.
+
+The repository contains one pinned candidate in
+`backend/scripts/anvisa_targets.json` for the initial system seed. Verify its
+exact product, strength, pharmaceutical form, presentation, audience, and source
+record in the official Bulário before use. Use
+`backend/scripts/anvisa_targets.example.json` only when adding another target.
+The configured `expected_pdf_terms` must identify the product, strength, and
+form in the selected PDF.
+
+Download only the pinned targets and generate manifest schema version 2:
+
+```bash
+make download-anvisa-bulas ARGS="--headless --targets scripts/anvisa_targets.json --limit 1"
+```
+
+PDFs and the generated manifest are stored in
+`backend/tmp/anvisa-bulas-v2/`, an ignored directory. The separate v2 directory
+keeps legacy schema-version-1 downloads untouched and prevents them from being
+resumed accidentally. Downloads are written to `.pdf.part`, parsed with the
+same 10 MB limit used by uploads, checked for the configured identity terms,
+and atomically moved into place. The manifest is also written atomically.
+
+The manifest records the exact regulatory identity, canonical ANVISA query,
+local filename, byte length, SHA-256 checksum, timestamps, and downloader
+version. A file is reused only when its target and source identity match the
+current result and its parsed bytes match the manifest. Changed sources, missing
+files, checksum mismatches, partial files, corrupt PDFs, duplicate filenames,
+and conflicting source identities are rejected or freshly downloaded. Schema
+version 1 manifests are intentionally rejected. Legacy `review` metadata in a
+schema-version-2 manifest is accepted but ignored.
+
+Running the seed is the administrator's deliberate enqueue action. Before doing
+so, the operator must inspect the selected manifest entry and PDF in the
+official Bulário and confirm the product, strength, pharmaceutical form,
+presentation, audience, manufacturer, registration, and source record. There is
+no separate approval command or review-state edit in the local system-corpus
+workflow.
+
+With the API, worker, database, and queue running, preview one validated entry:
+
+```bash
+make seed-system-bulas ARGS="--admin-email admin@example.com --dry-run --limit 1"
+```
+
+Then execute the same operator-validated seed without `--dry-run`. The owner
+must already be an active administrator. The command parses each PDF, validates
+its size and checksum, creates bulas with `corpus=system`, and enqueues the
+normal `ingest_bula` job. The exact ANVISA product name is stored as the bula
+name and the canonical ANVISA query as its source URL.
 
 ### RAG ingestion observability
 
@@ -233,8 +366,9 @@ Stable fields:
 - Final summary: `ingestion_status`, `total_duration_ms`,
   `stage_durations_ms`, `slowest_stage`, `slowest_stage_duration_ms`.
 - Safe counters/context: `pdf_size_bytes`, `extraction_tier`, `section_count`,
-  `chunk_count`, `embedding_vector_count`, `qdrant_point_count`,
-  `qdrant_collection`, `error_type`.
+  `batch_count`, `model_call_count`, `batch_fallback_count`, `chunk_count`,
+  `embedding_vector_count`, `qdrant_point_count`, `qdrant_collection`,
+  `error_type`.
 
 Example final summary:
 
@@ -267,7 +401,8 @@ To answer "which step dominated this run?", inspect `slowest_stage` first, then
 compare the ordered `stage_durations_ms` object for the full profile. The logs
 intentionally do not include API keys, PDF bytes, parsed markdown, prompts, raw
 model responses, or chunk text. Set `LOG_LEVEL=DEBUG` only when you need
-per-section chunking details such as `rag_section_chunked`.
+per-section or per-batch chunking details such as `rag_section_chunked` and
+`rag_chunking_batch_completed`.
 
 Uploads are intentionally limited to 10 MB. Validation reads the PDF in chunks
 and stops once the configured limit is exceeded; after validation, the current

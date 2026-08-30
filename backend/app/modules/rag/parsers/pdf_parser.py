@@ -2,15 +2,22 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
+from app.modules.rag.parsers.document_cleaner import (
+    BulaDocumentCleaner,
+    render_front_matter,
+)
 from app.modules.rag.parsers.handlers import (
     ExtractedLine,
     ExtractionResult,
     ParserHandler,
-    PdfplumberHandler,
+    PyMuPDF4LLMHandler,
     PyMuPDFHandler,
 )
 from app.modules.rag.parsers.markdown_hygiene import trim_markdown_from_legal_section
-from app.modules.rag.parsers.markdown_renderer import MarkdownRenderer
+from app.modules.rag.parsers.markdown_renderer import (
+    MarkdownBuildResult,
+    MarkdownRenderer,
+)
 from app.modules.rag.parsers.metadata_extractor import MetadataExtractor
 from app.modules.rag.parsers.section_detector import SectionDetector
 
@@ -19,6 +26,7 @@ DEFAULT_FAILURE_ERROR = (
     "No text-based extraction tier produced enough content. "
     "OCR is not enabled in this parsing phase."
 )
+PARSER_VERSION = "native_markdown_v1"
 
 
 @dataclass
@@ -29,6 +37,11 @@ class ParseResult:
     extraction_tier: str
     success: bool
     error: str | None = None
+    parser_version: str = PARSER_VERSION
+    converter_name: str | None = None
+    converter_version: str | None = None
+    extraction_decision: str | None = None
+    cleanup_summary: dict[str, object] | None = None
 
 
 class BulaParser:
@@ -41,12 +54,14 @@ class BulaParser:
         section_detector: SectionDetector | None = None,
         markdown_renderer: MarkdownRenderer | None = None,
         metadata_extractor: MetadataExtractor | None = None,
+        document_cleaner: BulaDocumentCleaner | None = None,
     ) -> None:
         self.ocr_enabled = ocr_enabled
         self.first_handler = first_handler or self._build_default_handler_chain()
         self.section_detector = section_detector or SectionDetector()
         self.markdown_renderer = markdown_renderer or MarkdownRenderer()
         self.metadata_extractor = metadata_extractor or MetadataExtractor()
+        self.document_cleaner = document_cleaner or BulaDocumentCleaner()
 
     async def parse(self, pdf_bytes: bytes, filename: str) -> ParseResult:
         if not pdf_bytes:
@@ -70,11 +85,18 @@ class BulaParser:
                 extraction_tier=extraction_result.extraction_tier,
             )
 
-        extracted_lines = self._collect_lines(extraction_result=extraction_result)
+        cleanup_result = self.document_cleaner.clean(extraction_result.pages)
+        extracted_lines = cleanup_result.lines
+        if not extracted_lines:
+            extracted_lines = self._collect_lines(extraction_result=extraction_result)
         detected_sections = self.section_detector.detect(extracted_lines)
         markdown_result = self.markdown_renderer.render(
             lines=extracted_lines,
             detected_sections=detected_sections,
+        )
+        markdown_result = self._prepend_front_matter(
+            markdown_result=markdown_result,
+            front_matter=cleanup_result.front_matter,
         )
         markdown_result = trim_markdown_from_legal_section(markdown_result)
         metadata = self.metadata_extractor.extract(
@@ -83,6 +105,9 @@ class BulaParser:
             markdown_sections=markdown_result.sections,
             detected_sections=markdown_result.detected_sections,
             quality_signals=extraction_result.quality_signals,
+            front_matter=cleanup_result.front_matter,
+            parser_version=PARSER_VERSION,
+            cleanup_summary=cleanup_result.summary,
         )
 
         return ParseResult(
@@ -91,13 +116,39 @@ class BulaParser:
             sections=markdown_result.sections,
             extraction_tier=extraction_result.extraction_tier,
             success=True,
+            converter_name=extraction_result.converter_name,
+            converter_version=extraction_result.converter_version,
+            extraction_decision=extraction_result.extraction_decision,
+            cleanup_summary=cleanup_result.summary,
         )
 
     def _build_default_handler_chain(self) -> ParserHandler:
-        pdfplumber_handler = PdfplumberHandler()
+        pymupdf4llm_handler = PyMuPDF4LLMHandler()
         pymupdf_handler = PyMuPDFHandler()
-        pdfplumber_handler.set_next(pymupdf_handler)
-        return pdfplumber_handler
+        pymupdf4llm_handler.set_next(pymupdf_handler)
+        return pymupdf4llm_handler
+
+    def _prepend_front_matter(
+        self,
+        *,
+        markdown_result: MarkdownBuildResult,
+        front_matter: dict[str, str],
+    ) -> MarkdownBuildResult:
+        front_matter_markdown = render_front_matter(front_matter)
+        if not front_matter_markdown:
+            return markdown_result
+
+        prefix = f"{front_matter_markdown}\n\n"
+        for section in markdown_result.detected_sections:
+            section.char_start += len(prefix)
+            if section.char_end is not None:
+                section.char_end += len(prefix)
+
+        return MarkdownBuildResult(
+            markdown=f"{prefix}{markdown_result.markdown}",
+            sections=markdown_result.sections,
+            detected_sections=markdown_result.detected_sections,
+        )
 
     def _collect_lines(
         self,

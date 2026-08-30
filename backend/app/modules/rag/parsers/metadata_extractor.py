@@ -10,6 +10,9 @@ from app.modules.rag.parsers.markdown_renderer import normalize_spaces
 from app.modules.rag.parsers.section_detector import DetectedSection
 
 
+MANUFACTURER_PLACEHOLDERS = {"EMPRESA"}
+
+
 class MetadataExtractor:
     def extract(
         self,
@@ -18,16 +21,34 @@ class MetadataExtractor:
         markdown_sections: list[str],
         detected_sections: list[DetectedSection],
         quality_signals: dict[str, object],
+        front_matter: dict[str, str] | None = None,
+        parser_version: str | None = None,
+        cleanup_summary: dict[str, object] | None = None,
     ) -> dict[str, object]:
-        drug_name, drug_name_source = self._extract_drug_name(
-            extracted_lines=lines,
-            filename=filename,
-        )
+        safe_front_matter = front_matter or {}
+        front_matter_product = safe_front_matter.get("product")
+        drug_name: str | None
+        drug_name_source: str | None
+        if front_matter_product is not None:
+            drug_name = front_matter_product
+            drug_name_source = "front_matter"
+        else:
+            drug_name, drug_name_source = self._extract_drug_name(
+                extracted_lines=lines,
+                filename=filename,
+            )
+
+        manufacturer = safe_front_matter.get("manufacturer")
+        if manufacturer is None or is_manufacturer_placeholder(manufacturer):
+            manufacturer = self._extract_manufacturer(lines)
 
         return {
             "drug_name": drug_name,
             "drug_name_source": drug_name_source,
-            "manufacturer": self._extract_manufacturer(lines),
+            "manufacturer": manufacturer,
+            "front_matter": safe_front_matter,
+            "parser_version": parser_version,
+            "cleanup_summary": cleanup_summary or {},
             "sections_present": markdown_sections,
             "section_metadata": [
                 {
@@ -94,7 +115,8 @@ class MetadataExtractor:
             "REGISTRADO POR",
             "FABRICADO POR",
             "DETENTOR DO REGISTRO",
-            "EMPRESA",
+            "TITULAR DO REGISTRO",
+            "IMPORTADO POR",
         )
 
         for index, extracted_line in enumerate(extracted_lines):
@@ -106,10 +128,12 @@ class MetadataExtractor:
                     continue
 
                 manufacturer_after_colon = extract_value_after_colon(clean_line)
-                if manufacturer_after_colon:
+                if manufacturer_after_colon and not is_manufacturer_placeholder(
+                    manufacturer_after_colon
+                ):
                     return manufacturer_after_colon
 
-                next_line = get_next_non_empty_line(
+                next_line = get_next_manufacturer_line(
                     extracted_lines=extracted_lines,
                     start_index=index + 1,
                 )
@@ -130,14 +154,21 @@ def extract_value_after_colon(value: str) -> str | None:
     return possible_value
 
 
-def get_next_non_empty_line(
+def is_manufacturer_placeholder(value: str) -> bool:
+    normalized_value = normalize_for_matching(value).strip()
+    normalized_value_without_colon = normalized_value.rstrip(":").strip()
+    return normalized_value_without_colon in MANUFACTURER_PLACEHOLDERS
+
+
+def get_next_manufacturer_line(
     *,
     extracted_lines: list[ExtractedLine],
     start_index: int,
 ) -> str | None:
-    for extracted_line in extracted_lines[start_index:]:
+    for line_index in range(start_index, len(extracted_lines)):
+        extracted_line = extracted_lines[line_index]
         clean_line = normalize_spaces(extracted_line.text)
-        if clean_line:
+        if clean_line and not is_manufacturer_placeholder(clean_line):
             return clean_line
 
     return None

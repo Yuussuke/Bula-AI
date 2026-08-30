@@ -138,6 +138,8 @@ def get_llm_client(settings: Settings = Depends(get_settings)) -> AsyncOpenAI:
     return AsyncOpenAI(
         base_url=OPENROUTER_BASE_URL,
         api_key=api_key or MISSING_OPENROUTER_API_KEY,
+        timeout=settings.openrouter.chunk_timeout_seconds,
+        max_retries=settings.openrouter.chunk_max_retries,
     )
 
 
@@ -152,10 +154,13 @@ def get_chunker(
         min_tokens=settings.processing.chunk_min_tokens,
         max_tokens=settings.processing.chunk_max_tokens,
         overlap_ratio=settings.processing.chunk_overlap_ratio,
-        max_concurrency=settings.processing.chunk_max_concurrency,
+        is_batching_enabled=settings.processing.chunk_batch_enabled,
+        batch_max_tokens=settings.processing.chunk_batch_max_tokens,
+        batch_max_sections=settings.processing.chunk_batch_max_sections,
         model=settings.openrouter.chunk_model,
-        fallback_model=settings.openrouter.chunk_fallback_model,
+        provider_zdr=settings.openrouter.require_zdr,
         is_llm_enabled=openrouter_api_key is not None,
+        request_timeout_seconds=settings.openrouter.chunk_timeout_seconds,
     )
     return BulaChunker(
         llm=llm,
@@ -236,11 +241,10 @@ def _build_ollama_base_url(*, settings: Settings) -> str:
 
 def _validate_zdr_model_policy(*, settings: Settings) -> None:
     if not settings.openrouter.require_zdr:
-        return
+        raise ValueError("Semantic chunking requires OpenRouter ZDR routing")
 
     has_free_primary_model = _is_free_model(settings.openrouter.chunk_model)
-    has_free_fallback_model = _is_free_model(settings.openrouter.chunk_fallback_model)
-    if has_free_primary_model or has_free_fallback_model:
+    if has_free_primary_model:
         raise ValueError("Free model variants are not allowed when ZDR is required")
 
 

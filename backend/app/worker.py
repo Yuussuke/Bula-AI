@@ -49,6 +49,10 @@ class BulaIngestionRetryExecutor(RetryWithBackoffEntrypointExecutor):
             raise
 
 
+def build_stale_job_retry_timer(*, retry_after_seconds: int) -> timedelta:
+    return timedelta(seconds=retry_after_seconds)
+
+
 @asynccontextmanager
 async def create_worker() -> AsyncIterator[PgQueuer]:
     worker_settings = get_settings()
@@ -71,6 +75,11 @@ async def create_worker() -> AsyncIterator[PgQueuer]:
     @pgq.entrypoint(
         INGEST_BULA_ENTRYPOINT,
         concurrency_limit=2,
+        retry_timer=build_stale_job_retry_timer(
+            retry_after_seconds=(
+                worker_settings.rag_ingestion.stale_job_retry_after_seconds
+            ),
+        ),
         executor_factory=lambda parameters: BulaIngestionRetryExecutor(
             parameters=parameters,
             max_attempts=3,

@@ -86,7 +86,21 @@ class FakeChunker:
     async def chunk_markdown(self, markdown: str, doc_id: str) -> ChunkResult:
         assert markdown.startswith("## Posologia")
         assert doc_id == str(BULA_ID)
-        return ChunkResult(doc_id=doc_id, chunks=self.chunks)
+        return ChunkResult(
+            doc_id=doc_id,
+            chunks=self.chunks,
+            metadata={
+                "section_count": 1,
+                "batch_count": 1,
+                "model_call_count": 1,
+                "batch_fallback_count": 0,
+                "validation": {
+                    "passed_section_count": 1,
+                    "failed_section_count": 0,
+                },
+                "fallback": {"count": 0, "reasons": {}},
+            },
+        )
 
 
 class FailingChunker:
@@ -141,9 +155,7 @@ def build_chunking_config() -> ChunkingConfig:
         min_tokens=200,
         max_tokens=850,
         overlap_ratio=0.12,
-        max_concurrency=4,
         model="primary-model",
-        fallback_model="fallback-model",
         is_llm_enabled=True,
     )
 
@@ -169,7 +181,8 @@ def build_chunk() -> DocumentChunk:
         chunk_title="Posologia",
         section_title="Posologia",
         token_estimate=8,
-        method="heuristic",
+        method="primary",
+        metadata={"validation_outcome": "passed"},
     )
 
 
@@ -297,6 +310,14 @@ async def test_ingest_bula_logs_stage_timings_and_summary(
     assert stage_logs[2]["pdf_size_bytes"] == 10
     assert stage_logs[4]["extraction_tier"] == "fake"
     assert stage_logs[4]["section_count"] == 1
+    assert stage_logs[5]["batch_count"] == 1
+    assert stage_logs[5]["model_call_count"] == 1
+    assert stage_logs[5]["batch_fallback_count"] == 0
+    assert stage_logs[5]["chunk_validation"] == {
+        "passed_section_count": 1,
+        "failed_section_count": 0,
+    }
+    assert stage_logs[5]["chunk_fallback"] == {"count": 0, "reasons": {}}
     assert stage_logs[5]["chunk_count"] == 1
     assert stage_logs[7]["embedding_vector_count"] == 1
     assert stage_logs[9]["qdrant_point_count"] == 1

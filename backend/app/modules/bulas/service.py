@@ -1,16 +1,30 @@
+import hashlib
+from collections.abc import Sequence
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile, status
 
-from app.modules.bulas.models import Bula
+from app.modules.auth.models import UserRole
+from app.modules.auth.repository import UserRepository
+from app.modules.bulas.models import Bula, BulaCorpus
+from app.modules.bulas.helpers import InvalidPdfError, validate_pdf_bytes
 from app.modules.bulas.queue import BulaIngestionQueue
 from app.modules.bulas.repository import BulaRepository
+from app.modules.bulas.schemas import (
+    SystemBulaSeedCandidate,
+    SystemBulaSeedFailure,
+    SystemBulaSeedSummary,
+)
 from app.modules.storage.client import ObjectStoreClient
 
 
 PDF_CONTENT_TYPE = "application/pdf"
 PDF_MAGIC_BYTES = b"%PDF-"
 UPLOAD_VALIDATION_CHUNK_SIZE_BYTES = 1024 * 1024
+
+
+class SystemBulaSeedConfigurationError(Exception):
+    """Raised when the system corpus seed command is configured incorrectly."""
 
 
 class BulaService:
@@ -196,3 +210,177 @@ class BulaService:
             return
 
         await self._delete_uploaded_file_after_failure(bula.file_address)
+
+
+class SystemBulaSeedService:
+    def __init__(
+        self,
+        *,
+        user_repository: UserRepository,
+        bula_repository: BulaRepository,
+        object_store: ObjectStoreClient,
+        ingestion_queue: BulaIngestionQueue,
+        max_upload_size_bytes: int,
+    ) -> None:
+        self.user_repository = user_repository
+        self.bula_repository = bula_repository
+        self.object_store = object_store
+        self.ingestion_queue = ingestion_queue
+        self.max_upload_size_bytes = max_upload_size_bytes
+
+    async def seed_documents(
+        self,
+        *,
+        admin_email: str,
+        candidates: Sequence[SystemBulaSeedCandidate],
+        is_dry_run: bool,
+    ) -> SystemBulaSeedSummary:
+        admin_user_id = await self._get_active_admin_user_id(admin_email)
+        summary = SystemBulaSeedSummary()
+
+        for candidate in candidates:
+            try:
+                await self._seed_document(
+                    admin_user_id=admin_user_id,
+                    candidate=candidate,
+                    is_dry_run=is_dry_run,
+                    summary=summary,
+                )
+            except Exception as exc:
+                summary.failed += 1
+                summary.failures.append(
+                    SystemBulaSeedFailure(
+                        filename=candidate.manifest_entry.filename,
+                        reason=self._build_safe_failure_reason(exc),
+                    )
+                )
+
+        return summary
+
+    async def _get_active_admin_user_id(self, admin_email: str) -> int:
+        clean_admin_email = admin_email.strip().lower()
+        admin_user = await self.user_repository.get_user_by_email(clean_admin_email)
+        if admin_user is None:
+            raise SystemBulaSeedConfigurationError(
+                "The configured administrator does not exist."
+            )
+
+        if admin_user.role != UserRole.ADMIN:
+            raise SystemBulaSeedConfigurationError(
+                "The configured user does not have the admin role."
+            )
+
+        if not admin_user.is_active:
+            raise SystemBulaSeedConfigurationError(
+                "The configured administrator is inactive."
+            )
+
+        return int(admin_user.id)
+
+    async def _seed_document(
+        self,
+        *,
+        admin_user_id: int,
+        candidate: SystemBulaSeedCandidate,
+        is_dry_run: bool,
+        summary: SystemBulaSeedSummary,
+    ) -> None:
+        self._validate_candidate(candidate)
+
+        manifest_entry = candidate.manifest_entry
+        stored_object = await self.object_store.find_by_sha256_checksum(
+            manifest_entry.sha256_checksum
+        )
+        if stored_object is not None:
+            existing_bula = await self.bula_repository.get_by_file_address_and_corpus(
+                file_address=stored_object.object_address,
+                corpus=BulaCorpus.SYSTEM,
+            )
+            if existing_bula is not None:
+                summary.skipped += 1
+                return
+
+        summary.planned += 1
+        if is_dry_run:
+            return
+
+        object_address = (
+            stored_object.object_address
+            if stored_object is not None
+            else await self.object_store.put_bytes(
+                data=candidate.content,
+                filename=manifest_entry.filename,
+            )
+        )
+        was_object_created = stored_object is None
+
+        try:
+            bula = await self.bula_repository.create_bula(
+                user_id=admin_user_id,
+                drug_name=manifest_entry.product_name,
+                manufacturer=manifest_entry.manufacturer,
+                file_address=object_address,
+                file_url=str(manifest_entry.canonical_source_url),
+                corpus=BulaCorpus.SYSTEM,
+            )
+        except Exception:
+            if was_object_created:
+                await self._delete_created_object_after_failure(object_address)
+            raise
+
+        try:
+            await self.ingestion_queue.enqueue_bula_ingestion(bula_id=bula.id)
+        except Exception:
+            await self._cleanup_bula_after_enqueue_failure(
+                bula=bula,
+                was_object_created=was_object_created,
+            )
+            raise
+
+        summary.inserted += 1
+        summary.queued += 1
+
+    def _validate_candidate(self, candidate: SystemBulaSeedCandidate) -> None:
+        manifest_entry = candidate.manifest_entry
+        content = candidate.content
+
+        try:
+            validate_pdf_bytes(
+                content,
+                max_size_bytes=self.max_upload_size_bytes,
+            )
+        except InvalidPdfError as exc:
+            raise ValueError(str(exc)) from exc
+
+        if len(content) != manifest_entry.content_size_bytes:
+            raise ValueError("The PDF size does not match the manifest.")
+
+        actual_checksum = hashlib.sha256(content).hexdigest()
+        if actual_checksum != manifest_entry.sha256_checksum:
+            raise ValueError("The PDF checksum does not match the manifest.")
+
+    async def _cleanup_bula_after_enqueue_failure(
+        self,
+        *,
+        bula: Bula,
+        was_object_created: bool,
+    ) -> None:
+        try:
+            await self.bula_repository.delete_bula(bula)
+        except Exception:
+            return
+
+        if was_object_created and bula.file_address is not None:
+            await self._delete_created_object_after_failure(bula.file_address)
+
+    async def _delete_created_object_after_failure(self, object_address: str) -> None:
+        try:
+            await self.object_store.delete(object_address)
+        except Exception:
+            return
+
+    def _build_safe_failure_reason(self, error: Exception) -> str:
+        if isinstance(error, ValueError):
+            return str(error)
+
+        return "The document could not be persisted or queued."

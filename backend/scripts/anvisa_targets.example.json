@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "targets": [
+    {
+      "target_id": "example-only-do-not-download",
+      "search_query": "SUBSTITUA PELA CONSULTA REVISADA",
+      "active_ingredient": "SUBSTITUA PELO PRINCIPIO ATIVO",
+      "product_name": "SUBSTITUA PELO NOME EXATO DA ANVISA",
+      "strength": "SUBSTITUA PELA CONCENTRACAO",
+      "pharmaceutical_form": "SUBSTITUA PELA FORMA FARMACEUTICA",
+      "presentation": "SUBSTITUA PELA APRESENTACAO COMPLETA",
+      "audience": "patient",
+      "manufacturer": "SUBSTITUA PELA RAZAO SOCIAL EXATA",
+      "company_tax_id": "SUBSTITUA PELO CNPJ",
+      "anvisa_product_id": 1,
+      "registration_number": "SUBSTITUA PELO REGISTRO",
+      "process_number": "SUBSTITUA PELO PROCESSO",
+      "expedition_number": "SUBSTITUA PELO EXPEDIENTE",
+      "transaction_number": "SUBSTITUA PELA TRANSACAO",
+      "source_record_id": "1",
+      "expected_pdf_terms": [
+        "SUBSTITUA PELO NOME DO PRODUTO",
+        "SUBSTITUA PELA CONCENTRACAO",
+        "SUBSTITUA PELA FORMA FARMACEUTICA"
+      ]
+    }
+  ]
+}

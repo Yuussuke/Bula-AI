@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import BinaryIO
+from io import BytesIO
+from typing import BinaryIO, Sequence
 
 from pypdf import PdfReader
 from pypdf.errors import PyPdfError
@@ -7,6 +8,46 @@ from pypdf.errors import PyPdfError
 
 class InvalidPdfError(Exception):
     """Raised when the uploaded file cannot be parsed as a valid PDF."""
+
+
+PDF_MAGIC_BYTES = b"%PDF-"
+PDF_EOF_MARKER = b"%%EOF"
+
+
+def validate_pdf_bytes(
+    content: bytes,
+    *,
+    max_size_bytes: int,
+    expected_text_terms: Sequence[str] = (),
+) -> None:
+    if len(content) > max_size_bytes:
+        raise InvalidPdfError("Arquivo PDF excede o tamanho maximo permitido.")
+
+    if not content.startswith(PDF_MAGIC_BYTES):
+        raise InvalidPdfError("Arquivo sem assinatura PDF valida.")
+
+    if PDF_EOF_MARKER not in content[-1_024:]:
+        raise InvalidPdfError("Arquivo PDF incompleto: marcador EOF ausente.")
+
+    try:
+        reader = PdfReader(BytesIO(content), strict=True)
+        if len(reader.pages) == 0:
+            raise InvalidPdfError("Arquivo PDF nao possui paginas.")
+        extracted_text = "\n".join(page.extract_text() or "" for page in reader.pages)
+    except (OSError, PyPdfError, ValueError) as exc:
+        raise InvalidPdfError("Arquivo PDF invalido ou corrompido.") from exc
+
+    normalized_text = " ".join(extracted_text.casefold().split())
+    missing_terms = [
+        term
+        for term in expected_text_terms
+        if " ".join(term.casefold().split()) not in normalized_text
+    ]
+    if missing_terms:
+        joined_terms = ", ".join(missing_terms)
+        raise InvalidPdfError(
+            f"Identidade esperada nao encontrada no PDF: {joined_terms}."
+        )
 
 
 @dataclass
