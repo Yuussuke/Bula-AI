@@ -220,15 +220,6 @@ wheels = [
 ]
 
 [[package]]
-name = "async-timeout"
-version = "5.0.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a5/ae/136395dfbfe00dfc94da3f3e136d0b13f394cba8f4841120e34226265780/async_timeout-5.0.1.tar.gz", hash = "sha256:d9321a7a3d5a6a5e187e824d2fa0793ce379a202935782d555d6e9d2735677d3", size = 9274, upload-time = "2024-11-06T16:41:39.6Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/fe/ba/e2081de779ca30d473f21f5b30e0e737c438205440784c7dfc81efc2b029/async_timeout-5.0.1-py3-none-any.whl", hash = "sha256:39e3809566ff85354557ec2398b55e096c8364bacac9405a7a1fa429e77fe76c", size = 6233, upload-time = "2024-11-06T16:41:37.9Z" },
-]
-
-[[package]]
 name = "asyncpg"
 version = "0.31.0"
 source = { registry = "https://pypi.org/simple" }
@@ -340,7 +331,7 @@ requires-dist = [
     { name = "openai", specifier = ">=2.36.0" },
     { name = "orjson", specifier = ">=3.11.9" },
     { name = "pdfplumber", specifier = ">=0.11.9" },
-    { name = "pgqueuer", specifier = ">=0.26.0" },
+    { name = "pgqueuer", specifier = ">=1.0.1" },
     { name = "pwdlib", extras = ["argon2"], specifier = ">=0.3.0" },
     { name = "pydantic-settings", specifier = ">=2.14.2" },
     { name = "pyjwt", specifier = ">=2.13.0" },
@@ -1462,11 +1453,10 @@ wheels = [
 
 [[package]]
 name = "pgqueuer"
-version = "0.26.3"
+version = "1.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
-    { name = "async-timeout" },
     { name = "croniter" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -1474,9 +1464,9 @@ dependencies = [
     { name = "typer" },
     { name = "uvloop", marker = "sys_platform != 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/07/95/3e668623fd9f3f32fe2e2c64f65113c359b98484a263078b8b9cef1f891e/pgqueuer-0.26.3.tar.gz", hash = "sha256:3552dd9522b7e046699d56e6c824de60369ea8814fa5cda49ff297d618549971", size = 402303, upload-time = "2026-04-02T20:49:08.124Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/63/c4/fe31376646001f18d29b4d14c4a2cf85b5bcb58980878286c48e1f467f03/pgqueuer-1.0.1.tar.gz", hash = "sha256:53fa85524f6f3b0f70f0c1db5a55d151e038979350412d706ea998880c9734c5", size = 370005, upload-time = "2026-05-18T06:44:06.205Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/36/3c/29a38d95c16baa7f9ec4449694ab714d6a9943a1754e364cb16968643d82/pgqueuer-0.26.3-py3-none-any.whl", hash = "sha256:7bed2bc65a28b3723cbbd9ce362721522ca3091e25b730057cf52fd8c9483253", size = 99340, upload-time = "2026-04-02T20:49:06.632Z" },
+    { url = "https://files.pythonhosted.org/packages/48/56/bcd6d42a66ddeb93da2cdf70aa9855cbd2a4c1fdb4deab929bacf22c5928/pgqueuer-1.0.1-py3-none-any.whl", hash = "sha256:2a8b7d3cdb461dc6a3c78e4ec279562c13ac6ef26023cf040bd86c6a92cd45be", size = 97175, upload-time = "2026-05-18T06:44:04.2Z" },
 ]
 
 [[package]]
