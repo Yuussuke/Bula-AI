@@ -1,22 +1,26 @@
 from __future__ import annotations
 
 import asyncio
+from collections import Counter
 import hashlib
 import re
 import time
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field as dataclass_field
 from typing import Any, Sequence
 
 import structlog
-from langchain_text_splitters import (
-    ExperimentalMarkdownSyntaxTextSplitter,
-    RecursiveCharacterTextSplitter,
-)
 from openai import AsyncOpenAI
 from openai.types.chat import ChatCompletionMessageParam
 from openai.types.shared_params import ResponseFormatJSONSchema
+from pydantic import ValidationError
 
+from app.modules.rag.chunk_validation import (
+    SourceChunkValidationError,
+    SourceChunkSpan,
+    SourceChunkValidator,
+)
+from app.modules.rag.deterministic_chunker import DeterministicMarkdownSplitter
 from app.modules.rag.schemas import (
     BatchChunkProposals,
     ChunkingConfig,
@@ -24,6 +28,11 @@ from app.modules.rag.schemas import (
     ChunkProposals,
     ChunkResult,
     DocumentChunk,
+    ValidationOutcome,
+)
+from app.modules.rag.semantic_chunking import (
+    SemanticChunkingRequestContract,
+    SemanticRequestDiagnostic,
 )
 from app.modules.rag.token_estimator import HeuristicTokenEstimator, TokenEstimator
 
@@ -46,10 +55,8 @@ CHUNK_PROPOSALS_RESPONSE_FORMAT: ResponseFormatJSONSchema = {
                         "type": "object",
                         "properties": {
                             "chunk_text": {"type": "string"},
-                            "chunk_title": {"type": "string"},
-                            "reason": {"type": ["string", "null"]},
                         },
-                        "required": ["chunk_text", "chunk_title", "reason"],
+                        "required": ["chunk_text"],
                         "additionalProperties": False,
                     },
                 }
@@ -75,14 +82,10 @@ BATCH_CHUNK_PROPOSALS_RESPONSE_FORMAT: ResponseFormatJSONSchema = {
                         "properties": {
                             "section_index": {"type": "integer", "minimum": 0},
                             "chunk_text": {"type": "string"},
-                            "chunk_title": {"type": "string"},
-                            "reason": {"type": ["string", "null"]},
                         },
                         "required": [
                             "section_index",
                             "chunk_text",
-                            "chunk_title",
-                            "reason",
                         ],
                         "additionalProperties": False,
                     },
@@ -97,6 +100,10 @@ BATCH_CHUNK_PROPOSALS_RESPONSE_FORMAT: ResponseFormatJSONSchema = {
 
 class ChunkingModelError(Exception):
     """Raised when a model response cannot be trusted for chunking."""
+
+    def __init__(self, failure_reason: str) -> None:
+        super().__init__(failure_reason)
+        self.failure_reason = failure_reason
 
 
 @dataclass(frozen=True)
@@ -120,6 +127,7 @@ class SectionChunkDraft:
     section_title: str
     method: ChunkingMethod
     reason: str | None = None
+    validation_outcome: ValidationOutcome = "not_attempted"
 
 
 @dataclass(frozen=True)
@@ -133,6 +141,13 @@ class ChunkingAttemptFailure:
 class ChunkingRunMetrics:
     model_call_count: int = 0
     batch_fallback_count: int = 0
+    validation_passed_section_count: int = 0
+    validation_failed_section_count: int = 0
+    deterministic_fallback_count: int = 0
+    fallback_reasons: Counter[str] = dataclass_field(default_factory=Counter)
+    semantic_requests: list[SemanticRequestDiagnostic] = dataclass_field(
+        default_factory=list
+    )
 
 
 def make_chunk_id(doc_id: str, index: int, text: str) -> str:
@@ -146,10 +161,19 @@ class BaseChunker(ABC):
         llm: AsyncOpenAI,
         config: ChunkingConfig,
         token_estimator: TokenEstimator | None = None,
+        source_validator: SourceChunkValidator | None = None,
     ) -> None:
         self.llm = llm
         self.config = config
         self.token_estimator = token_estimator or HeuristicTokenEstimator()
+        self.source_validator = source_validator or SourceChunkValidator()
+        self.request_contract = SemanticChunkingRequestContract(config=self.config)
+        self.deterministic_splitter = DeterministicMarkdownSplitter(
+            token_estimator=self.token_estimator,
+            target_tokens=self.config.target_tokens,
+            max_tokens=self.config.max_tokens,
+            overlap_ratio=self.config.overlap_ratio,
+        )
 
     @abstractmethod
     def system_prompt(self) -> str:
@@ -166,19 +190,16 @@ class BaseChunker(ABC):
     async def chunk_markdown(self, markdown: str, doc_id: str) -> ChunkResult:
         sections = self._split_markdown_sections(markdown)
         section_batches = self._build_section_batches(sections=sections)
-        semaphore = asyncio.Semaphore(self.config.max_concurrency)
         metrics = ChunkingRunMetrics()
 
-        batch_tasks = [
-            self._chunk_batch_with_semaphore(
-                semaphore=semaphore,
+        batch_results: list[list[SectionChunkDraft]] = []
+        for section_batch in section_batches:
+            batch_result = await self._chunk_batch_sequentially(
                 section_batch=section_batch,
                 doc_id=doc_id,
                 metrics=metrics,
             )
-            for section_batch in section_batches
-        ]
-        batch_results = await asyncio.gather(*batch_tasks)
+            batch_results.append(batch_result)
 
         chunk_drafts = [
             chunk_draft
@@ -208,31 +229,40 @@ class BaseChunker(ABC):
                 ),
                 "model_call_count": metrics.model_call_count,
                 "batch_fallback_count": metrics.batch_fallback_count,
+                "validation": {
+                    "passed_section_count": metrics.validation_passed_section_count,
+                    "failed_section_count": metrics.validation_failed_section_count,
+                },
+                "fallback": {
+                    "count": metrics.deterministic_fallback_count,
+                    "reasons": dict(sorted(metrics.fallback_reasons.items())),
+                },
+                "semantic_chunking": self._build_semantic_chunking_metadata(
+                    metrics=metrics
+                ),
                 "chunk_count": len(chunks),
             },
         )
 
-    async def _chunk_batch_with_semaphore(
+    async def _chunk_batch_sequentially(
         self,
         *,
-        semaphore: asyncio.Semaphore,
         section_batch: MarkdownSectionBatch,
         doc_id: str,
         metrics: ChunkingRunMetrics,
     ) -> list[SectionChunkDraft]:
-        async with semaphore:
-            if len(section_batch.sections) == 1:
-                return await self._chunk_section(
-                    section=section_batch.sections[0],
-                    doc_id=doc_id,
-                    metrics=metrics,
-                )
-
-            return await self._chunk_batch(
-                section_batch=section_batch,
+        if len(section_batch.sections) == 1:
+            return await self._chunk_section(
+                section=section_batch.sections[0],
                 doc_id=doc_id,
                 metrics=metrics,
             )
+
+        return await self._chunk_batch(
+            section_batch=section_batch,
+            doc_id=doc_id,
+            metrics=metrics,
+        )
 
     async def _chunk_section(
         self,
@@ -243,13 +273,11 @@ class BaseChunker(ABC):
     ) -> list[SectionChunkDraft]:
         section_started_at = time.perf_counter()
         primary_failure: ChunkingAttemptFailure | None = None
-        fallback_failure: ChunkingAttemptFailure | None = None
 
         if self.config.is_llm_enabled:
             primary_chunks, primary_failure = await self._try_model_chunking(
                 section=section,
                 doc_id=doc_id,
-                model=self.config.model,
                 method="primary",
                 metrics=metrics,
             )
@@ -262,35 +290,33 @@ class BaseChunker(ABC):
                     duration_ms=self._elapsed_ms(section_started_at),
                 )
                 return primary_chunks
-
-            fallback_chunks, fallback_failure = await self._try_model_chunking(
-                section=section,
-                doc_id=doc_id,
-                model=self.config.fallback_model,
-                method="fallback",
-                metrics=metrics,
+        else:
+            primary_failure = ChunkingAttemptFailure(
+                method="primary",
+                error_type="SemanticChunkingDisabled",
+                failure_reason="semantic_chunking_disabled",
             )
-            if fallback_chunks is not None:
-                self._log_section_chunked(
-                    doc_id=doc_id,
-                    section=section,
-                    method="fallback",
-                    chunk_count=len(fallback_chunks),
-                    duration_ms=self._elapsed_ms(section_started_at),
-                )
-                return fallback_chunks
 
-        heuristic_chunks = self._chunk_section_heuristically(section=section)
+        fallback_reason = (
+            primary_failure.failure_reason
+            if primary_failure is not None
+            else "semantic_chunking_failed"
+        )
+        deterministic_chunks = self._chunk_section_deterministically(
+            section=section,
+            fallback_reason=fallback_reason,
+        )
+        metrics.deterministic_fallback_count += 1
+        metrics.fallback_reasons[fallback_reason] += 1
         self._log_section_chunked(
             doc_id=doc_id,
             section=section,
-            method="heuristic",
-            chunk_count=len(heuristic_chunks),
+            method="deterministic",
+            chunk_count=len(deterministic_chunks),
             duration_ms=self._elapsed_ms(section_started_at),
             primary_failure=primary_failure,
-            fallback_failure=fallback_failure,
         )
-        return heuristic_chunks
+        return deterministic_chunks
 
     async def _chunk_batch(
         self,
@@ -303,7 +329,6 @@ class BaseChunker(ABC):
         primary_chunks, primary_failure = await self._try_batch_model_chunking(
             section_batch=section_batch,
             doc_id=doc_id,
-            model=self.config.model,
             method="primary",
             metrics=metrics,
         )
@@ -317,25 +342,7 @@ class BaseChunker(ABC):
             )
             return primary_chunks
 
-        fallback_chunks, fallback_failure = await self._try_batch_model_chunking(
-            section_batch=section_batch,
-            doc_id=doc_id,
-            model=self.config.fallback_model,
-            method="fallback",
-            metrics=metrics,
-        )
-        if fallback_chunks is not None:
-            self._log_batch_chunked(
-                doc_id=doc_id,
-                section_batch=section_batch,
-                method="fallback",
-                chunk_count=len(fallback_chunks),
-                duration_ms=self._elapsed_ms(batch_started_at),
-            )
-            return fallback_chunks
-
         assert primary_failure is not None
-        assert fallback_failure is not None
         metrics.batch_fallback_count += 1
         logger.warning(
             "rag_chunking_batch_falling_back_to_sections",
@@ -344,19 +351,18 @@ class BaseChunker(ABC):
             section_indices=[section.index for section in section_batch.sections],
             section_count=len(section_batch.sections),
             primary_error_type=primary_failure.error_type,
-            fallback_error_type=fallback_failure.error_type,
             primary_failure_reason=primary_failure.failure_reason,
-            fallback_failure_reason=fallback_failure.failure_reason,
         )
 
         chunk_drafts: list[SectionChunkDraft] = []
         for section in section_batch.sections:
-            section_chunk_drafts = await self._chunk_section(
+            section_chunk_drafts = self._chunk_section_deterministically(
                 section=section,
-                doc_id=doc_id,
-                metrics=metrics,
+                fallback_reason=primary_failure.failure_reason,
             )
             chunk_drafts.extend(section_chunk_drafts)
+            metrics.deterministic_fallback_count += 1
+            metrics.fallback_reasons[primary_failure.failure_reason] += 1
 
         self._log_batch_chunked(
             doc_id=doc_id,
@@ -372,7 +378,6 @@ class BaseChunker(ABC):
         *,
         section_batch: MarkdownSectionBatch,
         doc_id: str,
-        model: str,
         method: ChunkingMethod,
         metrics: ChunkingRunMetrics,
     ) -> tuple[list[SectionChunkDraft] | None, ChunkingAttemptFailure | None]:
@@ -380,11 +385,13 @@ class BaseChunker(ABC):
             metrics.model_call_count += 1
             chunks = await self._chunk_batch_with_model(
                 section_batch=section_batch,
-                model=model,
                 method=method,
+                metrics=metrics,
             )
+            metrics.validation_passed_section_count += len(section_batch.sections)
             return chunks, None
         except Exception as exc:
+            metrics.validation_failed_section_count += len(section_batch.sections)
             failure = self._build_chunking_attempt_failure(
                 method=method,
                 exc=exc,
@@ -406,41 +413,66 @@ class BaseChunker(ABC):
         self,
         *,
         section_batch: MarkdownSectionBatch,
-        model: str,
         method: ChunkingMethod,
+        metrics: ChunkingRunMetrics,
     ) -> list[SectionChunkDraft]:
-        response = await self.llm.chat.completions.create(
-            model=model,
-            messages=self._build_batch_llm_messages(
+        request_started_at = time.perf_counter()
+        response: Any | None = None
+        try:
+            async with asyncio.timeout(self.config.request_timeout_seconds):
+                response = await self.llm.chat.completions.create(
+                    **self.request_contract.build_request(
+                        messages=self._build_batch_llm_messages(
+                            sections=section_batch.sections,
+                        ),
+                        response_format=BATCH_CHUNK_PROPOSALS_RESPONSE_FORMAT,
+                    )
+                )
+            message_content = self._extract_message_content(response=response)
+            proposals = BatchChunkProposals.model_validate_json(message_content)
+            chunks = self._validate_and_build_batch_model_chunks(
+                proposals=proposals,
                 sections=section_batch.sections,
-            ),
-            temperature=0,
-            response_format=BATCH_CHUNK_PROPOSALS_RESPONSE_FORMAT,
+                method=method,
+            )
+        except Exception as exc:
+            self._record_semantic_request(
+                metrics=metrics,
+                response=response,
+                request_started_at=request_started_at,
+                validation_outcome="failed",
+                fallback_reason=self._safe_failure_reason(exc),
+            )
+            raise
+
+        self._record_semantic_request(
+            metrics=metrics,
+            response=response,
+            request_started_at=request_started_at,
+            validation_outcome="passed",
+            fallback_reason=None,
         )
-        message_content = self._extract_message_content(response=response)
-        proposals = BatchChunkProposals.model_validate_json(message_content)
-        return self._validate_and_build_batch_model_chunks(
-            proposals=proposals,
-            sections=section_batch.sections,
-            method=method,
-        )
+        return chunks
 
     async def _try_model_chunking(
         self,
         *,
         section: MarkdownSection,
         doc_id: str,
-        model: str,
         method: ChunkingMethod,
         metrics: ChunkingRunMetrics,
     ) -> tuple[list[SectionChunkDraft] | None, ChunkingAttemptFailure | None]:
         try:
             metrics.model_call_count += 1
             chunks = await self._chunk_section_with_model(
-                section=section, model=model, method=method
+                section=section,
+                method=method,
+                metrics=metrics,
             )
+            metrics.validation_passed_section_count += 1
             return chunks, None
         except Exception as exc:
+            metrics.validation_failed_section_count += 1
             failure = self._build_chunking_attempt_failure(
                 method=method,
                 exc=exc,
@@ -469,31 +501,136 @@ class BaseChunker(ABC):
         )
 
     def _safe_failure_reason(self, exc: Exception) -> str:
-        if isinstance(exc, ChunkingModelError):
-            return "untrusted_model_response"
+        if isinstance(exc, SourceChunkValidationError):
+            return exc.reason
 
-        return "model_call_failed"
+        if isinstance(exc, ChunkingModelError):
+            return exc.failure_reason
+
+        if isinstance(exc, TimeoutError):
+            return "timeout"
+
+        if isinstance(exc, ValidationError):
+            return "invalid_json"
+
+        return "provider_error"
 
     async def _chunk_section_with_model(
         self,
         *,
         section: MarkdownSection,
-        model: str,
         method: ChunkingMethod,
+        metrics: ChunkingRunMetrics,
     ) -> list[SectionChunkDraft]:
-        response = await self.llm.chat.completions.create(
-            model=model,
-            messages=self._build_llm_messages(section=section),
-            temperature=0,
-            response_format=CHUNK_PROPOSALS_RESPONSE_FORMAT,
+        request_started_at = time.perf_counter()
+        response: Any | None = None
+        try:
+            async with asyncio.timeout(self.config.request_timeout_seconds):
+                response = await self.llm.chat.completions.create(
+                    **self.request_contract.build_request(
+                        messages=self._build_llm_messages(section=section),
+                        response_format=CHUNK_PROPOSALS_RESPONSE_FORMAT,
+                    )
+                )
+            message_content = self._extract_message_content(response=response)
+            proposals = ChunkProposals.model_validate_json(message_content)
+            chunks = self._validate_and_build_model_chunks(
+                proposals=proposals,
+                section=section,
+                method=method,
+            )
+        except Exception as exc:
+            self._record_semantic_request(
+                metrics=metrics,
+                response=response,
+                request_started_at=request_started_at,
+                validation_outcome="failed",
+                fallback_reason=self._safe_failure_reason(exc),
+            )
+            raise
+
+        self._record_semantic_request(
+            metrics=metrics,
+            response=response,
+            request_started_at=request_started_at,
+            validation_outcome="passed",
+            fallback_reason=None,
         )
-        message_content = self._extract_message_content(response=response)
-        proposals = ChunkProposals.model_validate_json(message_content)
-        return self._validate_and_build_model_chunks(
-            proposals=proposals,
-            section=section,
-            method=method,
+        return chunks
+
+    def _record_semantic_request(
+        self,
+        *,
+        metrics: ChunkingRunMetrics,
+        response: Any | None,
+        request_started_at: float,
+        validation_outcome: ValidationOutcome,
+        fallback_reason: str | None,
+    ) -> None:
+        diagnostic = self.request_contract.build_diagnostic(
+            response=response,
+            latency_ms=self._elapsed_ms(request_started_at),
+            validation_outcome=validation_outcome,
+            fallback_reason=fallback_reason,
         )
+        metrics.semantic_requests.append(diagnostic)
+
+    def _build_semantic_chunking_metadata(
+        self,
+        *,
+        metrics: ChunkingRunMetrics,
+    ) -> dict[str, object]:
+        requests = metrics.semantic_requests
+        total_latency_ms = round(
+            sum(request.latency_ms for request in requests),
+            2,
+        )
+        average_latency_ms = (
+            round(total_latency_ms / len(requests), 2) if requests else 0.0
+        )
+
+        prompt_tokens = self._sum_optional_usage(
+            values=[request.prompt_tokens for request in requests]
+        )
+        completion_tokens = self._sum_optional_usage(
+            values=[request.completion_tokens for request in requests]
+        )
+        total_tokens = self._sum_optional_usage(
+            values=[request.total_tokens for request in requests]
+        )
+        cost_usd = self._sum_optional_cost(
+            values=[request.cost_usd for request in requests]
+        )
+
+        return {
+            "model": self.config.model,
+            "prompt_version": self.config.prompt_version,
+            "temperature": self.config.temperature,
+            "seed": self.config.seed,
+            "max_output_tokens": self.config.max_output_tokens,
+            "provider": self.request_contract.provider_options(),
+            "inference_mode": "sequential",
+            "request_count": len(requests),
+            "latency_ms": {
+                "total": total_latency_ms,
+                "average": average_latency_ms,
+            },
+            "usage": {
+                "prompt_tokens": prompt_tokens,
+                "completion_tokens": completion_tokens,
+                "total_tokens": total_tokens,
+                "cost_usd": cost_usd,
+            },
+            "requests": [request.to_metadata() for request in requests],
+        }
+
+    def _sum_optional_usage(self, *, values: Sequence[int | None]) -> int | None:
+        present_values = [value for value in values if value is not None]
+        return sum(present_values) if present_values else None
+
+    def _sum_optional_cost(self, *, values: Sequence[float | None]) -> float | None:
+        present_values = [value for value in values if value is not None]
+        return round(sum(present_values), 10) if present_values else None
 
     def _build_llm_messages(
         self,
@@ -518,12 +655,16 @@ class BaseChunker(ABC):
     def _extract_message_content(self, *, response: Any) -> str:
         choices = getattr(response, "choices", [])
         if not choices:
-            raise ChunkingModelError("Model response did not include choices.")
+            raise ChunkingModelError("invalid_response")
+
+        finish_reason = getattr(choices[0], "finish_reason", None)
+        if finish_reason == "length":
+            raise ChunkingModelError("truncated_response")
 
         message = getattr(choices[0], "message", None)
         message_content = getattr(message, "content", None)
         if not isinstance(message_content, str) or not message_content.strip():
-            raise ChunkingModelError("Model response did not include JSON content.")
+            raise ChunkingModelError("invalid_response")
 
         return message_content
 
@@ -534,39 +675,16 @@ class BaseChunker(ABC):
         section: MarkdownSection,
         method: ChunkingMethod,
     ) -> list[SectionChunkDraft]:
-        if not proposals.chunks:
-            raise ChunkingModelError("Model returned no chunk proposals.")
-
-        chunk_drafts: list[SectionChunkDraft] = []
-        for proposal in proposals.chunks:
-            chunk_text = proposal.chunk_text.strip()
-            if not chunk_text:
-                raise ChunkingModelError("Model returned an empty chunk.")
-
-            if not self._is_text_present_in_section(
-                chunk_text=chunk_text,
-                section_text=section.text,
-            ):
-                raise ChunkingModelError(
-                    "Model returned text outside the source section."
-                )
-
-            estimated_tokens = self._estimate_tokens(chunk_text)
-            if estimated_tokens > self.config.max_tokens:
-                raise ChunkingModelError("Model returned an oversized chunk.")
-
-            clean_chunk_title = proposal.chunk_title.strip() or section.title
-            chunk_drafts.append(
-                SectionChunkDraft(
-                    text=chunk_text,
-                    chunk_title=clean_chunk_title,
-                    section_title=section.title,
-                    method=method,
-                    reason=proposal.reason,
-                )
-            )
-
-        return chunk_drafts
+        source_spans = self.source_validator.validate_and_reconstruct(
+            source_text=section.text,
+            proposed_chunk_texts=[proposal.chunk_text for proposal in proposals.chunks],
+            section_title=section.title,
+        )
+        return self._build_validated_span_drafts(
+            source_spans=source_spans,
+            section=section,
+            method=method,
+        )
 
     def _validate_and_build_batch_model_chunks(
         self,
@@ -576,121 +694,87 @@ class BaseChunker(ABC):
         method: ChunkingMethod,
     ) -> list[SectionChunkDraft]:
         if not proposals.chunks:
-            raise ChunkingModelError("Model returned no batch chunk proposals.")
+            raise SourceChunkValidationError("missing_source_text")
 
         sections_by_index = {section.index: section for section in sections}
-        chunk_drafts_by_section: dict[int, list[SectionChunkDraft]] = {
+        proposal_texts_by_section: dict[int, list[str]] = {
             section.index: [] for section in sections
         }
 
         for proposal in proposals.chunks:
             section = sections_by_index.get(proposal.section_index)
             if section is None:
-                raise ChunkingModelError("Model returned an unknown section index.")
+                raise SourceChunkValidationError("invalid_span")
 
-            chunk_text = proposal.chunk_text.strip()
-            if not chunk_text:
-                raise ChunkingModelError("Model returned an empty batch chunk.")
+            proposal_texts_by_section[section.index].append(proposal.chunk_text)
 
-            if not self._is_text_present_in_section(
-                chunk_text=chunk_text,
-                section_text=section.text,
-            ):
-                raise ChunkingModelError(
-                    "Model returned batch text outside the referenced section."
+        chunk_drafts: list[SectionChunkDraft] = []
+        for section in sections:
+            source_spans = self.source_validator.validate_and_reconstruct(
+                source_text=section.text,
+                proposed_chunk_texts=proposal_texts_by_section[section.index],
+                section_title=section.title,
+            )
+            chunk_drafts.extend(
+                self._build_validated_span_drafts(
+                    source_spans=source_spans,
+                    section=section,
+                    method=method,
                 )
+            )
 
-            estimated_tokens = self._estimate_tokens(chunk_text)
-            if estimated_tokens > self.config.max_tokens:
-                raise ChunkingModelError("Model returned an oversized batch chunk.")
+        return chunk_drafts
 
-            clean_chunk_title = proposal.chunk_title.strip() or section.title
-            chunk_drafts_by_section[section.index].append(
+    def _build_validated_span_drafts(
+        self,
+        *,
+        source_spans: Sequence[SourceChunkSpan],
+        section: MarkdownSection,
+        method: ChunkingMethod,
+    ) -> list[SectionChunkDraft]:
+        chunk_drafts: list[SectionChunkDraft] = []
+
+        for source_span in source_spans:
+            chunk_drafts.extend(
                 SectionChunkDraft(
-                    text=chunk_text,
-                    chunk_title=clean_chunk_title,
+                    text=deterministic_chunk.text,
+                    chunk_title=deterministic_chunk.chunk_title,
                     section_title=section.title,
                     method=method,
-                    reason=proposal.reason,
+                    validation_outcome="passed",
+                )
+                for deterministic_chunk in self.deterministic_splitter.split_validated_text(
+                    source_text=source_span.text,
+                    section_title=source_span.chunk_title,
                 )
             )
 
-        missing_section_indices = [
-            section.index
-            for section in sections
-            if not chunk_drafts_by_section[section.index]
-        ]
-        if missing_section_indices:
-            raise ChunkingModelError(
-                "Model did not return chunks for every section in the batch."
-            )
+        return chunk_drafts
 
-        return [
-            chunk_draft
-            for section in sections
-            for chunk_draft in chunk_drafts_by_section[section.index]
-        ]
-
-    def _chunk_section_heuristically(
+    def _chunk_section_deterministically(
         self,
         *,
         section: MarkdownSection,
+        fallback_reason: str,
     ) -> list[SectionChunkDraft]:
-        first_pass_chunks = self._split_with_markdown_syntax(section.text)
-        final_chunk_texts: list[str] = []
-
-        for chunk_text in first_pass_chunks:
-            if self._estimate_tokens(chunk_text) > self.config.max_tokens:
-                final_chunk_texts.extend(self._split_oversized_chunk(chunk_text))
-                continue
-
-            final_chunk_texts.append(chunk_text)
-
         return [
             SectionChunkDraft(
-                text=chunk_text,
-                chunk_title=section.title,
+                text=deterministic_chunk.text,
+                chunk_title=deterministic_chunk.chunk_title,
                 section_title=section.title,
-                method="heuristic",
+                method="deterministic",
+                reason=fallback_reason,
+                validation_outcome=(
+                    "not_attempted"
+                    if fallback_reason == "semantic_chunking_disabled"
+                    else "failed"
+                ),
             )
-            for chunk_text in final_chunk_texts
-            if chunk_text.strip()
+            for deterministic_chunk in self.deterministic_splitter.split(
+                source_text=section.text,
+                section_title=section.title,
+            )
         ]
-
-    def _split_with_markdown_syntax(self, text: str) -> list[str]:
-        splitter = ExperimentalMarkdownSyntaxTextSplitter(
-            headers_to_split_on=[
-                ("##", "section"),
-                ("###", "subsection"),
-            ],
-            strip_headers=False,
-        )
-        documents = splitter.split_text(text)
-        chunks = [
-            document.page_content.strip()
-            for document in documents
-            if document.page_content.strip()
-        ]
-
-        clean_text = text.strip()
-        if chunks:
-            return chunks
-
-        if clean_text:
-            return [clean_text]
-
-        return []
-
-    def _split_oversized_chunk(self, text: str) -> list[str]:
-        max_tokens = self.config.max_tokens
-        overlap_tokens = self._overlap_tokens(max_tokens=max_tokens)
-        splitter = RecursiveCharacterTextSplitter(
-            chunk_size=max_tokens,
-            chunk_overlap=overlap_tokens,
-            length_function=self._estimate_tokens,
-            separators=["\n\n", "\n", ". ", "; ", ", ", " ", ""],
-        )
-        return [chunk.strip() for chunk in splitter.split_text(text) if chunk.strip()]
 
     def _build_section_batches(
         self,
@@ -823,7 +907,8 @@ class BaseChunker(ABC):
             "method": chunk_draft.method,
         }
         if chunk_draft.reason is not None:
-            metadata["reason"] = chunk_draft.reason
+            metadata["fallback_reason"] = chunk_draft.reason
+        metadata["validation_outcome"] = chunk_draft.validation_outcome
 
         return DocumentChunk(
             chunk_id=make_chunk_id(doc_id=doc_id, index=index, text=chunk_draft.text),
@@ -846,7 +931,6 @@ class BaseChunker(ABC):
         chunk_count: int,
         duration_ms: float,
         primary_failure: ChunkingAttemptFailure | None = None,
-        fallback_failure: ChunkingAttemptFailure | None = None,
     ) -> None:
         log_fields: dict[str, object] = {
             "doc_id": doc_id,
@@ -856,22 +940,15 @@ class BaseChunker(ABC):
             "chunk_count": chunk_count,
             "duration_ms": duration_ms,
         }
-        if method == "heuristic":
+        if method == "deterministic":
             log_fields.update(
                 {
                     "primary_failed": primary_failure is not None,
-                    "fallback_failed": fallback_failure is not None,
                     "primary_error_type": (
                         primary_failure.error_type if primary_failure else None
                     ),
-                    "fallback_error_type": (
-                        fallback_failure.error_type if fallback_failure else None
-                    ),
                     "primary_failure_reason": (
                         primary_failure.failure_reason if primary_failure else None
-                    ),
-                    "fallback_failure_reason": (
-                        fallback_failure.failure_reason if fallback_failure else None
                     ),
                 }
             )
@@ -899,28 +976,8 @@ class BaseChunker(ABC):
             duration_ms=duration_ms,
         )
 
-    def _is_text_present_in_section(
-        self,
-        *,
-        chunk_text: str,
-        section_text: str,
-    ) -> bool:
-        normalized_chunk_text = self._normalize_text_for_matching(chunk_text)
-        normalized_section_text = self._normalize_text_for_matching(section_text)
-        return normalized_chunk_text in normalized_section_text
-
-    def _normalize_text_for_matching(self, text: str) -> str:
-        return " ".join(text.split())
-
     def _estimate_tokens(self, text: str) -> int:
         return self.token_estimator.estimate(text)
 
     def _elapsed_ms(self, started_at: float) -> float:
         return round((time.perf_counter() - started_at) * 1000, 2)
-
-    def _overlap_tokens(self, *, max_tokens: int) -> int:
-        if max_tokens <= 1:
-            return 0
-
-        overlap_tokens = int(max_tokens * self.config.overlap_ratio)
-        return min(overlap_tokens, max_tokens - 1)

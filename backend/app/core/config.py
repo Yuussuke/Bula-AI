@@ -28,8 +28,7 @@ class OpenRouterSettings(BaseSettings):
     # Optional so CI/dev can use deterministic heuristic chunking without an API key.
     api_key: str | None = None
     chat_model: str = "openai/gpt-5.4-mini"
-    chunk_model: str = "google/gemini-3-flash-preview"
-    chunk_fallback_model: str = "deepseek/deepseek-chat"
+    chunk_model: str = "google/gemini-3.1-flash-lite"
     chunk_timeout_seconds: int = Field(default=60, gt=0)
     chunk_max_retries: int = Field(default=0, ge=0)
     require_zdr: bool = True
@@ -45,8 +44,7 @@ class ProcessingSettings(BaseSettings):
     chunk_target_tokens: int = 600
     chunk_min_tokens: int = 200
     chunk_max_tokens: int = 850
-    chunk_overlap_ratio: float = 0.12
-    chunk_max_concurrency: int = 4
+    chunk_overlap_ratio: float = 0.0
     chunk_batch_enabled: bool = True
     chunk_batch_max_tokens: int = 3000
     chunk_batch_max_sections: int = 8
