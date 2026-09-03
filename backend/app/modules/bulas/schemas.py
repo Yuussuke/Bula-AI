@@ -1,6 +1,6 @@
 from datetime import UTC, datetime
 from pathlib import PurePosixPath, PureWindowsPath
-from typing import Literal
+from typing import Literal, cast
 from uuid import UUID
 
 from pydantic import (
@@ -12,7 +12,12 @@ from pydantic import (
     model_validator,
 )
 
-from app.modules.bulas.models import BulaCorpus, BulaStatus
+from app.modules.bulas.models import (
+    Bula,
+    BulaCorpus,
+    BulaStatus,
+    SystemBulaPublicationState,
+)
 
 
 # What the user sends to the API
@@ -59,6 +64,70 @@ class BulaStatusResponse(BaseModel):
     error_message: str | None
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class SystemBulaResponse(BaseModel):
+    id: UUID
+    target_id: str
+    product_name: str
+    active_ingredient: str
+    strength: str
+    pharmaceutical_form: str
+    presentation: str
+    audience: Literal["patient", "professional"]
+    manufacturer: str
+    company_tax_id: str
+    anvisa_product_id: int
+    registration_number: str
+    process_number: str
+    expedition_number: str
+    transaction_number: str
+    source_record_id: str
+    canonical_source_url: str
+    source_published_at: datetime
+    source_updated_at: datetime | None
+    sha256_checksum: str
+    content_size_bytes: int
+    ingestion_status: BulaStatus
+    publication_state: SystemBulaPublicationState
+    reviewed_by: str | None
+    reviewed_at: datetime | None
+    published_at: datetime | None
+
+    @classmethod
+    def from_bula(cls, bula: Bula) -> "SystemBulaResponse":
+        publication = bula.system_publication
+        if publication is None:
+            raise ValueError("System bula does not have publication provenance.")
+
+        return cls(
+            id=bula.id,
+            target_id=publication.target_id,
+            product_name=publication.product_name,
+            active_ingredient=publication.active_ingredient,
+            strength=publication.strength,
+            pharmaceutical_form=publication.pharmaceutical_form,
+            presentation=publication.presentation,
+            audience=cast(Literal["patient", "professional"], publication.audience),
+            manufacturer=publication.manufacturer,
+            company_tax_id=publication.company_tax_id,
+            anvisa_product_id=publication.anvisa_product_id,
+            registration_number=publication.registration_number,
+            process_number=publication.process_number,
+            expedition_number=publication.expedition_number,
+            transaction_number=publication.transaction_number,
+            source_record_id=publication.source_record_id,
+            canonical_source_url=publication.canonical_source_url,
+            source_published_at=publication.source_published_at,
+            source_updated_at=publication.source_updated_at,
+            sha256_checksum=publication.sha256_checksum,
+            content_size_bytes=publication.content_size_bytes,
+            ingestion_status=bula.status,
+            publication_state=publication.state,
+            reviewed_by=publication.reviewed_by_name,
+            reviewed_at=publication.reviewed_at,
+            published_at=publication.published_at,
+        )
 
 
 class SystemBulaManifestEntry(BaseModel):

@@ -3,14 +3,23 @@ from httpx import AsyncClient
 from langchain_core.runnables import RunnableLambda
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import UTC, datetime
 from uuid import UUID
+from uuid import uuid4
 
 from app.main import app
 from app.modules.auth.models import User
-from app.modules.bulas.models import Bula, BulaStatus
+from app.modules.bulas.models import (
+    Bula,
+    BulaCorpus,
+    BulaStatus,
+    SystemBulaPublication,
+    SystemBulaPublicationState,
+)
 from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, RetrievalMode
 from app.modules.chat.repository import ChatRepository
 from app.modules.rag.dependencies import get_rag_chain_factory
+from app.modules.storage.models import StoredObject
 
 
 TEST_USER = {
@@ -52,6 +61,73 @@ async def create_ready_bula(
         status=status,
     )
     db_session.add(bula)
+    await db_session.commit()
+    await db_session.refresh(bula)
+    return bula
+
+
+async def create_system_bula(
+    db_session: AsyncSession,
+    *,
+    owner_id: int,
+    state: SystemBulaPublicationState,
+    has_matching_checksum: bool = True,
+) -> Bula:
+    object_address = f"stored_objects/{uuid4()}"
+    publication_checksum = "a" * 64
+    stored_object = StoredObject(
+        object_address=object_address,
+        original_filename="system.pdf",
+        content_type="application/pdf",
+        content_size_bytes=1024,
+        sha256_checksum=(publication_checksum if has_matching_checksum else "b" * 64),
+        data=b"%PDF-test",
+    )
+    bula = Bula(
+        user_id=owner_id,
+        drug_name="Dipirona System",
+        manufacturer="Example Pharma",
+        file_address=object_address,
+        status=BulaStatus.READY,
+        corpus=BulaCorpus.SYSTEM,
+    )
+    db_session.add_all([stored_object, bula])
+    await db_session.flush()
+    now = datetime.now(UTC)
+    db_session.add(
+        SystemBulaPublication(
+            bula_id=bula.id,
+            state=state,
+            target_id="dipirona-system",
+            active_ingredient="dipirona monoidratada",
+            product_name="Dipirona System",
+            strength="500 mg",
+            pharmaceutical_form="comprimido",
+            presentation="caixa com 10 comprimidos",
+            audience="patient",
+            manufacturer="Example Pharma",
+            company_tax_id="00000000000100",
+            anvisa_product_id=10,
+            registration_number="123456789",
+            process_number="process-1",
+            expedition_number="987654",
+            transaction_number="transaction-1",
+            source_record_id="111",
+            canonical_source_url="https://consultas.anvisa.gov.br/documento.pdf",
+            source_published_at=now,
+            source_updated_at=now,
+            search_query="Dipirona",
+            downloader_version="2.0",
+            downloaded_at=now,
+            filename="system.pdf",
+            sha256_checksum=publication_checksum,
+            content_size_bytes=1024,
+            reviewed_by_name="Reviewer",
+            reviewed_at=now,
+            published_by_name="Administrator",
+            published_at=now,
+        )
+    )
     await db_session.commit()
     await db_session.refresh(bula)
     return bula
@@ -311,3 +387,106 @@ async def test_endpoint_does_not_persist_when_chain_fails(
     assert session_count == 0
     assert message_count == 0
     assert fake_factory.built_bula_ids == [str(bula.id)]
+
+
+@pytest.mark.anyio
+async def test_ordinary_user_can_query_published_ready_system_bula(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    access_token = await get_access_token(client)
+    await client.post(
+        "/api/v1/auth/register",
+        json={
+            "full_name": "System Owner",
+            "email": "system-owner@bulaai.com",
+            "password": "Secret123!",
+        },
+    )
+    owner = await get_user_by_email(
+        db_session,
+        email="system-owner@bulaai.com",
+    )
+    bula = await create_system_bula(
+        db_session,
+        owner_id=owner.id,
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    fake_factory = override_rag_chain_factory()
+
+    response = await client.post(
+        f"/api/v1/chat/sessions/{bula.id}/ask",
+        json={"question": "Qual e a dose?"},
+        headers=build_auth_headers(access_token),
+    )
+
+    assert response.status_code == 200, response.json()
+    assert fake_factory.built_bula_ids == [str(bula.id)]
+
+
+@pytest.mark.anyio
+async def test_user_cannot_query_another_users_private_bula(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    access_token = await get_access_token(client)
+    await client.post(
+        "/api/v1/auth/register",
+        json={
+            "full_name": "Private Owner",
+            "email": "private-owner@bulaai.com",
+            "password": "Secret123!",
+        },
+    )
+    owner = await get_user_by_email(
+        db_session,
+        email="private-owner@bulaai.com",
+    )
+    bula = await create_ready_bula(db_session, user_id=owner.id)
+    fake_factory = override_rag_chain_factory()
+
+    response = await client.post(
+        f"/api/v1/chat/sessions/{bula.id}/ask",
+        json={"question": "Qual e a dose?"},
+        headers=build_auth_headers(access_token),
+    )
+
+    assert response.status_code == 404
+    assert fake_factory.built_bula_ids == []
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    ("publication_state", "has_matching_checksum"),
+    [
+        (SystemBulaPublicationState.STAGED, True),
+        (SystemBulaPublicationState.VETTED, True),
+        (SystemBulaPublicationState.WITHDRAWN, True),
+        (SystemBulaPublicationState.REJECTED, True),
+        (SystemBulaPublicationState.PUBLISHED, False),
+    ],
+)
+async def test_ordinary_user_cannot_query_unpublished_or_changed_system_bula(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    publication_state: SystemBulaPublicationState,
+    has_matching_checksum: bool,
+) -> None:
+    access_token = await get_access_token(client)
+    user = await get_user_by_email(db_session, email=TEST_USER["email"])
+    bula = await create_system_bula(
+        db_session,
+        owner_id=user.id,
+        state=publication_state,
+        has_matching_checksum=has_matching_checksum,
+    )
+    fake_factory = override_rag_chain_factory()
+
+    response = await client.post(
+        f"/api/v1/chat/sessions/{bula.id}/ask",
+        json={"question": "Qual e a dose?"},
+        headers=build_auth_headers(access_token),
+    )
+
+    assert response.status_code == 404
+    assert fake_factory.built_bula_ids == []

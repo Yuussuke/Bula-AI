@@ -1,13 +1,26 @@
 from typing import cast
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Form, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
 
 from app.modules.auth import models as auth_models
 from app.modules.auth.dependencies import get_current_user
 from app.modules.bulas.dependencies import get_bula_service
-from app.modules.bulas.schemas import BulaResponse, BulaStatusResponse
-from app.modules.bulas.service import BulaService
+from app.modules.bulas.schemas import (
+    BulaResponse,
+    BulaStatusResponse,
+    SystemBulaResponse,
+)
+from app.modules.bulas.service import BulaService, SystemBulaNotFoundError
 
 router = APIRouter(prefix="/bulas", tags=["bulas"])
 
@@ -42,6 +55,38 @@ async def list_bulas(
         user_id=cast(int, current_user.id),
     )
     return [BulaResponse.model_validate(bula) for bula in bulas]
+
+
+@router.get("/system", response_model=list[SystemBulaResponse])
+async def list_system_bulas(
+    limit: int = Query(default=50, ge=1, le=100),
+    offset: int = Query(default=0, ge=0),
+    current_user: auth_models.User = Depends(get_current_user),
+    bula_service: BulaService = Depends(get_bula_service),
+) -> list[SystemBulaResponse]:
+    _ = current_user
+    bulas = await bula_service.list_published_system_bulas(
+        limit=limit,
+        offset=offset,
+    )
+    return [SystemBulaResponse.from_bula(bula) for bula in bulas]
+
+
+@router.get("/system/{bula_id}", response_model=SystemBulaResponse)
+async def get_system_bula(
+    bula_id: UUID,
+    current_user: auth_models.User = Depends(get_current_user),
+    bula_service: BulaService = Depends(get_bula_service),
+) -> SystemBulaResponse:
+    _ = current_user
+    try:
+        bula = await bula_service.get_published_system_bula(bula_id=bula_id)
+    except SystemBulaNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Bula de sistema nao encontrada.",
+        ) from exc
+    return SystemBulaResponse.from_bula(bula)
 
 
 @router.get("/{bula_id}/status", response_model=BulaStatusResponse)

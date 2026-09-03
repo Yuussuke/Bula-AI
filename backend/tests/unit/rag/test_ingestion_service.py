@@ -5,7 +5,13 @@ from uuid import UUID
 
 import pytest
 
-from app.modules.bulas.models import Bula, BulaCorpus, BulaStatus
+from app.modules.bulas.models import (
+    Bula,
+    BulaCorpus,
+    BulaStatus,
+    SystemBulaPublication,
+    SystemBulaPublicationState,
+)
 from app.modules.rag import observability as observability_module
 from app.modules.rag.debug_artifacts import RAGIngestionDebugArtifacts
 from app.modules.rag.parsers.pdf_parser import ParseResult
@@ -21,6 +27,7 @@ class FakeBulaRepository:
     def __init__(self, bula: Bula | None) -> None:
         self.bula = bula
         self.statuses: list[BulaStatus] = []
+        self.reset_publications: list[SystemBulaPublication] = []
 
     async def get_by_id(self, *, bula_id: UUID) -> Bula | None:
         assert bula_id == BULA_ID
@@ -40,6 +47,15 @@ class FakeBulaRepository:
             bula.qdrant_collection = qdrant_collection
         self.statuses.append(status)
         return bula
+
+    async def reset_system_publication_for_reingestion(
+        self,
+        *,
+        publication: SystemBulaPublication,
+    ) -> SystemBulaPublication:
+        publication.state = SystemBulaPublicationState.STAGED
+        self.reset_publications.append(publication)
+        return publication
 
 
 class FakeObjectStore:
@@ -450,6 +466,25 @@ async def test_ingest_bula_raises_clear_error_when_no_chunks_are_generated() -> 
     assert len(debug_artifacts.calls) == 1
     assert debug_artifacts.calls[0]["status"] == "chunking_failed"
     assert isinstance(debug_artifacts.calls[0]["chunk_result"], ChunkResult)
+
+
+@pytest.mark.anyio
+async def test_reingestion_resets_published_system_bula_to_staged() -> None:
+    bula = build_bula(status=BulaStatus.ERROR)
+    bula.corpus = BulaCorpus.SYSTEM
+    publication = SystemBulaPublication(
+        bula_id=BULA_ID,
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    bula.system_publication = publication
+    repo = FakeBulaRepository(bula)
+    service = build_service(repo=repo)
+
+    result = await service.ingest_bula(bula_id=BULA_ID)
+
+    assert result.status == BulaStatus.READY
+    assert publication.state == SystemBulaPublicationState.STAGED
+    assert repo.reset_publications == [publication]
 
 
 @pytest.mark.anyio

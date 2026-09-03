@@ -5,7 +5,6 @@ from uuid import UUID
 from fastapi import HTTPException, status
 from pydantic import ValidationError
 
-from app.modules.bulas.models import BulaStatus
 from app.modules.bulas.repository import BulaRepository
 from app.modules.chat.models import RetrievalMode
 from app.modules.chat.repository import ChatRepository
@@ -50,11 +49,11 @@ class ChatService:
                 ),
             )
 
-        bula = await self.bula_repository.get_by_id_for_user(
+        bula = await self.bula_repository.get_queryable_by_id_for_user(
             bula_id=bula_id,
             user_id=user_id,
         )
-        if bula is None or bula.status != BulaStatus.READY:
+        if bula is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Bula not found or not ready for querying.",
