@@ -1,11 +1,16 @@
 import hashlib
+from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
 from uuid import UUID
 
 import pytest
 
 from app.modules.auth.models import UserRole
-from app.modules.bulas.models import BulaCorpus
+from app.modules.bulas.models import (
+    BulaCorpus,
+    BulaStatus,
+    SystemBulaPublicationState,
+)
 from app.modules.bulas.schemas import SystemBulaManifestEntry, SystemBulaSeedCandidate
 from app.modules.bulas.service import (
     SystemBulaSeedConfigurationError,
@@ -72,6 +77,7 @@ def build_seed_service(
         is_active=True,
     )
     storage.find_by_sha256_checksum.return_value = None
+    bulas.get_latest_system_publication_by_source_identity.return_value = None
 
     service = SystemBulaSeedService(
         user_repository=users,
@@ -86,6 +92,7 @@ def build_seed_service(
 @pytest.mark.anyio
 async def test_seed_creates_system_bula_and_enqueues_ingestion() -> None:
     bula_id = UUID("11111111-1111-1111-1111-111111111111")
+    candidate = build_candidate()
     service, _, bulas, storage, queue = build_seed_service()
     storage.put_bytes.return_value = "stored_objects/dipirona"
     bulas.create_bula.return_value = Mock(
@@ -95,7 +102,7 @@ async def test_seed_creates_system_bula_and_enqueues_ingestion() -> None:
 
     summary = await service.seed_documents(
         admin_email=" ADMIN@example.com ",
-        candidates=[build_candidate()],
+        candidates=[candidate],
         is_dry_run=False,
     )
 
@@ -112,29 +119,66 @@ async def test_seed_creates_system_bula_and_enqueues_ingestion() -> None:
         file_url="https://consultas.anvisa.gov.br/documento.pdf",
         corpus=BulaCorpus.SYSTEM,
     )
+    bulas.create_system_publication.assert_awaited_once_with(
+        bula=bulas.create_bula.return_value,
+        manifest_entry=candidate.manifest_entry,
+        supersedes_bula_id=None,
+    )
     queue.enqueue_bula_ingestion.assert_awaited_once_with(bula_id=bula_id)
 
 
 @pytest.mark.anyio
 async def test_seed_skips_existing_system_bula_with_same_checksum() -> None:
     service, _, bulas, storage, queue = build_seed_service()
-    storage.find_by_sha256_checksum.return_value = Mock(
-        spec=StoredObjectRef,
-        object_address="stored_objects/existing",
+    candidate = build_candidate()
+    manifest_entry = candidate.manifest_entry
+    existing_publication = SimpleNamespace(**manifest_entry.model_dump())
+    existing_publication.canonical_source_url = str(manifest_entry.canonical_source_url)
+    existing_publication.bula = SimpleNamespace(status=BulaStatus.READY)
+    bulas.get_latest_system_publication_by_source_identity.return_value = (
+        existing_publication
     )
-    bulas.get_by_file_address_and_corpus.return_value = Mock()
 
     summary = await service.seed_documents(
         admin_email="admin@example.com",
-        candidates=[build_candidate()],
+        candidates=[candidate],
         is_dry_run=False,
     )
 
     assert summary.skipped == 1
     assert summary.planned == 0
     assert summary.inserted == 0
-    storage.put_bytes.assert_not_awaited()
+    storage.find_by_sha256_checksum.assert_not_awaited()
     bulas.create_bula.assert_not_awaited()
+    queue.enqueue_bula_ingestion.assert_not_awaited()
+
+
+@pytest.mark.anyio
+async def test_seed_attaches_staged_provenance_to_legacy_ready_system_bula() -> None:
+    legacy_bula = Mock(
+        id=UUID("44444444-4444-4444-4444-444444444444"),
+        status=BulaStatus.READY,
+    )
+    service, _, bulas, storage, queue = build_seed_service()
+    storage.find_by_sha256_checksum.return_value = Mock(
+        spec=StoredObjectRef,
+        object_address="stored_objects/existing",
+    )
+    bulas.get_by_file_address_and_corpus.return_value = legacy_bula
+    candidate = build_candidate()
+
+    summary = await service.seed_documents(
+        admin_email="admin@example.com",
+        candidates=[candidate],
+        is_dry_run=False,
+    )
+
+    assert summary.inserted == 1
+    assert summary.queued == 0
+    bulas.create_system_publication.assert_awaited_once_with(
+        bula=legacy_bula,
+        manifest_entry=candidate.manifest_entry,
+    )
     queue.enqueue_bula_ingestion.assert_not_awaited()
 
 
@@ -279,3 +323,42 @@ async def test_seed_rejects_non_admin_owner_before_processing() -> None:
     storage.find_by_sha256_checksum.assert_not_awaited()
     bulas.create_bula.assert_not_awaited()
     queue.enqueue_bula_ingestion.assert_not_awaited()
+
+
+@pytest.mark.anyio
+async def test_seed_source_change_withdraws_previous_publication() -> None:
+    previous_bula_id = UUID("55555555-5555-5555-5555-555555555555")
+    new_bula_id = UUID("66666666-6666-6666-6666-666666666666")
+    previous_publication = SimpleNamespace(
+        bula_id=previous_bula_id,
+        target_id="old-target",
+        bula=SimpleNamespace(status=BulaStatus.READY),
+    )
+    service, _, bulas, storage, queue = build_seed_service()
+    bulas.get_latest_system_publication_by_source_identity.return_value = (
+        previous_publication
+    )
+    storage.put_bytes.return_value = "stored_objects/new-revision"
+    new_bula = Mock(id=new_bula_id, file_address="stored_objects/new-revision")
+    bulas.create_bula.return_value = new_bula
+    candidate = build_candidate()
+
+    summary = await service.seed_documents(
+        admin_email="admin@example.com",
+        candidates=[candidate],
+        is_dry_run=False,
+    )
+
+    assert summary.inserted == 1
+    assert summary.queued == 1
+    bulas.create_system_publication.assert_awaited_once_with(
+        bula=new_bula,
+        manifest_entry=candidate.manifest_entry,
+        supersedes_bula_id=previous_bula_id,
+    )
+    bulas.update_system_publication_state.assert_awaited_once_with(
+        publication=previous_publication,
+        state=SystemBulaPublicationState.WITHDRAWN,
+        withdrawal_reason="ANVISA source metadata or checksum changed.",
+    )
+    queue.enqueue_bula_ingestion.assert_awaited_once_with(bula_id=new_bula_id)
