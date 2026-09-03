@@ -3,7 +3,12 @@ from __future__ import annotations
 import asyncio
 from uuid import UUID, uuid4
 
-from app.modules.bulas.models import Bula, BulaStatus
+from app.modules.bulas.models import (
+    Bula,
+    BulaCorpus,
+    BulaStatus,
+    SystemBulaPublicationState,
+)
 from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.base_chunker import BaseChunker
 from app.modules.rag.debug_artifacts import (
@@ -76,6 +81,17 @@ class RAGIngestionService:
             assert bula is not None
             if bula.status == BulaStatus.READY:
                 return bula
+
+            publication = bula.system_publication
+            if (
+                bula.corpus == BulaCorpus.SYSTEM
+                and publication is not None
+                and publication.state != SystemBulaPublicationState.STAGED
+            ):
+                async with observer.stage("reset_publication"):
+                    await self.bula_repo.reset_system_publication_for_reingestion(
+                        publication=publication,
+                    )
 
             async with observer.stage("mark_processing") as stage:
                 bula = await self.bula_repo.update_ingestion_status(
