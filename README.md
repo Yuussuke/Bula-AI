@@ -346,6 +346,43 @@ its size and checksum, creates bulas with `corpus=system`, and enqueues the
 normal `ingest_bula` job. The exact ANVISA product name is stored as the bula
 name and the canonical ANVISA query as its source URL.
 
+Seeding and ingestion never publish a document. The seed stores the complete
+manifest provenance with publication state `staged`; a successful worker run
+changes only the ingestion status to `ready`. This preserves the operator
+validation boundary above without accepting legacy manifest review metadata as
+publication evidence.
+
+After the worker reports `ready`, record the independent review and publication
+decisions with an active reviewer or administrator account:
+
+```bash
+make manage-system-bula ARGS="vet --bula-id <uuid> --actor-email reviewer@example.com --notes 'Compared with the selected ANVISA record and PDF'"
+make manage-system-bula ARGS="publish --bula-id <uuid> --actor-email admin@example.com"
+```
+
+Only an administrator can publish or withdraw a document. Administrators and
+reviewers can vet or reject it. A withdrawal or rejection requires a reason:
+
+```bash
+make manage-system-bula ARGS="withdraw --bula-id <uuid> --actor-email admin@example.com --notes 'ANVISA source changed'"
+make manage-system-bula ARGS="reject --bula-id <uuid> --actor-email reviewer@example.com --notes 'Presentation does not match the selected record'"
+```
+
+Authenticated clients discover system bulas through `GET /api/v1/bulas/system`
+and `GET /api/v1/bulas/system/{bula_id}`. Both endpoints expose only documents
+whose corpus is `system`, ingestion status is `ready`, publication state is
+`published`, and stored-object checksum and size still match the vetted
+provenance. The dense chat endpoint applies the same policy. Private bulas
+remain queryable only by their owner, while `shared` corpus access stays closed
+until its separate review workflow is implemented.
+
+`canonical_source_url` preserves the exact ANVISA search request used during
+selection. It is an API provenance reference, not a guaranteed browser link:
+ANVISA's security layer can require an established Bulário session or block a
+direct request. To review a document manually, open the official Bulário
+Eletrônico and search using the stored product, manufacturer, registration,
+expedition, and source-record identity.
+
 ### RAG ingestion observability
 
 The PGQueuer ingestion worker emits structured logs for every RAG ingestion run.
