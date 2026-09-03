@@ -1,7 +1,16 @@
 from typing import cast
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, File, Form, Query, UploadFile, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    Form,
+    HTTPException,
+    Query,
+    UploadFile,
+    status,
+)
 
 from app.modules.auth import models as auth_models
 from app.modules.auth.dependencies import get_current_user
@@ -11,7 +20,7 @@ from app.modules.bulas.schemas import (
     BulaStatusResponse,
     SystemBulaResponse,
 )
-from app.modules.bulas.service import BulaService
+from app.modules.bulas.service import BulaService, SystemBulaNotFoundError
 
 router = APIRouter(prefix="/bulas", tags=["bulas"])
 
@@ -70,7 +79,13 @@ async def get_system_bula(
     bula_service: BulaService = Depends(get_bula_service),
 ) -> SystemBulaResponse:
     _ = current_user
-    bula = await bula_service.get_published_system_bula(bula_id=bula_id)
+    try:
+        bula = await bula_service.get_published_system_bula(bula_id=bula_id)
+    except SystemBulaNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Bula de sistema nao encontrada.",
+        ) from exc
     return SystemBulaResponse.from_bula(bula)
 
 

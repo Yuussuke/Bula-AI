@@ -38,6 +38,10 @@ class SystemBulaPublicationError(Exception):
     """Raised when a system bula publication transition is not allowed."""
 
 
+class SystemBulaNotFoundError(Exception):
+    """Raised when a queryable published system bula is not found."""
+
+
 class BulaService:
     def __init__(
         self,
@@ -128,10 +132,7 @@ class BulaService:
     async def get_published_system_bula(self, *, bula_id: UUID) -> Bula:
         bula = await self.repo.get_published_system_bula(bula_id=bula_id)
         if bula is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Bula de sistema nao encontrada.",
-            )
+            raise SystemBulaNotFoundError()
         return bula
 
     async def get_bula_status_for_user(
