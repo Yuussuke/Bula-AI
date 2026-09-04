@@ -3,7 +3,7 @@ from uuid import UUID
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
 
-from app.modules.chat.models import ChatRole, RetrievalMode
+from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, RetrievalMode
 
 
 class ChatMessageCreate(BaseModel):
@@ -36,6 +36,26 @@ class ChatSessionResponse(BaseModel):
     messages: list[ChatMessageResponse] = Field(default_factory=list)
 
     model_config = ConfigDict(from_attributes=True)
+
+    @classmethod
+    def from_session(
+        cls,
+        session: ChatSession,
+        *,
+        messages: list[ChatMessage] | None = None,
+    ) -> "ChatSessionResponse":
+        return cls(
+            id=session.id,
+            user_id=session.user_id,
+            bula_id=session.bula_id,
+            title=session.title,
+            created_at=session.created_at,
+            updated_at=session.updated_at,
+            messages=[
+                ChatMessageResponse.model_validate(message)
+                for message in messages or []
+            ],
+        )
 
 
 class DirectAskRequest(BaseModel):
