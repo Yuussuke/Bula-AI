@@ -9,10 +9,10 @@ from langchain_core.callbacks import (
 )
 from langchain_core.documents import Document
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import AIMessage, BaseMessage
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.retrievers import BaseRetriever
-from pydantic import ConfigDict
+from pydantic import ConfigDict, Field
 
 from app.modules.rag.chain import (
     build_dense_rag_chain,
@@ -49,6 +49,7 @@ class FakeRetriever(BaseRetriever):
 
 class FakeChatModel(BaseChatModel):
     response: str
+    received_messages: list[BaseMessage] = Field(default_factory=list)
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -63,7 +64,7 @@ class FakeChatModel(BaseChatModel):
         run_manager: CallbackManagerForLLMRun | None = None,
         **kwargs: Any,
     ) -> ChatResult:
-        _ = messages
+        self.received_messages = list(messages)
         _ = stop
         _ = run_manager
         _ = kwargs
@@ -129,3 +130,28 @@ async def test_chain_with_mock_llm_produces_output() -> None:
             "relevance_score": 0.95,
         }
     ]
+
+
+@pytest.mark.anyio
+async def test_chain_includes_prior_messages_before_current_question() -> None:
+    chat_model = FakeChatModel(response="Resposta contextual.")
+    chain = build_dense_rag_chain(
+        retriever=FakeRetriever(documents=[build_document()]),
+        llm=chat_model,
+    )
+
+    await chain.ainvoke(
+        {
+            "question": "E para criancas?",
+            "chat_history": [
+                HumanMessage(content="Como devo usar este medicamento?"),
+                AIMessage(content="Use conforme a secao [Posologia]."),
+            ],
+        }
+    )
+
+    assert [message.content for message in chat_model.received_messages[1:3]] == [
+        "Como devo usar este medicamento?",
+        "Use conforme a secao [Posologia].",
+    ]
+    assert "E para criancas?" in str(chat_model.received_messages[-1].content)

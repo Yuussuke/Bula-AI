@@ -111,6 +111,51 @@ class ChatRepository:
         await self.db.refresh(chat_message)
         return chat_message
 
+    async def add_turn(
+        self,
+        *,
+        session: ChatSession,
+        question: str,
+        answer: str,
+        retrieval_mode: RetrievalMode,
+    ) -> tuple[ChatMessage, ChatMessage]:
+        user_message = ChatMessage(
+            session=session,
+            role=ChatRole.USER,
+            content=question,
+            retrieval_mode=retrieval_mode,
+        )
+        assistant_message = ChatMessage(
+            session=session,
+            role=ChatRole.ASSISTANT,
+            content=answer,
+            retrieval_mode=retrieval_mode,
+        )
+        self.db.add_all([user_message, assistant_message])
+
+        try:
+            await self.db.commit()
+        except SQLAlchemyError as exc:
+            await self.db.rollback()
+            raise ChatPersistenceError() from exc
+
+        await self.db.refresh(user_message)
+        await self.db.refresh(assistant_message)
+        return user_message, assistant_message
+
+    async def get_session_for_user(
+        self,
+        *,
+        session_id: UUID,
+        user_id: int,
+    ) -> ChatSession | None:
+        statement = select(ChatSession).where(
+            ChatSession.id == session_id,
+            ChatSession.user_id == user_id,
+        )
+        result = await self.db.execute(statement)
+        return result.scalar_one_or_none()
+
     async def get_session_history(self, *, session_id: UUID) -> list[ChatMessage]:
         statement = (
             select(ChatMessage)
@@ -119,6 +164,22 @@ class ChatRepository:
         )
         result = await self.db.execute(statement)
         return list(result.scalars().all())
+
+    async def get_recent_session_history(
+        self,
+        *,
+        session_id: UUID,
+        message_limit: int,
+    ) -> list[ChatMessage]:
+        statement = (
+            select(ChatMessage)
+            .where(ChatMessage.session_id == session_id)
+            .order_by(ChatMessage.created_at.desc(), ChatMessage.id.desc())
+            .limit(message_limit)
+        )
+        result = await self.db.execute(statement)
+        newest_first_messages = list(result.scalars().all())
+        return list(reversed(newest_first_messages))
 
     async def list_user_sessions(
         self,

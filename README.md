@@ -383,6 +383,21 @@ direct request. To review a document manually, open the official Bulário
 Eletrônico and search using the stored product, manufacturer, registration,
 expedition, and source-record identity.
 
+### Dense chat sessions
+
+Start a conversation for a queryable bula with
+`POST /api/v1/chat/sessions/{bula_id}/ask`. Continue it with
+`POST /api/v1/chat/sessions/{session_id}/messages`; each successful request
+persists the user and assistant messages together. The service rebuilds the
+prompt history from PostgreSQL on every follow-up and sends at most the last 10
+complete turns to the model, so restarting the API does not erase context.
+
+Authenticated users can reload their own conversations with
+`GET /api/v1/chat/sessions` and `GET /api/v1/chat/sessions/{session_id}`.
+Session ownership is enforced as a not-found response, and continuing a session
+also rechecks the current bula access policy. A withdrawn or otherwise
+unqueryable system bula cannot receive new chat turns.
+
 ### RAG ingestion observability
 
 The PGQueuer ingestion worker emits structured logs for every RAG ingestion run.
