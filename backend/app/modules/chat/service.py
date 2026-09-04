@@ -211,10 +211,23 @@ class ChatService:
         self,
         messages: list[ChatMessage],
     ) -> list[BaseMessage]:
-        chat_history: list[BaseMessage] = []
+        complete_turns: list[tuple[ChatMessage, ChatMessage]] = []
+        pending_user_message: ChatMessage | None = None
+
         for message in messages:
             if message.role == ChatRole.USER:
-                chat_history.append(HumanMessage(content=message.content))
-            else:
-                chat_history.append(AIMessage(content=message.content))
+                pending_user_message = message
+                continue
+
+            if pending_user_message is None:
+                continue
+
+            complete_turns.append((pending_user_message, message))
+            pending_user_message = None
+
+        chat_history: list[BaseMessage] = []
+        for user_message, assistant_message in complete_turns[-MAX_PRIOR_CHAT_TURNS:]:
+            chat_history.append(HumanMessage(content=user_message.content))
+            chat_history.append(AIMessage(content=assistant_message.content))
+
         return chat_history

@@ -576,6 +576,51 @@ async def test_follow_up_caps_loaded_history_at_ten_prior_turns(
 
 
 @pytest.mark.anyio
+async def test_follow_up_ignores_incomplete_history_turns(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    access_token = await get_access_token(client)
+    user = await get_user_by_email(db_session, email=TEST_USER["email"])
+    bula = await create_ready_bula(db_session, user_id=user.id)
+    fake_factory = override_rag_chain_factory()
+
+    first_response = await client.post(
+        f"/api/v1/chat/sessions/{bula.id}/ask",
+        json={"question": "Pergunta completa"},
+        headers=build_auth_headers(access_token),
+    )
+    session_id = UUID(first_response.json()["session_id"])
+    chat_repository = ChatRepository(db=db_session)
+    await chat_repository.add_message(
+        session_id=session_id,
+        role=ChatRole.ASSISTANT,
+        content="Resposta sem pergunta",
+        retrieval_mode=RetrievalMode.DENSE,
+    )
+    await chat_repository.add_message(
+        session_id=session_id,
+        role=ChatRole.USER,
+        content="Pergunta sem resposta",
+        retrieval_mode=RetrievalMode.DENSE,
+    )
+
+    follow_up_response = await client.post(
+        f"/api/v1/chat/sessions/{session_id}/messages",
+        json={"question": "Nova pergunta"},
+        headers=build_auth_headers(access_token),
+    )
+
+    assert follow_up_response.status_code == 200, follow_up_response.json()
+    loaded_history = fake_factory.invocations[-1]["chat_history"]
+    assert isinstance(loaded_history, list)
+    assert [message.content for message in loaded_history] == [
+        "Pergunta completa",
+        "Resposta com citacao [Posologia].",
+    ]
+
+
+@pytest.mark.anyio
 async def test_session_can_be_reloaded_with_complete_history(
     client: AsyncClient,
     db_session: AsyncSession,
