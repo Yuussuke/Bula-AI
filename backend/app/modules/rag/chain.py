@@ -5,8 +5,9 @@ from typing import cast
 
 from langchain_core.documents import Document
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.messages import BaseMessage
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.runnables import Runnable, RunnableLambda, RunnablePassthrough
 
@@ -31,6 +32,7 @@ RAG_PROMPT = ChatPromptTemplate.from_messages(
                 "a consultar um profissional de saude."
             ),
         ),
+        MessagesPlaceholder(variable_name="chat_history", optional=True),
         (
             "human",
             (
@@ -56,7 +58,7 @@ class RAGChainFactory:
         self,
         *,
         bula_id: str,
-    ) -> Runnable[dict[str, str], dict[str, object]]:
+    ) -> Runnable[dict[str, object], dict[str, object]]:
         retriever = self.dense_retriever_builder(bula_id)
         llm = self.llm_builder()
         return build_dense_rag_chain(retriever=retriever, llm=llm)
@@ -66,7 +68,7 @@ def build_dense_rag_chain(
     *,
     retriever: BaseRetriever,
     llm: BaseChatModel,
-) -> Runnable[dict[str, str], dict[str, object]]:
+) -> Runnable[dict[str, object], dict[str, object]]:
     retrieve_documents = RunnableLambda(_extract_question) | retriever
     answer_chain = (
         RunnableLambda(_build_prompt_input) | RAG_PROMPT | llm | StrOutputParser()
@@ -74,7 +76,7 @@ def build_dense_rag_chain(
     chain = RunnablePassthrough.assign(documents=retrieve_documents).assign(
         answer=answer_chain
     ) | RunnableLambda(_build_chain_output)
-    return cast(Runnable[dict[str, str], dict[str, object]], chain)
+    return cast(Runnable[dict[str, object], dict[str, object]], chain)
 
 
 def format_documents(documents: list[Document]) -> str:
@@ -110,15 +112,17 @@ def build_source_chunks(documents: list[Document]) -> list[dict[str, object]]:
     ]
 
 
-def _extract_question(inputs: dict[str, str]) -> str:
-    return inputs["question"]
+def _extract_question(inputs: dict[str, object]) -> str:
+    return str(inputs["question"])
 
 
-def _build_prompt_input(inputs: dict[str, object]) -> dict[str, str]:
+def _build_prompt_input(inputs: dict[str, object]) -> dict[str, object]:
     documents = cast(list[Document], inputs["documents"])
+    chat_history = cast(list[BaseMessage], inputs.get("chat_history", []))
     return {
         "context": format_documents(documents),
         "question": str(inputs["question"]),
+        "chat_history": chat_history,
     }
 
 
