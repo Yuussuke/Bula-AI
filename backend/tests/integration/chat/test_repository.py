@@ -7,7 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.auth.models import User
-from app.modules.chat.models import ChatMessage, ChatRole
+from app.modules.chat.models import ChatMessage, ChatRole, RetrievalMode
 from app.modules.chat.repository import ChatPersistenceError, ChatRepository
 
 
@@ -131,3 +131,34 @@ async def test_list_user_sessions_paginated(db_session: AsyncSession) -> None:
     assert [session.id for session in paginated_sessions] == [
         session.id for session in reversed(created_sessions)
     ][1:3]
+
+
+@pytest.mark.anyio
+async def test_recent_history_returns_latest_messages_in_chronological_order(
+    db_session: AsyncSession,
+) -> None:
+    user = await create_user(db_session, email="chat-recent-history@bulaai.com")
+    repo = ChatRepository(db=db_session)
+    chat_session = await repo.create_session(
+        user_id=cast(int, user.id),
+        first_question="Pergunta inicial",
+    )
+    for turn_number in range(3):
+        await repo.add_turn(
+            session=chat_session,
+            question=f"Pergunta {turn_number}",
+            answer=f"Resposta {turn_number}",
+            retrieval_mode=RetrievalMode.DENSE,
+        )
+
+    recent_messages = await repo.get_recent_session_history(
+        session_id=chat_session.id,
+        message_limit=4,
+    )
+
+    assert [message.content for message in recent_messages] == [
+        "Pergunta 1",
+        "Resposta 1",
+        "Pergunta 2",
+        "Resposta 2",
+    ]
