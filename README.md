@@ -398,6 +398,40 @@ Session ownership is enforced as a not-found response, and continuing a session
 also rechecks the current bula access policy. A withdrawn or otherwise
 unqueryable system bula cannot receive new chat turns.
 
+### Dense retrieval quality contract
+
+The default `intfloat/multilingual-e5-large` model uses the asymmetric E5
+retrieval contract: document text is embedded as `passage: <text>` and user
+queries as `query: <text>`. Every Qdrant point stores an `embedding_profile`,
+and the dense retriever filters by that exact profile as well as `bula_id`.
+This fails closed instead of silently mixing vectors produced by different
+models or input contracts.
+
+After deploying a new embedding profile, existing Qdrant points must be
+re-embedded before they can be queried. Validate and then update one bula
+without parsing the PDF or running semantic chunking again:
+
+```bash
+make reindex-bula-embeddings ARGS="--bula-id <uuid> --dry-run"
+make reindex-bula-embeddings ARGS="--bula-id <uuid>"
+```
+
+The reindex command reads the existing chunks, computes every vector before
+writing, preserves point IDs and payload metadata, and then records the active
+embedding profile. It does not change publication or ingestion status.
+
+For follow-up turns, the retrieval query includes the medication name and the
+previous user question when the new question is context-dependent. The dense
+retriever over-fetches candidates but returns at most four evidence-bearing
+chunks; Markdown headings without body content are not sent to the answer
+model or exposed as sources. No fixed similarity threshold is applied before
+the retrieval evaluation has calibrated one for this corpus.
+
+The answer prompt treats retrieved chunks as a sample rather than proof of the
+entire leaflet. If evidence is insufficient, it must say that the information
+was not found in the retrieved excerpts instead of claiming that it does not
+exist in the complete leaflet.
+
 ### RAG ingestion observability
 
 The PGQueuer ingestion worker emits structured logs for every RAG ingestion run.
