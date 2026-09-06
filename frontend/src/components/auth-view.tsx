@@ -3,7 +3,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { Pill, Shield, Sparkles } from "lucide-react";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,10 +11,13 @@ import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { loginRequest, registerRequest } from "@/lib/api";
+import { getPostAuthPath } from "@/lib/auth-navigation";
 import { useAuthStore } from "@/store/auth";
 
 export function AuthView() {
+  const location = useLocation();
   const navigate = useNavigate();
+  const postAuthPath = getPostAuthPath(location.state);
   const setAuth = useAuthStore((state) => state.setAuth);
   const [loginEmail, setLoginEmail] = useState("");
   const [loginPassword, setLoginPassword] = useState("");
@@ -31,7 +34,7 @@ export function AuthView() {
         accessToken: payload.token.access_token,
         user: payload.user,
       });
-      void navigate("/", { replace: true });
+      void navigate(postAuthPath, { replace: true });
     },
     onError: (error: Error) => {
       setLoginErrorMessage(error.message);
@@ -45,7 +48,7 @@ export function AuthView() {
         accessToken: payload.token.access_token,
         user: payload.user,
       });
-      void navigate("/", { replace: true });
+      void navigate(postAuthPath, { replace: true });
     },
     onError: (error: Error) => {
       setRegisterErrorMessage(error.message);

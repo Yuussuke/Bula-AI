@@ -9,6 +9,8 @@ const API_BASE_URL =
     : "http://localhost:8000";
 const AUTH_PREFIX = "/api/v1/auth";
 
+let activeRefreshRequest: Promise<string | null> | null = null;
+
 interface AuthToken {
   access_token: string;
   token_type: string;
@@ -28,8 +30,18 @@ interface ValidationErrorItem {
   msg?: string;
 }
 
-interface AuthFetchOptions extends RequestInit {
+export interface AuthFetchOptions extends RequestInit {
   retryOnAuthError?: boolean;
+}
+
+export class ApiError extends Error {
+  readonly status: number;
+
+  constructor(status: number, message: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
 }
 
 export class SessionExpiredError extends Error {
@@ -67,7 +79,7 @@ function clearAuthAndCache(): void {
   queryClient.clear();
 }
 
-async function refreshAccessToken(): Promise<string | null> {
+async function requestRefreshedAccessToken(): Promise<string | null> {
   const refreshResponse = await fetch(`${API_BASE_URL}${AUTH_PREFIX}/refresh`, {
     method: "POST",
     credentials: "include",
@@ -81,13 +93,26 @@ async function refreshAccessToken(): Promise<string | null> {
   return refreshPayload.access_token;
 }
 
+function refreshAccessToken(): Promise<string | null> {
+  if (activeRefreshRequest) {
+    return activeRefreshRequest;
+  }
+
+  activeRefreshRequest = requestRefreshedAccessToken().finally(() => {
+    activeRefreshRequest = null;
+  });
+
+  return activeRefreshRequest;
+}
+
 export async function authFetch(path: string, init: AuthFetchOptions = {}): Promise<Response> {
   const authState = useAuthStore.getState();
+  const accessTokenUsedForRequest = authState.accessToken;
   const shouldRetryOnAuthError = init.retryOnAuthError ?? true;
 
   const requestHeaders = new Headers(init.headers);
-  if (authState.accessToken) {
-    requestHeaders.set("Authorization", `Bearer ${authState.accessToken}`);
+  if (accessTokenUsedForRequest) {
+    requestHeaders.set("Authorization", `Bearer ${accessTokenUsedForRequest}`);
   }
 
   const response = await fetch(`${API_BASE_URL}${path}`, {
@@ -105,13 +130,24 @@ export async function authFetch(path: string, init: AuthFetchOptions = {}): Prom
     throw new SessionExpiredError();
   }
 
-  const refreshedToken = await refreshAccessToken();
+  let refreshedToken: string | null;
+  try {
+    const latestAccessToken = useAuthStore.getState().accessToken;
+    const tokenWasAlreadyRefreshed =
+      latestAccessToken !== null && latestAccessToken !== accessTokenUsedForRequest;
+
+    refreshedToken = tokenWasAlreadyRefreshed ? latestAccessToken : await refreshAccessToken();
+  } catch {
+    clearAuthAndCache();
+    throw new SessionExpiredError();
+  }
+
   if (!refreshedToken) {
     clearAuthAndCache();
     throw new SessionExpiredError();
   }
 
-  authState.setAuth({ accessToken: refreshedToken });
+  authState.setAccessToken(refreshedToken);
 
   const retryHeaders = new Headers(init.headers);
   retryHeaders.set("Authorization", `Bearer ${refreshedToken}`);
@@ -130,10 +166,10 @@ export async function authFetch(path: string, init: AuthFetchOptions = {}): Prom
   return retryResponse;
 }
 
-async function requestJson<T>(path: string, init?: AuthFetchOptions): Promise<T> {
+export async function requestJson<T>(path: string, init?: AuthFetchOptions): Promise<T> {
   const response = await authFetch(path, init);
   if (!response.ok) {
-    throw new Error(await parseErrorMessage(response));
+    throw new ApiError(response.status, await parseErrorMessage(response));
   }
 
   return (await response.json()) as T;
@@ -179,7 +215,7 @@ export async function logoutRequest(): Promise<void> {
   });
 
   if (!response.ok && response.status !== 401) {
-    throw new Error(await parseErrorMessage(response));
+    throw new ApiError(response.status, await parseErrorMessage(response));
   }
 }
 
@@ -194,7 +230,7 @@ export async function bootstrapAuthSession(): Promise<void> {
       return;
     }
 
-    authState.setAuth({ accessToken: refreshedToken });
+    authState.setAccessToken(refreshedToken);
     const user = await meRequest();
     authState.setAuth({ accessToken: refreshedToken, user });
   } catch {
