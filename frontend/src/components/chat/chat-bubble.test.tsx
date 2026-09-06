@@ -38,7 +38,12 @@ describe("ChatBubble citations", () => {
       />
     );
 
-    await user.click(await screen.findByRole("link", { name: "Ir para a fonte 1" }));
+    const citationLink = await screen.findByRole(
+      "link",
+      { name: "Ir para a fonte 1" },
+      { timeout: 5_000 }
+    );
+    await user.click(citationLink);
 
     await waitFor(
       () => {

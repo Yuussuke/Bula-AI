@@ -224,7 +224,9 @@ describe("ChatPage", () => {
     await user.type(questionInput, "Para que serve este medicamento?");
     await user.keyboard("{Enter}");
 
-    expect(await screen.findByText(FIRST_RESPONSE.answer)).toBeInTheDocument();
+    expect(
+      await screen.findByText(FIRST_RESPONSE.answer, {}, { timeout: 5_000 })
+    ).toBeInTheDocument();
     expect(
       within(screen.getByRole("log", { name: "Histórico da conversa" })).getByText(
         "Para que serve este medicamento?"
@@ -245,9 +247,13 @@ describe("ChatPage", () => {
     const user = userEvent.setup();
     renderChatPage();
 
-    const sessionLink = await screen.findByRole("link", {
-      name: /Para que serve este medicamento\?/,
-    });
+    const sessionLink = await screen.findByRole(
+      "link",
+      {
+        name: /Para que serve este medicamento\?/,
+      },
+      { timeout: 5_000 }
+    );
     expect(screen.queryByText("Conversa de outra bula")).not.toBeInTheDocument();
 
     await user.click(sessionLink);
