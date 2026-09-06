@@ -71,7 +71,12 @@ class ChatService:
             raise QueryableBulaNotFoundError()
 
         chain = chain_factory.build_dense_chain(bula_id=str(bula_id))
-        chain_result = await chain.ainvoke({"question": payload.question})
+        chain_result = await chain.ainvoke(
+            {
+                "question": payload.question,
+                "drug_name": bula.drug_name,
+            }
+        )
         answer, source_chunks = self._parse_chain_result(chain_result)
 
         chat_session, _, _ = await self.chat_repository.create_session_with_messages(
@@ -122,6 +127,7 @@ class ChatService:
         chain_result = await chain.ainvoke(
             {
                 "question": payload.question,
+                "drug_name": bula.drug_name,
                 "chat_history": chat_history,
             }
         )

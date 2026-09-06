@@ -6,7 +6,7 @@ POSTGRES_IMAGE_TAG := 18
 POSTGRES_IMAGE := $(POSTGRES_IMAGE_NAME):$(POSTGRES_IMAGE_TAG)
 POSTGRES_IMAGE_CONTEXT := docker/bula_ai_postgres
 
-.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate pgq-install pgq-upgrade pgq-verify verify-postgres makemigrations create-admin download-anvisa-bulas seed-system-bulas manage-system-bula benchmark-pdf-markdown benchmark-semantic-chunking test test-unit test-integration test-cov lint typecheck format reset-db help dependencies add-dependency
+.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate pgq-install pgq-upgrade pgq-verify verify-postgres makemigrations create-admin download-anvisa-bulas seed-system-bulas manage-system-bula reindex-bula-embeddings benchmark-pdf-markdown benchmark-semantic-chunking test test-unit test-integration test-cov lint typecheck format reset-db help dependencies add-dependency
 
 # --- Docker ---
 build:
@@ -74,6 +74,9 @@ seed-system-bulas:
 
 manage-system-bula:
 	$(COMPOSE) exec api uv run python -m app.scripts.manage_system_bula_publication $(ARGS)
+
+reindex-bula-embeddings:
+	$(COMPOSE) exec api uv run python -m app.scripts.reindex_bula_embeddings $(ARGS)
 
 benchmark-pdf-markdown:
 	cd backend && uv run python -m scripts.benchmark_pdf_markdown $(ARGS)
@@ -147,6 +150,7 @@ help:
 	@echo "  make download-anvisa-bulas - Download ANVISA PDFs and generate a manifest"
 	@echo "  make seed-system-bulas - Seed downloaded PDFs into the system corpus"
 	@echo "  make manage-system-bula - Manage system bula publication state"
+	@echo "  make reindex-bula-embeddings - Re-embed existing Qdrant chunks for one bula"
 	@echo "  make benchmark-pdf-markdown - Compare legacy/native PDF parsing (ARGS=\"<five PDFs>\")"
 	@echo "  make benchmark-semantic-chunking - Compare retrieval_v3 chunking models on six focused sections"
 	@echo "  make reset-db       - Destroy volumes and remigrate from scratch"

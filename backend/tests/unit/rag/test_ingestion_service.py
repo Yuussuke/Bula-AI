@@ -132,6 +132,7 @@ class FailingChunker:
 class FakeEmbeddings:
     def __init__(self) -> None:
         self.texts: list[str] = []
+        self.embedding_profile = "test-model;input=plain-v1"
 
     def embed_documents(self, texts: list[str]) -> list[list[float]]:
         self.texts = texts
@@ -243,6 +244,9 @@ async def test_ingest_bula_moves_pending_to_processing_then_ready() -> None:
     assert embeddings.texts == ["Use conforme orientacao medica."]
     assert qdrant_store.did_ensure_collection is True
     assert qdrant_store.upserted_payloads[0]["bula_id"] == str(BULA_ID)
+    assert qdrant_store.upserted_payloads[0]["embedding_profile"] == (
+        "test-model;input=plain-v1"
+    )
 
 
 @pytest.mark.anyio

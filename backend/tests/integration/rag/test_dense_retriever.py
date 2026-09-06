@@ -10,6 +10,9 @@ from app.modules.rag.qdrant_store import QdrantVectorStore, make_point_id
 from app.modules.rag.retriever import DenseBulaRetriever
 
 
+TEST_EMBEDDING_PROFILE = "unspecified;input=plain-v1"
+
+
 class RecordingEmbeddings(LCEmbeddings):
     def __init__(self) -> None:
         self.queries: list[str] = []
@@ -29,6 +32,7 @@ def build_retriever_point(
     bula_id: str,
     chunk_text: str,
     vector: list[float] | None = None,
+    embedding_profile: str = TEST_EMBEDDING_PROFILE,
 ) -> PointStruct:
     return PointStruct(
         id=make_point_id(chunk_id),
@@ -42,6 +46,7 @@ def build_retriever_point(
             "chunk_index": 0,
             "manufacturer": "Example Pharma",
             "corpus": "private",
+            "embedding_profile": embedding_profile,
         },
     )
 
@@ -87,6 +92,40 @@ async def test_retriever_filters_by_bula_id(
     assert [document.metadata["bula_id"] for document in documents] == ["allowed-bula"]
     assert [document.metadata["chunk_id"] for document in documents] == [
         "allowed-chunk"
+    ]
+
+
+@pytest.mark.anyio
+async def test_retriever_excludes_points_from_an_incompatible_embedding_profile(
+    qdrant_test_context: tuple[QdrantVectorStore, AsyncQdrantClient, str],
+) -> None:
+    vector_store, _, _ = qdrant_test_context
+    await vector_store.ensure_collection()
+    await vector_store.upsert_points(
+        [
+            build_retriever_point(
+                chunk_id="current-profile",
+                bula_id="profile-bula",
+                chunk_text="Conteudo com o perfil atual.",
+            ),
+            build_retriever_point(
+                chunk_id="legacy-profile",
+                bula_id="profile-bula",
+                chunk_text="Conteudo vetorizado pelo contrato anterior.",
+                embedding_profile="legacy-profile",
+            ),
+        ]
+    )
+    retriever = DenseBulaRetriever(
+        bula_id="profile-bula",
+        qdrant_store=vector_store,
+        embeddings=build_embedding_adapter(),
+    )
+
+    documents = await retriever.ainvoke("Qual e o conteudo?")
+
+    assert [document.metadata["chunk_id"] for document in documents] == [
+        "current-profile"
     ]
 
 

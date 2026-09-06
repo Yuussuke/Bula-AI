@@ -33,7 +33,12 @@ def test_build_qdrant_point_uses_bula_and_chunk_payload_fields() -> None:
     )
     vector = [0.1, 0.2, 0.3]
 
-    point = build_qdrant_point(bula=bula, chunk=chunk, vector=vector)
+    point = build_qdrant_point(
+        bula=bula,
+        chunk=chunk,
+        vector=vector,
+        embedding_profile="test-model;input=plain-v1",
+    )
 
     assert point.id == make_point_id(chunk.chunk_id)
     assert point.vector == vector
@@ -46,4 +51,5 @@ def test_build_qdrant_point_uses_bula_and_chunk_payload_fields() -> None:
         "chunk_text": "Use conforme orientacao medica.",
         "chunk_id": "bula-123_chunk-0",
         "chunk_index": 0,
+        "embedding_profile": "test-model;input=plain-v1",
     }
