@@ -9,7 +9,7 @@ export interface AuthUser {
 
 interface SetAuthPayload {
   accessToken: string;
-  user?: AuthUser;
+  user: AuthUser;
 }
 
 interface AuthState {
@@ -17,6 +17,7 @@ interface AuthState {
   accessToken: string | null;
   authResolved: boolean;
   isAuthenticated: boolean;
+  setAccessToken: (accessToken: string) => void;
   setAuth: (payload: SetAuthPayload) => void;
   clearAuth: () => void;
   setAuthResolved: (authResolved: boolean) => void;
@@ -27,15 +28,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   accessToken: null,
   authResolved: false,
   isAuthenticated: false,
-  setAuth: ({ accessToken, user }) => {
+  setAccessToken: (accessToken) => {
     const existingUser = get().user;
-    const nextUser = user ?? existingUser;
-
     set({
       accessToken,
-      user: nextUser,
+      isAuthenticated: Boolean(accessToken && existingUser),
+    });
+  },
+  setAuth: ({ accessToken, user }) => {
+    set({
+      accessToken,
+      user,
       authResolved: true,
-      isAuthenticated: Boolean(accessToken && nextUser),
+      isAuthenticated: Boolean(accessToken && user),
     });
   },
   clearAuth: () => {

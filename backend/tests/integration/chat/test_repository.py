@@ -149,6 +149,7 @@ async def test_recent_history_returns_latest_messages_in_chronological_order(
             question=f"Pergunta {turn_number}",
             answer=f"Resposta {turn_number}",
             retrieval_mode=RetrievalMode.DENSE,
+            source_chunks=[],
         )
 
     recent_messages = await repo.get_recent_session_history(
