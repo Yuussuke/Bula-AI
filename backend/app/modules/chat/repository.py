@@ -49,6 +49,7 @@ class ChatRepository:
         first_question: str,
         answer: str,
         retrieval_mode: RetrievalMode,
+        source_chunks: list[dict[str, str | float]],
     ) -> tuple[ChatSession, ChatMessage, ChatMessage]:
         chat_session = ChatSession(
             user_id=user_id,
@@ -72,6 +73,7 @@ class ChatRepository:
             role=ChatRole.ASSISTANT,
             content=answer,
             retrieval_mode=retrieval_mode,
+            source_chunks=source_chunks,
         )
         self.db.add(assistant_message)
 
@@ -93,12 +95,14 @@ class ChatRepository:
         role: ChatRole,
         content: str,
         retrieval_mode: RetrievalMode | None = None,
+        source_chunks: list[dict[str, str | float]] | None = None,
     ) -> ChatMessage:
         chat_message = ChatMessage(
             session_id=session_id,
             role=role,
             content=content,
             retrieval_mode=retrieval_mode,
+            source_chunks=source_chunks or [],
         )
         self.db.add(chat_message)
 
@@ -118,6 +122,7 @@ class ChatRepository:
         question: str,
         answer: str,
         retrieval_mode: RetrievalMode,
+        source_chunks: list[dict[str, str | float]],
     ) -> tuple[ChatMessage, ChatMessage]:
         user_message = ChatMessage(
             session=session,
@@ -130,6 +135,7 @@ class ChatRepository:
             role=ChatRole.ASSISTANT,
             content=answer,
             retrieval_mode=retrieval_mode,
+            source_chunks=source_chunks,
         )
         self.db.add_all([user_message, assistant_message])
 

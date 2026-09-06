@@ -12,9 +12,18 @@ class ChatMessageCreate(BaseModel):
     retrieval_mode: RetrievalMode | None = None
 
 
+class SourceChunkResponse(BaseModel):
+    section_title: str
+    chunk_text: str
+    relevance_score: float = Field(
+        validation_alias=AliasChoices("relevance_score", "score")
+    )
+
+
 class ChatMessageResponse(ChatMessageCreate):
     id: UUID
     session_id: UUID
+    source_chunks: list[SourceChunkResponse] = Field(default_factory=list)
     created_at: datetime
     updated_at: datetime
 
@@ -78,14 +87,6 @@ class AskRequest(BaseModel):
             raise ValueError("Question cannot be blank.")
 
         return clean_question
-
-
-class SourceChunkResponse(BaseModel):
-    section_title: str
-    chunk_text: str
-    relevance_score: float = Field(
-        validation_alias=AliasChoices("relevance_score", "score")
-    )
 
 
 class AskResponse(BaseModel):

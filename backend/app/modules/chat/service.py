@@ -80,6 +80,7 @@ class ChatService:
             first_question=payload.question,
             answer=answer,
             retrieval_mode=payload.retrieval_mode,
+            source_chunks=self._serialize_source_chunks(source_chunks),
         )
 
         return AskResponse(
@@ -132,6 +133,7 @@ class ChatService:
             question=payload.question,
             answer=answer,
             retrieval_mode=payload.retrieval_mode,
+            source_chunks=self._serialize_source_chunks(source_chunks),
         )
         return AskResponse(
             session_id=chat_session.id,
@@ -206,6 +208,19 @@ class ChatService:
             ) from exc
 
         return answer, source_chunks
+
+    def _serialize_source_chunks(
+        self,
+        source_chunks: list[SourceChunkResponse],
+    ) -> list[dict[str, str | float]]:
+        return [
+            {
+                "section_title": source_chunk.section_title,
+                "chunk_text": source_chunk.chunk_text,
+                "relevance_score": source_chunk.relevance_score,
+            }
+            for source_chunk in source_chunks
+        ]
 
     def _build_chat_history(
         self,

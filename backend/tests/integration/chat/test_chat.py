@@ -285,6 +285,14 @@ async def test_endpoint_persists_both_messages(
     ]
     assert messages[0].content == "Qual e a dose?"
     assert messages[1].content == "Resposta com citacao [Posologia]."
+    assert messages[0].source_chunks == []
+    assert messages[1].source_chunks == [
+        {
+            "section_title": "Posologia",
+            "chunk_text": "Dose usual: 1 comprimido.",
+            "relevance_score": 0.95,
+        }
+    ]
 
 
 @pytest.mark.anyio
@@ -649,6 +657,18 @@ async def test_session_can_be_reloaded_with_complete_history(
     assert [message["content"] for message in detail_response.json()["messages"]] == [
         "Pergunta persistida",
         "Resposta com citacao [Posologia].",
+    ]
+    assert [
+        message["source_chunks"] for message in detail_response.json()["messages"]
+    ] == [
+        [],
+        [
+            {
+                "section_title": "Posologia",
+                "chunk_text": "Dose usual: 1 comprimido.",
+                "relevance_score": 0.95,
+            }
+        ],
     ]
     assert list_response.status_code == 200
     assert [session["id"] for session in list_response.json()] == [session_id]

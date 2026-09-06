@@ -4,7 +4,7 @@ import enum
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, ForeignKey, String, Text, Uuid
+from sqlalchemy import JSON, CheckConstraint, ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.base import Base, UUIDMixin, TimestampMixin
@@ -62,6 +62,11 @@ class ChatMessage(Base, UUIDMixin, TimestampMixin):
     role: Mapped[ChatRole] = mapped_column()
     content: Mapped[str] = mapped_column(Text)
     retrieval_mode: Mapped[RetrievalMode | None] = mapped_column(nullable=True)
+    source_chunks: Mapped[list[dict[str, str | float]]] = mapped_column(
+        JSON,
+        default=list,
+        nullable=False,
+    )
 
     session: Mapped["ChatSession"] = relationship(
         "ChatSession", back_populates="messages"
