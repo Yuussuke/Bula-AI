@@ -430,7 +430,8 @@ the retrieval evaluation has calibrated one for this corpus.
 The answer prompt treats retrieved chunks as a sample rather than proof of the
 entire leaflet. If evidence is insufficient, it must say that the information
 was not found in the retrieved excerpts instead of claiming that it does not
-exist in the complete leaflet.
+exist in the complete leaflet. Answers cite context using numeric references;
+only the cited chunks are returned as visible sources, in citation order.
 
 ### RAG ingestion observability
 
