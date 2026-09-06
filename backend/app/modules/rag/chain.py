@@ -18,6 +18,9 @@ NO_CONTEXT_MESSAGE = (
     "Informe que a bula disponivel nao trouxe contexto suficiente."
 )
 CITATION_PATTERN = re.compile(r"\[(\d+)\]")
+CITATION_WITH_SPACING_PATTERN = re.compile(
+    r"(?P<leading>[ \t]*)\[(?P<number>\d+)\](?P<trailing>[ \t]*)"
+)
 
 RAG_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -220,14 +223,23 @@ def _select_cited_documents(
     }
 
     def replace_citation(citation_match: re.Match[str]) -> str:
-        original_number = int(citation_match.group(1))
+        original_number = int(citation_match.group("number"))
         displayed_number = citation_number_mapping.get(original_number)
         if displayed_number is None:
-            return citation_match.group(0)
+            leading_spacing = citation_match.group("leading")
+            trailing_spacing = citation_match.group("trailing")
+            if leading_spacing and trailing_spacing:
+                return " "
 
-        return f"[{displayed_number}]"
+            return ""
 
-    normalized_answer = CITATION_PATTERN.sub(replace_citation, answer)
+        return (
+            f"{citation_match.group('leading')}"
+            f"[{displayed_number}]"
+            f"{citation_match.group('trailing')}"
+        )
+
+    normalized_answer = CITATION_WITH_SPACING_PATTERN.sub(replace_citation, answer)
     cited_documents = [
         documents[document_number - 1] for document_number in cited_document_numbers
     ]

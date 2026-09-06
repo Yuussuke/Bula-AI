@@ -184,6 +184,40 @@ async def test_chain_returns_only_cited_documents_and_renumbers_sources() -> Non
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("invalid_citation", ["[0]", "[99]"])
+async def test_chain_removes_invalid_citations_without_dropping_valid_sources(
+    invalid_citation: str,
+) -> None:
+    chain = build_dense_rag_chain(
+        retriever=FakeRetriever(documents=[build_document()]),
+        llm=FakeChatModel(
+            response=(
+                "Orientacao sustentada pelo trecho [1]. "
+                f"Referencia inexistente {invalid_citation}."
+            )
+        ),
+    )
+
+    result = await chain.ainvoke(
+        {
+            "question": "Qual e a orientacao?",
+            "drug_name": "Dipirona",
+        }
+    )
+
+    assert result["answer"] == (
+        "Orientacao sustentada pelo trecho [1]. Referencia inexistente."
+    )
+    assert result["source_chunks"] == [
+        {
+            "section_title": "Posologia",
+            "chunk_text": "Dose usual: 1 comprimido apos as refeicoes.",
+            "relevance_score": 0.95,
+        }
+    ]
+
+
+@pytest.mark.anyio
 async def test_chain_numbers_cited_sources_by_relevance_not_mention_order() -> None:
     retriever = FakeRetriever(
         documents=[
