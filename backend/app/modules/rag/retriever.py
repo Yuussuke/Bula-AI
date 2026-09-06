@@ -1,4 +1,5 @@
 import asyncio
+import re
 from typing import Any, Self
 
 from langchain_core.callbacks import (
@@ -16,6 +17,8 @@ from app.modules.rag.qdrant_store import QdrantVectorStore
 
 CITATION_METADATA_KEYS = ("section_title", "chunk_id", "drug_name", "bula_id")
 EXTRA_PAYLOAD_METADATA_KEYS = ("chunk_index", "manufacturer", "corpus")
+STRUCTURAL_HEADING_PATTERN = re.compile(r"^\s{0,3}#{1,6}\s+.*$", re.MULTILINE)
+DEFAULT_CANDIDATE_MULTIPLIER = 3
 SYNC_RETRIEVER_ERROR = (
     "DenseBulaRetriever must be used via async path "
     "(ainvoke / _aget_relevant_documents)"
@@ -27,6 +30,7 @@ class DenseBulaRetriever(BaseRetriever):
     k: int = 4
     qdrant_store: QdrantVectorStore
     embeddings: EmbeddingAdapter
+    candidate_multiplier: int = DEFAULT_CANDIDATE_MULTIPLIER
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -34,6 +38,9 @@ class DenseBulaRetriever(BaseRetriever):
     def validate_k(self) -> Self:
         if self.k < 1:
             raise ValueError("k must be >= 1")
+
+        if self.candidate_multiplier < 1:
+            raise ValueError("candidate_multiplier must be >= 1")
 
         return self
 
@@ -47,14 +54,23 @@ class DenseBulaRetriever(BaseRetriever):
         query_vector = await asyncio.to_thread(self.embeddings.embed_query, query)
         search_result = await self.qdrant_store.search_similar(
             vector=query_vector,
-            limit=self.k,
+            limit=self.k * self.candidate_multiplier,
             query_filter=self._build_bula_filter(),
         )
-        return [
-            self._point_to_document(point)
-            for point in search_result.points
-            if point.payload is not None
-        ]
+        evidence_documents: list[Document] = []
+        for point in search_result.points:
+            if point.payload is None:
+                continue
+
+            document = self._point_to_document(point)
+            if not self._has_evidence_beyond_markdown_headings(document.page_content):
+                continue
+
+            evidence_documents.append(document)
+            if len(evidence_documents) == self.k:
+                break
+
+        return evidence_documents
 
     def _get_relevant_documents(
         self,
@@ -72,7 +88,11 @@ class DenseBulaRetriever(BaseRetriever):
                 FieldCondition(
                     key="bula_id",
                     match=MatchValue(value=self.bula_id),
-                )
+                ),
+                FieldCondition(
+                    key="embedding_profile",
+                    match=MatchValue(value=self.embeddings.embedding_profile),
+                ),
             ]
         )
 
@@ -99,3 +119,7 @@ class DenseBulaRetriever(BaseRetriever):
             metadata["score"] = score
 
         return metadata
+
+    def _has_evidence_beyond_markdown_headings(self, chunk_text: str) -> bool:
+        text_without_headings = STRUCTURAL_HEADING_PATTERN.sub("", chunk_text)
+        return bool(text_without_headings.strip())
