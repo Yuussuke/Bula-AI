@@ -128,3 +128,35 @@ async def test_search_similar_returns_relevant_chunk(
     )
 
     assert search_result.points[0].payload["chunk_id"] == "test-chunk-2"
+
+
+@pytest.mark.anyio
+async def test_list_points_for_bula_paginates_and_filters(
+    qdrant_test_context: tuple[QdrantVectorStore, AsyncQdrantClient, str],
+) -> None:
+    vector_store, _, _ = qdrant_test_context
+    await vector_store.ensure_collection()
+    points = build_test_points()
+    points.append(
+        PointStruct(
+            id=make_point_id("other-bula-chunk"),
+            vector=[1.0, 0.1, 0.2, 0.3],
+            payload={
+                "chunk_id": "other-bula-chunk",
+                "chunk_text": "Conteudo de outra bula",
+                "corpus": "private",
+                "bula_id": "other-bula",
+            },
+        )
+    )
+    await vector_store.upsert_points(points)
+
+    records = await vector_store.list_points_for_bula(
+        bula_id="test-bula",
+        page_size=1,
+    )
+
+    assert len(records) == 3
+    assert {record.payload["bula_id"] for record in records if record.payload} == {
+        "test-bula"
+    }

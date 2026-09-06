@@ -3,9 +3,13 @@ import uuid
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import (
     Distance,
+    ExtendedPointId,
     Filter,
+    FieldCondition,
+    MatchValue,
     PointStruct,
     QueryResponse,
+    Record,
     VectorParams,
 )
 
@@ -25,6 +29,7 @@ def build_qdrant_point(
     bula: Bula,
     chunk: DocumentChunk,
     vector: list[float],
+    embedding_profile: str,
 ) -> PointStruct:
     corpus = (
         bula.corpus.value if isinstance(bula.corpus, BulaCorpus) else str(bula.corpus)
@@ -38,6 +43,7 @@ def build_qdrant_point(
         "chunk_text": chunk.text,
         "chunk_id": chunk.chunk_id,
         "chunk_index": chunk.index,
+        "embedding_profile": embedding_profile,
     }
 
     return PointStruct(
@@ -96,6 +102,39 @@ class QdrantVectorStore:
             limit=limit,
             with_payload=True,
         )
+
+    async def list_points_for_bula(
+        self,
+        *,
+        bula_id: str,
+        page_size: int = 100,
+    ) -> list[Record]:
+        if page_size < 1:
+            raise ValueError("page_size must be greater than zero.")
+
+        query_filter = Filter(
+            must=[
+                FieldCondition(
+                    key="bula_id",
+                    match=MatchValue(value=bula_id),
+                )
+            ]
+        )
+        records: list[Record] = []
+        next_page_offset: ExtendedPointId | None = None
+
+        while True:
+            page_records, next_page_offset = await self._client.scroll(
+                collection_name=self.collection_name,
+                scroll_filter=query_filter,
+                limit=page_size,
+                offset=next_page_offset,
+                with_payload=True,
+                with_vectors=False,
+            )
+            records.extend(page_records)
+            if next_page_offset is None:
+                return records
 
     async def close(self) -> None:
         await self._client.close()

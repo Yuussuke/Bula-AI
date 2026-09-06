@@ -162,6 +162,9 @@ def test_get_embeddings_uses_openrouter_provider(
     api_key = created_kwargs["api_key"]
 
     assert isinstance(adapter, EmbeddingAdapter)
+    assert adapter.embedding_profile == (
+        "intfloat/multilingual-e5-large;input=e5-query-passage-v1"
+    )
     assert created_kwargs["model"] == settings.embedding.model
     assert isinstance(api_key, SecretStr)
     assert api_key.get_secret_value() == "openrouter-embedding-key"
@@ -212,6 +215,9 @@ def test_get_embeddings_uses_ollama_provider(
     adapter = rag_dependencies.get_embeddings(settings=settings)
 
     assert isinstance(adapter, EmbeddingAdapter)
+    assert adapter.embedding_profile == (
+        "intfloat/multilingual-e5-large;input=e5-query-passage-v1"
+    )
     assert created_kwargs["model"] == settings.embedding.model
     assert created_kwargs["base_url"] == "http://ollama-test:11434"
 

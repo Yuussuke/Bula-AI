@@ -213,7 +213,12 @@ class RAGIngestionService:
                 stage.add_fields(embedding_vector_count=len(vectors))
 
             points = [
-                build_qdrant_point(bula=bula, chunk=chunk, vector=vector)
+                build_qdrant_point(
+                    bula=bula,
+                    chunk=chunk,
+                    vector=vector,
+                    embedding_profile=self.embeddings.embedding_profile,
+                )
                 for chunk, vector in zip(chunk_result.chunks, vectors, strict=True)
             ]
 

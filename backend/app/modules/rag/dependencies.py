@@ -71,6 +71,7 @@ def get_embeddings(settings: Settings = Depends(get_settings)) -> EmbeddingAdapt
         embedder=embedder,
         batch_size=settings.embedding.batch_size,
         dimension=settings.embedding.dimension,
+        model_name=settings.embedding.model,
     )
 
 
