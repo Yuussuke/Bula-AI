@@ -29,6 +29,7 @@ from app.modules.storage.client import ObjectStoreClient
 PDF_CONTENT_TYPE = "application/pdf"
 PDF_MAGIC_BYTES = b"%PDF-"
 UPLOAD_VALIDATION_CHUNK_SIZE_BYTES = 1024 * 1024
+MAX_BULA_ALIAS_LENGTH = 100
 
 
 class SystemBulaSeedConfigurationError(Exception):
@@ -61,9 +62,11 @@ class BulaService:
         *,
         user_id: int,
         file: UploadFile | None,
+        alias: str | None = None,
     ) -> Bula:
         bula = await self.upload_bula(
             user_id=user_id,
+            alias=alias,
             file=file,
         )
 
@@ -82,6 +85,7 @@ class BulaService:
         *,
         user_id: int,
         file: UploadFile | None,
+        alias: str | None = None,
     ) -> Bula:
         if file is None:
             raise HTTPException(
@@ -91,6 +95,7 @@ class BulaService:
 
         await self._validate_pdf_upload(file)
         pending_drug_name = self._build_pending_drug_name(file)
+        clean_alias = self._clean_alias(alias)
 
         file_address: str | None = None
         try:
@@ -99,6 +104,7 @@ class BulaService:
             bula = await self.repo.create_bula(
                 user_id=user_id,
                 drug_name=pending_drug_name,
+                alias=clean_alias,
                 manufacturer=None,
                 file_address=file_address,
             )
@@ -150,6 +156,25 @@ class BulaService:
         safe_filename = PurePosixPath(filename_without_windows_path).name
         filename_stem = PurePosixPath(safe_filename).stem.strip()
         return filename_stem or "Bula em processamento"
+
+    def _clean_alias(self, alias: str | None) -> str | None:
+        if alias is None:
+            return None
+
+        clean_alias = alias.strip()
+        if not clean_alias:
+            return None
+
+        if len(clean_alias) > MAX_BULA_ALIAS_LENGTH:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=(
+                    "O nome personalizado deve ter no maximo "
+                    f"{MAX_BULA_ALIAS_LENGTH} caracteres."
+                ),
+            )
+
+        return clean_alias
 
     async def _validate_pdf_upload(self, file: UploadFile) -> None:
         is_pdf_content_type = file.content_type == PDF_CONTENT_TYPE

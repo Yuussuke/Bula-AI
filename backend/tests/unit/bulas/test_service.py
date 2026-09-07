@@ -67,9 +67,59 @@ async def test_upload_bula_creates_bula_with_file_address() -> None:
     mock_repo.create_bula.assert_awaited_once_with(
         user_id=user_id,
         drug_name="leaflet",
+        alias=None,
         manufacturer=None,
         file_address="stored_objects/abc-123",
     )
+
+
+@pytest.mark.anyio
+async def test_upload_bula_persists_trimmed_optional_alias() -> None:
+    mock_repo = AsyncMock()
+    mock_repo.create_bula.return_value = Mock(file_address="stored_objects/abc-123")
+    mock_object_store_client = AsyncMock()
+    mock_object_store_client.put_file.return_value = "stored_objects/abc-123"
+    upload_file = build_upload_file(content=b"%PDF-1.4\n%%EOF")
+    service = build_bula_service(
+        repo=mock_repo,
+        object_store_client=mock_object_store_client,
+    )
+
+    await service.upload_bula(
+        user_id=123,
+        file=upload_file,
+        alias="  Remédio da minha mãe  ",
+    )
+
+    mock_repo.create_bula.assert_awaited_once_with(
+        user_id=123,
+        drug_name="leaflet",
+        alias="Remédio da minha mãe",
+        manufacturer=None,
+        file_address="stored_objects/abc-123",
+    )
+
+
+@pytest.mark.anyio
+async def test_upload_bula_rejects_alias_longer_than_database_limit() -> None:
+    mock_repo = AsyncMock()
+    mock_object_store_client = AsyncMock()
+    upload_file = build_upload_file(content=b"%PDF-1.4\n%%EOF")
+    service = build_bula_service(
+        repo=mock_repo,
+        object_store_client=mock_object_store_client,
+    )
+
+    with pytest.raises(HTTPException) as exception_info:
+        await service.upload_bula(
+            user_id=123,
+            file=upload_file,
+            alias="a" * 101,
+        )
+
+    assert exception_info.value.status_code == status.HTTP_422_UNPROCESSABLE_CONTENT
+    mock_object_store_client.put_file.assert_not_awaited()
+    mock_repo.create_bula.assert_not_awaited()
 
 
 @pytest.mark.anyio

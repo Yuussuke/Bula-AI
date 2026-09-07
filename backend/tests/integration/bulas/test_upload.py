@@ -35,6 +35,7 @@ async def test_upload_valid_pdf_returns_created_bula(client: AsyncClient) -> Non
 
     response = await client.post(
         "/api/v1/bulas/upload",
+        data={"alias": "  Dipirona da minha mãe  "},
         files={"file": ("dipirona.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         headers=build_auth_headers(access_token),
     )
@@ -42,6 +43,7 @@ async def test_upload_valid_pdf_returns_created_bula(client: AsyncClient) -> Non
     response_body = response.json()
     assert response.status_code == 202, response_body
     assert response_body["drug_name"] == "dipirona"
+    assert response_body["alias"] == "Dipirona da minha mãe"
     assert response_body["manufacturer"] is None
     assert response_body["file_url"] is None
     assert response_body["file_address"].startswith("stored_objects/")
@@ -93,6 +95,7 @@ async def test_get_bula_status_returns_current_status(
     assert response_body == {
         "id": bula_id,
         "drug_name": "leaflet",
+        "alias": None,
         "manufacturer": None,
         "status": "pending",
         "error_message": None,
@@ -147,6 +150,7 @@ async def test_upload_uses_filename_when_metadata_is_not_available_yet(
 
     assert response.status_code == 202
     assert response.json()["drug_name"] == "dipirona-sodica"
+    assert response.json()["alias"] is None
     assert response.json()["manufacturer"] is None
 
 

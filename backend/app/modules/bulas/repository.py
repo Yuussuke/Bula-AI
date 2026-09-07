@@ -33,6 +33,7 @@ class BulaRepository:
         *,
         user_id: int,
         drug_name: str,
+        alias: str | None = None,
         manufacturer: str | None = None,
         file_address: str | None = None,
         file_url: str | None = None,
@@ -43,6 +44,7 @@ class BulaRepository:
         bula = Bula(
             user_id=user_id,
             drug_name=drug_name,
+            alias=alias,
             manufacturer=manufacturer,
             file_url=file_url,
             file_address=file_address,

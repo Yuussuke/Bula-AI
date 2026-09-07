@@ -54,6 +54,7 @@ class Bula(Base, UUIDMixin, TimestampMixin):
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
 
     drug_name: Mapped[str] = mapped_column(String, index=True)
+    alias: Mapped[str | None] = mapped_column(String(100), nullable=True)
     manufacturer: Mapped[str | None] = mapped_column(String, nullable=True)
     file_url: Mapped[str | None] = mapped_column(String, nullable=True)
     file_address: Mapped[str | None] = mapped_column(String(500), nullable=True)
