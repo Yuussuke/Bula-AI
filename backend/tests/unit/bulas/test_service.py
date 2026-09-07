@@ -58,8 +58,6 @@ async def test_upload_bula_creates_bula_with_file_address() -> None:
 
     result = await service.upload_bula(
         user_id=user_id,
-        drug_name=" Dipirona ",
-        manufacturer="Example Pharma",
         file=upload_file,
     )
 
@@ -68,8 +66,8 @@ async def test_upload_bula_creates_bula_with_file_address() -> None:
     mock_object_store_client.put_file.assert_awaited_once_with(upload_file)
     mock_repo.create_bula.assert_awaited_once_with(
         user_id=user_id,
-        drug_name="Dipirona",
-        manufacturer="Example Pharma",
+        drug_name="leaflet",
+        manufacturer=None,
         file_address="stored_objects/abc-123",
     )
 
@@ -92,8 +90,6 @@ async def test_upload_and_enqueue_bula_enqueues_created_bula() -> None:
 
     result = await service.upload_and_enqueue_bula(
         user_id=123,
-        drug_name="Dipirona",
-        manufacturer=None,
         file=upload_file,
     )
 
@@ -121,8 +117,6 @@ async def test_upload_and_enqueue_bula_cleans_up_when_enqueue_fails() -> None:
     with pytest.raises(RuntimeError, match="queue unavailable"):
         await service.upload_and_enqueue_bula(
             user_id=123,
-            drug_name="Dipirona",
-            manufacturer=None,
             file=upload_file,
         )
 
@@ -145,8 +139,6 @@ async def test_upload_bula_deletes_file_when_bula_persistence_fails() -> None:
     with pytest.raises(BulaPersistenceError):
         await service.upload_bula(
             user_id=123,
-            drug_name="Dipirona",
-            manufacturer=None,
             file=upload_file,
         )
 
@@ -171,8 +163,6 @@ async def test_upload_bula_keeps_original_error_when_compensating_delete_fails()
     with pytest.raises(BulaPersistenceError):
         await service.upload_bula(
             user_id=123,
-            drug_name="Dipirona",
-            manufacturer=None,
             file=upload_file,
         )
 
@@ -195,8 +185,6 @@ async def test_upload_bula_rejects_invalid_content_type_before_storage() -> None
     with pytest.raises(HTTPException) as exception_info:
         await service.upload_bula(
             user_id=123,
-            drug_name="Dipirona",
-            manufacturer=None,
             file=upload_file,
         )
 
@@ -219,8 +207,6 @@ async def test_upload_bula_rejects_oversized_file_before_storage() -> None:
     with pytest.raises(HTTPException) as exception_info:
         await service.upload_bula(
             user_id=123,
-            drug_name="Dipirona",
-            manufacturer=None,
             file=upload_file,
         )
 

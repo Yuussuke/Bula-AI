@@ -27,6 +27,7 @@ class FakeBulaRepository:
     def __init__(self, bula: Bula | None) -> None:
         self.bula = bula
         self.statuses: list[BulaStatus] = []
+        self.metadata_updates: list[tuple[str, str | None]] = []
         self.reset_publications: list[SystemBulaPublication] = []
 
     async def get_by_id(self, *, bula_id: UUID) -> Bula | None:
@@ -46,6 +47,18 @@ class FakeBulaRepository:
         if qdrant_collection is not None:
             bula.qdrant_collection = qdrant_collection
         self.statuses.append(status)
+        return bula
+
+    async def update_extracted_metadata(
+        self,
+        *,
+        bula: Bula,
+        drug_name: str,
+        manufacturer: str | None,
+    ) -> Bula:
+        bula.drug_name = drug_name
+        bula.manufacturer = manufacturer
+        self.metadata_updates.append((drug_name, manufacturer))
         return bula
 
     async def reset_system_publication_for_reingestion(
@@ -78,15 +91,21 @@ class FakeObjectStore:
 
 
 class FakeParser:
-    def __init__(self, *, success: bool = True) -> None:
+    def __init__(
+        self,
+        *,
+        success: bool = True,
+        metadata: dict[str, object] | None = None,
+    ) -> None:
         self.success = success
+        self.metadata = metadata or {}
 
     async def parse(self, pdf_bytes: bytes, filename: str) -> ParseResult:
         assert pdf_bytes == b"%PDF-1.4\n%%EOF"
         assert filename == "leaflet.pdf"
         return ParseResult(
             markdown="## Posologia\nUse conforme orientacao medica.",
-            metadata={},
+            metadata=self.metadata,
             sections=["Posologia"],
             extraction_tier="fake",
             success=self.success,
@@ -250,6 +269,45 @@ async def test_ingest_bula_moves_pending_to_processing_then_ready() -> None:
 
 
 @pytest.mark.anyio
+async def test_ingest_private_bula_persists_parser_metadata_before_indexing() -> None:
+    bula = build_bula()
+    repo = FakeBulaRepository(bula)
+    qdrant_store = FakeQdrantStore()
+    parser = FakeParser(
+        metadata={
+            "drug_name": "  DIPIRONA MONOIDRATADA  ",
+            "manufacturer": "  Sanofi Medley  ",
+        }
+    )
+    service = build_service(repo=repo, parser=parser, qdrant_store=qdrant_store)
+
+    result = await service.ingest_bula(bula_id=BULA_ID)
+
+    assert result.drug_name == "DIPIRONA MONOIDRATADA"
+    assert result.manufacturer == "Sanofi Medley"
+    assert repo.metadata_updates == [("DIPIRONA MONOIDRATADA", "Sanofi Medley")]
+    assert qdrant_store.upserted_payloads[0]["drug_name"] == "DIPIRONA MONOIDRATADA"
+    assert qdrant_store.upserted_payloads[0]["manufacturer"] == "Sanofi Medley"
+
+
+@pytest.mark.anyio
+async def test_ingest_system_bula_keeps_manifest_metadata() -> None:
+    bula = build_bula()
+    bula.corpus = BulaCorpus.SYSTEM
+    repo = FakeBulaRepository(bula)
+    parser = FakeParser(
+        metadata={"drug_name": "Parsed name", "manufacturer": "Parsed company"}
+    )
+    service = build_service(repo=repo, parser=parser)
+
+    result = await service.ingest_bula(bula_id=BULA_ID)
+
+    assert result.drug_name == "Dipirona"
+    assert result.manufacturer == "Example Pharma"
+    assert repo.metadata_updates == []
+
+
+@pytest.mark.anyio
 async def test_ingest_bula_writes_success_debug_artifacts() -> None:
     bula = build_bula()
     repo = FakeBulaRepository(bula)
@@ -297,6 +355,7 @@ async def test_ingest_bula_logs_stage_timings_and_summary(
         "object_metadata",
         "pdf_download",
         "pdf_parse_to_markdown",
+        "persist_extracted_metadata",
         "chunk_markdown",
         "write_debug_artifacts",
         "embed_chunks",
@@ -330,18 +389,20 @@ async def test_ingest_bula_logs_stage_timings_and_summary(
     assert stage_logs[2]["pdf_size_bytes"] == 10
     assert stage_logs[4]["extraction_tier"] == "fake"
     assert stage_logs[4]["section_count"] == 1
-    assert stage_logs[5]["batch_count"] == 1
-    assert stage_logs[5]["model_call_count"] == 1
-    assert stage_logs[5]["batch_fallback_count"] == 0
-    assert stage_logs[5]["chunk_validation"] == {
+    assert stage_logs[5]["has_extracted_drug_name"] is False
+    assert stage_logs[5]["has_extracted_manufacturer"] is False
+    assert stage_logs[6]["batch_count"] == 1
+    assert stage_logs[6]["model_call_count"] == 1
+    assert stage_logs[6]["batch_fallback_count"] == 0
+    assert stage_logs[6]["chunk_validation"] == {
         "passed_section_count": 1,
         "failed_section_count": 0,
     }
-    assert stage_logs[5]["chunk_fallback"] == {"count": 0, "reasons": {}}
-    assert stage_logs[5]["chunk_count"] == 1
-    assert stage_logs[7]["embedding_vector_count"] == 1
-    assert stage_logs[9]["qdrant_point_count"] == 1
-    assert stage_logs[9]["qdrant_collection"] == "bulaai_chunks"
+    assert stage_logs[6]["chunk_fallback"] == {"count": 0, "reasons": {}}
+    assert stage_logs[6]["chunk_count"] == 1
+    assert stage_logs[8]["embedding_vector_count"] == 1
+    assert stage_logs[10]["qdrant_point_count"] == 1
+    assert stage_logs[10]["qdrant_collection"] == "bulaai_chunks"
 
 
 @pytest.mark.anyio

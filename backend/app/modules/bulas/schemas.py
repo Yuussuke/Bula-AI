@@ -60,6 +60,8 @@ class BulaUploadResponse(BaseModel):
 
 class BulaStatusResponse(BaseModel):
     id: UUID
+    drug_name: str
+    manufacturer: str | None
     status: BulaStatus
     error_message: str | None
 

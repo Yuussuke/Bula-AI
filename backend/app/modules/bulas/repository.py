@@ -323,6 +323,20 @@ class BulaRepository:
         await self.db.refresh(bula)
         return bula
 
+    async def update_extracted_metadata(
+        self,
+        *,
+        bula: Bula,
+        drug_name: str,
+        manufacturer: str | None,
+    ) -> Bula:
+        bula.drug_name = drug_name
+        bula.manufacturer = manufacturer
+
+        await self.db.commit()
+        await self.db.refresh(bula)
+        return bula
+
     async def delete_bula(self, bula: Bula) -> None:
         await self.db.delete(bula)
         await self.db.commit()

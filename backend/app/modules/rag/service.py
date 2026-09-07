@@ -147,6 +147,27 @@ class RAGIngestionService:
                         )
                 raise
 
+            if bula.corpus == BulaCorpus.PRIVATE:
+                async with observer.stage("persist_extracted_metadata") as stage:
+                    extracted_drug_name = self._get_metadata_text(
+                        metadata=parse_result.metadata,
+                        key="drug_name",
+                    )
+                    extracted_manufacturer = self._get_metadata_text(
+                        metadata=parse_result.metadata,
+                        key="manufacturer",
+                    )
+                    if extracted_drug_name is not None:
+                        bula = await self.bula_repo.update_extracted_metadata(
+                            bula=bula,
+                            drug_name=extracted_drug_name,
+                            manufacturer=extracted_manufacturer,
+                        )
+                    stage.add_fields(
+                        has_extracted_drug_name=extracted_drug_name is not None,
+                        has_extracted_manufacturer=extracted_manufacturer is not None,
+                    )
+
             chunk_result: ChunkResult | None = None
             try:
                 async with observer.stage("chunk_markdown") as stage:
@@ -253,6 +274,19 @@ class RAGIngestionService:
 
     async def chunk_markdown(self, *, markdown: str, doc_id: str) -> ChunkResult:
         return await self.chunker.chunk_markdown(markdown=markdown, doc_id=doc_id)
+
+    def _get_metadata_text(
+        self,
+        *,
+        metadata: dict[str, object],
+        key: str,
+    ) -> str | None:
+        value = metadata.get(key)
+        if not isinstance(value, str):
+            return None
+
+        clean_value = value.strip()
+        return clean_value or None
 
     async def _write_debug_artifacts(
         self,
