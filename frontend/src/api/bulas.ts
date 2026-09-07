@@ -72,6 +72,7 @@ export interface BulaStatusResponse {
 export interface QueryableBulaResponse {
   id: string;
   product_name: string;
+  alias: string | null;
   active_ingredient: string | null;
   strength: string | null;
   manufacturer: string | null;

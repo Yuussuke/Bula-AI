@@ -235,6 +235,7 @@ async def test_queryable_detail_normalizes_published_system_bula_for_chat(
     assert response.json() == {
         "id": str(published.id),
         "product_name": "Published Detail",
+        "alias": None,
         "active_ingredient": "dipirona monoidratada",
         "strength": "500 mg",
         "manufacturer": "Example Pharma",

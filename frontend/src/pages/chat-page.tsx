@@ -168,8 +168,9 @@ export function ChatPage(): ReactElement {
     );
   }
 
+  const bulaDisplayName = bulaQuery.data.alias || bulaQuery.data.product_name;
   const bulaDescription = [
-    bulaQuery.data.active_ingredient,
+    bulaQuery.data.alias ? bulaQuery.data.product_name : bulaQuery.data.active_ingredient,
     bulaQuery.data.strength,
     bulaQuery.data.manufacturer,
   ]
@@ -230,9 +231,7 @@ export function ChatPage(): ReactElement {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <FileText aria-hidden="true" className="text-primary h-4 w-4 shrink-0" />
-                <h1 className="truncate text-base font-semibold sm:text-lg">
-                  {bulaQuery.data.product_name}
-                </h1>
+                <h1 className="truncate text-base font-semibold sm:text-lg">{bulaDisplayName}</h1>
               </div>
               <p className="text-muted-foreground truncate text-xs sm:text-sm">
                 {bulaDescription || "Bula enviada por você"}

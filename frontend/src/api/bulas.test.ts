@@ -150,6 +150,7 @@ describe("system bula API", () => {
     const queryableBula = {
       id: BULA_ID,
       product_name: "DIPIRONA MONOIDRATADA",
+      alias: null,
       active_ingredient: null,
       strength: null,
       manufacturer: "Sanofi Medley",

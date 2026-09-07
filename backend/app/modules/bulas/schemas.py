@@ -73,6 +73,7 @@ class BulaStatusResponse(BaseModel):
 class QueryableBulaResponse(BaseModel):
     id: UUID
     product_name: str
+    alias: str | None
     active_ingredient: str | None
     strength: str | None
     manufacturer: str | None
@@ -89,6 +90,7 @@ class QueryableBulaResponse(BaseModel):
             return cls(
                 id=bula.id,
                 product_name=publication.product_name,
+                alias=None,
                 active_ingredient=publication.active_ingredient,
                 strength=publication.strength,
                 manufacturer=publication.manufacturer,
@@ -99,6 +101,7 @@ class QueryableBulaResponse(BaseModel):
         return cls(
             id=bula.id,
             product_name=bula.drug_name,
+            alias=bula.alias,
             active_ingredient=None,
             strength=None,
             manufacturer=bula.manufacturer,

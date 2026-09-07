@@ -35,6 +35,7 @@ const SESSION_ID = "22222222-2222-4222-8222-222222222222";
 const QUERYABLE_BULA: QueryableBulaResponse = {
   id: BULA_ID,
   product_name: "AMOXICILINA + CLAVULANATO DE POTASSIO",
+  alias: null,
   active_ingredient: "amoxicilina + clavulanato de potassio",
   strength: "500 mg + 125 mg",
   manufacturer: "EMS S/A",
@@ -198,6 +199,7 @@ describe("ChatPage", () => {
     getQueryableBulaMock.mockResolvedValue({
       id: BULA_ID,
       product_name: "DIPIRONA MONOIDRATADA",
+      alias: "Remédio da minha mãe",
       active_ingredient: null,
       strength: null,
       manufacturer: "Sanofi Medley",
@@ -208,9 +210,10 @@ describe("ChatPage", () => {
     renderChatPage();
 
     expect(
-      await screen.findByRole("heading", { name: "DIPIRONA MONOIDRATADA" })
+      await screen.findByRole("heading", { name: "Remédio da minha mãe" })
     ).toBeInTheDocument();
-    expect(screen.getByText("Sanofi Medley")).toBeInTheDocument();
+    expect(screen.getByText(/DIPIRONA MONOIDRATADA/)).toBeInTheDocument();
+    expect(screen.getByText(/Sanofi Medley/)).toBeInTheDocument();
     expect(getQueryableBulaMock).toHaveBeenCalledWith(BULA_ID);
   });
 

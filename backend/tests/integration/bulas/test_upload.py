@@ -137,6 +137,7 @@ async def test_ready_private_bula_detail_is_available_only_to_its_owner(
     other_user_token = await get_access_token(client, email="private-other@bulaai.com")
     upload_response = await client.post(
         "/api/v1/bulas/upload",
+        data={"alias": "Remédio da minha mãe"},
         files={"file": ("dipirona.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         headers=build_auth_headers(owner_token),
     )
@@ -161,6 +162,7 @@ async def test_ready_private_bula_detail_is_available_only_to_its_owner(
     assert owner_response.json() == {
         "id": str(bula_id),
         "product_name": "DIPIRONA MONOIDRATADA",
+        "alias": "Remédio da minha mãe",
         "active_ingredient": None,
         "strength": None,
         "manufacturer": "Sanofi Medley",
