@@ -64,8 +64,20 @@ describe("UserBulaCard processing status", () => {
   it("polls every three seconds and stops after the bula becomes ready", async () => {
     vi.useFakeTimers();
     getBulaStatusMock
-      .mockResolvedValueOnce({ id: BULA_ID, status: "processing", error_message: null })
-      .mockResolvedValueOnce({ id: BULA_ID, status: "ready", error_message: null });
+      .mockResolvedValueOnce({
+        id: BULA_ID,
+        drug_name: "Dipirona",
+        manufacturer: "Sanofi Medley",
+        status: "processing",
+        error_message: null,
+      })
+      .mockResolvedValueOnce({
+        id: BULA_ID,
+        drug_name: "DIPIRONA MONOIDRATADA",
+        manufacturer: "Sanofi Medley",
+        status: "ready",
+        error_message: null,
+      });
     renderUserBulaCard(buildUserBula());
 
     expect(screen.getByText("Processando...")).toBeInTheDocument();
@@ -85,6 +97,7 @@ describe("UserBulaCard processing status", () => {
     });
     expect(getBulaStatusMock).toHaveBeenCalledTimes(2);
     expect(screen.getByText("Pronta")).toBeInTheDocument();
+    expect(screen.getByText("DIPIRONA MONOIDRATADA")).toBeInTheDocument();
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(9_000);

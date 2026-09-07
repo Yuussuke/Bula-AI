@@ -18,15 +18,11 @@ import { useUploadBula } from "@/hooks/use-user-bulas";
 
 export function UserBulaUploadDialog(): ReactElement {
   const [isOpen, setIsOpen] = useState(false);
-  const [drugName, setDrugName] = useState("");
-  const [manufacturer, setManufacturer] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const uploadMutation = useUploadBula();
-  const canSubmit = drugName.trim().length > 0 && selectedFile !== null;
+  const canSubmit = selectedFile !== null;
 
   const resetForm = (): void => {
-    setDrugName("");
-    setManufacturer("");
     setSelectedFile(null);
     uploadMutation.reset();
   };
@@ -50,8 +46,6 @@ export function UserBulaUploadDialog(): ReactElement {
 
     uploadMutation.mutate(
       {
-        drugName,
-        manufacturer,
         file: selectedFile,
       },
       {
@@ -76,32 +70,12 @@ export function UserBulaUploadDialog(): ReactElement {
         <DialogHeader>
           <DialogTitle>Enviar uma bula</DialogTitle>
           <DialogDescription>
-            Envie um PDF de até 10 MB. O processamento continuará em segundo plano.
+            Envie um PDF de até 10 MB. Identificaremos automaticamente o medicamento e o fabricante
+            durante o processamento.
           </DialogDescription>
         </DialogHeader>
 
         <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-          <div className="space-y-2">
-            <Label htmlFor="user-bula-drug-name">Nome do medicamento</Label>
-            <Input
-              id="user-bula-drug-name"
-              value={drugName}
-              onChange={(event) => setDrugName(event.target.value)}
-              autoComplete="off"
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="user-bula-manufacturer">Fabricante (opcional)</Label>
-            <Input
-              id="user-bula-manufacturer"
-              value={manufacturer}
-              onChange={(event) => setManufacturer(event.target.value)}
-              autoComplete="organization"
-            />
-          </div>
-
           <div className="space-y-2">
             <Label htmlFor="user-bula-file">Arquivo PDF</Label>
             <Input

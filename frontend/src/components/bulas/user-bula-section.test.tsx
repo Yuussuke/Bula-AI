@@ -64,6 +64,8 @@ beforeEach(() => {
   listUserBulasMock.mockResolvedValue([]);
   getBulaStatusMock.mockResolvedValue({
     id: BULA_ID,
+    drug_name: "Dipirona",
+    manufacturer: "Sanofi Medley",
     status: "pending",
     error_message: null,
   });
@@ -78,8 +80,6 @@ describe("UserBulaSection", () => {
 
     expect(await screen.findByText("Nenhuma bula enviada")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Enviar bula" }));
-    await user.type(screen.getByLabelText("Nome do medicamento"), "Dipirona");
-    await user.type(screen.getByLabelText("Fabricante (opcional)"), "Sanofi Medley");
     const pdfFile = new File(["%PDF-1.7"], "dipirona.pdf", {
       type: "application/pdf",
     });
@@ -90,8 +90,6 @@ describe("UserBulaSection", () => {
 
     expect(uploadBulaMock).toHaveBeenCalledOnce();
     expect(uploadBulaMock.mock.calls[0][0]).toEqual({
-      drugName: "Dipirona",
-      manufacturer: "Sanofi Medley",
       file: pdfFile,
     });
     expect(await screen.findByText("Dipirona", {}, { timeout: 3_000 })).toBeInTheDocument();

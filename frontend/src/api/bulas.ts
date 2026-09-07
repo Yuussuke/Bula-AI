@@ -26,8 +26,6 @@ export interface UserBulaResponse {
 }
 
 export interface UploadBulaRequest {
-  drugName: string;
-  manufacturer?: string;
   file: File;
 }
 
@@ -62,6 +60,8 @@ export interface SystemBulaResponse {
 
 export interface BulaStatusResponse {
   id: string;
+  drug_name: string;
+  manufacturer: string | null;
   status: BulaStatus;
   error_message: string | null;
 }
@@ -103,16 +103,8 @@ export async function listUserBulas(): Promise<UserBulaResponse[]> {
   });
 }
 
-export async function uploadBula({
-  drugName,
-  manufacturer,
-  file,
-}: UploadBulaRequest): Promise<UserBulaResponse> {
+export async function uploadBula({ file }: UploadBulaRequest): Promise<UserBulaResponse> {
   const formData = new FormData();
-  formData.set("drug_name", drugName.trim());
-  if (manufacturer?.trim()) {
-    formData.set("manufacturer", manufacturer.trim());
-  }
   formData.set("file", file);
 
   return requestJson<UserBulaResponse>("/api/v1/bulas/upload", {

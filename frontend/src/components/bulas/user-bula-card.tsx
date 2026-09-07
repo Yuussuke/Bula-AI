@@ -80,6 +80,8 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
   const statusQuery = useBulaStatus(bula);
   const currentStatus = statusQuery.data?.status ?? bula.status;
   const currentErrorMessage = statusQuery.data?.error_message ?? bula.error_message;
+  const currentDrugName = statusQuery.data?.drug_name ?? bula.drug_name;
+  const currentManufacturer = statusQuery.data?.manufacturer ?? bula.manufacturer;
 
   return (
     <Card className="gap-4 py-5" aria-labelledby={`user-bula-${bula.id}-title`}>
@@ -90,10 +92,10 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
           </div>
           <div className="min-w-0 flex-1">
             <CardTitle id={`user-bula-${bula.id}-title`} className="truncate text-base">
-              {bula.drug_name}
+              {currentDrugName}
             </CardTitle>
             <p className="text-muted-foreground mt-1 truncate text-sm">
-              {bula.manufacturer || "Fabricante não informado"}
+              {currentManufacturer || "Fabricante não identificado"}
             </p>
           </div>
         </div>
@@ -105,7 +107,7 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
         </p>
         <div aria-live="polite">
           <BulaStatusBadge
-            drugName={bula.drug_name}
+            drugName={currentDrugName}
             status={currentStatus}
             errorMessage={currentErrorMessage}
           />

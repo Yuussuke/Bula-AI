@@ -176,8 +176,6 @@ describe("system bula API", () => {
 
     await expect(
       uploadBula({
-        drugName: "  Dipirona  ",
-        manufacturer: "  Sanofi Medley  ",
         file: pdfFile,
       })
     ).resolves.toEqual(uploadedBula);
@@ -185,8 +183,8 @@ describe("system bula API", () => {
     const requestInit = fetchMock.mock.calls[0][1];
     const requestBody = requestInit?.body;
     expect(requestBody).toBeInstanceOf(FormData);
-    expect((requestBody as FormData).get("drug_name")).toBe("Dipirona");
-    expect((requestBody as FormData).get("manufacturer")).toBe("Sanofi Medley");
+    expect((requestBody as FormData).has("drug_name")).toBe(false);
+    expect((requestBody as FormData).has("manufacturer")).toBe(false);
     expect((requestBody as FormData).get("file")).toBe(pdfFile);
     expect(new Headers(requestInit?.headers).has("Content-Type")).toBe(false);
   });
