@@ -31,16 +31,14 @@ router = APIRouter(prefix="/bulas", tags=["bulas"])
     status_code=status.HTTP_202_ACCEPTED,
 )
 async def upload_file(
-    drug_name: str | None = Form(default=None),
-    manufacturer: str | None = Form(default=None),
+    alias: str | None = Form(default=None),
     file: UploadFile | None = File(default=None),
     current_user: auth_models.User = Depends(get_current_user),
     bula_service: BulaService = Depends(get_bula_service),
 ) -> BulaResponse:
     bula = await bula_service.upload_and_enqueue_bula(
         user_id=cast(int, current_user.id),
-        drug_name=drug_name,
-        manufacturer=manufacturer,
+        alias=alias,
         file=file,
     )
     return BulaResponse.model_validate(bula)

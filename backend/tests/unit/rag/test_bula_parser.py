@@ -847,6 +847,40 @@ def test_metadata_extractor_uses_filename_as_low_priority_drug_name() -> None:
     assert metadata["manufacturer"] is None
 
 
+def test_metadata_extractor_recovers_iquego_product_from_description() -> None:
+    lines = [
+        ExtractedLine(text="COMPOSIÇÃO", page_number=1),
+        ExtractedLine(
+            text="Cada comprimido contém dipirona monoidratada 500 mg.",
+            page_number=1,
+        ),
+        ExtractedLine(
+            text=(
+                "IQUEGO-DIPIRONA é um medicamento à base de dipirona, "
+                "utilizado no tratamento da dor e febre."
+            ),
+            page_number=1,
+        ),
+    ]
+
+    metadata = MetadataExtractor().extract(
+        lines=lines,
+        filename="bula_1788801618034.pdf",
+        markdown_sections=["COMPOSIÇÃO"],
+        detected_sections=[],
+        quality_signals={},
+        front_matter={
+            "manufacturer": "IQUEGO - INDÚSTRIA QUÍMICA DO ESTADO DE GOIÁS S.A."
+        },
+    )
+
+    assert metadata["drug_name"] == "IQUEGO-DIPIRONA"
+    assert metadata["drug_name_source"] == "medicine_description"
+    assert metadata["manufacturer"] == (
+        "IQUEGO - INDÚSTRIA QUÍMICA DO ESTADO DE GOIÁS S.A."
+    )
+
+
 @pytest.mark.parametrize(
     ("marker_line", "following_lines"),
     [
