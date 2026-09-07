@@ -18,11 +18,13 @@ import { useUploadBula } from "@/hooks/use-user-bulas";
 
 export function UserBulaUploadDialog(): ReactElement {
   const [isOpen, setIsOpen] = useState(false);
+  const [alias, setAlias] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const uploadMutation = useUploadBula();
   const canSubmit = selectedFile !== null;
 
   const resetForm = (): void => {
+    setAlias("");
     setSelectedFile(null);
     uploadMutation.reset();
   };
@@ -46,6 +48,7 @@ export function UserBulaUploadDialog(): ReactElement {
 
     uploadMutation.mutate(
       {
+        alias,
         file: selectedFile,
       },
       {
@@ -76,6 +79,21 @@ export function UserBulaUploadDialog(): ReactElement {
         </DialogHeader>
 
         <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+          <div className="space-y-2">
+            <Label htmlFor="user-bula-alias">Nome personalizado (opcional)</Label>
+            <Input
+              id="user-bula-alias"
+              value={alias}
+              maxLength={100}
+              onChange={(event) => setAlias(event.target.value)}
+              placeholder="Ex.: Dipirona da minha mãe"
+              autoComplete="off"
+            />
+            <p className="text-muted-foreground text-xs">
+              Serve apenas para você identificar a bula. O nome oficial será extraído do PDF.
+            </p>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="user-bula-file">Arquivo PDF</Label>
             <Input
