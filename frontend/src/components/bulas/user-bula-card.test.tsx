@@ -1,6 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getBulaStatus, type UserBulaResponse } from "@/api/bulas";
@@ -48,7 +49,9 @@ function renderUserBulaCard(bula: UserBulaResponse): ReturnType<typeof render> {
 
   return render(
     <QueryClientProvider client={queryClient}>
-      <UserBulaCard bula={bula} />
+      <MemoryRouter>
+        <UserBulaCard bula={bula} />
+      </MemoryRouter>
     </QueryClientProvider>
   );
 }
@@ -101,6 +104,10 @@ describe("UserBulaCard processing status", () => {
     expect(getBulaStatusMock).toHaveBeenCalledTimes(2);
     expect(screen.getByText("Pronta")).toBeInTheDocument();
     expect(screen.getByText("DIPIRONA MONOIDRATADA")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Conversar sobre esta bula" })).toHaveAttribute(
+      "href",
+      `/bulas/${BULA_ID}/chat`
+    );
 
     await act(async () => {
       await vi.advanceTimersByTimeAsync(9_000);

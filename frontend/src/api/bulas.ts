@@ -69,6 +69,16 @@ export interface BulaStatusResponse {
   error_message: string | null;
 }
 
+export interface QueryableBulaResponse {
+  id: string;
+  product_name: string;
+  active_ingredient: string | null;
+  strength: string | null;
+  manufacturer: string | null;
+  corpus: BulaCorpus;
+  ingestion_status: BulaStatus;
+}
+
 export interface ListSystemBulasOptions {
   limit?: number;
   offset?: number;
@@ -90,6 +100,12 @@ export async function listSystemBulas({
 
 export async function getSystemBula(bulaId: string): Promise<SystemBulaResponse> {
   return requestJson<SystemBulaResponse>(`/api/v1/bulas/system/${bulaId}`, {
+    method: "GET",
+  });
+}
+
+export async function getQueryableBula(bulaId: string): Promise<QueryableBulaResponse> {
+  return requestJson<QueryableBulaResponse>(`/api/v1/bulas/${bulaId}`, {
     method: "GET",
   });
 }

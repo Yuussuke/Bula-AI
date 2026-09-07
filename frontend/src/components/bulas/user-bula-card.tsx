@@ -1,9 +1,11 @@
-import { AlertCircle, CheckCircle2, FileText, Loader2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, FileText, Loader2, MessageSquareText } from "lucide-react";
 import type { ReactElement } from "react";
+import { Link } from "react-router-dom";
 
 import type { BulaStatus, UserBulaResponse } from "@/api/bulas";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useBulaStatus } from "@/hooks/use-bula-status";
@@ -131,6 +133,17 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
           />
         </div>
       </CardContent>
+
+      {currentStatus === "ready" ? (
+        <CardFooter className="px-5">
+          <Button asChild className="w-full gap-2">
+            <Link to={`/bulas/${bula.id}/chat`}>
+              <MessageSquareText aria-hidden="true" className="h-4 w-4" />
+              Conversar sobre esta bula
+            </Link>
+          </Button>
+        </CardFooter>
+      ) : null}
     </Card>
   );
 }

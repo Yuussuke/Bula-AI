@@ -3,7 +3,7 @@ import { AlertCircle, ArrowLeft, FileText, History } from "lucide-react";
 import { type ReactElement, useState } from "react";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 
-import { getSystemBula } from "@/api/bulas";
+import { getQueryableBula } from "@/api/bulas";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatSessionNavigation } from "@/components/chat/chat-session-navigation";
@@ -111,8 +111,8 @@ export function ChatPage(): ReactElement {
   const resolvedBulaId = bulaId ?? "";
 
   const bulaQuery = useQuery({
-    queryKey: ["system-bula", resolvedBulaId],
-    queryFn: () => getSystemBula(resolvedBulaId),
+    queryKey: ["queryable-bula", resolvedBulaId],
+    queryFn: () => getQueryableBula(resolvedBulaId),
     enabled: Boolean(bulaId),
     staleTime: 5 * 60 * 1000,
   });
@@ -167,6 +167,14 @@ export function ChatPage(): ReactElement {
       <ChatPageUnavailable message="Esta conversa pertence a outra bula e não pode ser aberta nesta página." />
     );
   }
+
+  const bulaDescription = [
+    bulaQuery.data.active_ingredient,
+    bulaQuery.data.strength,
+    bulaQuery.data.manufacturer,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .join(" · ");
 
   return (
     <div className="bg-muted/20 flex min-h-screen">
@@ -227,8 +235,7 @@ export function ChatPage(): ReactElement {
                 </h1>
               </div>
               <p className="text-muted-foreground truncate text-xs sm:text-sm">
-                {bulaQuery.data.active_ingredient} · {bulaQuery.data.strength} ·{" "}
-                {bulaQuery.data.manufacturer}
+                {bulaDescription || "Bula enviada por você"}
               </p>
             </div>
             <ModeIndicator />

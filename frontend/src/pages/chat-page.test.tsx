@@ -5,7 +5,7 @@ import type { ReactElement } from "react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getSystemBula, type SystemBulaResponse } from "@/api/bulas";
+import { getQueryableBula, type QueryableBulaResponse } from "@/api/bulas";
 import {
   askBulaQuestion,
   type AskResponse,
@@ -18,7 +18,7 @@ import { ApiError } from "@/lib/api";
 import { ChatPage } from "@/pages/chat-page";
 
 vi.mock("@/api/bulas", () => ({
-  getSystemBula: vi.fn(),
+  getQueryableBula: vi.fn(),
 }));
 
 vi.mock("@/api/chat", () => ({
@@ -32,33 +32,14 @@ const BULA_ID = "11111111-1111-4111-8111-111111111111";
 const OTHER_BULA_ID = "33333333-3333-4333-8333-333333333333";
 const SESSION_ID = "22222222-2222-4222-8222-222222222222";
 
-const SYSTEM_BULA: SystemBulaResponse = {
+const QUERYABLE_BULA: QueryableBulaResponse = {
   id: BULA_ID,
-  target_id: "amoxicilina-clavulanato-500mg-125mg-comprimido-ems",
   product_name: "AMOXICILINA + CLAVULANATO DE POTASSIO",
   active_ingredient: "amoxicilina + clavulanato de potassio",
   strength: "500 mg + 125 mg",
-  pharmaceutical_form: "comprimido revestido",
-  presentation: "embalagem com 12 unidades",
-  audience: "patient",
   manufacturer: "EMS S/A",
-  company_tax_id: "57507378000365",
-  anvisa_product_id: 124891,
-  registration_number: "102350532",
-  process_number: "253510242290107",
-  expedition_number: "0186508263",
-  transaction_number: "2551962026",
-  source_record_id: "35934920",
-  canonical_source_url: "https://consultas.anvisa.gov.br/api/consulta/bulario",
-  source_published_at: "2026-02-25T17:20:51Z",
-  source_updated_at: "2026-08-26T03:00:00Z",
-  sha256_checksum: "ffd3780e4895c67b9bf1986127e4a205265245f865b6b0123843400582689d41",
-  content_size_bytes: 231137,
+  corpus: "system",
   ingestion_status: "ready",
-  publication_state: "published",
-  reviewed_by: "Reviewer",
-  reviewed_at: "2026-09-02T02:50:18Z",
-  published_at: "2026-09-02T02:50:35Z",
 };
 
 const FIRST_RESPONSE: AskResponse = {
@@ -73,7 +54,7 @@ const FIRST_RESPONSE: AskResponse = {
   ],
 };
 
-const getSystemBulaMock = vi.mocked(getSystemBula);
+const getQueryableBulaMock = vi.mocked(getQueryableBula);
 const askBulaQuestionMock = vi.mocked(askBulaQuestion);
 const continueChatSessionMock = vi.mocked(continueChatSession);
 const getChatSessionMock = vi.mocked(getChatSession);
@@ -162,7 +143,7 @@ beforeAll(() => {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  getSystemBulaMock.mockResolvedValue(SYSTEM_BULA);
+  getQueryableBulaMock.mockResolvedValue(QUERYABLE_BULA);
   askBulaQuestionMock.mockResolvedValue(FIRST_RESPONSE);
   continueChatSessionMock.mockResolvedValue({
     session_id: SESSION_ID,
@@ -183,8 +164,8 @@ beforeEach(() => {
 
 describe("ChatPage", () => {
   it("keeps the final page structure reserved while the conversation loads", async () => {
-    const deferredBula = createDeferredPromise<SystemBulaResponse>();
-    getSystemBulaMock.mockReturnValue(deferredBula.promise);
+    const deferredBula = createDeferredPromise<QueryableBulaResponse>();
+    getQueryableBulaMock.mockReturnValue(deferredBula.promise);
     renderChatPage();
 
     const loadingState = screen.getByRole("status", { name: "Carregando conversa" });
@@ -192,12 +173,12 @@ describe("ChatPage", () => {
     expect(screen.getByRole("complementary")).toHaveClass("w-72", "shrink-0");
 
     await act(async () => {
-      deferredBula.resolve(SYSTEM_BULA);
+      deferredBula.resolve(QUERYABLE_BULA);
       await deferredBula.promise;
     });
 
     expect(
-      await screen.findByRole("heading", { name: SYSTEM_BULA.product_name })
+      await screen.findByRole("heading", { name: QUERYABLE_BULA.product_name })
     ).toBeInTheDocument();
   });
 
@@ -205,12 +186,32 @@ describe("ChatPage", () => {
     renderChatPage();
 
     expect(
-      await screen.findByRole("heading", { name: SYSTEM_BULA.product_name })
+      await screen.findByRole("heading", { name: QUERYABLE_BULA.product_name })
     ).toBeInTheDocument();
     expect(screen.getByText("Dense retrieval (beta)")).toBeInTheDocument();
     expect(screen.getByRole("complementary")).toHaveClass("w-72", "shrink-0");
-    expect(getSystemBulaMock).toHaveBeenCalledWith(BULA_ID);
+    expect(getQueryableBulaMock).toHaveBeenCalledWith(BULA_ID);
     expect(getChatSessionMock).not.toHaveBeenCalled();
+  });
+
+  it("loads a ready private bula owned by the authenticated user", async () => {
+    getQueryableBulaMock.mockResolvedValue({
+      id: BULA_ID,
+      product_name: "DIPIRONA MONOIDRATADA",
+      active_ingredient: null,
+      strength: null,
+      manufacturer: "Sanofi Medley",
+      corpus: "private",
+      ingestion_status: "ready",
+    });
+
+    renderChatPage();
+
+    expect(
+      await screen.findByRole("heading", { name: "DIPIRONA MONOIDRATADA" })
+    ).toBeInTheDocument();
+    expect(screen.getByText("Sanofi Medley")).toBeInTheDocument();
+    expect(getQueryableBulaMock).toHaveBeenCalledWith(BULA_ID);
   });
 
   it("starts the first turn without reloading and stores the session in the URL", async () => {
