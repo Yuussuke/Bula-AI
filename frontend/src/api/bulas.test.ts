@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   getBulaStatus,
+  getQueryableBula,
   getSystemBula,
   listSystemBulas,
   listUserBulas,
@@ -141,6 +142,34 @@ describe("system bula API", () => {
 
     expect(fetchMock).toHaveBeenCalledWith(
       `${API_BASE_URL}/api/v1/bulas/${BULA_ID}/status`,
+      expect.objectContaining({ method: "GET", credentials: "include" })
+    );
+  });
+
+  it("retrieves a queryable private bula for the chat", async () => {
+    const queryableBula = {
+      id: BULA_ID,
+      product_name: "DIPIRONA MONOIDRATADA",
+      alias: null,
+      active_ingredient: null,
+      strength: null,
+      manufacturer: "Sanofi Medley",
+      corpus: "private" as const,
+      ingestion_status: "ready" as const,
+    };
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify(queryableBula), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(getQueryableBula(BULA_ID)).resolves.toEqual(queryableBula);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      `${API_BASE_URL}/api/v1/bulas/${BULA_ID}`,
       expect.objectContaining({ method: "GET", credentials: "include" })
     );
   });

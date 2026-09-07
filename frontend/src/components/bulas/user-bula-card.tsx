@@ -1,9 +1,18 @@
-import { AlertCircle, CheckCircle2, FileText, Loader2 } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  FileText,
+  Loader2,
+  MessageSquareText,
+} from "lucide-react";
 import type { ReactElement } from "react";
+import { Link } from "react-router-dom";
 
 import type { BulaStatus, UserBulaResponse } from "@/api/bulas";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useBulaStatus } from "@/hooks/use-bula-status";
@@ -131,6 +140,23 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
           />
         </div>
       </CardContent>
+
+      {currentStatus === "ready" ? (
+        <CardFooter className="border-border bg-muted/20 mt-auto border-t px-5 pt-4">
+          <Button asChild size="lg" className="group w-full justify-between rounded-lg shadow-sm">
+            <Link to={`/bulas/${bula.id}/chat`}>
+              <span className="flex items-center gap-2">
+                <MessageSquareText aria-hidden="true" className="h-4 w-4" />
+                Conversar sobre esta bula
+              </span>
+              <ArrowRight
+                aria-hidden="true"
+                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+              />
+            </Link>
+          </Button>
+        </CardFooter>
+      ) : null}
     </Card>
   );
 }

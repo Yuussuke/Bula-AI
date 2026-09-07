@@ -3,7 +3,7 @@ import { AlertCircle, ArrowLeft, FileText, History } from "lucide-react";
 import { type ReactElement, useState } from "react";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 
-import { getSystemBula } from "@/api/bulas";
+import { getQueryableBula } from "@/api/bulas";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatSessionNavigation } from "@/components/chat/chat-session-navigation";
@@ -111,8 +111,8 @@ export function ChatPage(): ReactElement {
   const resolvedBulaId = bulaId ?? "";
 
   const bulaQuery = useQuery({
-    queryKey: ["system-bula", resolvedBulaId],
-    queryFn: () => getSystemBula(resolvedBulaId),
+    queryKey: ["queryable-bula", resolvedBulaId],
+    queryFn: () => getQueryableBula(resolvedBulaId),
     enabled: Boolean(bulaId),
     staleTime: 5 * 60 * 1000,
   });
@@ -168,6 +168,15 @@ export function ChatPage(): ReactElement {
     );
   }
 
+  const bulaDisplayName = bulaQuery.data.alias || bulaQuery.data.product_name;
+  const bulaDescription = [
+    bulaQuery.data.alias ? bulaQuery.data.product_name : bulaQuery.data.active_ingredient,
+    bulaQuery.data.strength,
+    bulaQuery.data.manufacturer,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .join(" · ");
+
   return (
     <div className="bg-muted/20 flex min-h-screen">
       <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-72 shrink-0 border-r lg:block">
@@ -222,13 +231,10 @@ export function ChatPage(): ReactElement {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <FileText aria-hidden="true" className="text-primary h-4 w-4 shrink-0" />
-                <h1 className="truncate text-base font-semibold sm:text-lg">
-                  {bulaQuery.data.product_name}
-                </h1>
+                <h1 className="truncate text-base font-semibold sm:text-lg">{bulaDisplayName}</h1>
               </div>
               <p className="text-muted-foreground truncate text-xs sm:text-sm">
-                {bulaQuery.data.active_ingredient} · {bulaQuery.data.strength} ·{" "}
-                {bulaQuery.data.manufacturer}
+                {bulaDescription || "Bula enviada por você"}
               </p>
             </div>
             <ModeIndicator />
