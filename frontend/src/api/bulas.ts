@@ -8,6 +8,28 @@ export type SystemBulaPublicationState =
   | "withdrawn"
   | "rejected";
 export type BulaAudience = "patient" | "professional";
+export type BulaCorpus = "private" | "system" | "shared";
+
+export interface UserBulaResponse {
+  id: string;
+  user_id: number;
+  drug_name: string;
+  manufacturer: string | null;
+  file_url: string | null;
+  file_address: string | null;
+  qdrant_collection: string | null;
+  status: BulaStatus;
+  error_message: string | null;
+  corpus: BulaCorpus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UploadBulaRequest {
+  drugName: string;
+  manufacturer?: string;
+  file: File;
+}
 
 export interface SystemBulaResponse {
   id: string;
@@ -72,5 +94,29 @@ export async function getSystemBula(bulaId: string): Promise<SystemBulaResponse>
 export async function getBulaStatus(bulaId: string): Promise<BulaStatusResponse> {
   return requestJson<BulaStatusResponse>(`/api/v1/bulas/${bulaId}/status`, {
     method: "GET",
+  });
+}
+
+export async function listUserBulas(): Promise<UserBulaResponse[]> {
+  return requestJson<UserBulaResponse[]>("/api/v1/bulas/", {
+    method: "GET",
+  });
+}
+
+export async function uploadBula({
+  drugName,
+  manufacturer,
+  file,
+}: UploadBulaRequest): Promise<UserBulaResponse> {
+  const formData = new FormData();
+  formData.set("drug_name", drugName.trim());
+  if (manufacturer?.trim()) {
+    formData.set("manufacturer", manufacturer.trim());
+  }
+  formData.set("file", file);
+
+  return requestJson<UserBulaResponse>("/api/v1/bulas/upload", {
+    method: "POST",
+    body: formData,
   });
 }
