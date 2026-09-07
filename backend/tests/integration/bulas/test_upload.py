@@ -1,5 +1,10 @@
+from uuid import UUID
+
 import pytest
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from app.modules.bulas.models import Bula, BulaStatus
 from tests.conftest import FakeBulaIngestionQueue
 
 
@@ -118,6 +123,68 @@ async def test_get_bula_status_returns_404_for_another_user(
     response = await client.get(
         f"/api/v1/bulas/{bula_id}/status",
         headers=build_auth_headers(second_user_token),
+    )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_ready_private_bula_detail_is_available_only_to_its_owner(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    owner_token = await get_access_token(client, email="private-owner@bulaai.com")
+    other_user_token = await get_access_token(client, email="private-other@bulaai.com")
+    upload_response = await client.post(
+        "/api/v1/bulas/upload",
+        files={"file": ("dipirona.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
+        headers=build_auth_headers(owner_token),
+    )
+    bula_id = UUID(upload_response.json()["id"])
+    bula = await db_session.get(Bula, bula_id)
+    assert bula is not None
+    bula.drug_name = "DIPIRONA MONOIDRATADA"
+    bula.manufacturer = "Sanofi Medley"
+    bula.status = BulaStatus.READY
+    await db_session.commit()
+
+    owner_response = await client.get(
+        f"/api/v1/bulas/{bula_id}",
+        headers=build_auth_headers(owner_token),
+    )
+    other_user_response = await client.get(
+        f"/api/v1/bulas/{bula_id}",
+        headers=build_auth_headers(other_user_token),
+    )
+
+    assert owner_response.status_code == 200
+    assert owner_response.json() == {
+        "id": str(bula_id),
+        "product_name": "DIPIRONA MONOIDRATADA",
+        "active_ingredient": None,
+        "strength": None,
+        "manufacturer": "Sanofi Medley",
+        "corpus": "private",
+        "ingestion_status": "ready",
+    }
+    assert other_user_response.status_code == 404
+
+
+@pytest.mark.anyio
+async def test_processing_private_bula_is_not_available_for_chat(
+    client: AsyncClient,
+) -> None:
+    access_token = await get_access_token(client, email="private-processing@bulaai.com")
+    upload_response = await client.post(
+        "/api/v1/bulas/upload",
+        files={"file": ("dipirona.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
+        headers=build_auth_headers(access_token),
+    )
+    bula_id = upload_response.json()["id"]
+
+    response = await client.get(
+        f"/api/v1/bulas/{bula_id}",
+        headers=build_auth_headers(access_token),
     )
 
     assert response.status_code == 404

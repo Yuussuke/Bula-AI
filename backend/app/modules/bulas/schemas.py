@@ -70,6 +70,43 @@ class BulaStatusResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class QueryableBulaResponse(BaseModel):
+    id: UUID
+    product_name: str
+    active_ingredient: str | None
+    strength: str | None
+    manufacturer: str | None
+    corpus: BulaCorpus
+    ingestion_status: BulaStatus
+
+    @classmethod
+    def from_bula(cls, bula: Bula) -> "QueryableBulaResponse":
+        publication = bula.system_publication
+        if bula.corpus == BulaCorpus.SYSTEM:
+            if publication is None:
+                raise ValueError("System bula does not have publication provenance.")
+
+            return cls(
+                id=bula.id,
+                product_name=publication.product_name,
+                active_ingredient=publication.active_ingredient,
+                strength=publication.strength,
+                manufacturer=publication.manufacturer,
+                corpus=bula.corpus,
+                ingestion_status=bula.status,
+            )
+
+        return cls(
+            id=bula.id,
+            product_name=bula.drug_name,
+            active_ingredient=None,
+            strength=None,
+            manufacturer=bula.manufacturer,
+            corpus=bula.corpus,
+            ingestion_status=bula.status,
+        )
+
+
 class SystemBulaResponse(BaseModel):
     id: UUID
     target_id: str

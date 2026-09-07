@@ -214,6 +214,36 @@ async def test_system_detail_returns_published_ready_integrity_valid_document(
 
 
 @pytest.mark.anyio
+async def test_queryable_detail_normalizes_published_system_bula_for_chat(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    access_token = await get_access_token(client, email="queryable-system@example.com")
+    published = await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Published Detail",
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+
+    response = await client.get(
+        f"/api/v1/bulas/{published.id}",
+        headers=auth_headers(access_token),
+    )
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "id": str(published.id),
+        "product_name": "Published Detail",
+        "active_ingredient": "dipirona monoidratada",
+        "strength": "500 mg",
+        "manufacturer": "Example Pharma",
+        "corpus": "system",
+        "ingestion_status": "ready",
+    }
+
+
+@pytest.mark.anyio
 async def test_system_detail_hides_unpublished_document(
     client: AsyncClient,
     db_session: AsyncSession,

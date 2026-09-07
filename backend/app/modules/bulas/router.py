@@ -18,9 +18,14 @@ from app.modules.bulas.dependencies import get_bula_service
 from app.modules.bulas.schemas import (
     BulaResponse,
     BulaStatusResponse,
+    QueryableBulaResponse,
     SystemBulaResponse,
 )
-from app.modules.bulas.service import BulaService, SystemBulaNotFoundError
+from app.modules.bulas.service import (
+    BulaService,
+    QueryableBulaNotFoundError,
+    SystemBulaNotFoundError,
+)
 
 router = APIRouter(prefix="/bulas", tags=["bulas"])
 
@@ -85,6 +90,25 @@ async def get_system_bula(
             detail="Bula de sistema nao encontrada.",
         ) from exc
     return SystemBulaResponse.from_bula(bula)
+
+
+@router.get("/{bula_id}", response_model=QueryableBulaResponse)
+async def get_queryable_bula(
+    bula_id: UUID,
+    current_user: auth_models.User = Depends(get_current_user),
+    bula_service: BulaService = Depends(get_bula_service),
+) -> QueryableBulaResponse:
+    try:
+        bula = await bula_service.get_queryable_bula_for_user(
+            bula_id=bula_id,
+            user_id=cast(int, current_user.id),
+        )
+    except QueryableBulaNotFoundError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Bula pronta para consulta nao encontrada.",
+        ) from exc
+    return QueryableBulaResponse.from_bula(bula)
 
 
 @router.get("/{bula_id}/status", response_model=BulaStatusResponse)
