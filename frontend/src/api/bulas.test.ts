@@ -4,13 +4,34 @@ import {
   getBulaStatus,
   getSystemBula,
   listSystemBulas,
+  listUserBulas,
   type SystemBulaResponse,
+  uploadBula,
+  type UserBulaResponse,
 } from "@/api/bulas";
 import { queryClient } from "@/lib/queryClient";
 import { useAuthStore } from "@/store/auth";
 
 const API_BASE_URL = "http://localhost:8000";
 const BULA_ID = "11111111-1111-4111-8111-111111111111";
+
+function buildUserBula(overrides: Partial<UserBulaResponse> = {}): UserBulaResponse {
+  return {
+    id: BULA_ID,
+    user_id: 4,
+    drug_name: "Dipirona",
+    manufacturer: "Sanofi Medley",
+    file_url: null,
+    file_address: "stored_objects/dipirona",
+    qdrant_collection: null,
+    status: "pending",
+    error_message: null,
+    corpus: "private",
+    created_at: "2026-09-07T12:00:00Z",
+    updated_at: "2026-09-07T12:00:00Z",
+    ...overrides,
+  };
+}
 
 describe("system bula API", () => {
   beforeEach(() => {
@@ -118,5 +139,55 @@ describe("system bula API", () => {
       `${API_BASE_URL}/api/v1/bulas/${BULA_ID}/status`,
       expect.objectContaining({ method: "GET", credentials: "include" })
     );
+  });
+
+  it("lists user-owned bulas", async () => {
+    const userBulas = [buildUserBula()];
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify(userBulas), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(listUserBulas()).resolves.toEqual(userBulas);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      `${API_BASE_URL}/api/v1/bulas/`,
+      expect.objectContaining({ method: "GET", credentials: "include" })
+    );
+  });
+
+  it("uploads a PDF as multipart form data without overriding its content type", async () => {
+    const uploadedBula = buildUserBula();
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify(uploadedBula), {
+        status: 202,
+        headers: { "Content-Type": "application/json" },
+      })
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const pdfFile = new File(["%PDF-1.7"], "dipirona.pdf", {
+      type: "application/pdf",
+    });
+
+    await expect(
+      uploadBula({
+        drugName: "  Dipirona  ",
+        manufacturer: "  Sanofi Medley  ",
+        file: pdfFile,
+      })
+    ).resolves.toEqual(uploadedBula);
+
+    const requestInit = fetchMock.mock.calls[0][1];
+    const requestBody = requestInit?.body;
+    expect(requestBody).toBeInstanceOf(FormData);
+    expect((requestBody as FormData).get("drug_name")).toBe("Dipirona");
+    expect((requestBody as FormData).get("manufacturer")).toBe("Sanofi Medley");
+    expect((requestBody as FormData).get("file")).toBe(pdfFile);
+    expect(new Headers(requestInit?.headers).has("Content-Type")).toBe(false);
   });
 });

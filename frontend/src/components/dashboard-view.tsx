@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 import { SystemBulaCatalog } from "@/components/bulas/system-bula-catalog";
 import { SystemBulaNavigation } from "@/components/bulas/system-bula-navigation";
+import { UserBulaSection } from "@/components/bulas/user-bula-section";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
@@ -133,7 +134,8 @@ export function DashboardView(): ReactElement {
         </header>
 
         <main className="flex-1 overflow-auto p-4 sm:p-6">
-          <div className="mx-auto w-full max-w-7xl">
+          <div className="mx-auto w-full max-w-7xl space-y-10">
+            <UserBulaSection />
             <SystemBulaCatalog />
           </div>
         </main>

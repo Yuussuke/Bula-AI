@@ -5,17 +5,21 @@ import type { ReactElement } from "react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { listSystemBulas, type SystemBulaResponse } from "@/api/bulas";
+import { listSystemBulas, listUserBulas, type SystemBulaResponse } from "@/api/bulas";
 import { DashboardView } from "@/components/dashboard-view";
 import { ApiError } from "@/lib/api";
 import { useAuthStore } from "@/store/auth";
 
 vi.mock("@/api/bulas", () => ({
+  getBulaStatus: vi.fn(),
   listSystemBulas: vi.fn(),
+  listUserBulas: vi.fn(),
+  uploadBula: vi.fn(),
 }));
 
 const BULA_ID = "11111111-1111-4111-8111-111111111111";
 const listSystemBulasMock = vi.mocked(listSystemBulas);
+const listUserBulasMock = vi.mocked(listUserBulas);
 
 interface DeferredPromise<T> {
   promise: Promise<T>;
@@ -92,6 +96,7 @@ function renderDashboard(): ReturnType<typeof render> {
 beforeEach(() => {
   vi.clearAllMocks();
   listSystemBulasMock.mockResolvedValue([buildSystemBula()]);
+  listUserBulasMock.mockResolvedValue([]);
   useAuthStore.setState({
     user: {
       id: 5,
