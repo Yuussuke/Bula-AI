@@ -1,4 +1,11 @@
-import { AlertCircle, CheckCircle2, FileText, Loader2, MessageSquareText } from "lucide-react";
+import {
+  AlertCircle,
+  ArrowRight,
+  CheckCircle2,
+  FileText,
+  Loader2,
+  MessageSquareText,
+} from "lucide-react";
 import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
@@ -135,11 +142,17 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
       </CardContent>
 
       {currentStatus === "ready" ? (
-        <CardFooter className="px-5">
-          <Button asChild className="w-full gap-2">
+        <CardFooter className="border-border bg-muted/20 mt-auto border-t px-5 pt-4">
+          <Button asChild size="lg" className="group w-full justify-between rounded-lg shadow-sm">
             <Link to={`/bulas/${bula.id}/chat`}>
-              <MessageSquareText aria-hidden="true" className="h-4 w-4" />
-              Conversar sobre esta bula
+              <span className="flex items-center gap-2">
+                <MessageSquareText aria-hidden="true" className="h-4 w-4" />
+                Conversar sobre esta bula
+              </span>
+              <ArrowRight
+                aria-hidden="true"
+                className="h-4 w-4 transition-transform group-hover:translate-x-0.5"
+              />
             </Link>
           </Button>
         </CardFooter>
