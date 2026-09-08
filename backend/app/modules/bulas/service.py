@@ -44,6 +44,10 @@ class SystemBulaNotFoundError(Exception):
     """Raised when a queryable published system bula is not found."""
 
 
+class QueryableBulaNotFoundError(Exception):
+    """Raised when a user cannot query a ready bula."""
+
+
 class BulaService:
     def __init__(
         self,
@@ -133,6 +137,20 @@ class BulaService:
         bula = await self.repo.get_published_system_bula(bula_id=bula_id)
         if bula is None:
             raise SystemBulaNotFoundError()
+        return bula
+
+    async def get_queryable_bula_for_user(
+        self,
+        *,
+        bula_id: UUID,
+        user_id: int,
+    ) -> Bula:
+        bula = await self.repo.get_queryable_by_id_for_user(
+            bula_id=bula_id,
+            user_id=user_id,
+        )
+        if bula is None:
+            raise QueryableBulaNotFoundError()
         return bula
 
     async def get_bula_status_for_user(
