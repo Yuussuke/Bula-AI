@@ -71,6 +71,33 @@ def test_cleaner_extracts_identity_block_as_front_matter() -> None:
     )
 
 
+def test_cleaner_does_not_treat_iquego_company_name_as_product() -> None:
+    pages = [
+        build_page(
+            1,
+            [
+                ExtractedLine(
+                    text="IQUEGO - INDÚSTRIA QUÍMICA DO ESTADO DE GOIÁS S.A.",
+                    page_number=1,
+                ),
+                ExtractedLine(text="Comprimido 500 mg", page_number=1),
+                ExtractedLine(text="COMPOSIÇÃO", page_number=1, is_bold=True),
+                ExtractedLine(
+                    text="Cada comprimido contém dipirona monoidratada 500 mg.",
+                    page_number=1,
+                ),
+            ],
+        )
+    ]
+
+    result = BulaDocumentCleaner().clean(pages)
+
+    assert "product" not in result.front_matter
+    assert result.front_matter["manufacturer"] == (
+        "IQUEGO - INDÚSTRIA QUÍMICA DO ESTADO DE GOIÁS S.A."
+    )
+
+
 def test_cleaner_removes_page_furniture_and_joins_only_wrapped_prose() -> None:
     pages = [
         build_page(

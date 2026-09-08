@@ -14,7 +14,10 @@ export function isTerminalBulaStatus(status: BulaStatus): boolean {
 }
 
 export function useBulaStatus(
-  bula: Pick<UserBulaResponse, "id" | "status" | "error_message">
+  bula: Pick<
+    UserBulaResponse,
+    "id" | "drug_name" | "alias" | "manufacturer" | "status" | "error_message"
+  >
 ): UseQueryResult<BulaStatusResponse, Error> {
   const hasTerminalInitialStatus = isTerminalBulaStatus(bula.status);
 
@@ -23,6 +26,9 @@ export function useBulaStatus(
     queryFn: () => getBulaStatus(bula.id),
     initialData: {
       id: bula.id,
+      drug_name: bula.drug_name,
+      alias: bula.alias,
+      manufacturer: bula.manufacturer,
       status: bula.status,
       error_message: bula.error_message,
     },

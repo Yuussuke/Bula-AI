@@ -5,12 +5,18 @@ from __future__ import annotations
 from pathlib import Path
 import re
 
+from app.modules.rag.parsers.document_cleaner import CORPORATE_MARKERS
 from app.modules.rag.parsers.handlers import ExtractedLine, normalize_for_matching
 from app.modules.rag.parsers.markdown_renderer import normalize_spaces
 from app.modules.rag.parsers.section_detector import DetectedSection
 
 
 MANUFACTURER_PLACEHOLDERS = {"EMPRESA"}
+NAMED_MEDICINE_PATTERN = re.compile(
+    r"\b(?P<drug_name>[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ0-9]+"
+    r"(?:[- ][A-ZÁÀÂÃÉÊÍÓÔÕÚÇ0-9]+){0,5})\s+"
+    r"(?:é|e|É|E)\s+(?:um|UM)\s+(?:medicamento|MEDICAMENTO)\b"
+)
 
 
 class MetadataExtractor:
@@ -70,6 +76,10 @@ class MetadataExtractor:
         extracted_lines: list[ExtractedLine],
         filename: str,
     ) -> tuple[str | None, str | None]:
+        named_medicine = self._extract_named_medicine(extracted_lines)
+        if named_medicine is not None:
+            return named_medicine, "medicine_description"
+
         for extracted_line in extracted_lines[:30]:
             clean_line = normalize_spaces(extracted_line.text)
             if self._is_likely_drug_name(clean_line):
@@ -81,6 +91,22 @@ class MetadataExtractor:
             return filename_candidate, "filename_best_effort"
 
         return None, None
+
+    def _extract_named_medicine(
+        self,
+        extracted_lines: list[ExtractedLine],
+    ) -> str | None:
+        for extracted_line in extracted_lines:
+            clean_text = normalize_spaces(extracted_line.text)
+            match = NAMED_MEDICINE_PATTERN.search(clean_text)
+            if match is None:
+                continue
+
+            candidate = normalize_spaces(match.group("drug_name"))
+            if self._is_likely_drug_name(candidate):
+                return candidate
+
+        return None
 
     def _is_likely_drug_name(self, text: str) -> bool:
         if not text:
@@ -102,6 +128,12 @@ class MetadataExtractor:
             for ignored_fragment in ignored_fragments
         )
         if has_ignored_fragment:
+            return False
+
+        has_corporate_marker = any(
+            marker in normalized_text for marker in CORPORATE_MARKERS
+        )
+        if has_corporate_marker:
             return False
 
         has_letter = any(character.isalpha() for character in text)

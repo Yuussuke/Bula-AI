@@ -1,6 +1,7 @@
 import hashlib
 from collections.abc import Sequence
 from datetime import UTC, datetime
+from pathlib import PurePosixPath, PureWindowsPath
 from uuid import UUID
 
 from fastapi import HTTPException, UploadFile, status
@@ -28,6 +29,7 @@ from app.modules.storage.client import ObjectStoreClient
 PDF_CONTENT_TYPE = "application/pdf"
 PDF_MAGIC_BYTES = b"%PDF-"
 UPLOAD_VALIDATION_CHUNK_SIZE_BYTES = 1024 * 1024
+MAX_BULA_ALIAS_LENGTH = 100
 
 
 class SystemBulaSeedConfigurationError(Exception):
@@ -59,14 +61,12 @@ class BulaService:
         self,
         *,
         user_id: int,
-        drug_name: str | None,
-        manufacturer: str | None,
         file: UploadFile | None,
+        alias: str | None = None,
     ) -> Bula:
         bula = await self.upload_bula(
             user_id=user_id,
-            drug_name=drug_name,
-            manufacturer=manufacturer,
+            alias=alias,
             file=file,
         )
 
@@ -84,12 +84,9 @@ class BulaService:
         self,
         *,
         user_id: int,
-        drug_name: str | None,
-        manufacturer: str | None,
         file: UploadFile | None,
+        alias: str | None = None,
     ) -> Bula:
-        clean_drug_name = self._validate_drug_name(drug_name)
-
         if file is None:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -97,6 +94,8 @@ class BulaService:
             )
 
         await self._validate_pdf_upload(file)
+        pending_drug_name = self._build_pending_drug_name(file)
+        clean_alias = self._clean_alias(alias)
 
         file_address: str | None = None
         try:
@@ -104,8 +103,9 @@ class BulaService:
             file_address = await self.object_store.put_file(file)
             bula = await self.repo.create_bula(
                 user_id=user_id,
-                drug_name=clean_drug_name,
-                manufacturer=manufacturer,
+                drug_name=pending_drug_name,
+                alias=clean_alias,
+                manufacturer=None,
                 file_address=file_address,
             )
         except Exception:
@@ -150,22 +150,31 @@ class BulaService:
 
         return bula
 
-    def _validate_drug_name(self, drug_name: str | None) -> str:
-        if drug_name is None:
+    def _build_pending_drug_name(self, file: UploadFile) -> str:
+        original_filename = file.filename or "bula.pdf"
+        filename_without_windows_path = PureWindowsPath(original_filename).name
+        safe_filename = PurePosixPath(filename_without_windows_path).name
+        filename_stem = PurePosixPath(safe_filename).stem.strip()
+        return filename_stem or "Bula em processamento"
+
+    def _clean_alias(self, alias: str | None) -> str | None:
+        if alias is None:
+            return None
+
+        clean_alias = alias.strip()
+        if not clean_alias:
+            return None
+
+        if len(clean_alias) > MAX_BULA_ALIAS_LENGTH:
             raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Nome do medicamento e obrigatorio.",
+                status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+                detail=(
+                    "O nome personalizado deve ter no maximo "
+                    f"{MAX_BULA_ALIAS_LENGTH} caracteres."
+                ),
             )
 
-        clean_drug_name = drug_name.strip()
-        has_drug_name = len(clean_drug_name) > 0
-        if not has_drug_name:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Nome do medicamento e obrigatorio.",
-            )
-
-        return clean_drug_name
+        return clean_alias
 
     async def _validate_pdf_upload(self, file: UploadFile) -> None:
         is_pdf_content_type = file.content_type == PDF_CONTENT_TYPE

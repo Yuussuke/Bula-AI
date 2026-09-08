@@ -37,6 +37,7 @@ class BulaResponse(BaseModel):
     id: UUID
     user_id: int
     drug_name: str
+    alias: str | None
     manufacturer: str | None
     file_url: str | None
     file_address: str | None
@@ -60,6 +61,9 @@ class BulaUploadResponse(BaseModel):
 
 class BulaStatusResponse(BaseModel):
     id: UUID
+    drug_name: str
+    alias: str | None
+    manufacturer: str | None
     status: BulaStatus
     error_message: str | None
 

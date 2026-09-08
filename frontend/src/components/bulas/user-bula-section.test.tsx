@@ -27,6 +27,7 @@ function buildUserBula(overrides: Partial<UserBulaResponse> = {}): UserBulaRespo
     id: BULA_ID,
     user_id: 4,
     drug_name: "Dipirona",
+    alias: null,
     manufacturer: "Sanofi Medley",
     file_url: null,
     file_address: "stored_objects/dipirona",
@@ -64,6 +65,9 @@ beforeEach(() => {
   listUserBulasMock.mockResolvedValue([]);
   getBulaStatusMock.mockResolvedValue({
     id: BULA_ID,
+    drug_name: "Dipirona",
+    alias: null,
+    manufacturer: "Sanofi Medley",
     status: "pending",
     error_message: null,
   });
@@ -72,14 +76,13 @@ beforeEach(() => {
 describe("UserBulaSection", () => {
   it("adds a real upload to the list immediately after the API accepts it", async () => {
     const user = userEvent.setup();
-    const uploadedBula = buildUserBula();
+    const uploadedBula = buildUserBula({ alias: "Dipirona da mãe" });
     uploadBulaMock.mockResolvedValue(uploadedBula);
     renderUserBulaSection();
 
     expect(await screen.findByText("Nenhuma bula enviada")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Enviar bula" }));
-    await user.type(screen.getByLabelText("Nome do medicamento"), "Dipirona");
-    await user.type(screen.getByLabelText("Fabricante (opcional)"), "Sanofi Medley");
+    await user.type(screen.getByLabelText("Nome personalizado (opcional)"), "Dipirona da mãe");
     const pdfFile = new File(["%PDF-1.7"], "dipirona.pdf", {
       type: "application/pdf",
     });
@@ -90,11 +93,10 @@ describe("UserBulaSection", () => {
 
     expect(uploadBulaMock).toHaveBeenCalledOnce();
     expect(uploadBulaMock.mock.calls[0][0]).toEqual({
-      drugName: "Dipirona",
-      manufacturer: "Sanofi Medley",
+      alias: "Dipirona da mãe",
       file: pdfFile,
     });
-    expect(await screen.findByText("Dipirona", {}, { timeout: 3_000 })).toBeInTheDocument();
+    expect(await screen.findByText("Dipirona da mãe", {}, { timeout: 3_000 })).toBeInTheDocument();
     expect(screen.getByText("Processando...")).toBeInTheDocument();
     expect(screen.queryByText("Nenhuma bula enviada")).not.toBeInTheDocument();
   });

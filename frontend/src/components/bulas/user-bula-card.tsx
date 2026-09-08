@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import type { BulaStatus, UserBulaResponse } from "@/api/bulas";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useBulaStatus } from "@/hooks/use-bula-status";
 
@@ -80,6 +81,14 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
   const statusQuery = useBulaStatus(bula);
   const currentStatus = statusQuery.data?.status ?? bula.status;
   const currentErrorMessage = statusQuery.data?.error_message ?? bula.error_message;
+  const currentDrugName = statusQuery.data?.drug_name ?? bula.drug_name;
+  const currentAlias = statusQuery.data?.alias ?? bula.alias;
+  const currentManufacturer = statusQuery.data?.manufacturer ?? bula.manufacturer;
+  const isMetadataPending = currentStatus === "pending" || currentStatus === "processing";
+  const displayName = currentAlias || currentDrugName;
+  const metadataDescription = currentAlias
+    ? `${currentDrugName} · ${currentManufacturer || "Fabricante não identificado"}`
+    : currentManufacturer || "Fabricante não identificado";
 
   return (
     <Card className="gap-4 py-5" aria-labelledby={`user-bula-${bula.id}-title`}>
@@ -90,11 +99,22 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
           </div>
           <div className="min-w-0 flex-1">
             <CardTitle id={`user-bula-${bula.id}-title`} className="truncate text-base">
-              {bula.drug_name}
+              {currentAlias ? (
+                currentAlias
+              ) : isMetadataPending ? (
+                <>
+                  <span className="sr-only">Identificando medicamento</span>
+                  <Skeleton className="h-5 w-4/5" />
+                </>
+              ) : (
+                currentDrugName
+              )}
             </CardTitle>
-            <p className="text-muted-foreground mt-1 truncate text-sm">
-              {bula.manufacturer || "Fabricante não informado"}
-            </p>
+            {isMetadataPending ? (
+              <Skeleton aria-label="Identificando fabricante" className="mt-2 h-4 w-1/2" />
+            ) : (
+              <p className="text-muted-foreground mt-1 truncate text-sm">{metadataDescription}</p>
+            )}
           </div>
         </div>
       </CardHeader>
@@ -105,7 +125,7 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
         </p>
         <div aria-live="polite">
           <BulaStatusBadge
-            drugName={bula.drug_name}
+            drugName={displayName}
             status={currentStatus}
             errorMessage={currentErrorMessage}
           />

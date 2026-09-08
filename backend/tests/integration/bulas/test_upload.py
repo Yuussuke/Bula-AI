@@ -35,15 +35,16 @@ async def test_upload_valid_pdf_returns_created_bula(client: AsyncClient) -> Non
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipyrone", "manufacturer": "Example Pharma"},
-        files={"file": ("leaflet.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
+        data={"alias": "  Dipirona da minha mãe  "},
+        files={"file": ("dipirona.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         headers=build_auth_headers(access_token),
     )
 
     response_body = response.json()
     assert response.status_code == 202, response_body
-    assert response_body["drug_name"] == "Dipyrone"
-    assert response_body["manufacturer"] == "Example Pharma"
+    assert response_body["drug_name"] == "dipirona"
+    assert response_body["alias"] == "Dipirona da minha mãe"
+    assert response_body["manufacturer"] is None
     assert response_body["file_url"] is None
     assert response_body["file_address"].startswith("stored_objects/")
     assert response_body["status"] == "pending"
@@ -61,7 +62,6 @@ async def test_upload_enqueues_bula_ingestion_job(
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipyrone"},
         files={"file": ("leaflet.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         headers=build_auth_headers(access_token),
     )
@@ -80,7 +80,6 @@ async def test_get_bula_status_returns_current_status(
     access_token = await get_access_token(client, email="status-owner@bulaai.com")
     upload_response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipyrone"},
         files={"file": ("leaflet.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         headers=build_auth_headers(access_token),
     )
@@ -95,6 +94,9 @@ async def test_get_bula_status_returns_current_status(
     assert response.status_code == 200, response_body
     assert response_body == {
         "id": bula_id,
+        "drug_name": "leaflet",
+        "alias": None,
+        "manufacturer": None,
         "status": "pending",
         "error_message": None,
     }
@@ -108,7 +110,6 @@ async def test_get_bula_status_returns_404_for_another_user(
     second_user_token = await get_access_token(client, email="status-second@bulaai.com")
     upload_response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipyrone"},
         files={"file": ("leaflet.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         headers=build_auth_headers(first_user_token),
     )
@@ -126,7 +127,6 @@ async def test_get_bula_status_returns_404_for_another_user(
 async def test_upload_requires_authentication(client: AsyncClient) -> None:
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipyrone"},
         files={"file": ("leaflet.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
     )
 
@@ -134,21 +134,24 @@ async def test_upload_requires_authentication(client: AsyncClient) -> None:
 
 
 @pytest.mark.anyio
-async def test_upload_rejects_missing_drug_name_with_400(
+async def test_upload_uses_filename_when_metadata_is_not_available_yet(
     client: AsyncClient,
 ) -> None:
     access_token = await get_access_token(
         client,
-        email="missing-drug-name@bulaai.com",
+        email="automatic-metadata@bulaai.com",
     )
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        files={"file": ("leaflet.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
+        files={"file": ("dipirona-sodica.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         headers=build_auth_headers(access_token),
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 202
+    assert response.json()["drug_name"] == "dipirona-sodica"
+    assert response.json()["alias"] is None
+    assert response.json()["manufacturer"] is None
 
 
 @pytest.mark.anyio
@@ -157,7 +160,6 @@ async def test_upload_rejects_missing_file_with_400(client: AsyncClient) -> None
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipyrone"},
         headers=build_auth_headers(access_token),
     )
 
@@ -170,7 +172,6 @@ async def test_upload_rejects_empty_file_with_400(client: AsyncClient) -> None:
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipyrone"},
         files={"file": ("empty.pdf", b"", "application/pdf")},
         headers=build_auth_headers(access_token),
     )
@@ -186,7 +187,6 @@ async def test_upload_rejects_non_pdf_content_type_with_415(
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipyrone"},
         files={"file": ("imagem.png", b"fake image", "image/png")},
         headers=build_auth_headers(access_token),
     )
@@ -202,7 +202,6 @@ async def test_upload_rejects_invalid_pdf_magic_bytes_with_415(
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipyrone"},
         files={"file": ("corrupted.pdf", b"not a real pdf", "application/pdf")},
         headers=build_auth_headers(access_token),
     )
@@ -220,7 +219,6 @@ async def test_upload_rejects_files_larger_than_10_mb_with_413(
 
     response = await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Dipyrone"},
         files={"file": ("grande.pdf", oversized_file, "application/pdf")},
         headers=build_auth_headers(access_token),
     )
@@ -244,19 +242,16 @@ async def test_list_bulas_returns_only_current_user_bulas_newest_first(
 
     await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "First Bula"},
         files={"file": ("first.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         headers=build_auth_headers(first_user_token),
     )
     await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Second Bula"},
         files={"file": ("second.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         headers=build_auth_headers(first_user_token),
     )
     await client.post(
         "/api/v1/bulas/upload",
-        data={"drug_name": "Other User Bula"},
         files={"file": ("other.pdf", b"%PDF-1.4\n%%EOF", "application/pdf")},
         headers=build_auth_headers(second_user_token),
     )
@@ -269,7 +264,7 @@ async def test_list_bulas_returns_only_current_user_bulas_newest_first(
     response_body = response.json()
     returned_drug_names = [bula["drug_name"] for bula in response_body]
     assert response.status_code == 200, response_body
-    assert returned_drug_names == ["Second Bula", "First Bula"]
+    assert returned_drug_names == ["second", "first"]
     assert all(bula["corpus"] == "private" for bula in response_body)
     has_only_object_ref_addresses = all(
         bula["file_address"].startswith("stored_objects/") for bula in response_body

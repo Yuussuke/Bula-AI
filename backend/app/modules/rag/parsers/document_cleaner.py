@@ -33,10 +33,14 @@ STRENGTH_PATTERN = re.compile(
     re.IGNORECASE,
 )
 CORPORATE_MARKERS = (
+    "CNPJ",
+    "INDUSTRIA",
+    "QUIMICA",
     "FARMACEUTICA",
     "LABORATORIO",
     "LTDA",
     "S/A",
+    "S.A.",
     "SANOFI",
     "MEDLEY",
     "EMS",
@@ -371,7 +375,7 @@ class BulaDocumentCleaner:
             if any(marker in normalized_value for marker in ignored_markers):
                 continue
             if any(marker in normalized_value for marker in CORPORATE_MARKERS):
-                break
+                continue
             if STRENGTH_PATTERN.search(value):
                 break
             if 2 <= len(value) <= 100 and any(
