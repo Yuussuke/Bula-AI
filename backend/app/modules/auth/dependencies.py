@@ -11,6 +11,7 @@ from app.modules.auth.repository import UserRepository, RefreshTokenRepository
 from app.modules.auth.service import AuthService, InvalidCredentialsError, TokenService
 from app.modules.auth.security import PasswordHasher
 from app.modules.auth.models import User, UserRole
+from app.modules.auth.password_breach import PasswordBreachChecker
 
 security = HTTPBearer(auto_error=False)
 
@@ -35,6 +36,15 @@ def get_token_service() -> TokenService:
     )
 
 
+@lru_cache
+def get_password_breach_checker() -> PasswordBreachChecker:
+    """Provides the privacy-preserving compromised-password checker."""
+    return PasswordBreachChecker(
+        is_enabled=settings.password_breach.enabled,
+        timeout_seconds=settings.password_breach.timeout_seconds,
+    )
+
+
 def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
     """FastAPI gets the database session and wires the User Repository."""
     return UserRepository(db=db)
@@ -52,6 +62,9 @@ def get_auth_service(
     refresh_token_repo: RefreshTokenRepository = Depends(get_refresh_token_repository),
     hasher: PasswordHasher = Depends(get_password_hasher),
     token_srv: TokenService = Depends(get_token_service),
+    password_breach_checker: PasswordBreachChecker = Depends(
+        get_password_breach_checker
+    ),
 ) -> AuthService:
     """FastAPI gets the Repository, Hasher, and TokenService, and wires the Auth Service."""
     return AuthService(
@@ -59,6 +72,7 @@ def get_auth_service(
         refresh_token_repository=refresh_token_repo,
         password_hasher=hasher,
         token_service=token_srv,
+        password_breach_checker=password_breach_checker,
     )
 
 

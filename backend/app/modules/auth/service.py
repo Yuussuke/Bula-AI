@@ -4,7 +4,7 @@ from typing import cast
 import jwt
 import structlog
 
-from app.modules.auth import schemas, repository, security
+from app.modules.auth import password_breach, repository, schemas, security
 from app.modules.auth.models import User, UserRole
 
 logger = structlog.get_logger(__name__)
@@ -32,6 +32,10 @@ class InvalidRefreshTokenError(Exception):
     """Raised when a refresh token is missing, expired, or revoked."""
 
     pass
+
+
+class CompromisedPasswordError(Exception):
+    """Raised when a new password appears in known breach data."""
 
 
 class TokenService:
@@ -72,11 +76,13 @@ class AuthService:
         refresh_token_repository: repository.RefreshTokenRepository,
         password_hasher: security.PasswordHasher,
         token_service: TokenService,
+        password_breach_checker: password_breach.PasswordBreachChecker,
     ) -> None:
         self.user_repository = user_repository
         self.refresh_token_repository = refresh_token_repository
         self.password_hasher = password_hasher
         self.token_service = token_service
+        self.password_breach_checker = password_breach_checker
 
     def create_access_token(
         self, data: dict, expires_delta: timedelta | None = None
@@ -136,6 +142,17 @@ class AuthService:
                 email=normalized_email,
             )
             raise UserAlreadyExistsError()
+
+        is_password_compromised = (
+            await self.password_breach_checker.is_password_compromised(password)
+        )
+        if is_password_compromised:
+            logger.warning(
+                "user_registration_failed",
+                reason="compromised_password",
+                email=normalized_email,
+            )
+            raise CompromisedPasswordError()
 
         hashed_password = self.password_hasher.get_password_hash(password)
 
