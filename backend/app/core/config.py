@@ -133,6 +133,17 @@ class SecuritySettings(BaseSettings):
         return value
 
 
+class PasswordBreachSettings(BaseSettings):
+    enabled: bool = True
+    timeout_seconds: float = Field(default=2.0, gt=0)
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="PASSWORD_BREACH_",
+        extra="ignore",
+    )
+
+
 class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     """
     This class combines all application settings, including database and security configurations.
@@ -151,6 +162,9 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     ollama: OllamaSettings = Field(default_factory=OllamaSettings)
     qdrant: QdrantSettings = Field(default_factory=QdrantSettings)
     rag_ingestion: RAGIngestionSettings = Field(default_factory=RAGIngestionSettings)
+    password_breach: PasswordBreachSettings = Field(
+        default_factory=PasswordBreachSettings
+    )
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

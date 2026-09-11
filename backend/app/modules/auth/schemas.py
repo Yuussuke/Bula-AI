@@ -1,4 +1,3 @@
-import re
 from pydantic import (
     AliasChoices,
     BaseModel,
@@ -9,6 +8,9 @@ from pydantic import (
 )
 
 from app.modules.auth.models import UserRole
+
+PASSWORD_MIN_LENGTH = 8
+PASSWORD_MAX_LENGTH = 64
 
 
 class UserBase(BaseModel):
@@ -23,28 +25,20 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     full_name: str
-    password: str = Field(min_length=8, max_length=64)
+    password: str = Field(
+        min_length=PASSWORD_MIN_LENGTH,
+        max_length=PASSWORD_MAX_LENGTH,
+    )
 
     model_config = ConfigDict(extra="forbid")
-
-    @field_validator("password")
-    @classmethod
-    def validate_password_strength(cls, value: str) -> str:
-        """Validates that the password contains at least one uppercase letter, one lowercase letter, one number, and one special character."""
-        if not re.search(r"[A-Z]", value):
-            raise ValueError("A senha deve conter pelo menos uma letra maiúscula.")
-        if not re.search(r"[a-z]", value):
-            raise ValueError("A senha deve conter pelo menos uma letra minúscula.")
-        if not re.search(r"\d", value):
-            raise ValueError("A senha deve conter pelo menos um número.")
-        if not re.search(r"[!@#$%^&*(),.?\":{}|<>]", value):
-            raise ValueError("A senha deve conter pelo menos um caractere especial.")
-        return value
 
 
 class UserLogin(BaseModel):
     email: EmailStr
-    password: str
+    password: str = Field(
+        min_length=PASSWORD_MIN_LENGTH,
+        max_length=PASSWORD_MAX_LENGTH,
+    )
 
     @field_validator("email")
     @classmethod

@@ -200,6 +200,13 @@ Public registration through `/api/v1/auth/register` always creates regular
 `user` accounts. Administrative users are created through the internal
 management command exposed by `make create-admin`.
 
+New passwords are checked against the free Pwned Passwords range API using
+k-anonymity: only the first five characters of a locally computed SHA-1 lookup
+hash leave the backend, while stored passwords continue to use Argon2id. The
+check uses response padding and a two-second timeout. Registration fails open
+when the external service is unavailable so local development remains usable.
+Set `PASSWORD_BREACH_ENABLED=false` to disable this check explicitly.
+
 PDF ingestion runs through a separate PGQueuer worker. On a new local database,
 run `make migrate` for application tables and `make pgq-install` for queue
 tables before uploading bulas.

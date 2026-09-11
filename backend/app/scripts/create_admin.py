@@ -12,9 +12,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.database import async_session_factory, close_engine
 from app.modules.auth.repository import RefreshTokenRepository, UserRepository
+from app.modules.auth.password_breach import PasswordBreachChecker
 from app.modules.auth.schemas import UserCreate
 from app.modules.auth.security import PasswordHasher
-from app.modules.auth.service import AuthService, TokenService, UserAlreadyExistsError
+from app.modules.auth.service import (
+    AuthService,
+    CompromisedPasswordError,
+    TokenService,
+    UserAlreadyExistsError,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -57,6 +63,10 @@ def build_auth_service(db: AsyncSession) -> AuthService:
             algorithm=settings.algorithm,
             access_token_expire_minutes=settings.access_token_expire_minutes,
         ),
+        password_breach_checker=PasswordBreachChecker(
+            is_enabled=settings.password_breach.enabled,
+            timeout_seconds=settings.password_breach.timeout_seconds,
+        ),
     )
 
 
@@ -91,6 +101,9 @@ async def async_main(argv: Sequence[str] | None = None) -> int:
         return 1
     except UserAlreadyExistsError:
         print("A user with this email already exists.")
+        return 1
+    except CompromisedPasswordError:
+        print("This password appears in known breaches. Choose a different password.")
         return 1
     except ValueError as exc:
         print(str(exc))

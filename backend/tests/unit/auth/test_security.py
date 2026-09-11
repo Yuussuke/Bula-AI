@@ -43,6 +43,13 @@ class TestPasswordHasher:
         assert hasher.verify_password(password, hash1) is True
         assert hasher.verify_password(password, hash2) is True
 
+    def test_password_with_unicode_spaces_and_slash_round_trips(self) -> None:
+        password = "minha senha/segura ç"
+
+        hashed_password = hasher.get_password_hash(password)
+
+        assert hasher.verify_password(password, hashed_password) is True
+
 
 class TestJWTToken:
     """Tests for JWT Token generation and validation."""

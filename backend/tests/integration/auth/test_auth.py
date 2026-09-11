@@ -3,15 +3,22 @@ from fastapi import HTTPException
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.responses import Response
+from typing import Protocol
 
 from app.core.config import Settings
 from app.modules.auth.dependencies import require_admin
 from app.modules.auth.models import User, UserRole
+from app.modules.auth.password_breach import PasswordBreachChecker
 from app.modules.auth.repository import RefreshTokenRepository, UserRepository
 from app.modules.auth.router import set_refresh_cookie
 from app.modules.auth.schemas import UserCreate
 from app.modules.auth.security import PasswordHasher
 from app.modules.auth.service import AuthService, TokenService
+
+
+class ConfigurablePasswordBreachChecker(Protocol):
+    compromised_passwords: set[str]
+
 
 TEST_USER = {
     "full_name": "Test User",
@@ -36,6 +43,70 @@ async def test_register_creates_user_and_returns_201(client: AsyncClient):
     assert "is_active" not in data["user"]
     assert "password" not in data["user"]
     assert "hashed_password" not in data["user"]
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    ("email", "password"),
+    [
+        ("slash-password@bulaai.com", "senha/12"),
+        ("space-password@bulaai.com", "senha com espaços"),
+        ("unicode-password@bulaai.com", "remédio/seguro ç"),
+        ("maximum-password@bulaai.com", "a" * 64),
+    ],
+)
+async def test_register_accepts_passwords_without_composition_rules(
+    client: AsyncClient,
+    email: str,
+    password: str,
+) -> None:
+    payload = {
+        "full_name": "Password Policy User",
+        "email": email,
+        "password": password,
+    }
+
+    response = await client.post("/api/v1/auth/register", json=payload)
+
+    assert response.status_code == 201, response.json()
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("password", ["curta/1", "a" * 65])
+async def test_register_rejects_password_outside_length_limits(
+    client: AsyncClient,
+    password: str,
+) -> None:
+    payload = {
+        "full_name": "Password Policy User",
+        "email": "invalid-password@bulaai.com",
+        "password": password,
+    }
+
+    response = await client.post("/api/v1/auth/register", json=payload)
+
+    assert response.status_code == 422
+
+
+@pytest.mark.anyio
+async def test_register_rejects_password_found_in_known_breaches(
+    client: AsyncClient,
+    fake_password_breach_checker: ConfigurablePasswordBreachChecker,
+) -> None:
+    compromised_password = "senha/comprometida"
+    fake_password_breach_checker.compromised_passwords.add(compromised_password)
+    payload = {
+        "full_name": "Password Policy User",
+        "email": "compromised-password@bulaai.com",
+        "password": compromised_password,
+    }
+
+    response = await client.post("/api/v1/auth/register", json=payload)
+
+    assert response.status_code == 422
+    assert response.json()["detail"] == (
+        "Esta senha apareceu em vazamentos conhecidos. Escolha uma senha diferente."
+    )
 
 
 @pytest.mark.anyio
@@ -98,6 +169,16 @@ async def test_login_wrong_password_returns_401(client: AsyncClient):
         json={"email": TEST_USER["email"], "password": "senhaincorreta"},
     )
     assert response.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_login_rejects_oversized_password(client: AsyncClient) -> None:
+    response = await client.post(
+        "/api/v1/auth/login",
+        json={"email": TEST_USER["email"], "password": "a" * 65},
+    )
+
+    assert response.status_code == 422
 
 
 @pytest.mark.anyio
@@ -288,6 +369,10 @@ async def test_create_admin_user_creates_admin_that_can_login(
             secret_key="long_and_secure_secret_key_for_testing_purposes_only_1234567890",
             algorithm="HS256",
             access_token_expire_minutes=30,
+        ),
+        password_breach_checker=PasswordBreachChecker(
+            is_enabled=False,
+            timeout_seconds=2,
         ),
     )
     admin_payload = UserCreate(

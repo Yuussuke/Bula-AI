@@ -18,6 +18,7 @@ from app.core.base import Base
 # Import from database module which also imports all models.
 # This ensures SQLAlchemy mapper configuration works with forward references.
 from app.core.database import get_db
+from app.modules.auth.dependencies import get_password_breach_checker
 from app.modules.bulas.dependencies import get_bula_ingestion_queue
 
 app.state.limiter.enabled = False
@@ -54,6 +55,14 @@ class FakeBulaIngestionQueue:
         self.enqueued_bula_ids.append(bula_id)
 
 
+class FakePasswordBreachChecker:
+    def __init__(self) -> None:
+        self.compromised_passwords: set[str] = set()
+
+    async def is_password_compromised(self, password: str) -> bool:
+        return password in self.compromised_passwords
+
+
 @pytest.fixture
 def anyio_backend():
     return "asyncio"
@@ -80,13 +89,22 @@ def fake_bula_ingestion_queue() -> FakeBulaIngestionQueue:
 
 
 @pytest.fixture
+def fake_password_breach_checker() -> FakePasswordBreachChecker:
+    return FakePasswordBreachChecker()
+
+
+@pytest.fixture
 async def client(
     db_session: AsyncSession,
     fake_bula_ingestion_queue: FakeBulaIngestionQueue,
+    fake_password_breach_checker: FakePasswordBreachChecker,
 ) -> AsyncGenerator[AsyncClient, None]:
     app.dependency_overrides[get_db] = lambda: db_session
     app.dependency_overrides[get_bula_ingestion_queue] = lambda: (
         fake_bula_ingestion_queue
+    )
+    app.dependency_overrides[get_password_breach_checker] = lambda: (
+        fake_password_breach_checker
     )
 
     async with AsyncClient(

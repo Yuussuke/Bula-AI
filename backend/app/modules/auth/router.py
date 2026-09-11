@@ -7,6 +7,7 @@ from app.modules.auth import models, schemas
 from app.modules.auth.dependencies import get_auth_service, get_current_user
 from app.modules.auth.service import (
     AuthService,
+    CompromisedPasswordError,
     InvalidCredentialsError,
     InvalidRefreshTokenError,
     UserAlreadyExistsError,
@@ -57,6 +58,14 @@ async def register(
     """
     try:
         new_user = await auth_service.register_new_user(user_in)
+    except CompromisedPasswordError:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail=(
+                "Esta senha apareceu em vazamentos conhecidos. "
+                "Escolha uma senha diferente."
+            ),
+        )
     except UserAlreadyExistsError:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
