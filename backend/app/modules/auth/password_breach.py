@@ -31,10 +31,14 @@ class PasswordBreachChecker:
         if not self.is_enabled:
             return False
 
-        password_hash = hashlib.sha1(
-            password.encode("utf-8"),
-            usedforsecurity=False,
-        ).hexdigest().upper()
+        password_hash = (
+            hashlib.sha1(
+                password.encode("utf-8"),
+                usedforsecurity=False,
+            )
+            .hexdigest()
+            .upper()
+        )
         hash_prefix = password_hash[:5]
         hash_suffix = password_hash[5:]
 

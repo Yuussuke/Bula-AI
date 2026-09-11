@@ -19,6 +19,7 @@ from app.modules.auth.service import AuthService, TokenService
 class ConfigurablePasswordBreachChecker(Protocol):
     compromised_passwords: set[str]
 
+
 TEST_USER = {
     "full_name": "Test User",
     "email": "test@bulaai.com",
@@ -104,8 +105,7 @@ async def test_register_rejects_password_found_in_known_breaches(
 
     assert response.status_code == 422
     assert response.json()["detail"] == (
-        "Esta senha apareceu em vazamentos conhecidos. "
-        "Escolha uma senha diferente."
+        "Esta senha apareceu em vazamentos conhecidos. Escolha uma senha diferente."
     )
 
 

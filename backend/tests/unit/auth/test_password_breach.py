@@ -7,10 +7,14 @@ from app.modules.auth.password_breach import PasswordBreachChecker
 
 
 def build_password_hash(password: str) -> str:
-    return hashlib.sha1(
-        password.encode("utf-8"),
-        usedforsecurity=False,
-    ).hexdigest().upper()
+    return (
+        hashlib.sha1(
+            password.encode("utf-8"),
+            usedforsecurity=False,
+        )
+        .hexdigest()
+        .upper()
+    )
 
 
 @pytest.mark.anyio
