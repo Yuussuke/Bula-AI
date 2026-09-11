@@ -14,6 +14,9 @@ import { loginRequest, registerRequest } from "@/lib/api";
 import { getPostAuthPath } from "@/lib/auth-navigation";
 import { useAuthStore } from "@/store/auth";
 
+const PASSWORD_MIN_LENGTH = 8;
+const PASSWORD_MAX_LENGTH = 64;
+
 export function AuthView() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -126,6 +129,9 @@ export function AuthView() {
                         placeholder="••••••••"
                         value={loginPassword}
                         onChange={(event) => setLoginPassword(event.target.value)}
+                        minLength={PASSWORD_MIN_LENGTH}
+                        maxLength={PASSWORD_MAX_LENGTH}
+                        autoComplete="current-password"
                         required
                       />
                     </Field>
@@ -179,8 +185,19 @@ export function AuthView() {
                         placeholder="••••••••"
                         value={registerPassword}
                         onChange={(event) => setRegisterPassword(event.target.value)}
+                        minLength={PASSWORD_MIN_LENGTH}
+                        maxLength={PASSWORD_MAX_LENGTH}
+                        autoComplete="new-password"
+                        aria-describedby="registerPasswordRequirements"
                         required
                       />
+                      <p
+                        id="registerPasswordRequirements"
+                        className="text-muted-foreground text-xs"
+                      >
+                        Use de 8 a 64 caracteres. Letras, números, espaços e símbolos são aceitos.
+                        Senhas encontradas em vazamentos conhecidos serão recusadas.
+                      </p>
                     </Field>
                   </FieldGroup>
                   {registerErrorMessage ? (
