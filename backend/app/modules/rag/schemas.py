@@ -1,6 +1,30 @@
 from typing import Literal
+from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
+
+from app.modules.bulas.models import BulaCorpus
+
+
+class ChunkMetadataInput(BaseModel):
+    chunk_id: str = Field(min_length=1)
+    doc_id: str = Field(min_length=1)
+    bula_id: UUID
+    corpus: BulaCorpus
+    drug_name: str | None = None
+    section_title: str
+    chunk_text: str = Field(min_length=1)
+
+    @field_validator("chunk_id", "doc_id", "chunk_text")
+    @classmethod
+    def reject_blank_text(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("Chunk identity and source text must not be blank.")
+        return value  # Keep source whitespace verbatim.
+
+
+class BM25SearchResult(ChunkMetadataInput):
+    bm25_score: float
 
 
 ChunkingMethod = Literal["primary", "fallback", "heuristic", "deterministic"]
