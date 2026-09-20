@@ -34,6 +34,11 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-bulaai}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bulaai}
       POSTGRES_DB: ${POSTGRES_DB:-bulaai}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432"
     volumes:
