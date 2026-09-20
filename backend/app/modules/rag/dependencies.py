@@ -9,11 +9,15 @@ from langchain_openai import OpenAIEmbeddings
 from openai import AsyncOpenAI
 from pydantic import SecretStr
 from qdrant_client import AsyncQdrantClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import Settings, get_settings
+from app.core.database import get_db
 from app.modules.bulas.dependencies import get_bula_repository
 from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.base_chunker import BaseChunker
+from app.modules.rag.bm25_index import PostgreSQLBM25Index
+from app.modules.rag.repository import ChunkMetadataRepository
 from app.modules.rag.chain import RAGChainFactory
 from app.modules.rag.chunker import BulaChunker
 from app.modules.rag.debug_artifacts import RAGIngestionDebugArtifacts
@@ -170,6 +174,10 @@ def get_chunker(
     )
 
 
+def get_bm25_index(db: AsyncSession = Depends(get_db)) -> PostgreSQLBM25Index:
+    return PostgreSQLBM25Index(repository=ChunkMetadataRepository(db=db))
+
+
 def get_ingestion_service(
     chunker: BaseChunker = Depends(get_chunker),
     parser: BulaParser = Depends(get_parser),
@@ -177,6 +185,7 @@ def get_ingestion_service(
     qdrant_store: QdrantVectorStore = Depends(get_qdrant_store),
     object_store: ObjectStoreClient = Depends(get_object_store_client),
     bula_repo: BulaRepository = Depends(get_bula_repository),
+    bm25_index: PostgreSQLBM25Index = Depends(get_bm25_index),
     debug_artifacts: RAGIngestionDebugArtifacts = Depends(
         get_ingestion_debug_artifacts
     ),
@@ -188,6 +197,7 @@ def get_ingestion_service(
         qdrant_store=qdrant_store,
         object_store=object_store,
         bula_repo=bula_repo,
+        bm25_index=bm25_index,
         debug_artifacts=debug_artifacts,
     )
 

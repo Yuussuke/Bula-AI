@@ -19,6 +19,7 @@ from app.modules.bulas.models import BulaStatus
 from app.modules.bulas.queue import INGEST_BULA_ENTRYPOINT
 from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.dependencies import (
+    get_bm25_index,
     get_chunker,
     get_embeddings,
     get_ingestion_debug_artifacts,
@@ -102,6 +103,7 @@ async def create_worker() -> AsyncIterator[PgQueuer]:
                     repository=StoredObjectRepository(db=db),
                 ),
                 bula_repo=BulaRepository(db=db),
+                bm25_index=get_bm25_index(db=db),
                 debug_artifacts=debug_artifacts,
             )
             await service.ingest_bula(bula_id=bula_id)

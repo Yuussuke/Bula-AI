@@ -1,10 +1,12 @@
 from typing import cast
+from unittest.mock import AsyncMock
 
 import pytest
 from fastapi import FastAPI, Request
 from langchain_core.embeddings import Embeddings as LCEmbeddings
 from openai import AsyncOpenAI
 from pydantic import SecretStr
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import (
     EmbeddingSettings,
@@ -21,6 +23,7 @@ from app.modules.rag.debug_artifacts import RAGIngestionDebugArtifacts
 from app.modules.rag import dependencies as rag_dependencies
 from app.modules.rag import qdrant_client as qdrant_client_module
 from app.modules.rag.dependencies import (
+    get_bm25_index,
     get_chunker,
     get_ingestion_debug_artifacts,
     get_ingestion_service,
@@ -485,6 +488,7 @@ def test_get_ingestion_service_receives_base_chunker() -> None:
         qdrant_store=qdrant_store,
         object_store=object_store,
         bula_repo=bula_repo,
+        bm25_index=get_bm25_index(db=AsyncMock(spec=AsyncSession)),
         debug_artifacts=debug_artifacts,
     )
 
