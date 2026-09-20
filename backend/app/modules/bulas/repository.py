@@ -28,6 +28,16 @@ class BulaRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
 
+    async def list_ready_bulas_for_indexing(
+        self, *, after_id: UUID | None = None, limit: int = 100
+    ) -> list[Bula]:
+        """Operator-only keyset pagination; not a user catalog or access check."""
+        statement = select(Bula).where(Bula.status == BulaStatus.READY)
+        if after_id is not None:
+            statement = statement.where(Bula.id > after_id)
+        result = await self.db.execute(statement.order_by(Bula.id).limit(limit))
+        return list(result.scalars().all())
+
     async def create_bula(
         self,
         *,
