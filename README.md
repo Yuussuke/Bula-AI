@@ -451,8 +451,11 @@ using the backfill below, not by parsing or embedding them again.
 
 The index uses **real BM25 via pg_textsearch 1.1.0**, already included in our
 first-party PostgreSQL image. It does not use `ts_rank_cd` or a Python in-memory
-index. The `bula_portuguese` text configuration applies `unaccent` and Portuguese
-stemming to both indexing and queries, without modifying stored source text.
+index. Versioned database normalization combines Portuguese stemming before
+accent folding with the previous accent-folding-first path. It is applied to
+both indexing and queries without modifying stored source text. The internal
+`search_text` column is maintained by a PostgreSQL trigger and indexed with
+the `simple` configuration so its already-normalized terms are not stemmed again.
 Search results contain positive BM25 scores (higher is better), not probabilities
 or scores normalized to [0, 1]. The chat still uses dense retrieval until #55–#57
 and #51 wire in the additional modes.
@@ -504,6 +507,77 @@ fixtures for unrelated modules remain unchanged.
 
 Design deviations from #32, ranking limitations, and the #55 handoff are recorded
 in [the BM25 decision note](docs/decisions/2026-09-19-postgres-bm25.md).
+
+### Standalone BM25 retriever (#55)
+
+`app.modules.rag.bm25_retriever.BM25Retriever` adapts the persistent index to
+LangChain's `BaseRetriever`. It performs no embedding or LLM calls. Its async
+`ainvoke(question)` returns ranked `Document` objects with the original text,
+`chunk_id`, `doc_id`, `bula_id`, `corpus`, `drug_name`, and `section_title`.
+`score` and `bm25_score` both hold the positive BM25 score (not a probability).
+`Document.id` is the original chunk ID, not a Qdrant point ID.
+
+Inject `get_bm25_retriever_factory` through FastAPI `Depends`, then construct a
+retriever **after** the application service has authorized the selected bula:
+
+```python
+retriever = factory.build(bula_id=authorized_bula.id, k=10)
+documents = await retriever.ainvoke(question)
+```
+
+The factory reuses the injected request-scoped index/session; it is not a global
+singleton. SQL and Portuguese normalization remain in the PostgreSQL index,
+not in the LangChain adapter. A small `BM25SearchIndex` protocol allows tests to
+replace persistence without mocking the retriever itself.
+
+- `k` is bounded to 1–100. Bula and corpus filters are applied together.
+- `corpus=None` means no corpus filter; an empty corpus returns no documents.
+- Blank queries and no matches return `[]`. Database errors propagate rather
+  than being presented as absence of evidence in the leaflet.
+- Use `ainvoke`, not synchronous `invoke`. Do not run concurrent queries on
+  the same session; for `abatch`, use `config={"max_concurrency": 1}` or allocate
+  separate sessions per concurrent operation.
+- This remains an internal component: filters do not replace ownership and
+  publication authorization. Unscoped searches include private chunks.
+- The chat still uses dense retrieval. Mode selection and hybrid fusion are
+  separate work; no new endpoint or UI mode is introduced here.
+
+The #32 BM25 decision also applies to #55: `to_bm25query`/native BM25 replace
+the card's `plainto_tsquery`/`ts_rank_cd` examples. The normalization migration
+`f6c8d2a91b40` fixes the specific `contraindicação`/`contraindicações` regression,
+with passing tests in both directions. Tests also cover accent-insensitive
+spellings, other inflections, source preservation, term frequencies, and numbers.
+There are no word-specific substitutions or expected-failure tests for this case.
+
+If #32's migration/backfill is already applied, **do not repeat the Qdrant
+backfill** for this normalization change. After updating the local code, pause
+ingestion and other writes, then run:
+
+```bash
+docker compose stop worker
+make migrate
+docker compose exec api uv run alembic current
+docker compose up -d worker
+```
+
+The expected revision is `f6c8d2a91b40 (head)`. This transactional migration
+populates the derived column from existing `chunk_meta.chunk_text` and rebuilds
+only the PostgreSQL BM25 index. It takes table locks, so schedule a maintenance
+window for a large corpus. It does not read PDFs, change original chunks, access
+Qdrant, or call embedding/LLM providers. New inserts/updates maintain the derived
+column automatically. A downgrade restores the previous lexical index without
+deleting original chunks; roll application code back together with the schema.
+
+Normalization and ranking tradeoffs, including linguistic limitations, are in
+[the #55 decision note](docs/decisions/2026-09-20-bm25-portuguese-normalization.md).
+
+Validation (PostgreSQL tests require the isolated database described above):
+
+```bash
+cd backend
+uv run pytest -q tests/unit/rag/test_bm25_retriever.py
+uv run pytest -q tests/integration/rag/test_bm25_index.py
+```
 
 ### RAG ingestion observability
 
