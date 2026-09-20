@@ -11,6 +11,7 @@ from app.modules.bulas.models import (
 )
 from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.base_chunker import BaseChunker
+from app.modules.rag.bm25_index import PostgreSQLBM25Index
 from app.modules.rag.debug_artifacts import (
     DebugArtifactStatus,
     RAGIngestionDebugArtifacts,
@@ -19,7 +20,7 @@ from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.observability import RAGIngestionObserver
 from app.modules.rag.parsers.pdf_parser import BulaParser, ParseResult
 from app.modules.rag.qdrant_store import QdrantVectorStore, build_qdrant_point
-from app.modules.rag.schemas import ChunkResult
+from app.modules.rag.schemas import ChunkMetadataInput, ChunkResult
 from app.modules.storage.client import ObjectStoreClient
 
 
@@ -37,6 +38,7 @@ class RAGIngestionService:
         qdrant_store: QdrantVectorStore,
         object_store: ObjectStoreClient,
         bula_repo: BulaRepository,
+        bm25_index: PostgreSQLBM25Index,
         debug_artifacts: RAGIngestionDebugArtifacts | None = None,
     ) -> None:
         self.chunker = chunker
@@ -45,6 +47,7 @@ class RAGIngestionService:
         self.qdrant_store = qdrant_store
         self.object_store = object_store
         self.bula_repo = bula_repo
+        self.bm25_index = bm25_index
         self.debug_artifacts = debug_artifacts or RAGIngestionDebugArtifacts(
             enabled=False,
             root_path="tmp/rag-ingestion-debug",
@@ -52,7 +55,7 @@ class RAGIngestionService:
 
     async def ingest_bula(self, *, bula_id: UUID) -> Bula:
         """
-        Run the dense-only ingestion pipeline for one uploaded bula.
+        Index source chunks in Qdrant and PostgreSQL before marking them ready.
 
         This phase assumes the parser is text-based and OCR is disabled. Empty
         parse/chunk output is treated as an explicit document-quality failure.
@@ -253,6 +256,24 @@ class RAGIngestionService:
                     qdrant_collection=self.qdrant_store.collection_name,
                     qdrant_point_count=qdrant_point_count,
                 )
+
+            async with observer.stage("bm25_upsert") as stage:
+                indexed_chunk_count = await self.bm25_index.replace_bula_chunks(
+                    bula_id=bula.id,
+                    chunks=[
+                        ChunkMetadataInput(
+                            chunk_id=chunk.chunk_id,
+                            doc_id=doc_id,
+                            bula_id=bula.id,
+                            corpus=bula.corpus,
+                            drug_name=bula.drug_name,
+                            section_title=chunk.section_title,
+                            chunk_text=chunk.text,
+                        )
+                        for chunk in chunk_result.chunks
+                    ],
+                )
+                stage.add_fields(bm25_chunk_count=indexed_chunk_count)
 
             async with observer.stage("mark_ready") as stage:
                 ready_bula = await self.bula_repo.update_ingestion_status(

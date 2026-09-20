@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 import pytest
+from unittest.mock import AsyncMock
+from app.modules.rag.schemas import ChunkMetadataInput
 
 from app.modules.bulas.models import (
     Bula,
@@ -238,6 +240,7 @@ def build_service(
         qdrant_store=qdrant_store or FakeQdrantStore(),  # type: ignore[arg-type]
         object_store=FakeObjectStore(),  # type: ignore[arg-type]
         bula_repo=repo,  # type: ignore[arg-type]
+        bm25_index=AsyncMock(replace_bula_chunks=AsyncMock(return_value=1)),
         debug_artifacts=debug_artifacts,
     )
 
@@ -266,6 +269,41 @@ async def test_ingest_bula_moves_pending_to_processing_then_ready() -> None:
     assert qdrant_store.upserted_payloads[0]["embedding_profile"] == (
         "test-model;input=plain-v1"
     )
+
+
+@pytest.mark.anyio
+async def test_ingestion_indexes_exact_source_identity_before_ready() -> None:
+    repo = FakeBulaRepository(build_bula())
+    service = build_service(repo=repo)
+    indexed_chunks: list[ChunkMetadataInput] = []
+
+    async def capture_chunks(*, bula_id: UUID, chunks: list[ChunkMetadataInput]) -> int:
+        assert repo.statuses == [BulaStatus.PROCESSING]
+        assert bula_id == BULA_ID
+        indexed_chunks.extend(chunks)
+        return len(chunks)
+
+    service.bm25_index.replace_bula_chunks.side_effect = capture_chunks
+    await service.ingest_bula(bula_id=BULA_ID)
+    assert indexed_chunks[0].chunk_id == "chunk-1"
+    assert indexed_chunks[0].doc_id == str(BULA_ID)
+    assert indexed_chunks[0].chunk_text == build_chunk().text
+    assert repo.statuses[-1] == BulaStatus.READY
+
+
+@pytest.mark.anyio
+async def test_bm25_failure_never_marks_ready_and_retry_succeeds() -> None:
+    repo = FakeBulaRepository(build_bula())
+    service = build_service(repo=repo)
+    service.bm25_index.replace_bula_chunks.side_effect = RuntimeError(
+        "index unavailable"
+    )
+    with pytest.raises(RuntimeError, match="index unavailable"):
+        await service.ingest_bula(bula_id=BULA_ID)
+    assert repo.statuses == [BulaStatus.PROCESSING]
+    service.bm25_index.replace_bula_chunks.side_effect = None
+    await service.ingest_bula(bula_id=BULA_ID)
+    assert repo.statuses[-1] == BulaStatus.READY
 
 
 @pytest.mark.anyio
@@ -361,6 +399,7 @@ async def test_ingest_bula_logs_stage_timings_and_summary(
         "embed_chunks",
         "qdrant_ensure_collection",
         "qdrant_upsert",
+        "bm25_upsert",
         "mark_ready",
     ]
     stage_logs = [
