@@ -1,6 +1,14 @@
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, ForeignKey, Index, String, Text, Uuid
+from sqlalchemy import (
+    CheckConstraint,
+    FetchedValue,
+    ForeignKey,
+    Index,
+    String,
+    Text,
+    Uuid,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.base import Base
@@ -18,9 +26,9 @@ class ChunkMetadata(Base):
         Index("ix_chunk_meta_corpus", "corpus"),
         Index(
             "ix_chunk_meta_bm25",
-            "chunk_text",
+            "search_text",
             postgresql_using="bm25",
-            postgresql_with={"text_config": "'public.bula_portuguese'"},
+            postgresql_with={"text_config": "'pg_catalog.simple'"},
         ).ddl_if(dialect="postgresql"),
     )
 
@@ -33,3 +41,7 @@ class ChunkMetadata(Base):
     drug_name: Mapped[str | None] = mapped_column(Text)
     section_title: Mapped[str] = mapped_column(Text)
     chunk_text: Mapped[str] = mapped_column(Text)
+    # PostgreSQL trigger derives this from chunk_text; never exposed as a source.
+    search_text: Mapped[str] = mapped_column(
+        Text, server_default=FetchedValue(), server_onupdate=FetchedValue()
+    )

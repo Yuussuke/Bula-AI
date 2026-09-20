@@ -90,12 +90,25 @@ class ChunkMetadataRepository:
         # pg_textsearch 1.1 can post-filter an index top-k scan. Materialize the
         # scope FIRST so unrelated bulas cannot crowd out eligible results.
         scoped_chunks = candidates.cte("scoped_chunks").prefix_with("MATERIALIZED")
-        bm25_query = func.to_bm25query(query, "public.ix_chunk_meta_bm25")
-        distance = scoped_chunks.c.chunk_text.op("<@>", return_type=Float)(bm25_query)
+        # An uncorrelated scalar subquery avoids normalizing for every candidate.
+        normalized_query = select(
+            func.public.bula_bm25_normalize_v2(query)
+        ).scalar_subquery()
+        bm25_query = func.to_bm25query(normalized_query, "public.ix_chunk_meta_bm25")
+        distance = scoped_chunks.c.search_text.op("<@>", return_type=Float)(bm25_query)
         # The extension returns NEGATIVE BM25 scores (lower is better).
         score = (-distance).label("bm25_score")
         statement = (
-            select(scoped_chunks, score)
+            select(
+                scoped_chunks.c.chunk_id,
+                scoped_chunks.c.doc_id,
+                scoped_chunks.c.bula_id,
+                scoped_chunks.c.corpus,
+                scoped_chunks.c.drug_name,
+                scoped_chunks.c.section_title,
+                scoped_chunks.c.chunk_text,
+                score,
+            )
             .where(distance < 0)
             .order_by(distance.asc(), scoped_chunks.c.chunk_id.asc())
             .limit(k)
