@@ -440,6 +440,71 @@ was not found in the retrieved excerpts instead of claiming that it does not
 exist in the complete leaflet. Answers cite context using numeric references;
 only the cited chunks are returned as visible sources, in citation order.
 
+### PostgreSQL BM25 index (Phase 5 foundation)
+
+New ingestions persist their source chunks to `chunk_meta` after Qdrant and
+before `ready`. Both stores must succeed. PostgreSQL replacement is transactional
+per bula and removes obsolete lexical chunks. A failed write propagates to the
+worker retry policy; repeating the write does not duplicate rows. There is no
+distributed transaction with Qdrant. Existing ready bulas are populated explicitly
+using the backfill below, not by parsing or embedding them again.
+
+The index uses **real BM25 via pg_textsearch 1.1.0**, already included in our
+first-party PostgreSQL image. It does not use `ts_rank_cd` or a Python in-memory
+index. The `bula_portuguese` text configuration applies `unaccent` and Portuguese
+stemming to both indexing and queries, without modifying stored source text.
+Search results contain positive BM25 scores (higher is better), not probabilities
+or scores normalized to [0, 1]. The chat still uses dense retrieval until #55–#57
+and #51 wire in the additional modes.
+
+For the first local upgrade, pause ingestion and apply the migration before
+restarting the worker:
+
+```bash
+docker compose stop worker
+make migrate
+make backfill-chunk-meta ARGS="--bula-id <uuid> --dry-run"
+make backfill-chunk-meta ARGS="--bula-id <uuid>"
+docker compose up -d worker
+```
+
+The API and PostgreSQL must already be running for `make migrate`; Qdrant must
+also be running for backfill. If the environment is down, first start
+`docker compose up -d postgres qdrant api`.
+
+Omit `--bula-id` to process **all ready bulas**, including private ones, as an
+operator. This command is not an HTTP endpoint. Use `--dry-run` first and run it
+only with no concurrent ingestion, deletion, or corpus changes. `--batch-size`
+(1–1000, default 100) controls database listing and Qdrant scroll pages; one bula's
+chunks are held in memory for complete validation before its transactional write.
+If a later bula fails, earlier completed bulas remain committed; rerunning is safe.
+Missing chunks, malformed payloads, and identity mismatches fail the selected
+document before any of its index is replaced. Current PostgreSQL metadata is
+authoritative for corpus/name; the source `chunk_id`, not the Qdrant point UUID,
+is preserved. Historical payloads without `doc_id` derive it from `bula_id`.
+
+The command does not modify PDFs, vectors, publication status, or chats and makes
+no model calls. Do not run backfill against a collection containing known stale
+or duplicate source chunks: it copies the current Qdrant content, not a repaired
+version of it. A corpus filter is not an authorization check; future user-facing
+retrievers must enforce the existing publication/ownership policy first.
+
+Real PostgreSQL tests require a **separate migrated test database** (its name
+must contain `test`). Set `BM25_TEST_DATABASE_URL` to its asyncpg URL, then run:
+
+```bash
+cd backend
+uv run pytest -q tests/integration/rag/test_bm25_index.py
+```
+
+CI runs these tests in the migration job with the first-party PostgreSQL image.
+Without that explicit URL these integration tests are skipped, never redirected
+to the application database or simulated with SQLite. The pre-existing SQLite
+fixtures for unrelated modules remain unchanged.
+
+Design deviations from #32, ranking limitations, and the #55 handoff are recorded
+in [the BM25 decision note](docs/decisions/2026-09-19-postgres-bm25.md).
+
 ### RAG ingestion observability
 
 The PGQueuer ingestion worker emits structured logs for every RAG ingestion run.
