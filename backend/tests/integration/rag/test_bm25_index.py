@@ -4,12 +4,16 @@ Only uniquely named test users/bulas are created and removed. No production
 database defaults, schema drops, or table-wide truncates are used.
 """
 
+import asyncio
 import os
+import sys
+from collections import Counter
 from collections.abc import AsyncIterator
+from pathlib import Path
 from uuid import uuid4
 
 import pytest
-from sqlalchemy import delete, func, select, text
+from sqlalchemy import delete, func, insert, select, text, update
 from sqlalchemy.engine import make_url
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import NullPool
@@ -18,6 +22,8 @@ from qdrant_client import AsyncQdrantClient
 from app.modules.auth.models import User
 from app.modules.bulas.models import Bula, BulaCorpus, BulaStatus
 from app.modules.rag.bm25_index import PostgreSQLBM25Index
+from app.modules.rag.bm25_retriever import BM25Retriever
+from app.modules.rag.dependencies import get_bm25_index, get_bm25_retriever_factory
 from app.modules.rag.models import ChunkMetadata
 from app.modules.rag.repository import (
     ChunkIndexPersistenceError,
@@ -329,3 +335,219 @@ async def test_qdrant_backfill_is_idempotent_and_does_not_change_source(
         assert bulas[0].status == BulaStatus.READY
     finally:
         await client.close()
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "query", ["paracetamol", "paracetamol 500", "SODICA", "sódica", "paciente"]
+)
+async def test_bm25_retriever_keyword_accents_and_stemming(
+    bm25_context: BM25Context, query: str
+) -> None:
+    index, db, bulas = bm25_context
+    source = "## Composição\nParacetamol 500mg; substância sódica para pacientes.\n"
+    chunk = make_chunk(bulas[0], source)
+    await index.upsert_chunks([chunk])
+    # Exercise the same scoped dependency factories used by future consumers.
+    factory = get_bm25_retriever_factory(index=get_bm25_index(db=db))
+    documents = await factory.build(bula_id=bulas[0].id).ainvoke(query)
+    assert len(documents) == 1
+    assert documents[0].page_content == source
+    assert documents[0].id == chunk.chunk_id
+    assert documents[0].metadata["bula_id"] == str(bulas[0].id)
+    assert documents[0].metadata["section_title"] == chunk.section_title
+    assert documents[0].metadata["bm25_score"] > 0
+    assert documents[0].metadata["score"] == documents[0].metadata["bm25_score"]
+
+
+@pytest.mark.anyio
+async def test_normalization_keeps_token_frequency_and_numeric_distinctions(
+    bm25_context: BM25Context,
+) -> None:
+    _, db, _ = bm25_context
+
+    async def normalize(source: str) -> str:
+        value = await db.scalar(select(func.public.bula_bm25_normalize_v2(source)))
+        assert isinstance(value, str)
+        return value
+
+    single = Counter((await normalize("dipirona")).split())
+    repeated = Counter((await normalize("dipirona " * 300)).split())
+    assert single
+    assert repeated == Counter({term: count * 300 for term, count in single.items()})
+    for first, second in [("500", "50"), ("0.5", "5"), ("10-20", "1020"), ("mg", "mL")]:
+        assert await normalize(first) != await normalize(second)
+    assert await normalize("e de a") == ""
+    assert await normalize("") == ""
+
+
+@pytest.mark.anyio
+async def test_search_text_is_internal_and_tracks_source_updates(
+    bm25_context: BM25Context,
+) -> None:
+    index, db, bulas = bm25_context
+    source = "## Posologia\n| Dose | Volume |\n| 500 mg | 0,5 mL |\nContraindicações.\n"
+    chunk = make_chunk(bulas[0], source)
+    await index.upsert_chunks([chunk])
+    documents = await BM25Retriever(index=index, bula_id=bulas[0].id).ainvoke(
+        "contraindicação"
+    )
+    assert documents[0].page_content == source
+    assert "search_text" not in documents[0].metadata
+
+    # The database, not caller-supplied search terms, owns the derived column.
+    await db.execute(
+        update(ChunkMetadata)
+        .where(ChunkMetadata.chunk_id == chunk.chunk_id)
+        .values(chunk_text="Amoxicilina 50 mg.", search_text="forged normalization")
+    )
+    await db.commit()
+    assert await index.search("contraindicação", bula_id=bulas[0].id) == []
+    assert await index.search("500", bula_id=bulas[0].id) == []
+    assert await index.search("dipirona", bula_id=bulas[0].id) == []
+    assert (await index.search("amoxicilina", bula_id=bulas[0].id))[
+        0
+    ].chunk_text == "Amoxicilina 50 mg."
+    assert len(await index.search("50", bula_id=bulas[0].id)) == 1
+
+
+@pytest.mark.anyio
+async def test_normalization_migration_rebuilds_existing_chunks_without_source_changes(
+    bm25_context: BM25Context,
+) -> None:
+    index, db, bulas = bm25_context
+    database_url = os.environ["BM25_TEST_DATABASE_URL"]
+    # The fixture already requires an explicit isolated database named *test*.
+    # Run serially: this test migrates that test database, never the application.
+    source = "## Contraindicações\nTexto original: 500 mg, 0,5 mL; 10–20 kg.\n"
+    chunk = make_chunk(bulas[0], source)
+    await index.upsert_chunks([chunk])
+    other_chunk = make_chunk(bulas[0], "Advertências: texto preexistente.", "legacy")
+
+    async def migrate(direction: str, revision: str) -> None:
+        await db.close()  # Release locks and prepared statements before DDL.
+        migration_environment = {
+            **os.environ,
+            "DATABASE_URL": database_url,
+            "SECRET_KEY": "bm25-migration-test-only-not-a-real-secret",
+        }
+        process = await asyncio.create_subprocess_exec(
+            sys.executable,
+            "-m",
+            "alembic",
+            direction,
+            revision,
+            cwd=Path(__file__).resolve().parents[3],
+            env=migration_environment,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.STDOUT,
+        )
+        try:
+            output, _ = await asyncio.wait_for(process.communicate(), timeout=60)
+        except TimeoutError:
+            process.kill()
+            await process.communicate()
+            raise
+        assert process.returncode == 0, output.decode(errors="replace")
+
+    try:
+        await migrate("downgrade", "e2b7c4d9a630")
+        # Insert through the pre-v2 schema to prove existing rows are backfilled.
+        await db.execute(insert(ChunkMetadata).values(**other_chunk.model_dump()))
+        await db.commit()
+        preserved = await db.scalar(
+            select(ChunkMetadata.chunk_text).where(
+                ChunkMetadata.chunk_id == chunk.chunk_id
+            )
+        )
+        assert preserved == source
+    finally:
+        await migrate("upgrade", "head")
+
+    matches = await index.search("contraindicação", bula_id=bulas[0].id)
+    assert len(matches) == 1
+    assert matches[0].chunk_id == chunk.chunk_id
+    assert matches[0].chunk_text == source
+    assert (await index.search("advertência", bula_id=bulas[0].id))[
+        0
+    ].chunk_text == other_chunk.chunk_text
+
+
+@pytest.mark.anyio
+async def test_bm25_retriever_scopes_top_k_and_order(bm25_context: BM25Context) -> None:
+    index, _, bulas = bm25_context
+    term = f"retrieval{uuid4().hex}"
+    await index.upsert_chunks(
+        [
+            make_chunk(bula, f"{term} " * (number + 1) + "cuidados", str(number))
+            for bula in bulas
+            for number in range(4)
+        ]
+    )
+    retriever = BM25Retriever(index=index, bula_id=bulas[0].id, k=2)
+    documents = await retriever.ainvoke(term)
+    assert len(documents) == 2
+    assert {document.metadata["bula_id"] for document in documents} == {
+        str(bulas[0].id)
+    }
+    scores = [document.metadata["score"] for document in documents]
+    assert scores == sorted(scores, reverse=True)
+    assert documents == await retriever.ainvoke(term)
+
+    corpus_retriever = BM25Retriever(
+        index=index, corpus=(BulaCorpus.SHARED, BulaCorpus.SYSTEM), k=10
+    )
+    documents = await corpus_retriever.ainvoke(term)
+    assert len(documents) == 8
+    assert {document.metadata["corpus"] for document in documents} == {
+        "shared",
+        "system",
+    }
+    assert str(bulas[0].id) not in {
+        document.metadata["bula_id"] for document in documents
+    }
+
+    contradictory_scope = BM25Retriever(
+        index=index, bula_id=bulas[0].id, corpus=(BulaCorpus.SYSTEM,)
+    )
+    assert await contradictory_scope.ainvoke(term) == []
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("query", ["paracetamois", "ornitorrinco", "e de a", "", "  "])
+async def test_bm25_retriever_returns_no_matches(
+    bm25_context: BM25Context, query: str
+) -> None:
+    index, _, bulas = bm25_context
+    await index.upsert_chunks([make_chunk(bulas[0], "paracetamol 500mg")])
+    retriever = BM25Retriever(index=index, bula_id=bulas[0].id)
+    assert await retriever.ainvoke(query) == []
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    ("source", "query"),
+    [
+        ("Contraindicações", "contraindicação"),
+        ("Contraindicação", "contraindicações"),
+        ("Contraindicações", "contraindicacoes"),
+        ("contraindicacoes", "contraindicações"),
+        ("Contraindicação", "contraindicacao"),
+        ("contraindicacao", "contraindicação"),
+        ("Informações", "informação"),
+        ("Advertências", "advertência"),
+        ("sódica", "sodica"),
+        ("sodica", "sódica"),
+    ],
+)
+async def test_bm25_retriever_contraindicacao_inflections(
+    bm25_context: BM25Context,
+    source: str,
+    query: str,
+) -> None:
+    index, _, bulas = bm25_context
+    await index.upsert_chunks([make_chunk(bulas[0], source)])
+    retriever = BM25Retriever(index=index, bula_id=bulas[0].id)
+    documents = await retriever.ainvoke(query)
+    assert len(documents) == 1
+    assert documents[0].page_content == source
