@@ -17,6 +17,7 @@ from app.modules.bulas.dependencies import get_bula_repository
 from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.base_chunker import BaseChunker
 from app.modules.rag.bm25_index import PostgreSQLBM25Index
+from app.modules.rag.bm25_retriever import BM25RetrieverFactory
 from app.modules.rag.repository import ChunkMetadataRepository
 from app.modules.rag.chain import RAGChainFactory
 from app.modules.rag.chunker import BulaChunker
@@ -176,6 +177,12 @@ def get_chunker(
 
 def get_bm25_index(db: AsyncSession = Depends(get_db)) -> PostgreSQLBM25Index:
     return PostgreSQLBM25Index(repository=ChunkMetadataRepository(db=db))
+
+
+def get_bm25_retriever_factory(
+    index: PostgreSQLBM25Index = Depends(get_bm25_index),
+) -> BM25RetrieverFactory:
+    return BM25RetrieverFactory(index=index)
 
 
 def get_ingestion_service(
