@@ -4,6 +4,8 @@ from dataclasses import dataclass
 import re
 from typing import Literal, Sequence
 
+from app.modules.rag.table_blocks import build_source_blocks
+
 
 ValidationFailureReason = Literal[
     "duplicate_span",
@@ -13,6 +15,7 @@ ValidationFailureReason = Literal[
     "non_source_text",
     "overlapping_span",
     "reordered_span",
+    "split_table_context",
 ]
 
 SOURCE_TOKEN_PATTERN = re.compile(r"\S+")
@@ -140,12 +143,18 @@ class SourceChunkValidator:
         if source_cursor != len(source_tokens):
             raise SourceChunkValidationError("missing_source_text")
 
-        return self._reconstruct_spans(
+        spans = self._reconstruct_spans(
             source_text=source_text,
             source_tokens=source_tokens,
             token_ranges=validated_token_ranges,
             section_title=section_title,
         )
+        for block in build_source_blocks(source_text):
+            if block.is_table and any(
+                block.start < span.end < block.end for span in spans[:-1]
+            ):
+                raise SourceChunkValidationError("split_table_context")
+        return spans
 
     def _tokenize(self, text: str) -> list[SourceToken]:
         return [

@@ -144,3 +144,17 @@ def test_large_section_reconstructs_all_source_tokens() -> None:
 
     reconstructed_tokens = [token for span in spans for token in span.text.split()]
     assert reconstructed_tokens == source_text.split()
+
+
+@pytest.mark.parametrize("boundary", ["| 10 kg", "*Nota"])
+def test_lossless_proposal_cannot_separate_table_from_rows_or_notes(
+    boundary: str,
+) -> None:
+    source = "Adultos\n\n| Peso | Dose |\n| --- | --- |\n| 10 kg | 100 mg |\n\n*Nota: limite diário."
+    offset = source.index(boundary)
+    with pytest.raises(SourceChunkValidationError, match="split_table_context"):
+        SourceChunkValidator().validate_and_reconstruct(
+            source_text=source,
+            proposed_chunk_texts=[source[:offset], source[offset:]],
+            section_title="Dose",
+        )
