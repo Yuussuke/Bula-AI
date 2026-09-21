@@ -77,3 +77,14 @@ academic development can continue, but a production/public-service release
 must first choose AGPL-compatible project terms or obtain the applicable
 commercial license. This README records the dependency decision; it is not
 legal advice.
+# Geometric table preservation follow-up
+
+The native path now complements PyMuPDF4LLM with ruled-table geometry. It uses
+page boxes and source offsets to replace affected regions, preserves dynamic
+cell grids, and rejects known ambiguous structure instead of flattening it via
+fallback. `native_only_table_count` identifies tables still handled by the native
+converter without geometric verification. Multi-page joining is not automatic.
+
+See [the decision and local benchmark](../../../../../docs/decisions/2026-09-21-geometric-table-preservation.md)
+for limitations, tests and rollout. Existing indexed chunks are not changed by
+updating the parser code. Do not repeat BM25 backfill expecting it to repair PDFs.
