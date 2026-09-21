@@ -26,7 +26,7 @@ DEFAULT_FAILURE_ERROR = (
     "No text-based extraction tier produced enough content. "
     "OCR is not enabled in this parsing phase."
 )
-PARSER_VERSION = "native_markdown_v1"
+PARSER_VERSION = "native_markdown_tables_v2"
 
 
 @dataclass
@@ -80,12 +80,20 @@ class BulaParser:
             extraction_result.quality_signals.get("is_sparse", True)
         )
         if extraction_result.error is not None or is_extraction_sparse:
-            return self._build_failure_parse_result(
+            failure = self._build_failure_parse_result(
                 error=self._build_extraction_error(extraction_result),
                 extraction_tier=extraction_result.extraction_tier,
             )
+            failure.converter_name = extraction_result.converter_name
+            failure.converter_version = extraction_result.converter_version
+            failure.extraction_decision = extraction_result.extraction_decision
+            failure.metadata["quality_signals"] = extraction_result.quality_signals
+            return failure
 
         cleanup_result = self.document_cleaner.clean(extraction_result.pages)
+        cleanup_result.summary["table_extraction"] = (
+            extraction_result.quality_signals.get("table_extraction", {})
+        )
         extracted_lines = cleanup_result.lines
         if not extracted_lines:
             extracted_lines = self._collect_lines(extraction_result=extraction_result)

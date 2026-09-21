@@ -28,11 +28,12 @@ from app.modules.rag.parsers.handlers import (
     ExtractedPage,
     PdfplumberHandler,
     PyMuPDFHandler,
+    PyMuPDF4LLMHandler,
 )
 from app.modules.rag.parsers.pdf_parser import BulaParser
 
 
-ParserVariant = Literal["legacy", "native"]
+ParserVariant = Literal["legacy", "native", "native_before_tables"]
 TOKEN_PATTERN = re.compile(r"[\wµ]+(?:[.,/-][\wµ]+)*", re.UNICODE)
 DOSAGE_SIGNAL_PATTERN = re.compile(
     r"\b\d+(?:[.,]\d+)?(?:\s*(?:a|-|–)\s*\d+(?:[.,]\d+)?)?\s*"
@@ -92,8 +93,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument(
+        "--table-comparison",
+        action="store_true",
+        help="Compare native conversion without geometry against the table-aware parser.",
+    )
+    parser.add_argument(
         "--variant",
-        choices=("legacy", "native"),
+        choices=("legacy", "native", "native_before_tables"),
         help=argparse.SUPPRESS,
     )
     parser.add_argument("--pdf", type=Path, help=argparse.SUPPRESS)
@@ -116,7 +122,12 @@ async def run_worker(
     variant: ParserVariant,
 ) -> dict[str, object]:
     pdf_bytes = pdf_path.read_bytes()
-    parser = BulaParser() if variant == "native" else build_legacy_parser()
+    if variant == "native_before_tables":
+        handler = PyMuPDF4LLMHandler(is_geometry_enabled=False)
+        handler.set_next(PyMuPDFHandler())
+        parser = BulaParser(first_handler=handler)
+    else:
+        parser = BulaParser() if variant == "native" else build_legacy_parser()
     source_text, page_count = extract_native_reference(pdf_bytes)
 
     started_at = time.perf_counter()
@@ -317,7 +328,7 @@ def get_process_tree_rss_bytes(process: psutil.Process) -> int:
 
 def build_summary(results: list[dict[str, object]]) -> dict[str, object]:
     summary: dict[str, object] = {}
-    for variant in ("legacy", "native"):
+    for variant in dict.fromkeys(str(result["variant"]) for result in results):
         variant_results = [result for result in results if result["variant"] == variant]
         summary[variant] = {
             "document_count": len(variant_results),
@@ -377,13 +388,20 @@ def validate_pdf_paths(pdf_paths: list[Path]) -> list[Path]:
     return resolved_paths
 
 
-def run_controller(*, pdf_paths: list[Path], output_path: Path) -> int:
+def run_controller(
+    *, pdf_paths: list[Path], output_path: Path, is_table_comparison: bool = False
+) -> int:
     validated_paths = validate_pdf_paths(pdf_paths)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     results: list[dict[str, object]] = []
+    variants: tuple[ParserVariant, ...] = (
+        ("native_before_tables", "native")
+        if is_table_comparison
+        else ("legacy", "native")
+    )
 
     for document_index, pdf_path in enumerate(validated_paths, start=1):
-        for variant in ("legacy", "native"):
+        for variant in variants:
             worker_output_path = output_path.with_name(
                 f".{output_path.stem}-{document_index}-{variant}-worker.json"
             )
@@ -403,7 +421,8 @@ def run_controller(*, pdf_paths: list[Path], output_path: Path) -> int:
         "schema_version": 1,
         "execution_mode": "sequential",
         "document_count": len(validated_paths),
-        "variants": ["legacy", "native"],
+        "variants": list(variants),
+        "table_relationship_quality": "See cell-level regression assertions; lexical recall alone does not validate table relationships.",
         "results": results,
         "summary": build_summary(results),
     }
@@ -438,7 +457,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
         return 0
 
-    return run_controller(pdf_paths=arguments.pdfs, output_path=arguments.output)
+    return run_controller(
+        pdf_paths=arguments.pdfs,
+        output_path=arguments.output,
+        is_table_comparison=arguments.table_comparison,
+    )
 
 
 if __name__ == "__main__":

@@ -128,6 +128,7 @@ class SectionChunkDraft:
     method: ChunkingMethod
     reason: str | None = None
     validation_outcome: ValidationOutcome = "not_attempted"
+    has_repeated_table_context: bool = False
 
 
 @dataclass(frozen=True)
@@ -742,6 +743,7 @@ class BaseChunker(ABC):
                     section_title=section.title,
                     method=method,
                     validation_outcome="passed",
+                    has_repeated_table_context=deterministic_chunk.has_repeated_table_context,
                 )
                 for deterministic_chunk in self.deterministic_splitter.split_validated_text(
                     source_text=source_span.text,
@@ -764,6 +766,7 @@ class BaseChunker(ABC):
                 section_title=section.title,
                 method="deterministic",
                 reason=fallback_reason,
+                has_repeated_table_context=deterministic_chunk.has_repeated_table_context,
                 validation_outcome=(
                     "not_attempted"
                     if fallback_reason == "semantic_chunking_disabled"
@@ -909,6 +912,11 @@ class BaseChunker(ABC):
         if chunk_draft.reason is not None:
             metadata["fallback_reason"] = chunk_draft.reason
         metadata["validation_outcome"] = chunk_draft.validation_outcome
+        if chunk_draft.has_repeated_table_context:
+            metadata["table_context"] = {
+                "repeated_from_source": True,
+                "policy": "caption_header_and_explicit_footnotes",
+            }
 
         return DocumentChunk(
             chunk_id=make_chunk_id(doc_id=doc_id, index=index, text=chunk_draft.text),

@@ -910,3 +910,27 @@ def test_metadata_extractor_skips_manufacturer_placeholders(
     )
 
     assert metadata["manufacturer"] == "Sanofi Medley Farmacêutica Ltda."
+
+
+@pytest.mark.anyio
+async def test_table_structure_rejection_never_delegates_to_flat_text() -> None:
+    extraction = build_extraction_result(
+        text="",
+        extraction_tier="pymupdf4llm_native",
+        is_sparse=True,
+        error="Table structure validation failed: ambiguous_cell_ownership; page=4.",
+    )
+    extraction.quality_signals["has_table_structure_error"] = True
+    first = StaticHandler(extraction)
+    fallback = StaticHandler(
+        build_extraction_result(
+            text="Fallback must not run", extraction_tier="pymupdf", is_sparse=False
+        )
+    )
+    first.set_next(fallback)
+    result = await BulaParser(first_handler=first).parse(b"test", "test.pdf")
+    assert result.success is False
+    assert result.markdown == ""
+    assert "ambiguous_cell_ownership" in (result.error or "")
+    assert result.metadata["quality_signals"]["has_table_structure_error"] is True
+    assert fallback.was_called is False

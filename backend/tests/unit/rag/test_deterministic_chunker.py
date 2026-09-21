@@ -1,4 +1,5 @@
 from app.modules.rag.deterministic_chunker import DeterministicMarkdownSplitter
+import pytest
 
 
 class WordTokenEstimator:
@@ -92,3 +93,22 @@ def test_single_oversized_item_uses_hard_cap_without_truncation() -> None:
     assert all(WordTokenEstimator().estimate(chunk.text) <= 8 for chunk in chunks)
     reconstructed_tokens = [token for chunk in chunks for token in chunk.text.split()]
     assert reconstructed_tokens == source_text.split()
+
+
+def test_oversized_table_row_is_rejected_instead_of_cut_in_half() -> None:
+    source = "| A | B |\n| --- | --- |\n| " + "dose " * 40 + "| 500 mg |"
+    with pytest.raises(ValueError, match="Table row"):
+        build_splitter(max_tokens=24).split(source_text=source, section_title="Dose")
+
+
+def test_table_fragments_keep_caption_and_footnotes() -> None:
+    source = "Adultos\n\n| Peso | Dose |\n| --- | --- |\n| 10 kg | 100 mg* |\n| 20 kg | 200 mg* |\n\n*Nota: limite diário."
+    chunks = build_splitter(max_tokens=24).split(
+        source_text=source, section_title="Dose"
+    )
+    assert len(chunks) == 2
+    for chunk in chunks:
+        assert chunk.has_repeated_table_context
+        assert "Adultos" in chunk.text
+        assert "*Nota: limite diário." in chunk.text
+        assert "| Peso | Dose |" in chunk.text

@@ -8,6 +8,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 from app.modules.rag.chunk_validation import SourceHeadingResolver
 from app.modules.rag.token_estimator import TokenEstimator
+from app.modules.rag.table_blocks import build_source_blocks
 
 
 MarkdownBlockKind = Literal["list", "prose", "table"]
@@ -24,12 +25,14 @@ class MarkdownBlock:
     start: int
     end: int
     kind: MarkdownBlockKind
+    has_repeated_table_context: bool = False
 
 
 @dataclass(frozen=True)
 class DeterministicChunkDraft:
     text: str
     chunk_title: str
+    has_repeated_table_context: bool = False
 
 
 class DeterministicMarkdownSplitter:
@@ -70,6 +73,7 @@ class DeterministicMarkdownSplitter:
                     span_start=block.start,
                     section_title=section_title,
                 ),
+                has_repeated_table_context=block.has_repeated_table_context,
             )
             for block in packed_blocks
             if block.text.strip()
@@ -96,64 +100,17 @@ class DeterministicMarkdownSplitter:
         return self.split(source_text=source_text, section_title=section_title)
 
     def _build_blocks(self, source_text: str) -> list[MarkdownBlock]:
-        blocks: list[MarkdownBlock] = []
-        block_start: int | None = None
-        block_end = 0
-        block_lines: list[str] = []
-        line_start = 0
-
-        for line in source_text.splitlines(keepends=True):
-            line_end = line_start + len(line)
-            if line.strip():
-                if block_start is None:
-                    block_start = line_start
-                block_lines.append(line)
-                block_end = line_end
-            else:
-                self._append_block(
-                    blocks=blocks,
-                    source_text=source_text,
-                    block_start=block_start,
-                    block_end=block_end,
-                    block_lines=block_lines,
-                )
-                block_start = None
-                block_lines = []
-            line_start = line_end
-
-        self._append_block(
-            blocks=blocks,
-            source_text=source_text,
-            block_start=block_start,
-            block_end=block_end,
-            block_lines=block_lines,
-        )
-        return blocks
-
-    def _append_block(
-        self,
-        *,
-        blocks: list[MarkdownBlock],
-        source_text: str,
-        block_start: int | None,
-        block_end: int,
-        block_lines: Sequence[str],
-    ) -> None:
-        if block_start is None or not block_lines:
-            return
-
-        block_text = source_text[block_start:block_end].strip()
-        if not block_text:
-            return
-
-        blocks.append(
+        return [
             MarkdownBlock(
-                text=block_text,
-                start=block_start,
-                end=block_end,
-                kind=self._classify_block(block_text),
+                text=source_text[block.start : block.end].strip(),
+                start=block.start,
+                end=block.end,
+                kind="table"
+                if block.is_table
+                else self._classify_block(source_text[block.start : block.end]),
             )
-        )
+            for block in build_source_blocks(source_text)
+        ]
 
     def _classify_block(self, block_text: str) -> MarkdownBlockKind:
         lines = [line for line in block_text.splitlines() if line.strip()]
@@ -193,7 +150,14 @@ class DeterministicMarkdownSplitter:
             return self._split_prose_block(block)
 
         header_lines = lines[: separator_index + 1]
-        data_rows = lines[separator_index + 1 :]
+        following_lines = lines[separator_index + 1 :]
+        row_count = 0
+        for line in following_lines:
+            if not line.strip().startswith("|"):
+                break
+            row_count += 1
+        data_rows = following_lines[:row_count]
+        footnotes = following_lines[row_count:]
         if not data_rows:
             return self._split_prose_block(block)
 
@@ -201,11 +165,11 @@ class DeterministicMarkdownSplitter:
         current_rows: list[str] = []
         for data_row in data_rows:
             candidate_rows = [*current_rows, data_row]
-            candidate_text = "\n".join([*header_lines, *candidate_rows])
+            candidate_text = "\n".join([*header_lines, *candidate_rows, *footnotes])
             if current_rows and self._estimate_tokens(candidate_text) > self.max_tokens:
                 table_chunks.extend(
                     self._build_bounded_block(
-                        text="\n".join([*header_lines, *current_rows]),
+                        text="\n".join([*header_lines, *current_rows, *footnotes]),
                         source_block=block,
                         kind="table",
                     )
@@ -218,7 +182,7 @@ class DeterministicMarkdownSplitter:
         if current_rows:
             table_chunks.extend(
                 self._build_bounded_block(
-                    text="\n".join([*header_lines, *current_rows]),
+                    text="\n".join([*header_lines, *current_rows, *footnotes]),
                     source_block=block,
                     kind="table",
                 )
@@ -285,9 +249,14 @@ class DeterministicMarkdownSplitter:
             start=source_block.start,
             end=source_block.end,
             kind=kind,
+            has_repeated_table_context=kind == "table",
         )
         if self._estimate_tokens(text) <= self.max_tokens:
             return [bounded_block]
+        if kind == "table":
+            raise ValueError(
+                "Table row and required context exceed the chunk token limit."
+            )
         return self._split_prose_block(bounded_block)
 
     def _split_prose_block(self, block: MarkdownBlock) -> list[MarkdownBlock]:
@@ -343,6 +312,9 @@ class DeterministicMarkdownSplitter:
             start=blocks[0].start,
             end=blocks[-1].end,
             kind="prose",
+            has_repeated_table_context=any(
+                block.has_repeated_table_context for block in blocks
+            ),
         )
 
     def _estimate_tokens(self, text: str) -> int:
