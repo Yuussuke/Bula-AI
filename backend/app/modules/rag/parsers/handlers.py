@@ -8,6 +8,11 @@ import re
 from typing import Any
 import unicodedata
 
+from app.modules.rag.parsers.geometric_tables import (
+    GeometricTableIntegrator,
+    TableStructureError,
+)
+
 
 ANVISA_SECTION_KEYWORDS = (
     "COMPOSICAO",
@@ -84,6 +89,8 @@ class ParserHandler(ABC):
         raise NotImplementedError
 
     def _should_delegate(self, extraction_result: ExtractionResult) -> bool:
+        if extraction_result.quality_signals.get("has_table_structure_error"):
+            return False
         has_next_handler = self._next is not None
         has_error = extraction_result.error is not None
         is_sparse = bool(extraction_result.quality_signals.get("is_sparse", True))
@@ -301,6 +308,10 @@ class PyMuPDF4LLMHandler(ParserHandler):
     converter_name = "pymupdf4llm"
     extraction_decision = "native_text"
 
+    def __init__(self, *, is_geometry_enabled: bool = True) -> None:
+        super().__init__()
+        self.is_geometry_enabled = is_geometry_enabled
+
     def _extract(self, pdf_bytes: bytes, filename: str) -> ExtractionResult:
         try:
             pymupdf4llm_module = get_pymupdf4llm_module()
@@ -333,7 +344,27 @@ class PyMuPDF4LLMHandler(ParserHandler):
                 write_images=False,
                 embed_images=False,
             )
+            table_summary = (
+                GeometricTableIntegrator().repair(document, page_chunks)
+                if self.is_geometry_enabled
+                else {}
+            )
             pages = self._build_pages(page_chunks=page_chunks)
+        except TableStructureError as exc:
+            result = self._build_failure_result(
+                error=str(exc),
+                converter_name=self.converter_name,
+                converter_version=converter_version,
+                extraction_decision="table_structure_rejected",
+            )
+            result.quality_signals.update(
+                {
+                    "has_table_structure_error": True,
+                    "table_failure_reason": exc.reason,
+                    "table_failure_page": exc.page_number,
+                }
+            )
+            return result
         except Exception as exc:
             return self._build_failure_result(
                 error=f"PyMuPDF4LLM failed to extract text from {filename}: {exc}",
@@ -344,12 +375,14 @@ class PyMuPDF4LLMHandler(ParserHandler):
         finally:
             document.close()
 
-        return self._build_success_result(
+        result = self._build_success_result(
             pages=pages,
             converter_name=self.converter_name,
             converter_version=converter_version,
             extraction_decision=self.extraction_decision,
         )
+        result.quality_signals["table_extraction"] = table_summary
+        return result
 
     def _build_pages(self, *, page_chunks: object) -> list[ExtractedPage]:
         if not isinstance(page_chunks, list):
