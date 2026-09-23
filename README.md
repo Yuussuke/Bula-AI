@@ -592,6 +592,39 @@ uv run pytest -q tests/unit/rag/test_bm25_retriever.py
 uv run pytest -q tests/integration/rag/test_bm25_index.py
 ```
 
+### Scoped hybrid retriever
+
+`HybridRetrieverFactory` builds one retrieval pipeline for an already authorized
+bula. Both the dense and BM25 retrievers receive the same `bula_id` and fetch
+`2 * k` candidates. `HybridRetriever` then combines their ranks with equal-weight
+Reciprocal Rank Fusion (RRF), using the standard constant `60`, deduplicates by
+the stable `chunk_id`, and returns at most `k` documents.
+
+Fusion is rank-based: dense similarity and BM25 scores are retained only as
+diagnostics (`dense_score` and `bm25_score`) and are never compared directly.
+The final `score` is the RRF score. Results also expose source-specific ranks and
+`retrieval_sources` so evaluations can explain why a chunk was selected.
+
+`EnrichingRetriever` performs one batched Qdrant payload lookup after final
+top-k selection. It fills only allowlisted source metadata such as medication,
+manufacturer and section. Existing values are never silently overwritten. A
+missing payload leaves the fused document usable, while identity, source-text or
+metadata disagreements fail explicitly because they indicate index drift.
+
+Inject `get_hybrid_retriever_factory` with FastAPI `Depends` and build the
+retriever only after the service has authorized access to the selected bula:
+
+```python
+retriever = factory.build(bula_id=authorized_bula.id, k=4)
+documents = await retriever.ainvoke(question)
+```
+
+This is an internal retrieval component. It does not add an endpoint, expose a
+UI mode, or change the chat's current default. It requires no migration,
+backfill, re-embedding or PDF reprocessing. The decision, consistency contracts
+and rollout boundary are recorded in
+[the hybrid retrieval decision](docs/decisions/2026-09-22-hybrid-retrieval-rrf.md).
+
 ### RAG ingestion observability
 
 The PGQueuer ingestion worker emits structured logs for every RAG ingestion run.
