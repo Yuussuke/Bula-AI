@@ -2,6 +2,7 @@ from collections.abc import Sequence
 from uuid import UUID
 
 from app.modules.bulas.models import BulaCorpus
+from app.modules.rag.bm25_query_normalizer import BM25QueryNormalizer
 from app.modules.rag.repository import ChunkMetadataRepository
 from app.modules.rag.schemas import BM25SearchResult, ChunkMetadataInput
 
@@ -15,6 +16,7 @@ class PostgreSQLBM25Index:
 
     def __init__(self, repository: ChunkMetadataRepository) -> None:
         self.repository = repository
+        self.query_normalizer = BM25QueryNormalizer()
 
     async def upsert_chunks(self, chunks: Sequence[ChunkMetadataInput]) -> int:
         self._validate_chunk_identities(chunks)
@@ -45,7 +47,10 @@ class PostgreSQLBM25Index:
         if not query.strip() or corpus == [] or corpus == ():
             return []
         return await self.repository.search(
-            query=query, k=k, bula_id=bula_id, corpus=corpus
+            query=self.query_normalizer.normalize(query),
+            k=k,
+            bula_id=bula_id,
+            corpus=corpus,
         )
 
     async def update_corpus(self, *, bula_id: UUID, corpus: BulaCorpus) -> None:
