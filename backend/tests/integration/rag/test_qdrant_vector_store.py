@@ -131,6 +131,23 @@ async def test_search_similar_returns_relevant_chunk(
 
 
 @pytest.mark.anyio
+async def test_retrieve_payloads_by_chunk_ids_uses_logical_chunk_identity(
+    qdrant_test_context: tuple[QdrantVectorStore, AsyncQdrantClient, str],
+) -> None:
+    vector_store, _, _ = qdrant_test_context
+    await vector_store.ensure_collection()
+    await vector_store.upsert_points(build_test_points())
+
+    payloads = await vector_store.retrieve_payloads_by_chunk_ids(
+        ["test-chunk-2", "test-chunk-0", "missing-chunk"]
+    )
+
+    assert set(payloads) == {"test-chunk-2", "test-chunk-0"}
+    assert payloads["test-chunk-2"]["chunk_text"] == "Chunk 2"
+    assert payloads["test-chunk-0"]["chunk_text"] == "Chunk 0"
+
+
+@pytest.mark.anyio
 async def test_list_points_for_bula_paginates_and_filters(
     qdrant_test_context: tuple[QdrantVectorStore, AsyncQdrantClient, str],
 ) -> None:
