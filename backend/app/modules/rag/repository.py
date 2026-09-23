@@ -81,7 +81,19 @@ class ChunkMetadataRepository:
         bula_id: UUID | None,
         corpus: Sequence[BulaCorpus] | None,
     ) -> list[BM25SearchResult]:
-        candidates = select(ChunkMetadata)
+        # ATX headings alone are navigation, not answer evidence. Filter before
+        # top-k so even many short heading-only matches cannot consume slots.
+        # Only the eligibility expression is cleaned; source text stays intact.
+        text_without_headings = func.regexp_replace(
+            ChunkMetadata.chunk_text,
+            r"^[ \t]{0,3}#{1,6}([ \t]+[^\r\n]*|[ \t]*$)",
+            "",
+            "gn",
+        )
+        has_body = (
+            func.regexp_replace(text_without_headings, r"[[:space:]]", "", "g") != ""
+        )
+        candidates = select(ChunkMetadata).where(has_body)
         if bula_id is not None:
             candidates = candidates.where(ChunkMetadata.bula_id == bula_id)
         if corpus is not None:

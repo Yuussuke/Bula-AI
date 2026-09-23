@@ -538,6 +538,12 @@ async def test_bm25_retriever_returns_no_matches(
         ("Advertências", "advertência"),
         ("sódica", "sodica"),
         ("sodica", "sódica"),
+        (
+            "A amoxicilina é contraindicada para pacientes alérgicos.",
+            "contraindicacoes",
+        ),
+        ("A amoxicilina é contraindicada para pacientes alérgicos.", "CONTRAINDICACAO"),
+        ("Medicamento indicado para adultos.", "indicacoes"),
     ],
 )
 async def test_bm25_retriever_contraindicacao_inflections(
@@ -551,3 +557,95 @@ async def test_bm25_retriever_contraindicacao_inflections(
     documents = await retriever.ainvoke(query)
     assert len(documents) == 1
     assert documents[0].page_content == source
+
+
+@pytest.mark.anyio
+async def test_heading_only_chunks_cannot_crowd_out_evidence(
+    bm25_context: BM25Context,
+) -> None:
+    index, db, bulas = bm25_context
+    headings = [
+        make_chunk(bulas[0], "### Amoxicilina\n\n", f"heading-{number}")
+        for number in range(15)
+    ]
+    sources = [
+        "## Composição\n\nAmoxicilina 500 mg + clavulanato 125 mg.",
+        "## Cuidados\r\n\r\n- Amoxicilina: respeite a orientação médica.\r\n",
+        "## Composição\n| Medicamento | Dose |\n| --- | --- |\n| Amoxicilina | 500 mg |",
+    ]
+    evidence = [
+        make_chunk(bulas[0], source, f"body-{number}")
+        for number, source in enumerate(sources)
+    ]
+    other_bula = make_chunk(bulas[1], "Amoxicilina", "other-bula")
+    await index.upsert_chunks([*headings, *evidence, other_bula])
+
+    results = await index.search("amoxicilina", bula_id=bulas[0].id, k=3)
+    assert len(results) == 3
+    assert {result.chunk_id for result in results} == {
+        chunk.chunk_id for chunk in evidence
+    }
+    assert {result.chunk_text for result in results} == set(sources)
+    scores = [result.bm25_score for result in results]
+    assert scores == sorted(scores, reverse=True)
+    assert results == await index.search("amoxicilina", bula_id=bulas[0].id, k=3)
+    assert len(await index.search("amoxicilina", bula_id=bulas[0].id, k=1)) == 1
+    assert (
+        await index.search(
+            "amoxicilina", bula_id=bulas[0].id, corpus=[BulaCorpus.SYSTEM]
+        )
+        == []
+    )
+    documents = await BM25Retriever(index=index, bula_id=bulas[0].id, k=3).ainvoke(
+        "amoxicilina"
+    )
+    assert [document.id for document in documents] == [
+        result.chunk_id for result in results
+    ]
+    # Eligibility never deletes stored chunks, needed by audits/backfills.
+    stored_text = await db.scalar(
+        select(ChunkMetadata.chunk_text).where(
+            ChunkMetadata.chunk_id == headings[0].chunk_id
+        )
+    )
+    assert stored_text == headings[0].chunk_text
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "source",
+    [
+        "# Amoxicilina",
+        "  ## Amoxicilina\r\n\t\r\n### 500 mg\r\n",
+        "### Amoxicilina\n\n###### Dose\n",
+        "### Amoxicilina\n##\n",
+    ],
+)
+async def test_only_headings_return_no_evidence(
+    bm25_context: BM25Context, source: str
+) -> None:
+    index, _, bulas = bm25_context
+    await index.upsert_chunks([make_chunk(bulas[0], source)])
+    assert await index.search("amoxicilina", bula_id=bulas[0].id) == []
+
+
+@pytest.mark.anyio
+async def test_accent_restoration_preserves_scope_and_does_not_correct_drug_typos(
+    bm25_context: BM25Context,
+) -> None:
+    index, _, bulas = bm25_context
+    source = "A amoxicilina é contraindicada para pacientes alérgicos."
+    await index.upsert_chunks([make_chunk(bula, source) for bula in bulas])
+    results = await index.search(
+        "contraindicacoes", bula_id=bulas[1].id, corpus=[BulaCorpus.SYSTEM]
+    )
+    assert len(results) == 1
+    assert results[0].bula_id == bulas[1].id
+    assert results[0].chunk_text == source
+    assert await index.search("amoxicilinna", bula_id=bulas[1].id) == []
+    assert (
+        await index.search(
+            "contraindicacoes", bula_id=bulas[1].id, corpus=[BulaCorpus.PRIVATE]
+        )
+        == []
+    )

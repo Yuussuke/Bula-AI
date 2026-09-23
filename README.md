@@ -531,6 +531,8 @@ not in the LangChain adapter. A small `BM25SearchIndex` protocol allows tests to
 replace persistence without mocking the retriever itself.
 
 - `k` is bounded to 1–100. Bula and corpus filters are applied together.
+- Markdown ATX heading-only chunks are excluded before top-k selection. Stored
+  source chunks remain unchanged; paragraphs, lists and tables remain eligible.
 - `corpus=None` means no corpus filter; an empty corpus returns no documents.
 - Blank queries and no matches return `[]`. Database errors propagate rather
   than being presented as absence of evidence in the leaflet.
@@ -547,7 +549,18 @@ the card's `plainto_tsquery`/`ts_rank_cd` examples. The normalization migration
 `f6c8d2a91b40` fixes the specific `contraindicação`/`contraindicações` regression,
 with passing tests in both directions. Tests also cover accent-insensitive
 spellings, other inflections, source preservation, term frequencies, and numbers.
-There are no word-specific substitutions or expected-failure tests for this case.
+That migration uses no word-specific substitutions or expected-failure tests.
+
+A subsequent query-only guard restores missing accents for an explicit leaflet
+vocabulary (for example `contraindicacoes` → `contraindicações`) before the shared
+database normalizer runs. This also retrieves prose such as `contraindicada`.
+It is **not** general spelling correction: `amoxicilinna` is left unchanged.
+See [the quality follow-up decision](docs/decisions/2026-09-20-bm25-query-quality.md)
+for supported terms, boundaries, and regression tests. This follow-up requires
+only updated application code; if already at `f6c8d2a91b40`, no additional
+migration, backfill, or PDF reprocessing is required. Restart long-running API
+processes to load the code (`docker compose restart api`). The standalone manual
+test starts a fresh process and sees bind-mounted backend changes immediately.
 
 If #32's migration/backfill is already applied, **do not repeat the Qdrant
 backfill** for this normalization change. After updating the local code, pause
