@@ -23,6 +23,7 @@ from app.modules.rag.chain import RAGChainFactory
 from app.modules.rag.chunker import BulaChunker
 from app.modules.rag.debug_artifacts import RAGIngestionDebugArtifacts
 from app.modules.rag.embeddings import EmbeddingAdapter
+from app.modules.rag.hybrid_factory import HybridRetrieverFactory
 from app.modules.rag.llm import OPENROUTER_BASE_URL, get_llm
 from app.modules.rag.parsers.pdf_parser import BulaParser
 from app.modules.rag.qdrant_client import QDRANT_CLIENT_STATE_KEY
@@ -183,6 +184,18 @@ def get_bm25_retriever_factory(
     index: PostgreSQLBM25Index = Depends(get_bm25_index),
 ) -> BM25RetrieverFactory:
     return BM25RetrieverFactory(index=index)
+
+
+def get_hybrid_retriever_factory(
+    qdrant_store: QdrantVectorStore = Depends(get_qdrant_store),
+    embeddings: EmbeddingAdapter = Depends(get_embeddings),
+    bm25_retriever_factory: BM25RetrieverFactory = Depends(get_bm25_retriever_factory),
+) -> HybridRetrieverFactory:
+    return HybridRetrieverFactory(
+        qdrant_store=qdrant_store,
+        embeddings=embeddings,
+        bm25_retriever_factory=bm25_retriever_factory,
+    )
 
 
 def get_ingestion_service(

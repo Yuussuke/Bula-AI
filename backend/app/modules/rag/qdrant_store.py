@@ -1,4 +1,6 @@
 import uuid
+from collections.abc import Sequence
+from typing import Any
 
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.models import (
@@ -102,6 +104,44 @@ class QdrantVectorStore:
             limit=limit,
             with_payload=True,
         )
+
+    async def retrieve_payloads_by_chunk_ids(
+        self,
+        chunk_ids: Sequence[str],
+    ) -> dict[str, dict[str, Any]]:
+        unique_chunk_ids = list(dict.fromkeys(chunk_ids))
+        if not unique_chunk_ids:
+            return {}
+        if any(not chunk_id.strip() for chunk_id in unique_chunk_ids):
+            raise ValueError("Chunk identities must not be blank.")
+
+        logical_id_by_point_id = {
+            make_point_id(chunk_id): chunk_id for chunk_id in unique_chunk_ids
+        }
+        records = await self._client.retrieve(
+            collection_name=self.collection_name,
+            ids=list(logical_id_by_point_id),
+            with_payload=True,
+            with_vectors=False,
+        )
+        payloads_by_chunk_id: dict[str, dict[str, Any]] = {}
+        for record in records:
+            point_id = str(record.id).replace("-", "").lower()
+            expected_chunk_id = logical_id_by_point_id.get(point_id)
+            if expected_chunk_id is None:
+                raise ValueError("Qdrant returned an unexpected point identity.")
+            if record.payload is None:
+                continue
+
+            payload = dict(record.payload)
+            payload_chunk_id = payload.get("chunk_id")
+            if payload_chunk_id != expected_chunk_id:
+                raise ValueError("Qdrant point and payload identities do not match.")
+            if expected_chunk_id in payloads_by_chunk_id:
+                raise ValueError("Qdrant returned a duplicate chunk payload.")
+            payloads_by_chunk_id[expected_chunk_id] = payload
+
+        return payloads_by_chunk_id
 
     async def list_points_for_bula(
         self,
