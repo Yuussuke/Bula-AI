@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from datetime import datetime, timezone
 from uuid import UUID
 
@@ -23,6 +24,8 @@ from app.modules.storage.schemas import StoredObjectRef
 
 
 BULA_ID = UUID("11111111-1111-1111-1111-111111111111")
+FAKE_PDF_BYTES = b"%PDF-1.4\n%%EOF"
+FAKE_PDF_CHECKSUM = hashlib.sha256(FAKE_PDF_BYTES).hexdigest()
 
 
 class FakeBulaRepository:
@@ -81,15 +84,15 @@ class FakeObjectStore:
             object_address=address,
             original_filename="leaflet.pdf",
             content_type="application/pdf",
-            content_size_bytes=10,
-            sha256_checksum="abc123",
+            content_size_bytes=len(FAKE_PDF_BYTES),
+            sha256_checksum=FAKE_PDF_CHECKSUM,
             created_at=now,
             updated_at=now,
         )
 
     async def get_bytes(self, address: str) -> bytes:
         assert address == "stored_objects/pdf-123"
-        return b"%PDF-1.4\n%%EOF"
+        return FAKE_PDF_BYTES
 
 
 class FakeParser:
@@ -103,7 +106,7 @@ class FakeParser:
         self.metadata = metadata or {}
 
     async def parse(self, pdf_bytes: bytes, filename: str) -> ParseResult:
-        assert pdf_bytes == b"%PDF-1.4\n%%EOF"
+        assert pdf_bytes == FAKE_PDF_BYTES
         assert filename == "leaflet.pdf"
         return ParseResult(
             markdown="## Posologia\nUse conforme orientacao medica.",
@@ -175,6 +178,12 @@ class FakeQdrantStore:
             point.payload for point in points if isinstance(point.payload, dict)
         ]
         return len(points)
+
+    async def replace_bula_points(
+        self, *, bula_id: str, points: list[object]
+    ) -> int:
+        assert bula_id == str(BULA_ID)
+        return await self.upsert_points(points)
 
 
 class FakeDebugArtifacts(RAGIngestionDebugArtifacts):
@@ -398,7 +407,7 @@ async def test_ingest_bula_logs_stage_timings_and_summary(
         "write_debug_artifacts",
         "embed_chunks",
         "qdrant_ensure_collection",
-        "qdrant_upsert",
+        "qdrant_replace",
         "bm25_upsert",
         "mark_ready",
     ]
@@ -425,7 +434,7 @@ async def test_ingest_bula_logs_stage_timings_and_summary(
         summary_log["slowest_stage_duration_ms"]
         == summary_log["stage_durations_ms"][summary_log["slowest_stage"]]
     )
-    assert stage_logs[2]["pdf_size_bytes"] == 10
+    assert stage_logs[2]["pdf_size_bytes"] == len(FAKE_PDF_BYTES)
     assert stage_logs[4]["extraction_tier"] == "fake"
     assert stage_logs[4]["section_count"] == 1
     assert stage_logs[5]["has_extracted_drug_name"] is False
@@ -601,3 +610,86 @@ async def test_ingest_bula_skips_ready_bula() -> None:
 
     assert result is bula
     assert repo.statuses == []
+
+
+@pytest.mark.anyio
+async def test_reprocess_ready_system_bula_requires_new_publication_review() -> None:
+    bula = build_bula(status=BulaStatus.READY)
+    bula.corpus = BulaCorpus.SYSTEM
+    publication = SystemBulaPublication(
+        bula_id=BULA_ID,
+        state=SystemBulaPublicationState.PUBLISHED,
+        sha256_checksum=FAKE_PDF_CHECKSUM,
+        content_size_bytes=len(FAKE_PDF_BYTES),
+    )
+    bula.system_publication = publication
+    repo = FakeBulaRepository(bula)
+    service = build_service(repo=repo)
+
+    result = await service.ingest_bula(bula_id=BULA_ID, is_reprocessing=True)
+
+    assert result.status == BulaStatus.READY
+    assert publication.state == SystemBulaPublicationState.STAGED
+    assert repo.reset_publications == [publication]
+    assert repo.statuses == [BulaStatus.PROCESSING, BulaStatus.READY]
+    service.bm25_index.replace_bula_chunks.assert_awaited_once()
+
+
+@pytest.mark.anyio
+async def test_reprocessing_rejects_source_mismatch_before_changing_publication() -> None:
+    bula = build_bula(status=BulaStatus.READY)
+    bula.corpus = BulaCorpus.SYSTEM
+    publication = SystemBulaPublication(
+        bula_id=BULA_ID,
+        state=SystemBulaPublicationState.PUBLISHED,
+        sha256_checksum="different-checksum",
+        content_size_bytes=len(FAKE_PDF_BYTES),
+    )
+    bula.system_publication = publication
+    repo = FakeBulaRepository(bula)
+    service = build_service(repo=repo)
+
+    with pytest.raises(BulaIngestionError, match="does not match"):
+        await service.ingest_bula(bula_id=BULA_ID, is_reprocessing=True)
+
+    assert publication.state == SystemBulaPublicationState.PUBLISHED
+    assert repo.reset_publications == []
+    assert repo.statuses == []
+    service.bm25_index.replace_bula_chunks.assert_not_awaited()
+
+
+@pytest.mark.anyio
+async def test_reprocessing_rejects_private_bula() -> None:
+    repo = FakeBulaRepository(build_bula(status=BulaStatus.READY))
+    service = build_service(repo=repo)
+
+    with pytest.raises(BulaIngestionError, match="Only a system bula"):
+        await service.ingest_bula(bula_id=BULA_ID, is_reprocessing=True)
+
+    assert repo.statuses == []
+
+
+@pytest.mark.anyio
+async def test_reprocessing_does_not_mark_ready_if_qdrant_replacement_fails() -> None:
+    bula = build_bula(status=BulaStatus.READY)
+    bula.corpus = BulaCorpus.SYSTEM
+    publication = SystemBulaPublication(
+        bula_id=BULA_ID,
+        state=SystemBulaPublicationState.PUBLISHED,
+        sha256_checksum=FAKE_PDF_CHECKSUM,
+        content_size_bytes=len(FAKE_PDF_BYTES),
+    )
+    bula.system_publication = publication
+    repo = FakeBulaRepository(bula)
+    qdrant_store = FakeQdrantStore()
+    qdrant_store.replace_bula_points = AsyncMock(
+        side_effect=RuntimeError("Qdrant replacement failed")
+    )
+    service = build_service(repo=repo, qdrant_store=qdrant_store)
+
+    with pytest.raises(RuntimeError, match="Qdrant replacement failed"):
+        await service.ingest_bula(bula_id=BULA_ID, is_reprocessing=True)
+
+    assert publication.state == SystemBulaPublicationState.STAGED
+    assert repo.statuses == [BulaStatus.PROCESSING]
+    service.bm25_index.replace_bula_chunks.assert_not_awaited()

@@ -177,3 +177,51 @@ async def test_list_points_for_bula_paginates_and_filters(
     assert {record.payload["bula_id"] for record in records if record.payload} == {
         "test-bula"
     }
+
+
+@pytest.mark.anyio
+async def test_replace_bula_points_removes_only_obsolete_points(
+    qdrant_test_context: tuple[QdrantVectorStore, AsyncQdrantClient, str],
+) -> None:
+    vector_store, _, _ = qdrant_test_context
+    await vector_store.ensure_collection()
+    other_bula_point = PointStruct(
+        id=make_point_id("other-bula-chunk"),
+        vector=[0.1, 0.2, 0.3, 0.4],
+        payload={"chunk_id": "other-bula-chunk", "bula_id": "other-bula"},
+    )
+    await vector_store.upsert_points([*build_test_points(), other_bula_point])
+
+    replacement_points = [
+        PointStruct(
+            id=make_point_id(chunk_id),
+            vector=[0.4, 0.3, 0.2, 0.1],
+            payload={
+                "chunk_id": chunk_id,
+                "chunk_text": f"New {chunk_id}",
+                "bula_id": "test-bula",
+            },
+        )
+        for chunk_id in ("test-chunk-0", "test-chunk-new")
+    ]
+
+    assert await vector_store.replace_bula_points(
+        bula_id="test-bula", points=replacement_points
+    ) == 2
+    assert await vector_store.replace_bula_points(
+        bula_id="test-bula", points=replacement_points
+    ) == 2
+
+    current_points = await vector_store.list_points_for_bula(bula_id="test-bula")
+    other_points = await vector_store.list_points_for_bula(bula_id="other-bula")
+    assert {point.payload["chunk_id"] for point in current_points if point.payload} == {
+        "test-chunk-0",
+        "test-chunk-new",
+    }
+    assert current_points[0].payload is not None
+    assert all(
+        "New " in str(point.payload["chunk_text"])
+        for point in current_points
+        if point.payload
+    )
+    assert len(other_points) == 1
