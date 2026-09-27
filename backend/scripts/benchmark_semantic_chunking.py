@@ -374,7 +374,8 @@ def _normalize_heading(value: str) -> str:
     without_accents = "".join(
         character for character in normalized if not unicodedata.combining(character)
     )
-    return _normalize_whitespace(without_accents).upper().rstrip(":")
+    heading_without_number = re.sub(r"^\d+[.)]\s+", "", without_accents)
+    return _normalize_whitespace(heading_without_number).upper().rstrip(":")
 
 
 def _normalize_whitespace(value: str) -> str:
