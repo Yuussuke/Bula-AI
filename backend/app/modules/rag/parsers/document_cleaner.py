@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
+import html
 import json
 import math
 import re
@@ -27,10 +28,16 @@ MARKDOWN_TABLE_SEPARATOR_PATTERN = re.compile(r"^\|(?:\s*:?-{3,}:?\s*\|)+$")
 EMBEDDED_NUMBERED_HEADING_PATTERN = re.compile(
     r"^(.+[.!?])\s+((?:[0-9]{1,2})\.\s+[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ][A-ZÁÀÂÃÉÊÍÓÔÕÚÇ ]+)$"
 )
+STRENGTH_COMPONENT = (
+    r"\d+(?:[.,]\d+)?\s*(?:mg|g|mcg|µg|mL|UI)"
+    r"(?:\s*/\s*(?:\d+(?:[.,]\d+)?\s*)?(?:mg|g|mL))?"
+)
 STRENGTH_PATTERN = re.compile(
-    r"\b\d+(?:[.,]\d+)?\s*(?:mg|g|mcg|µg|mL|UI)"
-    r"(?:\s*/\s*(?:\d+(?:[.,]\d+)?\s*)?(?:mg|g|mL))?\b",
+    rf"\b{STRENGTH_COMPONENT}(?:\s*\+\s*{STRENGTH_COMPONENT})*\b",
     re.IGNORECASE,
+)
+LEADING_NUMBERED_HEADING_PATTERN = re.compile(
+    r"^\*{0,2}(?P<title>\d{1,2}\.\s+.+?[?!])\*{0,2}\s+(?P<body>.+)$"
 )
 CORPORATE_MARKERS = (
     "CNPJ",
@@ -143,11 +150,24 @@ class BulaDocumentCleaner:
                         max_font_size=extracted_line.max_font_size,
                         is_bold=extracted_line.is_bold,
                         markdown_heading_level=extracted_line.markdown_heading_level,
+                        is_list_continuation=extracted_line.is_list_continuation,
                     )
                 )
 
+                if (
+                    extracted_line.is_list_continuation
+                    and len(page_lines) >= 2
+                    and page_lines[-2].is_paragraph_break
+                ):
+                    page_lines.pop(-2)
+
             self._trim_paragraph_breaks(page_lines)
-            if clean_lines and page_lines:
+            if (
+                clean_lines
+                and page_lines
+                and not self._can_join_page_boundary(clean_lines[-1], page_lines[0])
+                and not self._can_continue_table(clean_lines[-1], page_lines)
+            ):
                 self._append_paragraph_break(
                     lines=clean_lines,
                     page_number=page.page_number,
@@ -228,6 +248,26 @@ class BulaDocumentCleaner:
     def _normalize_line_text(self, value: str) -> tuple[str, int]:
         soft_hyphen_count = value.count("\u00ad")
         without_soft_hyphens = value.replace("\u00ad", "")
+        # A literal pipe inside a cell must stay escaped or it changes the
+        # column count. Other HTML entities are presentation artifacts.
+        without_soft_hyphens = "&#124;".join(
+            html.unescape(part) for part in without_soft_hyphens.split("&#124;")
+        )
+        without_soft_hyphens = re.sub(
+            r"\\?<br\s*/?>", " ", without_soft_hyphens, flags=re.IGNORECASE
+        )
+        without_soft_hyphens = re.sub(
+            r"</?(?:u|strong|b|em|i|sup|sub)>",
+            "",
+            without_soft_hyphens,
+            flags=re.IGNORECASE,
+        )
+        without_soft_hyphens = without_soft_hyphens.replace(r"\*", "*")
+        without_soft_hyphens = re.sub(
+            r"(?<!\w)\*\*(.+?)\*\*(?!\w)",
+            r"\1",
+            without_soft_hyphens,
+        )
 
         if self._is_markdown_table_line(without_soft_hyphens):
             return without_soft_hyphens.strip(), soft_hyphen_count
@@ -251,6 +291,33 @@ class BulaDocumentCleaner:
         for line in lines:
             if line.is_paragraph_break:
                 expanded_lines.append(line)
+                continue
+
+            leading_heading = LEADING_NUMBERED_HEADING_PATTERN.fullmatch(line.text)
+            if leading_heading is not None and (
+                line.is_bold
+                or line.markdown_heading_level is not None
+                or leading_heading.group("title")
+                == leading_heading.group("title").upper()
+            ):
+                expanded_lines.append(
+                    ExtractedLine(
+                        text=leading_heading.group("title"),
+                        page_number=line.page_number,
+                        is_bold=True,
+                        markdown_heading_level=2,
+                    )
+                )
+                self._append_paragraph_break(
+                    lines=expanded_lines, page_number=line.page_number
+                )
+                expanded_lines.append(
+                    ExtractedLine(
+                        text=leading_heading.group("body").strip("* "),
+                        page_number=line.page_number,
+                    )
+                )
+                split_heading_count += 1
                 continue
 
             heading_match = EMBEDDED_NUMBERED_HEADING_PATTERN.fullmatch(line.text)
@@ -676,6 +743,7 @@ class BulaDocumentCleaner:
                     max_font_size=current_line.max_font_size,
                     is_bold=current_line.is_bold,
                     markdown_heading_level=current_line.markdown_heading_level,
+                    is_list_continuation=current_line.is_list_continuation,
                 )
                 joined_line_count += 1
                 continue
@@ -693,7 +761,12 @@ class BulaDocumentCleaner:
     ) -> bool:
         if current_line.is_paragraph_break or next_line.is_paragraph_break:
             return False
-        if current_line.page_number != next_line.page_number:
+        if next_line.is_list_continuation:
+            return bool(re.match(r"^[-*+]\s+", current_line.text))
+        if (
+            current_line.page_number != next_line.page_number
+            and not self._can_join_page_boundary(current_line, next_line)
+        ):
             return False
         if self._is_structural_line(current_line) or self._is_structural_line(
             next_line
@@ -703,6 +776,35 @@ class BulaDocumentCleaner:
             return False
 
         return current_line.text.endswith("-") or next_line.text[:1].islower()
+
+    def _can_join_page_boundary(
+        self, previous_line: ExtractedLine, next_line: ExtractedLine
+    ) -> bool:
+        if previous_line.is_paragraph_break or next_line.is_paragraph_break:
+            return False
+        if self._is_structural_line(previous_line) or self._is_structural_line(
+            next_line
+        ):
+            return False
+        if previous_line.text.endswith((".", "?", "!", ":", ";")):
+            return False
+        return next_line.text[:1].islower()
+
+    def _can_continue_table(
+        self, previous_line: ExtractedLine, next_page_lines: list[ExtractedLine]
+    ) -> bool:
+        first_line = next_page_lines[0]
+        if not self._is_markdown_table_row(previous_line.text):
+            return False
+        if not self._is_markdown_table_row(first_line.text):
+            return False
+        if len(next_page_lines) > 1 and self._is_markdown_table_separator(
+            next_page_lines[1].text
+        ):
+            return False
+        return len(self._parse_markdown_table_cells(previous_line.text)) == len(
+            self._parse_markdown_table_cells(first_line.text)
+        )
 
     def _is_structural_line(self, line: ExtractedLine) -> bool:
         clean_text = line.text.lstrip()

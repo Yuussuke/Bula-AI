@@ -39,6 +39,15 @@ class ExtractedLine:
     is_bold: bool = False
     is_paragraph_break: bool = False
     markdown_heading_level: int | None = None
+    is_list_continuation: bool = False
+
+
+@dataclass(frozen=True)
+class PdfTextLineEvidence:
+    text: str
+    x0: float
+    y0: float
+    has_bullet_marker: bool
 
 
 @dataclass
@@ -349,7 +358,7 @@ class PyMuPDF4LLMHandler(ParserHandler):
                 if self.is_geometry_enabled
                 else {}
             )
-            pages = self._build_pages(page_chunks=page_chunks)
+            pages = self._build_pages(page_chunks=page_chunks, document=document)
         except TableStructureError as exc:
             result = self._build_failure_result(
                 error=str(exc),
@@ -384,7 +393,9 @@ class PyMuPDF4LLMHandler(ParserHandler):
         result.quality_signals["table_extraction"] = table_summary
         return result
 
-    def _build_pages(self, *, page_chunks: object) -> list[ExtractedPage]:
+    def _build_pages(
+        self, *, page_chunks: object, document: Any
+    ) -> list[ExtractedPage]:
         if not isinstance(page_chunks, list):
             raise TypeError("PyMuPDF4LLM page_chunks output must be a list.")
 
@@ -405,6 +416,9 @@ class PyMuPDF4LLMHandler(ParserHandler):
                     lines=self._build_markdown_lines(
                         text=page_text,
                         page_number=page_number,
+                        physical_lines=self._get_physical_lines(
+                            document[page_number - 1]
+                        ),
                     ),
                 )
             )
@@ -432,9 +446,12 @@ class PyMuPDF4LLMHandler(ParserHandler):
         *,
         text: str,
         page_number: int,
+        physical_lines: list[PdfTextLineEvidence] | None = None,
     ) -> list[ExtractedLine]:
         extracted_lines: list[ExtractedLine] = []
         previous_line_was_break = False
+        physical_cursor = 0
+        previous_bullet_line: PdfTextLineEvidence | None = None
 
         for raw_line in text.splitlines():
             clean_line = raw_line.strip()
@@ -454,12 +471,32 @@ class PyMuPDF4LLMHandler(ParserHandler):
             line_without_emphasis, is_bold = strip_markdown_emphasis(
                 line_without_heading
             )
+            is_list_continuation = False
+            if line_without_emphasis.startswith("- ") and physical_lines:
+                physical_match = self._match_physical_line(
+                    line_without_emphasis[2:], physical_lines, physical_cursor
+                )
+                if physical_match is not None:
+                    match_index, evidence = physical_match
+                    physical_cursor = match_index + 1
+                    if evidence.has_bullet_marker:
+                        previous_bullet_line = evidence
+                    else:
+                        line_without_emphasis = line_without_emphasis[2:]
+                        if (
+                            previous_bullet_line is not None
+                            and abs(evidence.x0 - previous_bullet_line.x0) <= 14
+                            and 0 <= evidence.y0 - previous_bullet_line.y0 <= 30
+                        ):
+                            is_list_continuation = True
+                            previous_bullet_line = evidence
             extracted_lines.append(
                 ExtractedLine(
                     text=line_without_emphasis,
                     page_number=page_number,
                     is_bold=is_bold or heading_level is not None,
                     markdown_heading_level=heading_level,
+                    is_list_continuation=is_list_continuation,
                 )
             )
             previous_line_was_break = False
@@ -468,6 +505,43 @@ class PyMuPDF4LLMHandler(ParserHandler):
             extracted_lines.pop()
 
         return extracted_lines
+
+    def _get_physical_lines(self, page: Any) -> list[PdfTextLineEvidence]:
+        lines: list[PdfTextLineEvidence] = []
+        for block in page.get_text("dict").get("blocks", []):
+            for line in block.get("lines", []):
+                spans = line.get("spans", [])
+                text = "".join(str(span.get("text", "")) for span in spans).strip()
+                if not text:
+                    continue
+                bounds = line.get("bbox", (0, 0, 0, 0))
+                lines.append(
+                    PdfTextLineEvidence(
+                        text=text,
+                        x0=float(bounds[0]),
+                        y0=float(bounds[1]),
+                        has_bullet_marker=bool(re.match(r"^[-•●▪–]\s+", text)),
+                    )
+                )
+        return sorted(lines, key=lambda line: (line.y0, line.x0))
+
+    def _match_physical_line(
+        self,
+        markdown_content: str,
+        physical_lines: list[PdfTextLineEvidence],
+        start_index: int,
+    ) -> tuple[int, PdfTextLineEvidence] | None:
+        normalized_content = normalize_for_matching(markdown_content).strip(" *_\\")
+        for index in range(start_index, len(physical_lines)):
+            line = physical_lines[index]
+            source_content = re.sub(r"^[-•●▪–]\s+", "", line.text)
+            normalized_source = normalize_for_matching(source_content).strip(" *_\\")
+            if (
+                normalized_content[:24] == normalized_source[:24]
+                and len(normalized_content) >= 12
+            ):
+                return index, line
+        return None
 
 
 class PyMuPDFHandler(ParserHandler):
