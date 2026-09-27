@@ -49,10 +49,11 @@ describe("chat API", () => {
     queryClient.clear();
   });
 
-  it("starts a session with dense retrieval by default", async () => {
+  it("omits mode so the server chooses the default and returns the executed mode", async () => {
     const askResponse: AskResponse = {
       session_id: SESSION_ID,
       answer: "Answer grounded in the leaflet.",
+      retrieval_mode: "hybrid",
       source_chunks: [
         {
           section_title: "INDICATIONS",
@@ -76,7 +77,6 @@ describe("chat API", () => {
     expect(requestInit?.body).toBe(
       JSON.stringify({
         question: "What is this medicine for?",
-        retrieval_mode: "dense",
       })
     );
     expectAuthenticatedRequest(requestInit);
@@ -86,6 +86,7 @@ describe("chat API", () => {
     const followUpResponse: AskResponse = {
       session_id: SESSION_ID,
       answer: "Follow-up answer grounded in the same leaflet.",
+      retrieval_mode: "hybrid",
       source_chunks: [],
     };
     const sessionResponse: ChatSessionResponse = {
@@ -124,7 +125,6 @@ describe("chat API", () => {
         method: "POST",
         body: JSON.stringify({
           question: "And for children?",
-          retrieval_mode: "dense",
         }),
       })
     );
@@ -134,6 +134,29 @@ describe("chat API", () => {
       expect.objectContaining({ method: "GET" })
     );
   });
+
+  it.each(["dense", "bm25", "hybrid"] as const)(
+    "sends an explicit %s mode on both write endpoints",
+    async (mode) => {
+      const response: AskResponse = {
+        session_id: SESSION_ID,
+        answer: "Resposta com fontes.",
+        retrieval_mode: mode,
+        source_chunks: [],
+      };
+      const fetchMock = vi.fn<typeof fetch>();
+      fetchMock.mockImplementation(() => Promise.resolve(createJsonResponse(response)));
+      vi.stubGlobal("fetch", fetchMock);
+
+      const payload = { question: "Para que serve?", mode };
+      await expect(askBulaQuestion(BULA_ID, payload)).resolves.toEqual(response);
+      await expect(continueChatSession(SESSION_ID, payload)).resolves.toEqual(response);
+
+      for (const [, requestInit] of fetchMock.mock.calls) {
+        expect(requestInit?.body).toBe(JSON.stringify(payload));
+      }
+    }
+  );
 
   it("lists the authenticated user's recent sessions", async () => {
     const sessions = [

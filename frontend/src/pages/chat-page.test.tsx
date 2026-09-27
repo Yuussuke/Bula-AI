@@ -45,6 +45,7 @@ const QUERYABLE_BULA: QueryableBulaResponse = {
 
 const FIRST_RESPONSE: AskResponse = {
   session_id: SESSION_ID,
+  retrieval_mode: "hybrid",
   answer: "Este medicamento e indicado para tratar infeccoes descritas na bula.",
   source_chunks: [
     {
@@ -149,6 +150,7 @@ beforeEach(() => {
   continueChatSessionMock.mockResolvedValue({
     session_id: SESSION_ID,
     answer: "Resposta contextual para a pergunta seguinte.",
+    retrieval_mode: "hybrid",
     source_chunks: [],
   });
   getChatSessionMock.mockResolvedValue(buildPersistedSession());
@@ -238,7 +240,6 @@ describe("ChatPage", () => {
     ).toBeInTheDocument();
     expect(askBulaQuestionMock).toHaveBeenCalledWith(BULA_ID, {
       question: "Para que serve este medicamento?",
-      retrieval_mode: "dense",
     });
     expect(continueChatSessionMock).not.toHaveBeenCalled();
     expect(screen.getByTestId("location")).toHaveTextContent(
@@ -433,7 +434,6 @@ describe("ChatPage", () => {
     ).toBeInTheDocument();
     expect(continueChatSessionMock).toHaveBeenCalledWith(SESSION_ID, {
       question: "E para criancas?",
-      retrieval_mode: "dense",
     });
     expect(askBulaQuestionMock).not.toHaveBeenCalled();
   });

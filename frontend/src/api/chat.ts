@@ -7,7 +7,7 @@ export type ChatRole = "user" | "assistant";
 
 export interface AskRequest {
   question: string;
-  retrieval_mode?: RetrievalMode;
+  mode?: RetrievalMode;
 }
 
 export interface SourceChunkResponse {
@@ -19,6 +19,7 @@ export interface SourceChunkResponse {
 export interface AskResponse {
   session_id: string;
   answer: string;
+  retrieval_mode: RetrievalMode;
   source_chunks: SourceChunkResponse[];
 }
 
@@ -52,7 +53,7 @@ export async function askBulaQuestion(bulaId: string, payload: AskRequest): Prom
   return requestJson<AskResponse>(`${CHAT_SESSIONS_PREFIX}/${bulaId}/ask`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(buildDenseAskPayload(payload)),
+    body: JSON.stringify(payload),
   });
 }
 
@@ -63,7 +64,7 @@ export async function continueChatSession(
   return requestJson<AskResponse>(`${CHAT_SESSIONS_PREFIX}/${sessionId}/messages`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(buildDenseAskPayload(payload)),
+    body: JSON.stringify(payload),
   });
 }
 
@@ -85,11 +86,4 @@ export async function listChatSessions({
   return requestJson<ChatSessionResponse[]>(`${CHAT_SESSIONS_PREFIX}?${searchParams.toString()}`, {
     method: "GET",
   });
-}
-
-function buildDenseAskPayload(payload: AskRequest): Required<AskRequest> {
-  return {
-    question: payload.question,
-    retrieval_mode: payload.retrieval_mode ?? "dense",
-  };
 }

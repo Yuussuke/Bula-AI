@@ -105,10 +105,10 @@ export function useChatSession({
   const sendMutation = useMutation({
     mutationFn: async ({ question, sessionId: existingSessionId }: SendQuestionVariables) => {
       if (existingSessionId) {
-        return continueChatSession(existingSessionId, { question, retrieval_mode: "dense" });
+        return continueChatSession(existingSessionId, { question });
       }
 
-      return askBulaQuestion(bulaId, { question, retrieval_mode: "dense" });
+      return askBulaQuestion(bulaId, { question });
     },
     onSuccess: (response, variables) => {
       const nextSessionId = response.session_id;
