@@ -427,6 +427,25 @@ The reindex command reads the existing chunks, computes every vector before
 writing, preserves point IDs and payload metadata, and then records the active
 embedding profile. It does not change publication or ingestion status.
 
+To regenerate chunks from a stored **system** PDF with the current parser and
+chunker, use the separate reprocessing command. Preview validates an active
+admin, the terminal bula state, and the stored PDF against publication SHA-256
+and byte size without changing data. `--apply` parses, chunks, embeds, replaces
+that bula's Qdrant points (including removal of obsolete IDs), and replaces its
+PostgreSQL chunk rows. The bula becomes unavailable during this maintenance
+operation and returns to **staged** even when ingestion succeeds; an operator
+must inspect the generated Markdown/chunks, vet, and publish it again. Run one
+operator at a time. A failed run stays unpublished and can be retried after
+investigating the error.
+
+```bash
+make reprocess-system-bula ARGS="--bula-id <uuid> --actor-email admin@example.com"
+make reprocess-system-bula ARGS="--bula-id <uuid> --actor-email admin@example.com --apply"
+```
+
+Do not use `reindex-bula-embeddings` for parser changes: it re-embeds the old
+chunks without reading the PDF.
+
 For follow-up turns, the retrieval query includes the medication name and the
 previous user question when the new question is context-dependent. The dense
 retriever over-fetches candidates but returns at most four evidence-bearing

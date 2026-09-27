@@ -6,7 +6,7 @@ POSTGRES_IMAGE_TAG := 18
 POSTGRES_IMAGE := $(POSTGRES_IMAGE_NAME):$(POSTGRES_IMAGE_TAG)
 POSTGRES_IMAGE_CONTEXT := docker/bula_ai_postgres
 
-.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate pgq-install pgq-upgrade pgq-verify verify-postgres makemigrations create-admin download-anvisa-bulas seed-system-bulas manage-system-bula reindex-bula-embeddings benchmark-pdf-markdown benchmark-semantic-chunking test test-unit test-integration test-cov lint typecheck format reset-db help dependencies add-dependency
+.PHONY: up down build rebuild logs shell build-postgres-image verify-postgres-image migrate pgq-install pgq-upgrade pgq-verify verify-postgres makemigrations create-admin download-anvisa-bulas seed-system-bulas manage-system-bula reindex-bula-embeddings reprocess-system-bula benchmark-pdf-markdown benchmark-semantic-chunking test test-unit test-integration test-cov lint typecheck format reset-db help dependencies add-dependency
 
 # --- Docker ---
 build:
@@ -77,6 +77,9 @@ manage-system-bula:
 
 reindex-bula-embeddings:
 	$(COMPOSE) exec api uv run python -m app.scripts.reindex_bula_embeddings $(ARGS)
+
+reprocess-system-bula:
+	$(COMPOSE) exec api uv run python -m app.scripts.reprocess_system_bula $(ARGS)
 
 .PHONY: backfill-chunk-meta
 backfill-chunk-meta:
@@ -155,6 +158,7 @@ help:
 	@echo "  make seed-system-bulas - Seed downloaded PDFs into the system corpus"
 	@echo "  make manage-system-bula - Manage system bula publication state"
 	@echo "  make reindex-bula-embeddings - Re-embed existing Qdrant chunks for one bula"
+	@echo "  make reprocess-system-bula - Preview or reprocess one stored system PDF"
 	@echo "  make backfill-chunk-meta - Copy existing Qdrant text into PostgreSQL BM25"
 	@echo "  make benchmark-pdf-markdown - Compare legacy/native PDF parsing (ARGS=\"<five PDFs>\")"
 	@echo "  make benchmark-semantic-chunking - Compare retrieval_v3 chunking models on six focused sections"

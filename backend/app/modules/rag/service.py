@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import hashlib
 from uuid import UUID, uuid4
 
 from app.modules.bulas.models import (
@@ -53,7 +54,9 @@ class RAGIngestionService:
             root_path="tmp/rag-ingestion-debug",
         )
 
-    async def ingest_bula(self, *, bula_id: UUID) -> Bula:
+    async def ingest_bula(
+        self, *, bula_id: UUID, is_reprocessing: bool = False
+    ) -> Bula:
         """
         Index source chunks in Qdrant and PostgreSQL before marking them ready.
 
@@ -82,10 +85,49 @@ class RAGIngestionService:
                 )
 
             assert bula is not None
-            if bula.status == BulaStatus.READY:
+            if bula.status == BulaStatus.READY and not is_reprocessing:
                 return bula
 
             publication = bula.system_publication
+            verified_pdf_bytes: bytes | None = None
+            if is_reprocessing:
+                if bula.corpus != BulaCorpus.SYSTEM or publication is None:
+                    raise BulaIngestionError(
+                        "Only a system bula with publication provenance can be reprocessed."
+                    )
+                if bula.status not in {
+                    BulaStatus.READY,
+                    BulaStatus.ERROR,
+                    BulaStatus.FAILED,
+                }:
+                    raise BulaIngestionError(
+                        "Bula is not in a reprocessable terminal state."
+                    )
+                if not bula.file_address:
+                    raise BulaIngestionError("Bula does not have a stored PDF address.")
+                source_metadata = await self.object_store.get_metadata(
+                    bula.file_address
+                )
+                if (
+                    source_metadata.sha256_checksum != publication.sha256_checksum
+                    or source_metadata.content_size_bytes
+                    != publication.content_size_bytes
+                ):
+                    raise BulaIngestionError(
+                        "Stored PDF does not match system publication provenance."
+                    )
+                verified_pdf_bytes = await self.object_store.get_bytes(
+                    bula.file_address
+                )
+                if (
+                    hashlib.sha256(verified_pdf_bytes).hexdigest()
+                    != publication.sha256_checksum
+                    or len(verified_pdf_bytes) != publication.content_size_bytes
+                ):
+                    raise BulaIngestionError(
+                        "Stored PDF bytes do not match system publication provenance."
+                    )
+
             if (
                 bula.corpus == BulaCorpus.SYSTEM
                 and publication is not None
@@ -120,7 +162,11 @@ class RAGIngestionService:
                 )
 
             async with observer.stage("pdf_download") as stage:
-                pdf_bytes = await self.object_store.get_bytes(file_address)
+                pdf_bytes = (
+                    verified_pdf_bytes
+                    if verified_pdf_bytes is not None
+                    else await self.object_store.get_bytes(file_address)
+                )
                 stage.add_fields(pdf_size_bytes=len(pdf_bytes))
 
             parse_result: ParseResult | None = None
@@ -250,8 +296,10 @@ class RAGIngestionService:
                 await self.qdrant_store.ensure_collection()
                 stage.add_fields(qdrant_collection=self.qdrant_store.collection_name)
 
-            async with observer.stage("qdrant_upsert") as stage:
-                qdrant_point_count = await self.qdrant_store.upsert_points(points)
+            async with observer.stage("qdrant_replace") as stage:
+                qdrant_point_count = await self.qdrant_store.replace_bula_points(
+                    bula_id=str(bula.id), points=points
+                )
                 stage.add_fields(
                     qdrant_collection=self.qdrant_store.collection_name,
                     qdrant_point_count=qdrant_point_count,
