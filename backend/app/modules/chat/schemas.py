@@ -3,7 +3,8 @@ from uuid import UUID
 
 from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
 
-from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, RetrievalMode
+from app.modules.chat.models import ChatMessage, ChatRole, ChatSession
+from app.modules.rag.retrieval_mode import RetrievalMode
 
 
 class ChatMessageCreate(BaseModel):
@@ -76,8 +77,10 @@ class DirectAskResponse(BaseModel):
 
 
 class AskRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
     question: str = Field(min_length=1)
-    retrieval_mode: RetrievalMode = RetrievalMode.DENSE
+    mode: RetrievalMode = RetrievalMode.HYBRID
 
     @field_validator("question")
     @classmethod
@@ -92,4 +95,5 @@ class AskRequest(BaseModel):
 class AskResponse(BaseModel):
     session_id: UUID
     answer: str
+    retrieval_mode: RetrievalMode
     source_chunks: list[SourceChunkResponse] = Field(default_factory=list)

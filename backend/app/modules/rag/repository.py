@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import Float, delete, func, select, update
+from sqlalchemy import Float, case, delete, func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -127,6 +127,50 @@ class ChunkMetadataRepository:
         )
         result = await self.db.execute(statement)
         return [BM25SearchResult.model_validate(row) for row in result.mappings()]
+
+    async def find_section_evidence(
+        self,
+        *,
+        bula_id: UUID,
+        section_titles: Sequence[str],
+        limit: int,
+    ) -> list[ChunkMetadataInput]:
+        """Read bounded source chunks from named sections of one authorized bula."""
+        if not section_titles or limit < 1:
+            return []
+
+        normalized_titles = [title.casefold() for title in section_titles]
+        normalized_section = func.lower(ChunkMetadata.section_title)
+        text_without_headings = func.regexp_replace(
+            ChunkMetadata.chunk_text,
+            r"^[ \t]{0,3}#{1,6}([ \t]+[^\r\n]*|[ \t]*$)",
+            "",
+            "gn",
+        )
+        has_body = (
+            func.regexp_replace(text_without_headings, r"[[:space:]]", "", "g") != ""
+        )
+        section_priority = case(
+            *(
+                (normalized_section == title, priority)
+                for priority, title in enumerate(normalized_titles)
+            ),
+            else_=len(normalized_titles),
+        )
+        statement = (
+            select(ChunkMetadata)
+            .where(ChunkMetadata.bula_id == bula_id)
+            .where(normalized_section.in_(normalized_titles))
+            .where(has_body)
+            .order_by(section_priority, ChunkMetadata.chunk_id)
+            .limit(limit)
+        )
+        result = await self.db.execute(statement)
+        return [
+            ChunkMetadataInput.model_validate(chunk, from_attributes=True)
+            for chunk in result.scalars()
+            if chunk.chunk_text.strip()
+        ]
 
     async def update_corpus(self, *, bula_id: UUID, corpus: BulaCorpus) -> None:
         try:

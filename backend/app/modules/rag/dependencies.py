@@ -1,4 +1,5 @@
 from typing import cast
+from uuid import UUID
 
 from fastapi import Depends, Request
 from langchain_core.embeddings import Embeddings as LCEmbeddings
@@ -29,7 +30,10 @@ from app.modules.rag.parsers.pdf_parser import BulaParser
 from app.modules.rag.qdrant_client import QDRANT_CLIENT_STATE_KEY
 from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.retriever import DenseBulaRetriever
+from app.modules.rag.retrieval_mode import RetrievalMode
+from app.modules.rag.retriever_factory import RetrieverStrategyFactory
 from app.modules.rag.schemas import ChunkingConfig
+from app.modules.rag.section_evidence_retriever import SectionEvidenceRetriever
 from app.modules.rag.service import RAGIngestionService
 from app.modules.rag.token_estimator import build_token_estimator
 from app.modules.storage.client import ObjectStoreClient
@@ -117,29 +121,6 @@ def get_chat_llm(settings: Settings = Depends(get_settings)) -> BaseChatModel:
     return get_llm(settings=settings)
 
 
-def get_rag_chain_factory(
-    settings: Settings = Depends(get_settings),
-    qdrant_client: AsyncQdrantClient = Depends(get_qdrant_client),
-) -> RAGChainFactory:
-    def build_dense_retriever(bula_id: str) -> BaseRetriever:
-        return DenseBulaRetriever(
-            bula_id=bula_id,
-            qdrant_store=get_qdrant_store(
-                qdrant_client=qdrant_client,
-                settings=settings,
-            ),
-            embeddings=get_embeddings(settings=settings),
-        )
-
-    def build_chat_llm() -> BaseChatModel:
-        return get_llm(settings=settings)
-
-    return RAGChainFactory(
-        dense_retriever_builder=build_dense_retriever,
-        llm_builder=build_chat_llm,
-    )
-
-
 def get_llm_client(settings: Settings = Depends(get_settings)) -> AsyncOpenAI:
     api_key = _clean_optional_api_key(settings.openrouter.api_key)
     return AsyncOpenAI(
@@ -195,6 +176,75 @@ def get_hybrid_retriever_factory(
         qdrant_store=qdrant_store,
         embeddings=embeddings,
         bm25_retriever_factory=bm25_retriever_factory,
+    )
+
+
+def get_retriever_strategy_factory(
+    request: Request,
+    settings: Settings = Depends(get_settings),
+    bm25_factory: BM25RetrieverFactory = Depends(get_bm25_retriever_factory),
+    section_index: PostgreSQLBM25Index = Depends(get_bm25_index),
+) -> RetrieverStrategyFactory:
+    # Builders initialize only the selected strategy, after service authorization.
+    # In particular, BM25 must not require embedding credentials or a model.
+    def build_vector_store() -> QdrantVectorStore:
+        return get_qdrant_store(
+            qdrant_client=get_qdrant_client(request=request), settings=settings
+        )
+
+    def build_dense(*, bula_id: UUID, k: int) -> BaseRetriever:
+        retriever = DenseBulaRetriever(
+            bula_id=str(bula_id),
+            k=k,
+            qdrant_store=build_vector_store(),
+            embeddings=get_embeddings(settings=settings),
+        )
+        return SectionEvidenceRetriever(
+            wrapped_retriever=retriever,
+            index=section_index,
+            bula_id=bula_id,
+        )
+
+    def build_bm25(*, bula_id: UUID, k: int) -> BaseRetriever:
+        return SectionEvidenceRetriever(
+            wrapped_retriever=bm25_factory.build(bula_id=bula_id, k=k),
+            index=section_index,
+            bula_id=bula_id,
+        )
+
+    def build_hybrid(*, bula_id: UUID, k: int) -> BaseRetriever:
+        factory = HybridRetrieverFactory(
+            qdrant_store=build_vector_store(),
+            embeddings=get_embeddings(settings=settings),
+            bm25_retriever_factory=bm25_factory,
+        )
+        return SectionEvidenceRetriever(
+            wrapped_retriever=factory.build(bula_id=bula_id, k=k),
+            index=section_index,
+            bula_id=bula_id,
+        )
+
+    return RetrieverStrategyFactory(
+        builders={
+            RetrievalMode.DENSE: build_dense,
+            RetrievalMode.BM25: build_bm25,
+            RetrievalMode.HYBRID: build_hybrid,
+        }
+    )
+
+
+def get_rag_chain_factory(
+    retriever_factory: RetrieverStrategyFactory = Depends(
+        get_retriever_strategy_factory
+    ),
+    settings: Settings = Depends(get_settings),
+) -> RAGChainFactory:
+    def build_chat_llm() -> BaseChatModel:
+        return get_llm(settings=settings)
+
+    return RAGChainFactory(
+        retriever_factory=retriever_factory,
+        llm_builder=build_chat_llm,
     )
 
 

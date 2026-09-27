@@ -8,16 +8,11 @@ from sqlalchemy import JSON, CheckConstraint, ForeignKey, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.base import Base, UUIDMixin, TimestampMixin
+from app.modules.rag.retrieval_mode import RetrievalMode
 
 if TYPE_CHECKING:
     from app.modules.auth.models import User
     from app.modules.bulas.models import Bula
-
-
-class RetrievalMode(str, enum.Enum):
-    DENSE = "dense"
-    BM25 = "bm25"
-    HYBRID = "hybrid"
 
 
 class ChatRole(str, enum.Enum):

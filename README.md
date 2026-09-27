@@ -457,8 +457,8 @@ both indexing and queries without modifying stored source text. The internal
 `search_text` column is maintained by a PostgreSQL trigger and indexed with
 the `simple` configuration so its already-normalized terms are not stemmed again.
 Search results contain positive BM25 scores (higher is better), not probabilities
-or scores normalized to [0, 1]. The chat still uses dense retrieval until #55–#57
-and #51 wire in the additional modes.
+or scores normalized to [0, 1]. Chat requests can select BM25 explicitly with
+`mode: "bm25"`; the default is hybrid retrieval.
 
 For the first local upgrade, pause ingestion and apply the migration before
 restarting the worker:
@@ -541,8 +541,8 @@ replace persistence without mocking the retriever itself.
   separate sessions per concurrent operation.
 - This remains an internal component: filters do not replace ownership and
   publication authorization. Unscoped searches include private chunks.
-- The chat still uses dense retrieval. Mode selection and hybrid fusion are
-  separate work; no new endpoint or UI mode is introduced here.
+- The chat selects this adapter for `mode: "bm25"`. This path queries PostgreSQL
+  without constructing embeddings or querying Qdrant.
 
 The #32 BM25 decision also applies to #55: `to_bm25query`/native BM25 replace
 the card's `plainto_tsquery`/`ts_rank_cd` examples. The normalization migration
@@ -619,11 +619,86 @@ retriever = factory.build(bula_id=authorized_bula.id, k=4)
 documents = await retriever.ainvoke(question)
 ```
 
-This is an internal retrieval component. It does not add an endpoint, expose a
-UI mode, or change the chat's current default. It requires no migration,
-backfill, re-embedding or PDF reprocessing. The decision, consistency contracts
-and rollout boundary are recorded in
+This component is used by the chat's default hybrid strategy. The retrieval
+component itself requires no migration, backfill, re-embedding or PDF
+reprocessing. Existing bulas still need the previously documented lexical
+backfill if they predate the PostgreSQL index. Its consistency contracts are in
 [the hybrid retrieval decision](docs/decisions/2026-09-22-hybrid-retrieval-rrf.md).
+
+### Chat retrieval mode selection
+
+Both `POST /api/v1/chat/sessions/{bula_id}/ask` and
+`POST /api/v1/chat/sessions/{session_id}/messages` accept:
+
+```json
+{"question": "Para que serve este medicamento?", "mode": "hybrid"}
+```
+
+The optional `mode` accepts `dense`, `bm25`, or `hybrid`; omission selects
+`hybrid` on each request, including follow-up turns. The response includes the
+executed `retrieval_mode` alongside `session_id`, `answer`, and `source_chunks`.
+Both messages in the turn persist that mode, so reloading history preserves
+earlier strategy choices even when a later question changes mode.
+
+This is a coordinated API/client contract change: `retrieval_mode` is a
+response/history field, **not** a request alias. Old requests using it, unknown
+fields, invalid modes and empty questions return 422. Deploy/reload backend and
+frontend together. The frontend omits `mode` until a visual selector is added,
+so the server owns the default. No schema migration is required; the existing
+PostgreSQL enum and stored historical values are unchanged.
+
+Authorization precedes retriever/model construction. The request-scoped
+strategy registry builds only the selected retriever; BM25 does not require
+embedding credentials. All strategies share the same prompt, contextual query
+construction, citation processing and independently injected LLM. An error in
+retrieval or generation propagates without switching strategies or persisting
+a partial conversation turn.
+
+`relevance_score` uses the selected method's scale (dense similarity, BM25 or
+RRF), not a confidence probability. Scores may order sources within one response
+but must not be compared across modes. A section-supplemented source has score
+`0.0` because the section lookup is unranked; this does not mean the source is
+irrelevant. The retrieval query uses the patient's
+question and, for follow-ups, the preceding user question. The selected bula is
+already enforced by the retriever's ID filter, so its name is not repeated in
+the query. Manual standalone searches using only the raw question may still
+rank follow-up turns differently.
+
+For contraindication or allergy questions, each strategy also reads up to two
+original body chunks from the selected bula's contraindication and warning
+sections. This bounded section lookup runs after the selected retriever and
+never broadens access to other bulas. It does not require another embedding
+call. Direct questions such as "Who cannot use this medication?" pass only
+explicit contraindication sections to the answer model when those sections are
+available. Specific allergy questions retain both restrictions and warnings.
+Only sources cited in the answer are returned to the user. A narrow
+output guard replaces a false claim that the bula has no allergy information
+when an original contraindication chunk in the retrieved context states it.
+If the answer still claims the entire bula is silent without that evidence, it
+falls back to a cautious statement about the limited retrieved context. This
+guard is not a general clinical claim verifier.
+
+Manual validation with a ready bula indexed in both stores:
+
+1. Restart the local API and reload the frontend to pick up the new contract.
+2. In authenticated Swagger, send the same question in three separate calls to
+   `/ask`, explicitly selecting each mode. Verify the echoed `retrieval_mode`
+   and inspect the cited evidence rather than comparing numerical scores.
+   With an amoxicillin bula, also ask `Quem não pode usar este medicamento?`:
+   the contraindication chunk about allergy to penicillins should be present
+   when cited, with no claim that the bula lacks that information.
+3. Send `{"question": "Para que serve?"}` and verify `hybrid`. An empty object
+   is invalid because the question is still required.
+4. Send `{"question": "Para que serve?", "mode": "magic"}` and then the legacy
+   `retrieval_mode` request field; both should return 422 without creating turns.
+5. Continue one returned session with a different mode using `/messages`. Reload
+   its history and verify the original and new modes remain attached to their
+   respective messages.
+6. Repeat with a regular user: published system bulas remain accessible, while
+   another user's private bula and withdrawn system publications remain denied.
+
+The new default requires the lexical index to be populated for meaningful hybrid
+evaluation. Mode selection does not repair old metadata or reprocess PDF tables.
 
 ### RAG ingestion observability
 

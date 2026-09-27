@@ -1,7 +1,12 @@
 import pytest
+from functools import partial
 from httpx import AsyncClient
 from langchain_core.messages import BaseMessage
 from langchain_core.runnables import RunnableLambda
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
+from langchain_core.documents import Document
+from langchain_core.retrievers import BaseRetriever
+from langchain_core.language_models.fake_chat_models import FakeListChatModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import UTC, datetime
@@ -17,9 +22,12 @@ from app.modules.bulas.models import (
     SystemBulaPublication,
     SystemBulaPublicationState,
 )
-from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, RetrievalMode
+from app.modules.chat.models import ChatMessage, ChatRole, ChatSession
+from app.modules.rag.retrieval_mode import RetrievalMode
 from app.modules.chat.repository import ChatRepository
 from app.modules.rag.dependencies import get_rag_chain_factory
+from app.modules.rag.chain import RAGChainFactory
+from app.modules.rag.retriever_factory import RetrieverStrategyFactory
 from app.modules.storage.models import StoredObject
 
 
@@ -28,6 +36,118 @@ TEST_USER = {
     "email": "chat-test@bulaai.com",
     "password": "Secret123!",
 }
+
+
+class ModeEvidenceRetriever(BaseRetriever):
+    mode: RetrievalMode
+    bula_id: UUID
+
+    def _get_relevant_documents(
+        self, query: str, *, run_manager: CallbackManagerForRetrieverRun
+    ) -> list[Document]:
+        return [
+            Document(
+                page_content=f"Evidence from {self.mode.value} for {self.bula_id}",
+                metadata={"section_title": "Indicações", "score": 0.1},
+            )
+        ]
+
+
+def build_mode_evidence_retriever(
+    *, mode: RetrievalMode, bula_id: UUID, k: int
+) -> BaseRetriever:
+    return ModeEvidenceRetriever(mode=mode, bula_id=bula_id)
+
+
+def override_real_chain_factory() -> None:
+    strategy_factory = RetrieverStrategyFactory(
+        builders={
+            mode: partial(build_mode_evidence_retriever, mode=mode)
+            for mode in RetrievalMode
+        }
+    )
+    chain_factory = RAGChainFactory(
+        retriever_factory=strategy_factory,
+        llm_builder=lambda: FakeListChatModel(responses=["Resposta fundamentada [1]."]),
+    )
+    app.dependency_overrides[get_rag_chain_factory] = lambda: chain_factory
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("mode", [None, "dense", "bm25", "hybrid"])
+async def test_modes_select_evidence_echo_and_persist_on_both_endpoints(
+    client: AsyncClient, db_session: AsyncSession, mode: str | None
+) -> None:
+    access_token = await get_access_token(client)
+    user = await get_user_by_email(db_session, email=TEST_USER["email"])
+    bula = await create_ready_bula(db_session, user_id=user.id)
+    override_real_chain_factory()
+    payload = {"question": "Para que serve?"}
+    if mode is not None:
+        payload["mode"] = mode
+    expected_mode = mode or "hybrid"
+
+    initial = await client.post(
+        f"/api/v1/chat/sessions/{bula.id}/ask",
+        json=payload,
+        headers=build_auth_headers(access_token),
+    )
+    assert initial.status_code == 200, initial.json()
+    session_id = initial.json()["session_id"]
+    follow_up = await client.post(
+        f"/api/v1/chat/sessions/{session_id}/messages",
+        json=payload,
+        headers=build_auth_headers(access_token),
+    )
+    for response in (initial, follow_up):
+        assert response.status_code == 200, response.json()
+        assert response.json()["retrieval_mode"] == expected_mode
+        assert response.json()["source_chunks"][0]["chunk_text"] == (
+            f"Evidence from {expected_mode} for {bula.id}"
+        )
+
+    history = await client.get(
+        f"/api/v1/chat/sessions/{session_id}", headers=build_auth_headers(access_token)
+    )
+    assert [message["retrieval_mode"] for message in history.json()["messages"]] == [
+        expected_mode
+    ] * 4
+
+
+@pytest.mark.anyio
+async def test_session_can_change_modes_without_rewriting_previous_turns(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    access_token = await get_access_token(client)
+    user = await get_user_by_email(db_session, email=TEST_USER["email"])
+    bula = await create_ready_bula(db_session, user_id=user.id)
+    override_real_chain_factory()
+    initial = await client.post(
+        f"/api/v1/chat/sessions/{bula.id}/ask",
+        json={"question": "Para que serve?", "mode": "dense"},
+        headers=build_auth_headers(access_token),
+    )
+    session_id = initial.json()["session_id"]
+    for mode in ("bm25", "hybrid"):
+        response = await client.post(
+            f"/api/v1/chat/sessions/{session_id}/messages",
+            json={"question": "E para crianças?", "mode": mode},
+            headers=build_auth_headers(access_token),
+        )
+        assert response.status_code == 200, response.json()
+        assert response.json()["retrieval_mode"] == mode
+
+    history = await client.get(
+        f"/api/v1/chat/sessions/{session_id}", headers=build_auth_headers(access_token)
+    )
+    assert [message["retrieval_mode"] for message in history.json()["messages"]] == [
+        "dense",
+        "dense",
+        "bm25",
+        "bm25",
+        "hybrid",
+        "hybrid",
+    ]
 
 
 async def get_access_token(client: AsyncClient) -> str:
@@ -142,10 +262,12 @@ class FakeRAGChainFactory:
     ) -> None:
         self.response_text = response_text
         self.built_bula_ids: list[str] = []
+        self.built_modes: list[RetrievalMode] = []
         self.invocations: list[dict[str, object]] = []
 
-    def build_dense_chain(self, *, bula_id: str) -> RunnableLambda:
-        self.built_bula_ids.append(bula_id)
+    def build_chain(self, *, bula_id: UUID, mode: RetrievalMode) -> RunnableLambda:
+        self.built_bula_ids.append(str(bula_id))
+        self.built_modes.append(mode)
         return RunnableLambda(self._invoke)
 
     def _invoke(self, inputs: dict[str, object]) -> dict[str, object]:
@@ -176,8 +298,8 @@ def override_rag_chain_factory(
 
 def build_failing_rag_chain_factory() -> FakeRAGChainFactory:
     class FailingRAGChainFactory(FakeRAGChainFactory):
-        def build_dense_chain(self, *, bula_id: str) -> RunnableLambda:
-            self.built_bula_ids.append(bula_id)
+        def build_chain(self, *, bula_id: UUID, mode: RetrievalMode) -> RunnableLambda:
+            self.built_bula_ids.append(str(bula_id))
 
             async def fail_chain(inputs: dict[str, str]) -> dict[str, object]:
                 _ = inputs
@@ -280,8 +402,8 @@ async def test_endpoint_persists_both_messages(
         ChatRole.ASSISTANT,
     ]
     assert [message.retrieval_mode for message in messages] == [
-        RetrievalMode.DENSE,
-        RetrievalMode.DENSE,
+        RetrievalMode.HYBRID,
+        RetrievalMode.HYBRID,
     ]
     assert messages[0].content == "Qual e a dose?"
     assert messages[1].content == "Resposta com citacao [Posologia]."
@@ -360,26 +482,75 @@ async def test_endpoint_404_uningested_bula(
 
 
 @pytest.mark.anyio
-async def test_endpoint_returns_501_for_future_retrieval_modes(
+@pytest.mark.parametrize(
+    "extra_fields, error_field",
+    [
+        ({"mode": "magic"}, "mode"),
+        ({"mode": None}, "mode"),
+        ({"retrieval_mode": "dense"}, "retrieval_mode"),
+        ({"mode": "hybrid", "retrieval_mode": "dense"}, "retrieval_mode"),
+    ],
+)
+async def test_endpoint_rejects_invalid_or_legacy_mode_before_retrieval(
     client: AsyncClient,
+    db_session: AsyncSession,
+    extra_fields: dict[str, object],
+    error_field: str,
 ) -> None:
     access_token = await get_access_token(client)
     fake_factory = override_rag_chain_factory()
 
     response = await client.post(
         "/api/v1/chat/sessions/11111111-1111-1111-1111-111111111111/ask",
-        json={"question": "Qual e a dose?", "retrieval_mode": "bm25"},
+        json={"question": "Qual e a dose?", **extra_fields},
         headers=build_auth_headers(access_token),
     )
 
-    assert response.status_code == 501
+    assert response.status_code == 422
+    assert any(error["loc"][-1] == error_field for error in response.json()["detail"])
     assert fake_factory.built_bula_ids == []
+    assert await db_session.scalar(select(func.count()).select_from(ChatSession)) == 0
 
 
 @pytest.mark.anyio
+async def test_invalid_follow_up_keeps_history_unchanged(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    access_token = await get_access_token(client)
+    user = await get_user_by_email(db_session, email=TEST_USER["email"])
+    bula = await create_ready_bula(db_session, user_id=user.id)
+    factory = override_rag_chain_factory()
+    initial = await client.post(
+        f"/api/v1/chat/sessions/{bula.id}/ask",
+        json={"question": "Para que serve?"},
+        headers=build_auth_headers(access_token),
+    )
+    session_id = initial.json()["session_id"]
+    for payload in (
+        {"question": "E depois?", "mode": "magic"},
+        {"question": "E depois?", "retrieval_mode": "dense"},
+        {},
+    ):
+        response = await client.post(
+            f"/api/v1/chat/sessions/{session_id}/messages",
+            json=payload,
+            headers=build_auth_headers(access_token),
+        )
+        assert response.status_code == 422, response.json()
+
+    messages = await ChatRepository(db=db_session).get_session_history(
+        session_id=UUID(session_id)
+    )
+    assert len(messages) == 2
+    assert factory.built_modes == [RetrievalMode.HYBRID]
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("mode", list(RetrievalMode))
 async def test_endpoint_does_not_persist_when_chain_fails(
     client: AsyncClient,
     db_session: AsyncSession,
+    mode: RetrievalMode,
 ) -> None:
     access_token = await get_access_token(client)
     user = await get_user_by_email(db_session, email=TEST_USER["email"])
@@ -389,7 +560,7 @@ async def test_endpoint_does_not_persist_when_chain_fails(
     with pytest.raises(RuntimeError, match="LLM unavailable"):
         await client.post(
             f"/api/v1/chat/sessions/{bula.id}/ask",
-            json={"question": "Qual e a dose?"},
+            json={"question": "Qual e a dose?", "mode": mode.value},
             headers=build_auth_headers(access_token),
         )
 
@@ -441,9 +612,11 @@ async def test_ordinary_user_can_query_published_ready_system_bula(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("mode", list(RetrievalMode))
 async def test_user_cannot_query_another_users_private_bula(
     client: AsyncClient,
     db_session: AsyncSession,
+    mode: RetrievalMode,
 ) -> None:
     access_token = await get_access_token(client)
     await client.post(
@@ -463,7 +636,7 @@ async def test_user_cannot_query_another_users_private_bula(
 
     response = await client.post(
         f"/api/v1/chat/sessions/{bula.id}/ask",
-        json={"question": "Qual e a dose?"},
+        json={"question": "Qual e a dose?", "mode": mode.value},
         headers=build_auth_headers(access_token),
     )
 
@@ -675,9 +848,11 @@ async def test_session_can_be_reloaded_with_complete_history(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("mode", list(RetrievalMode))
 async def test_other_user_cannot_read_or_continue_session(
     client: AsyncClient,
     db_session: AsyncSession,
+    mode: RetrievalMode,
 ) -> None:
     owner_token = await get_access_token(client)
     owner = await get_user_by_email(db_session, email=TEST_USER["email"])
@@ -685,7 +860,7 @@ async def test_other_user_cannot_read_or_continue_session(
     fake_factory = override_rag_chain_factory()
     first_response = await client.post(
         f"/api/v1/chat/sessions/{bula.id}/ask",
-        json={"question": "Pergunta privada"},
+        json={"question": "Pergunta privada", "mode": mode.value},
         headers=build_auth_headers(owner_token),
     )
     session_id = first_response.json()["session_id"]
@@ -707,7 +882,7 @@ async def test_other_user_cannot_read_or_continue_session(
     )
     continue_response = await client.post(
         f"/api/v1/chat/sessions/{session_id}/messages",
-        json={"question": "Tentativa sem acesso"},
+        json={"question": "Tentativa sem acesso", "mode": mode.value},
         headers=build_auth_headers(other_user_token),
     )
 
@@ -717,9 +892,11 @@ async def test_other_user_cannot_read_or_continue_session(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("mode", list(RetrievalMode))
 async def test_follow_up_is_denied_when_system_bula_is_withdrawn(
     client: AsyncClient,
     db_session: AsyncSession,
+    mode: RetrievalMode,
 ) -> None:
     access_token = await get_access_token(client)
     user = await get_user_by_email(db_session, email=TEST_USER["email"])
@@ -731,7 +908,7 @@ async def test_follow_up_is_denied_when_system_bula_is_withdrawn(
     fake_factory = override_rag_chain_factory()
     first_response = await client.post(
         f"/api/v1/chat/sessions/{bula.id}/ask",
-        json={"question": "Qual e esta bula?"},
+        json={"question": "Qual e esta bula?", "mode": mode.value},
         headers=build_auth_headers(access_token),
     )
     session_id = first_response.json()["session_id"]
@@ -742,7 +919,7 @@ async def test_follow_up_is_denied_when_system_bula_is_withdrawn(
 
     follow_up_response = await client.post(
         f"/api/v1/chat/sessions/{session_id}/messages",
-        json={"question": "E para criancas?"},
+        json={"question": "E para criancas?", "mode": mode.value},
         headers=build_auth_headers(access_token),
     )
 
@@ -751,9 +928,11 @@ async def test_follow_up_is_denied_when_system_bula_is_withdrawn(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize("mode", list(RetrievalMode))
 async def test_failed_follow_up_does_not_persist_partial_turn(
     client: AsyncClient,
     db_session: AsyncSession,
+    mode: RetrievalMode,
 ) -> None:
     access_token = await get_access_token(client)
     user = await get_user_by_email(db_session, email=TEST_USER["email"])
@@ -761,7 +940,7 @@ async def test_failed_follow_up_does_not_persist_partial_turn(
     override_rag_chain_factory()
     first_response = await client.post(
         f"/api/v1/chat/sessions/{bula.id}/ask",
-        json={"question": "Pergunta inicial"},
+        json={"question": "Pergunta inicial", "mode": mode.value},
         headers=build_auth_headers(access_token),
     )
     session_id = first_response.json()["session_id"]
@@ -770,7 +949,7 @@ async def test_failed_follow_up_does_not_persist_partial_turn(
     with pytest.raises(RuntimeError, match="LLM unavailable"):
         await client.post(
             f"/api/v1/chat/sessions/{session_id}/messages",
-            json={"question": "Pergunta que falha"},
+            json={"question": "Pergunta que falha", "mode": mode.value},
             headers=build_auth_headers(access_token),
         )
 
