@@ -4,7 +4,8 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, RetrievalMode
+from app.modules.chat.models import ChatMessage, ChatRole, ChatSession
+from app.modules.rag.retrieval_mode import RetrievalMode
 
 MAX_CHAT_SESSION_TITLE_LENGTH = 50
 DEFAULT_CHAT_SESSION_TITLE = "New conversation"

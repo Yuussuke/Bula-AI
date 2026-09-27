@@ -1,5 +1,6 @@
 from typing import cast
 from unittest.mock import AsyncMock
+from uuid import UUID
 
 import pytest
 from fastapi import FastAPI, Request
@@ -7,6 +8,8 @@ from langchain_core.embeddings import Embeddings as LCEmbeddings
 from openai import AsyncOpenAI
 from pydantic import SecretStr
 from sqlalchemy.ext.asyncio import AsyncSession
+from qdrant_client import AsyncQdrantClient
+from qdrant_client.http.models import QueryResponse, Record, ScoredPoint
 
 from app.core.config import (
     EmbeddingSettings,
@@ -30,6 +33,12 @@ from app.modules.rag.dependencies import (
     get_qdrant_client,
 )
 from app.modules.rag.embeddings import EmbeddingAdapter
+from app.modules.rag.bm25_retriever import BM25RetrieverFactory, BM25SearchIndex
+from app.modules.rag.retrieval_mode import RetrievalMode
+from app.modules.rag.qdrant_store import make_point_id
+from app.modules.rag.schemas import BM25SearchResult
+from app.modules.rag.section_evidence_retriever import SectionEvidenceIndex
+from app.modules.bulas.models import BulaCorpus
 from app.modules.rag.parsers.pdf_parser import BulaParser
 from app.modules.rag.qdrant_client import QDRANT_CLIENT_STATE_KEY
 from app.modules.rag.qdrant_store import QdrantVectorStore
@@ -42,6 +51,102 @@ from app.modules.rag.token_estimator import (
 
 class FakeOpenAIClient:
     pass
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("mode", list(RetrievalMode))
+async def test_strategy_composition_uses_only_selected_stores_and_preserves_scope(
+    mode: RetrievalMode, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    settings = build_settings(api_key=None)
+    bula_id = UUID(int=1)
+    payload = {
+        "chunk_id": "shared",
+        "chunk_text": "Trecho da bula.",
+        "bula_id": str(bula_id),
+        "drug_name": "Dipirona",
+        "manufacturer": "Fabricante",
+        "corpus": "private",
+        "section_title": "Indicações",
+    }
+    client = AsyncMock(spec=AsyncQdrantClient)
+    client.query_points.return_value = QueryResponse(
+        points=[
+            ScoredPoint(
+                id=make_point_id("shared"),
+                version=0,
+                score=0.9,
+                payload=payload,
+            )
+        ]
+    )
+    client.retrieve.return_value = [Record(id=make_point_id("shared"), payload=payload)]
+    application = FastAPI()
+    if mode != RetrievalMode.BM25:
+        setattr(application.state, QDRANT_CLIENT_STATE_KEY, client)
+    request = Request({"type": "http", "app": application})
+    index = AsyncMock(spec=BM25SearchIndex)
+    index.search.return_value = [
+        BM25SearchResult(
+            chunk_id="shared",
+            doc_id=str(bula_id),
+            bula_id=bula_id,
+            corpus=BulaCorpus.PRIVATE,
+            drug_name="Dipirona",
+            section_title="Indicações",
+            chunk_text="Trecho da bula.",
+            bm25_score=5.0,
+        )
+    ]
+    initialized_embeddings: list[EmbeddingAdapter] = []
+
+    def build_embeddings(settings: Settings) -> EmbeddingAdapter:
+        adapter = EmbeddingAdapter(embedder=FakeEmbeddings(), dimension=1024)
+        initialized_embeddings.append(adapter)
+        return adapter
+
+    # BM25 deliberately keeps the real embedding initializer with a missing API
+    # key, and no app Qdrant client: either accidental dependency would fail.
+    if mode != RetrievalMode.BM25:
+        monkeypatch.setattr(rag_dependencies, "get_embeddings", build_embeddings)
+    factory = rag_dependencies.get_retriever_strategy_factory(
+        request=request,
+        settings=settings,
+        bm25_factory=BM25RetrieverFactory(index=index),
+        section_index=AsyncMock(spec=SectionEvidenceIndex),
+    )
+    assert initialized_embeddings == []
+
+    documents = await factory.build(mode=mode, bula_id=bula_id, k=4).ainvoke(
+        "Indicações"
+    )
+
+    assert documents[0].page_content == "Trecho da bula."
+    assert documents[0].metadata["bula_id"] == str(bula_id)
+    if mode == RetrievalMode.DENSE:
+        index.search.assert_not_awaited()
+    else:
+        index.search.assert_awaited_once_with(
+            "Indicações",
+            k=8 if mode == RetrievalMode.HYBRID else 4,
+            bula_id=bula_id,
+            corpus=None,
+        )
+    if mode == RetrievalMode.BM25:
+        client.query_points.assert_not_awaited()
+        client.retrieve.assert_not_awaited()
+        assert initialized_embeddings == []
+    else:
+        assert len(initialized_embeddings) == 1
+        query_arguments = client.query_points.call_args.kwargs
+        assert query_arguments["query_filter"].must[0].match.value == str(bula_id)
+        assert query_arguments["limit"] == (24 if mode == RetrievalMode.HYBRID else 12)
+    if mode == RetrievalMode.HYBRID:
+        client.retrieve.assert_awaited_once()
+        assert documents[0].metadata["retrieval_sources"] == ["dense", "bm25"]
+        assert documents[0].metadata["score"] == pytest.approx(2 / 61)
+    else:
+        client.retrieve.assert_not_awaited()
 
 
 class FakeEmbeddings(LCEmbeddings):

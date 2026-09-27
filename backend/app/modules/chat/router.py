@@ -18,10 +18,7 @@ from app.modules.chat.service import (
     ChatSessionNotFoundError,
     DirectAskUnavailableError,
     QueryableBulaNotFoundError,
-    UnsupportedRetrievalModeError,
 )
-from app.modules.rag.chain import RAGChainFactory
-from app.modules.rag.dependencies import get_rag_chain_factory
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
@@ -52,7 +49,6 @@ async def ask_bula(
     bula_id: UUID,
     payload: AskRequest,
     current_user: User = Depends(get_current_user),
-    chain_factory: RAGChainFactory = Depends(get_rag_chain_factory),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> AskResponse:
     try:
@@ -60,10 +56,7 @@ async def ask_bula(
             bula_id=bula_id,
             payload=payload,
             user_id=cast(int, current_user.id),
-            chain_factory=chain_factory,
         )
-    except UnsupportedRetrievalModeError as exc:
-        raise _unsupported_retrieval_mode_http_exception() from exc
     except QueryableBulaNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -110,7 +103,6 @@ async def continue_session(
     session_id: UUID,
     payload: AskRequest,
     current_user: User = Depends(get_current_user),
-    chain_factory: RAGChainFactory = Depends(get_rag_chain_factory),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> AskResponse:
     try:
@@ -118,22 +110,9 @@ async def continue_session(
             session_id=session_id,
             payload=payload,
             user_id=cast(int, current_user.id),
-            chain_factory=chain_factory,
         )
     except ChatSessionNotFoundError as exc:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Chat session not found or no longer queryable.",
         ) from exc
-    except UnsupportedRetrievalModeError as exc:
-        raise _unsupported_retrieval_mode_http_exception() from exc
-
-
-def _unsupported_retrieval_mode_http_exception() -> HTTPException:
-    return HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail=(
-            "This retrieval mode is part of the API contract, "
-            "but has not yet been implemented in this MVP."
-        ),
-    )

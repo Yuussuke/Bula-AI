@@ -53,6 +53,19 @@ class PostgreSQLBM25Index:
             corpus=corpus,
         )
 
+    async def find_section_evidence(
+        self,
+        *,
+        bula_id: UUID,
+        section_titles: Sequence[str],
+        limit: int = 2,
+    ) -> list[ChunkMetadataInput]:
+        return await self.repository.find_section_evidence(
+            bula_id=bula_id,
+            section_titles=section_titles,
+            limit=limit,
+        )
+
     async def update_corpus(self, *, bula_id: UUID, corpus: BulaCorpus) -> None:
         await self.repository.update_corpus(bula_id=bula_id, corpus=corpus)
 

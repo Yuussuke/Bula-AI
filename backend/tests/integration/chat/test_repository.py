@@ -7,7 +7,8 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.auth.models import User
-from app.modules.chat.models import ChatMessage, ChatRole, RetrievalMode
+from app.modules.chat.models import ChatMessage, ChatRole
+from app.modules.rag.retrieval_mode import RetrievalMode
 from app.modules.chat.repository import ChatPersistenceError, ChatRepository
 
 

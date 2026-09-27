@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from collections.abc import Callable
 from typing import cast
+from uuid import UUID
 
 from langchain_core.documents import Document
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -11,6 +13,14 @@ from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.runnables import Runnable, RunnableLambda, RunnablePassthrough
+
+from app.modules.rag.retrieval_mode import RetrievalMode
+from app.modules.rag.retriever_factory import RetrieverStrategyFactory
+from app.modules.rag.section_evidence_retriever import (
+    is_contraindication_question,
+    is_contraindication_section,
+    is_direct_contraindication_question,
+)
 
 
 NO_CONTEXT_MESSAGE = (
@@ -21,6 +31,14 @@ CITATION_PATTERN = re.compile(r"\[(\d+)\]")
 CITATION_WITH_SPACING_PATTERN = re.compile(
     r"(?P<leading>[ \t]*)\[(?P<number>\d+)\](?P<trailing>[ \t]*)"
 )
+UNSUPPORTED_ALLERGY_ABSENCE_PATTERN = re.compile(
+    r"(?:bula|trechos?)[^.!?]{0,120}nao (?:informa|menciona|contem)"
+    r"[^.!?]{0,160}(?:alerg\w*|hipersensib\w*|penicilin\w*)"
+)
+UNSUPPORTED_BULA_ABSENCE_PATTERN = re.compile(
+    r"\ba bula nao (?:informa|menciona|contem)\b"
+)
+ALLERGY_EVIDENCE_PATTERN = re.compile(r"alerg\w*|hipersensib\w*|penicilin\w*")
 
 RAG_PROMPT = ChatPromptTemplate.from_messages(
     [
@@ -34,7 +52,12 @@ RAG_PROMPT = ChatPromptTemplate.from_messages(
                 "orientacoes que nao estejam no contexto. Cada trecho recuperado "
                 "tem um numero. Cite somente os trechos efetivamente usados pelo "
                 "numero exato, por exemplo: [1] ou [2]. Nao cite um trecho que nao "
-                "sustente a afirmacao. Os trechos "
+                "sustente a afirmacao. Diferencie contraindicacao de advertencia: "
+                "so diga que alguem nao pode usar o medicamento quando o texto "
+                "citado afirmar expressamente essa restricao. Uma orientacao para "
+                "informar o medico sobre alergia ou para avaliar o caso exige "
+                "cautela, mas nao equivale por si so a uma contraindicacao. "
+                "Se ambas aparecerem, apresente-as separadamente. Os trechos "
                 "recuperados nao representam necessariamente a bula inteira. "
                 "Nunca conclua que uma informacao nao existe na bula apenas porque "
                 "ela nao aparece nesses trechos. Se o contexto nao for suficiente, "
@@ -59,23 +82,24 @@ class RAGChainFactory:
     def __init__(
         self,
         *,
-        dense_retriever_builder: Callable[[str], BaseRetriever],
+        retriever_factory: RetrieverStrategyFactory,
         llm_builder: Callable[[], BaseChatModel],
     ) -> None:
-        self.dense_retriever_builder = dense_retriever_builder
+        self.retriever_factory = retriever_factory
         self.llm_builder = llm_builder
 
-    def build_dense_chain(
+    def build_chain(
         self,
         *,
-        bula_id: str,
+        bula_id: UUID,
+        mode: RetrievalMode,
     ) -> Runnable[dict[str, object], dict[str, object]]:
-        retriever = self.dense_retriever_builder(bula_id)
+        retriever = self.retriever_factory.build(bula_id=bula_id, mode=mode)
         llm = self.llm_builder()
-        return build_dense_rag_chain(retriever=retriever, llm=llm)
+        return build_rag_chain(retriever=retriever, llm=llm)
 
 
-def build_dense_rag_chain(
+def build_rag_chain(
     *,
     retriever: BaseRetriever,
     llm: BaseChatModel,
@@ -85,8 +109,8 @@ def build_dense_rag_chain(
         RunnableLambda(_build_prompt_input) | RAG_PROMPT | llm | StrOutputParser()
     )
     chain = RunnablePassthrough.assign(documents=retrieve_documents).assign(
-        answer=answer_chain
-    ) | RunnableLambda(_build_chain_output)
+        documents=RunnableLambda(_select_answer_documents)
+    ).assign(answer=answer_chain) | RunnableLambda(_build_chain_output)
     return cast(Runnable[dict[str, object], dict[str, object]], chain)
 
 
@@ -125,19 +149,15 @@ def build_source_chunks(documents: list[Document]) -> list[dict[str, object]]:
 
 def _build_retrieval_query(inputs: dict[str, object]) -> str:
     question = str(inputs["question"]).strip()
-    drug_name = str(inputs.get("drug_name", "")).strip()
     chat_history = cast(list[BaseMessage], inputs.get("chat_history", []))
-
-    query_parts: list[str] = []
-    if drug_name:
-        query_parts.append(f"Medicamento: {drug_name}.")
 
     previous_user_question = _get_previous_user_question(chat_history)
     if previous_user_question and _looks_like_follow_up(question):
-        query_parts.append(f"Pergunta anterior: {previous_user_question}")
+        return f"{previous_user_question} {question}"
 
-    query_parts.append(f"Pergunta atual: {question}")
-    return " ".join(query_parts)
+    # The retriever is already scoped to the selected bula. Repeating its name
+    # biases lexical ranking toward chunks with many mentions of that name.
+    return question
 
 
 def _get_previous_user_question(chat_history: list[BaseMessage]) -> str | None:
@@ -180,9 +200,26 @@ def _build_prompt_input(inputs: dict[str, object]) -> dict[str, object]:
     }
 
 
+def _select_answer_documents(inputs: dict[str, object]) -> list[Document]:
+    documents = cast(list[Document], inputs["documents"])
+    question = str(inputs["question"])
+    if not is_direct_contraindication_question(question):
+        return documents
+
+    contraindication_documents = [
+        document
+        for document in documents
+        if is_contraindication_section(str(document.metadata.get("section_title", "")))
+    ]
+    return contraindication_documents or documents
+
+
 def _build_chain_output(inputs: dict[str, object]) -> dict[str, object]:
     documents = cast(list[Document], inputs["documents"])
     answer = str(inputs["answer"]).strip()
+    answer = _correct_unsupported_allergy_absence(
+        question=str(inputs["question"]), answer=answer, documents=documents
+    )
     normalized_answer, cited_documents = _select_cited_documents(
         answer=answer,
         documents=documents,
@@ -191,6 +228,48 @@ def _build_chain_output(inputs: dict[str, object]) -> dict[str, object]:
         "answer": normalized_answer,
         "source_chunks": build_source_chunks(cited_documents),
     }
+
+
+def _correct_unsupported_allergy_absence(
+    *, question: str, answer: str, documents: list[Document]
+) -> str:
+    """Use exact source wording if an answer denies allergy evidence we found."""
+    if not is_contraindication_question(question):
+        return answer
+
+    normalized_answer = _without_accents(answer)
+    if UNSUPPORTED_ALLERGY_ABSENCE_PATTERN.search(normalized_answer):
+        for index, document in enumerate(documents, start=1):
+            section_title = str(document.metadata.get("section_title", ""))
+            if not is_contraindication_section(section_title):
+                continue
+
+            body = re.sub(
+                r"(?m)^[ \t]{0,3}#{1,6}[ \t]+[^\r\n]*$", "", document.page_content
+            )
+            for sentence in re.split(r"(?<=[.!?])\s+", body.strip()):
+                if ALLERGY_EVIDENCE_PATTERN.search(_without_accents(sentence)):
+                    return (
+                        f'A seção "{section_title}" da bula informa: "{sentence.strip()}" '
+                        f"[{index}]. Confira esse trecho e consulte um profissional "
+                        "de saúde para avaliar o seu caso."
+                    )
+
+    if UNSUPPORTED_BULA_ABSENCE_PATTERN.search(normalized_answer):
+        return (
+            "Os trechos recuperados não permitem confirmar que essa informação "
+            "esteja ausente da bula. Consulte a bula completa ou um profissional "
+            "de saúde para avaliar o seu caso."
+        )
+
+    return answer
+
+
+def _without_accents(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value.casefold())
+    return "".join(
+        character for character in normalized if not unicodedata.combining(character)
+    )
 
 
 def _select_cited_documents(

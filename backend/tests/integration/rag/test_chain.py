@@ -1,4 +1,5 @@
 from typing import Any
+from uuid import UUID
 
 import pytest
 from langchain_core.callbacks import (
@@ -15,10 +16,44 @@ from langchain_core.retrievers import BaseRetriever
 from pydantic import ConfigDict, Field
 
 from app.modules.rag.chain import (
-    build_dense_rag_chain,
+    RAGChainFactory,
+    build_rag_chain,
     build_source_chunks,
     format_documents,
 )
+from app.modules.rag.retrieval_mode import RetrievalMode
+from app.modules.rag.retriever_factory import RetrieverStrategyFactory
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("mode", list(RetrievalMode))
+async def test_swapping_llm_keeps_selected_retriever_and_sources(
+    mode: RetrievalMode,
+) -> None:
+    selected_retriever = FakeRetriever(documents=[build_document()])
+
+    def build_selected(*, bula_id: UUID, k: int) -> BaseRetriever:
+        return selected_retriever
+
+    def build_unselected(*, bula_id: UUID, k: int) -> BaseRetriever:
+        raise AssertionError("An unrelated retriever was constructed.")
+
+    builders = {strategy: build_unselected for strategy in RetrievalMode}
+    builders[mode] = build_selected
+    factory = RetrieverStrategyFactory(builders=builders)
+    results = []
+    for response in ("Primeiro modelo [1].", "Segundo modelo [1]."):
+        llm = FakeChatModel(response=response)
+        chain_factory = RAGChainFactory(
+            retriever_factory=factory, llm_builder=lambda: llm
+        )
+        chain = chain_factory.build_chain(bula_id=UUID(int=1), mode=mode)
+        result = await chain.ainvoke({"question": "Como usar?"})
+        assert result["answer"] == response
+        results.append(result)
+
+    assert results[0]["source_chunks"] == results[1]["source_chunks"]
+    assert selected_retriever.queries == ["Como usar?"] * 2
 
 
 class FakeRetriever(BaseRetriever):
@@ -122,7 +157,7 @@ def test_build_source_chunks_maps_relevance_score() -> None:
 @pytest.mark.anyio
 async def test_chain_with_mock_llm_produces_output() -> None:
     retriever = FakeRetriever(documents=[build_document()])
-    chain = build_dense_rag_chain(
+    chain = build_rag_chain(
         retriever=retriever,
         llm=FakeChatModel(response="Tome conforme indicado no trecho [1]."),
     )
@@ -142,9 +177,7 @@ async def test_chain_with_mock_llm_produces_output() -> None:
             "relevance_score": 0.95,
         }
     ]
-    assert retriever.queries == [
-        "Medicamento: Dipirona. Pergunta atual: Como devo tomar?"
-    ]
+    assert retriever.queries == ["Como devo tomar?"]
 
 
 @pytest.mark.anyio
@@ -159,7 +192,7 @@ async def test_chain_returns_only_cited_documents_and_renumbers_sources() -> Non
             ),
         ]
     )
-    chain = build_dense_rag_chain(
+    chain = build_rag_chain(
         retriever=retriever,
         llm=FakeChatModel(
             response="Consulte seu medico conforme o trecho [2]. Releia [2]."
@@ -184,11 +217,114 @@ async def test_chain_returns_only_cited_documents_and_renumbers_sources() -> Non
 
 
 @pytest.mark.anyio
+async def test_chain_corrects_false_claim_that_bula_has_no_allergy_information() -> (
+    None
+):
+    contraindication = build_document(
+        section_title="QUANDO NÃO DEVO USAR ESTE MEDICAMENTO?",
+        content=(
+            "## QUANDO NÃO DEVO USAR ESTE MEDICAMENTO?\n"
+            "A amoxicilina é contraindicada para pessoas com alergia "
+            "a penicilinas."
+        ),
+    )
+    chain = build_rag_chain(
+        retriever=FakeRetriever(documents=[contraindication]),
+        llm=FakeChatModel(
+            response=(
+                "A bula não informa explicitamente sobre alergia a penicilinas, "
+                "e essa informação não está presente nos trechos recuperados."
+            )
+        ),
+    )
+
+    result = await chain.ainvoke({"question": "Quem não pode usar este medicamento?"})
+
+    assert "é contraindicada para pessoas com alergia a penicilinas" in result["answer"]
+    assert "não informa" not in result["answer"]
+    assert "[1]" in result["answer"]
+    assert result["source_chunks"][0]["chunk_text"] == contraindication.page_content
+
+
+@pytest.mark.anyio
+async def test_chain_does_not_claim_bula_is_silent_when_context_is_incomplete() -> None:
+    chain = build_rag_chain(
+        retriever=FakeRetriever(
+            documents=[
+                build_document(
+                    section_title="Advertências",
+                    content="Informe seu médico sobre outras doenças.",
+                )
+            ]
+        ),
+        llm=FakeChatModel(response="A bula não informa sobre alergias."),
+    )
+
+    result = await chain.ainvoke(
+        {"question": "Tenho alergia a penicilinas. Posso usar?"}
+    )
+
+    assert "não permitem confirmar" in result["answer"]
+    assert result["source_chunks"] == []
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "question",
+    ["Quem não pode usar este medicamento?", "Quais são as contraindicações?"],
+)
+async def test_direct_contraindication_question_uses_only_explicit_restrictions(
+    question: str,
+) -> None:
+    contraindication = build_document(
+        section_title="QUANDO NÃO DEVO USAR ESTE MEDICAMENTO?",
+        content="É contraindicado para pessoas com alergia a penicilinas.",
+    )
+    warning = build_document(
+        section_title="O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO?",
+        content="Informe o médico se já teve alergia a cefalosporinas.",
+    )
+    llm = FakeChatModel(response="Pessoas com alergia a penicilinas [1].")
+    chain = build_rag_chain(
+        retriever=FakeRetriever(documents=[warning, contraindication]), llm=llm
+    )
+
+    result = await chain.ainvoke({"question": question})
+
+    prompt_text = str(llm.received_messages[-1].content)
+    assert "alergia a penicilinas" in prompt_text
+    assert "cefalosporinas" not in prompt_text
+    assert result["source_chunks"][0]["chunk_text"] == contraindication.page_content
+
+
+@pytest.mark.anyio
+async def test_specific_allergy_question_keeps_warning_and_contraindication() -> None:
+    contraindication = build_document(
+        section_title="QUANDO NÃO DEVO USAR ESTE MEDICAMENTO?",
+        content="É contraindicado para pessoas com alergia a penicilinas.",
+    )
+    warning = build_document(
+        section_title="O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO?",
+        content="Informe o médico se já teve alergia a cefalosporinas.",
+    )
+    llm = FakeChatModel(response="Consulte o médico [1] e observe a bula [2].")
+    chain = build_rag_chain(
+        retriever=FakeRetriever(documents=[warning, contraindication]), llm=llm
+    )
+
+    await chain.ainvoke({"question": "Tenho alergia a cefalosporinas. Posso usar?"})
+
+    prompt_text = str(llm.received_messages[-1].content)
+    assert "alergia a penicilinas" in prompt_text
+    assert "alergia a cefalosporinas" in prompt_text
+
+
+@pytest.mark.anyio
 @pytest.mark.parametrize("invalid_citation", ["[0]", "[99]"])
 async def test_chain_removes_invalid_citations_without_dropping_valid_sources(
     invalid_citation: str,
 ) -> None:
-    chain = build_dense_rag_chain(
+    chain = build_rag_chain(
         retriever=FakeRetriever(documents=[build_document()]),
         llm=FakeChatModel(
             response=(
@@ -233,7 +369,7 @@ async def test_chain_numbers_cited_sources_by_relevance_not_mention_order() -> N
             ),
         ]
     )
-    chain = build_dense_rag_chain(
+    chain = build_rag_chain(
         retriever=retriever,
         llm=FakeChatModel(response="Complemento [2]. Evidencia principal [1]."),
     )
@@ -253,7 +389,7 @@ async def test_chain_numbers_cited_sources_by_relevance_not_mention_order() -> N
 
 @pytest.mark.anyio
 async def test_chain_returns_no_sources_when_answer_does_not_cite_context() -> None:
-    chain = build_dense_rag_chain(
+    chain = build_rag_chain(
         retriever=FakeRetriever(documents=[build_document()]),
         llm=FakeChatModel(response="Os trechos recuperados nao sao suficientes."),
     )
@@ -272,7 +408,7 @@ async def test_chain_returns_no_sources_when_answer_does_not_cite_context() -> N
 async def test_chain_includes_prior_messages_before_current_question() -> None:
     chat_model = FakeChatModel(response="Resposta contextual.")
     retriever = FakeRetriever(documents=[build_document()])
-    chain = build_dense_rag_chain(
+    chain = build_rag_chain(
         retriever=retriever,
         llm=chat_model,
     )
@@ -293,11 +429,10 @@ async def test_chain_includes_prior_messages_before_current_question() -> None:
         "Use conforme a secao [Posologia].",
     ]
     assert "E para criancas?" in str(chat_model.received_messages[-1].content)
-    assert retriever.queries == [
-        "Medicamento: Dipirona. "
-        "Pergunta anterior: Como devo usar este medicamento? "
-        "Pergunta atual: E para criancas?"
-    ]
+    assert retriever.queries == ["Como devo usar este medicamento? E para criancas?"]
     assert "Nunca conclua que uma informacao nao existe na bula" in str(
+        chat_model.received_messages[0].content
+    )
+    assert "Diferencie contraindicacao de advertencia" in str(
         chat_model.received_messages[0].content
     )

@@ -124,6 +124,36 @@ async def test_real_bm25_portuguese_accents_stemming_and_nonmatches(
 
 
 @pytest.mark.anyio
+async def test_section_evidence_reads_only_body_chunks_from_selected_bula(
+    bm25_context: BM25Context,
+) -> None:
+    index, _, bulas = bm25_context
+    selected_bula, other_bula = bulas[:2]
+    section_title = "QUANDO NÃO DEVO USAR ESTE MEDICAMENTO?"
+    contraindication = make_chunk(
+        selected_bula,
+        "A amoxicilina é contraindicada para pessoas com alergia a penicilinas.",
+        "contraindication",
+    ).model_copy(update={"section_title": section_title})
+    heading_only = make_chunk(
+        selected_bula, "## QUANDO NÃO DEVO USAR ESTE MEDICAMENTO?", "heading"
+    ).model_copy(update={"section_title": section_title})
+    other = make_chunk(
+        other_bula, "Outra bula contém informações diferentes.", "other"
+    ).model_copy(update={"section_title": section_title})
+    await index.upsert_chunks([contraindication, heading_only, other])
+
+    results = await index.find_section_evidence(
+        bula_id=selected_bula.id,
+        section_titles=[section_title],
+        limit=2,
+    )
+
+    assert [result.chunk_id for result in results] == [contraindication.chunk_id]
+    assert "alergia a penicilinas" in results[0].chunk_text
+
+
+@pytest.mark.anyio
 async def test_filtered_top_k_and_corpus_isolation(bm25_context: BM25Context) -> None:
     index, _, bulas = bm25_context
     unique_term = f"seletor{uuid4().hex}"
