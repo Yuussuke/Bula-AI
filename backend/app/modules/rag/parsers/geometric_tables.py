@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
-import html
 import re
 from typing import Any
 import unicodedata
@@ -42,7 +41,7 @@ class GeometricTable:
     column_count: int
     cells: tuple[TableCell, ...]
 
-    def to_markdown(self) -> str:
+    def to_markdown(self, *, is_continuation: bool = False) -> str:
         """Expand proven spans, not empty cells, into a rectangular view.
 
         The typed cells retain original spans. Repeated values in this view are
@@ -51,13 +50,12 @@ class GeometricTable:
         """
         rows = [[""] * self.column_count for _ in range(self.row_count)]
         for cell in self.cells:
-            value = html.escape(cell.text, quote=False).replace("|", "&#124;")
-            value = value.replace("\n", "<br>")
+            value = re.sub(r"\s*\n\s*", " ", cell.text).replace("|", "&#124;")
             for row in range(cell.row_start, cell.row_end):
                 for column in range(cell.column_start, cell.column_end):
                     rows[row][column] = value
         captions: list[str] = []
-        while len(rows) > 1:
+        while not is_continuation and len(rows) > 1:
             row_index = len(captions)
             caption = next(
                 (
@@ -73,10 +71,11 @@ class GeometricTable:
             if caption is None:
                 break
             captions.append(rows.pop(0)[0])
-        header = "| " + " | ".join(rows[0]) + " |"
+        rendered_rows = ["| " + " | ".join(row) + " |" for row in rows]
+        if is_continuation:
+            return "\n".join(rendered_rows)
         separator = "| " + " | ".join(["---"] * self.column_count) + " |"
-        body = ["| " + " | ".join(row) + " |" for row in rows[1:]]
-        return "\n".join([*captions, header, separator, *body])
+        return "\n".join([*captions, rendered_rows[0], separator, *rendered_rows[1:]])
 
 
 class GeometricTableExtractor:
@@ -191,10 +190,24 @@ class GeometricTableIntegrator:
         diagnostics: list[dict[str, object]] = []
         repaired_count = 0
         native_only_count = 0
+        previous_page_table: GeometricTable | None = None
+        previous_page_height = 0.0
         for chunk in page_chunks:
             page_number = chunk["metadata"]["page_number"]
             page = document[page_number - 1]
             tables = self.extractor.extract(page)
+            continuation_table: GeometricTable | None = None
+            if (
+                previous_page_table is not None
+                and tables
+                and self._is_multipage_continuation(
+                    previous=previous_page_table,
+                    current=tables[0],
+                    previous_page_height=previous_page_height,
+                    current_page_height=float(page.rect.height),
+                )
+            ):
+                continuation_table = tables[0]
             boxes = [
                 box for box in chunk.get("page_boxes", []) if box["class"] == "table"
             ]
@@ -252,7 +265,9 @@ class GeometricTableIntegrator:
                     max(candidate["bbox"][2] for candidate in related_boxes),
                     max(candidate["bbox"][3] for candidate in related_boxes),
                 )
-                replacement = self._render_region(page, region_bounds, selected)
+                replacement = self._render_region(
+                    page, region_bounds, selected, continuation_table
+                )
                 replacements.append((start, end, replacement + "\n\n"))
                 for table in selected:
                     diagnostics.append(
@@ -279,6 +294,8 @@ class GeometricTableIntegrator:
                 chunk["text"] = (
                     chunk["text"][:start] + replacement + chunk["text"][end:]
                 )
+            previous_page_table = tables[-1] if tables else None
+            previous_page_height = float(page.rect.height)
         return {
             "geometric_table_count": repaired_count,
             "native_only_table_count": native_only_count,
@@ -296,8 +313,47 @@ class GeometricTableIntegrator:
         )
         return bool(area > 0 and width * height / area >= 0.75)
 
+    def _is_multipage_continuation(
+        self,
+        *,
+        previous: GeometricTable,
+        current: GeometricTable,
+        previous_page_height: float,
+        current_page_height: float,
+    ) -> bool:
+        if current.page_number != previous.page_number + 1:
+            return False
+        if current.column_count != previous.column_count:
+            return False
+        if previous.bounds[3] < previous_page_height * 0.60:
+            return False
+        if current.bounds[1] > current_page_height * 0.15:
+            return False
+        previous_edges = sorted(
+            {
+                edge
+                for cell in previous.cells
+                for edge in (cell.bounds[0], cell.bounds[2])
+            }
+        )
+        current_edges = sorted(
+            {
+                edge
+                for cell in current.cells
+                for edge in (cell.bounds[0], cell.bounds[2])
+            }
+        )
+        return len(previous_edges) == len(current_edges) and all(
+            abs(before - after) <= 2
+            for before, after in zip(previous_edges, current_edges, strict=True)
+        )
+
     def _render_region(
-        self, page: Any, bounds: Any, tables: list[GeometricTable]
+        self,
+        page: Any,
+        bounds: Any,
+        tables: list[GeometricTable],
+        continuation_table: GeometricTable | None,
     ) -> str:
         words = page.get_text("words")
         region_bounds: Bounds = (
@@ -321,7 +377,11 @@ class GeometricTableIntegrator:
         if self._characters(accounted_text) != self._characters(source_text):
             raise TableStructureError("region_text_mismatch", page.number + 1)
         items: list[tuple[float, str]] = [
-            (table.bounds[1], table.to_markdown()) for table in tables
+            (
+                table.bounds[1],
+                table.to_markdown(is_continuation=table is continuation_table),
+            )
+            for table in tables
         ]
         # Native boxes sometimes include section titles above/between tables.
         # Reinsert those physical lines in reading order, not into table cells.

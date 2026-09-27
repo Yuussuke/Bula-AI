@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
+import html
 from pathlib import Path
+import re
 
 import pytest
 from sacrebleu import corpus_bleu
@@ -62,7 +64,8 @@ async def test_bula_parser_matches_golden_markdown(fixture: GoldenFixture) -> No
     if fixture.name == "dipirona_sanofi_medley_solucao_oral":
         assert_dipirona_native_markdown_contract(result)
 
-    hypothesis_markdown = result.markdown.strip()
+    hypothesis_markdown = normalize_comparison_markup(result.markdown)
+    reference_markdown = normalize_comparison_markup(reference_markdown)
     bleu_score = corpus_bleu(
         [hypothesis_markdown],
         [[reference_markdown]],
@@ -149,8 +152,9 @@ def assert_dipirona_native_markdown_contract(result: object) -> None:
 
 
 def multiset_token_f1(*, hypothesis: str, reference: str) -> float:
-    hypothesis_tokens = hypothesis.split()
-    reference_tokens = reference.split()
+    # Measure lexical preservation independently of Markdown/HTML punctuation.
+    hypothesis_tokens = re.findall(r"\w+", hypothesis.casefold())
+    reference_tokens = re.findall(r"\w+", reference.casefold())
 
     if not hypothesis_tokens and not reference_tokens:
         return 1.0
@@ -172,3 +176,9 @@ def multiset_token_f1(*, hypothesis: str, reference: str) -> float:
         return 0.0
 
     return 2 * precision * recall / (precision + recall)
+
+
+def normalize_comparison_markup(markdown: str) -> str:
+    """Compare source words, not an older converter's HTML line-break spelling."""
+    text = html.unescape(markdown)
+    return re.sub(r"\\?<br\s*/?>", " ", text, flags=re.IGNORECASE).strip()

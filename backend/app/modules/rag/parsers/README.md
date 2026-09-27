@@ -83,7 +83,17 @@ The native path now complements PyMuPDF4LLM with ruled-table geometry. It uses
 page boxes and source offsets to replace affected regions, preserves dynamic
 cell grids, and rejects known ambiguous structure instead of flattening it via
 fallback. `native_only_table_count` identifies tables still handled by the native
-converter without geometric verification. Multi-page joining is not automatic.
+converter without geometric verification. Consecutive ruled tables are joined
+only when their column edges, page adjacency, and top/bottom placement support
+one continuing table. Continuation pages contribute data rows, not new headers.
+Physical cell spans are expanded within each page; ambiguous cross-page empty
+cells are not filled with guessed values.
+
+The parser also checks physical bullet markers before accepting native Markdown
+list items, joins continuous prose across page boundaries, keeps numeric section
+labels, and extracts complete compound strengths. Cell-internal line breaks are
+rendered as spaces so RAG text does not inherit HTML `<br>` artifacts. These
+structural changes are recorded as parser version `native_markdown_tables_v3`.
 
 See [the decision and local benchmark](../../../../../docs/decisions/2026-09-21-geometric-table-preservation.md)
 for limitations, tests and rollout. Existing indexed chunks are not changed by

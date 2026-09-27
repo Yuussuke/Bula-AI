@@ -274,7 +274,7 @@ def test_section_detector_detects_standard_numbered_and_visual_sections() -> Non
 
     assert [section.title for section in detected_sections] == [
         "COMPOSICAO",
-        "Como devo usar este medicamento?",
+        "1. Como devo usar este medicamento?",
         "CUIDADOS IMPORTANTES",
     ]
     assert [section.level for section in detected_sections] == [2, 2, 3]
@@ -446,8 +446,8 @@ def test_section_detector_keeps_real_patient_question_headers() -> None:
     detected_sections = detector.detect(lines)
 
     assert [section.title for section in detected_sections] == [
-        "O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO?",
-        "QUAIS OS MALES QUE ESTE MEDICAMENTO PODE ME CAUSAR?",
+        "4. O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO?",
+        "8. QUAIS OS MALES QUE ESTE MEDICAMENTO PODE ME CAUSAR?",
         "COMPOSIÇÃO:",
     ]
     assert [section.level for section in detected_sections] == [2, 2, 2]
@@ -489,7 +489,7 @@ def test_section_detector_promotes_bold_internal_subheadings() -> None:
     detected_sections = detector.detect(lines)
 
     assert [section.title for section in detected_sections] == [
-        "ADVERTÊNCIAS E PRECAUÇÕES",
+        "5. ADVERTÊNCIAS E PRECAUÇÕES",
         "Agranulocitose:",
         "Gravidez",
     ]

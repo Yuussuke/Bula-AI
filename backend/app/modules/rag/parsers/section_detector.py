@@ -316,23 +316,25 @@ class SectionDetector:
         standard_section = self._match_standard_section(clean_line)
         if standard_section is not None:
             return SectionCandidate(
-                title=strip_leading_numbering(clean_line),
+                title=clean_line,
                 canonical_title=standard_section.canonical_title,
                 level=2,
             )
 
         is_numbered_heading = has_heading_numbering(clean_line)
         if is_numbered_heading:
-            heading_title = strip_leading_numbering(clean_line)
+            heading_title = clean_line
             if self._is_cross_reference_or_quoted_fragment(
-                heading_title
-            ) or self._looks_like_numbered_body_item(heading_title):
+                strip_leading_numbering(heading_title)
+            ) or self._looks_like_numbered_body_item(
+                strip_leading_numbering(heading_title)
+            ):
                 return None
 
             return SectionCandidate(
                 title=heading_title,
                 canonical_title=heading_title,
-                level=3,
+                level=2 if re.match(r"^\d{1,2}\.\s", clean_line) else 3,
             )
 
         is_visual_heading = self._is_visual_heading(

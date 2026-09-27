@@ -4,6 +4,7 @@ import pytest
 
 from scripts.benchmark_semantic_chunking import (
     FOCUSED_SECTION_SPECS,
+    FocusedSectionSpec,
     _find_focused_section,
     _validate_inputs,
     critical_content_preservation,
@@ -42,6 +43,22 @@ def test_six_focused_benchmark_sections_exist_in_regression_markdown() -> None:
         ("amoxicilina", "dosage"),
         ("amoxicilina", "adverse_effects"),
     }
+
+
+def test_benchmark_matches_numbered_heading_without_changing_source() -> None:
+    section = _find_focused_section(
+        spec=FocusedSectionSpec(
+            document="dipirona",
+            label="contraindications",
+            heading_aliases=("CONTRAINDICACOES",),
+        ),
+        available_sections=[
+            ("4. CONTRAINDICAÇÕES", "## 4. CONTRAINDICAÇÕES\nTexto da bula.")
+        ],
+    )
+
+    assert section.heading == "4. CONTRAINDICAÇÕES"
+    assert section.text == "## 4. CONTRAINDICAÇÕES\nTexto da bula."
 
 
 def test_source_coverage_allows_repeated_table_header_without_omission() -> None:
