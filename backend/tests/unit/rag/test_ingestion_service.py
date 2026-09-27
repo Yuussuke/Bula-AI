@@ -179,9 +179,7 @@ class FakeQdrantStore:
         ]
         return len(points)
 
-    async def replace_bula_points(
-        self, *, bula_id: str, points: list[object]
-    ) -> int:
+    async def replace_bula_points(self, *, bula_id: str, points: list[object]) -> int:
         assert bula_id == str(BULA_ID)
         return await self.upsert_points(points)
 
@@ -636,7 +634,9 @@ async def test_reprocess_ready_system_bula_requires_new_publication_review() -> 
 
 
 @pytest.mark.anyio
-async def test_reprocessing_rejects_source_mismatch_before_changing_publication() -> None:
+async def test_reprocessing_rejects_source_mismatch_before_changing_publication() -> (
+    None
+):
     bula = build_bula(status=BulaStatus.READY)
     bula.corpus = BulaCorpus.SYSTEM
     publication = SystemBulaPublication(

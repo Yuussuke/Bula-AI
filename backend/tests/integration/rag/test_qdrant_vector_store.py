@@ -205,12 +205,18 @@ async def test_replace_bula_points_removes_only_obsolete_points(
         for chunk_id in ("test-chunk-0", "test-chunk-new")
     ]
 
-    assert await vector_store.replace_bula_points(
-        bula_id="test-bula", points=replacement_points
-    ) == 2
-    assert await vector_store.replace_bula_points(
-        bula_id="test-bula", points=replacement_points
-    ) == 2
+    assert (
+        await vector_store.replace_bula_points(
+            bula_id="test-bula", points=replacement_points
+        )
+        == 2
+    )
+    assert (
+        await vector_store.replace_bula_points(
+            bula_id="test-bula", points=replacement_points
+        )
+        == 2
+    )
 
     current_points = await vector_store.list_points_for_bula(bula_id="test-bula")
     other_points = await vector_store.list_points_for_bula(bula_id="other-bula")
