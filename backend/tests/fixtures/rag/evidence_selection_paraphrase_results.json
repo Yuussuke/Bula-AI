@@ -1,0 +1,1281 @@
+{
+  "purpose": "auxiliary_paraphrase_robustness_12_scenarios_not_24_independent_cases",
+  "started_at": "2026-09-30T02:20:38.925858+00:00",
+  "completed_at": "2026-09-30T02:20:56.362208+00:00",
+  "fixtures_sha256": "c32832b346e86c649d360e34e3a8d77313df7ee6d6c27b50175971e87300fe16",
+  "prompt_sha256": "60041f2820b2dd80d6dbe4ca554862039544c00f0a0b87ab85897ca643238850",
+  "schema_sha256": "2d764ffb05bda932361cba39c04e3ffe87f530b1de7a7774841956e1ff04f2af",
+  "paraphrases_sha256": "47971636c6a44da19aee4d5dfd4e7dc46a09e1f2e11dbb3475e1457e722ed77e",
+  "comparison_baseline_sha256": "04d524ca53c7370661fda03049c487dfaae8d4d889e1ca18d855f86e59d0635f",
+  "requested_model": "sabia-4",
+  "temperature": 0.2,
+  "execution_order": "One original/paraphrase pair per case. Original first for odd-numbered cases, paraphrase first for even-numbered cases. Unit order unchanged.",
+  "annotations_not_sent_to_model": [
+    {
+      "case_id": "regression_indication_scope",
+      "original_question": "Esse antibiótico trata virose, certo?",
+      "paraphrase": "Esse antibiótico serve para tratar virose, não é?",
+      "review": "Preserva o tratamento de virose e o pedido de confirmação; não introduz bactérias ou a resposta esperada."
+    },
+    {
+      "case_id": "regression_age_with_renal_table",
+      "original_question": "Uma criança de 5 anos pode usar estes comprimidos?",
+      "paraphrase": "Estes comprimidos podem ser usados por uma criança de 5 anos?",
+      "review": "Preserva idade, apresentação e possibilidade de uso; não adiciona condição renal nem limite etário."
+    },
+    {
+      "case_id": "regression_absence_not_safety",
+      "original_question": "Se diabetes não foi citado, isso comprova que é seguro para diabéticos?",
+      "paraphrase": "O fato de não terem mencionado diabetes prova que é seguro para quem tem diabetes?",
+      "review": "Preserva a inferência proposta de ausência de menção para comprovação de segurança e a população."
+    },
+    {
+      "case_id": "regression_express_use_condition",
+      "original_question": "Estou no segundo trimestre da gravidez. Então está liberado usar?",
+      "paraphrase": "Minha gravidez está no segundo trimestre. Isso significa que posso usar?",
+      "review": "Preserva o segundo trimestre e a inferência de permissão individual; não acrescenta avaliação médica."
+    },
+    {
+      "case_id": "general_storage_direct",
+      "original_question": "Como este documento orienta conservar o produto?",
+      "paraphrase": "Segundo este documento, como devo guardar o produto?",
+      "review": "Preserva a consulta documental sobre conservação, sem especificar condições ausentes da pergunta."
+    },
+    {
+      "case_id": "general_administration_route",
+      "original_question": "Qual é a via de administração informada?",
+      "paraphrase": "Que via de administração é indicada no texto?",
+      "review": "Preserva a identificação da via documentada; não sugere nenhuma via."
+    },
+    {
+      "case_id": "general_storage_two_facts",
+      "original_question": "Quais são as condições de conservação e o prazo de uso após a abertura?",
+      "paraphrase": "Como devo conservar o produto e por quanto tempo posso usá-lo depois de aberto?",
+      "review": "Preserva ambas as informações solicitadas: condições de conservação e prazo após abertura."
+    },
+    {
+      "case_id": "general_route_and_meal",
+      "original_question": "Qual é a via de uso e quando devo usar em relação às refeições, segundo o documento?",
+      "paraphrase": "Segundo o documento, por qual via devo usar o produto e em que momento em relação às refeições?",
+      "review": "Preserva as duas relações perguntadas e a referência documental; não antecipa via ou horário."
+    },
+    {
+      "case_id": "general_presentation_scope_contrast",
+      "original_question": "Esta apresentação é para aplicação na pele?",
+      "paraphrase": "Esta apresentação foi feita para ser aplicada na pele?",
+      "review": "Preserva a finalidade de aplicação cutânea desta apresentação, sem sugerir via alternativa."
+    },
+    {
+      "case_id": "general_explicit_package_condition",
+      "original_question": "O documento permite utilizar o produto com a embalagem danificada?",
+      "paraphrase": "Segundo o documento, pode usar o produto se a embalagem estiver danificada?",
+      "review": "Preserva a condição de embalagem danificada e a permissão documental de uso."
+    },
+    {
+      "case_id": "general_unmentioned_population",
+      "original_question": "O documento traz orientação específica para pessoas do grupo Y?",
+      "paraphrase": "Há neste documento alguma orientação específica para quem faz parte do grupo Y?",
+      "review": "Preserva a população Y e a existência de orientação específica, sem substituir por grupo X."
+    },
+    {
+      "case_id": "general_unmentioned_interaction",
+      "original_question": "O documento informa se posso combinar este produto com o medicamento B?",
+      "paraphrase": "Neste documento há informação sobre se posso usar este produto junto com o medicamento B?",
+      "review": "Preserva a combinação com B e a pergunta documental de possibilidade, sem substituir a substância."
+    }
+  ],
+  "unit_order_by_case": {
+    "regression_indication_scope": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "regression_age_with_renal_table": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "E7",
+      "E8",
+      "E9",
+      "E10",
+      "E11",
+      "E12",
+      "E13",
+      "E14",
+      "E15"
+    ],
+    "regression_absence_not_safety": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ],
+    "regression_express_use_condition": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E6"
+    ],
+    "general_storage_direct": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "general_administration_route": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "general_storage_two_facts": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ],
+    "general_route_and_meal": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ],
+    "general_presentation_scope_contrast": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "general_explicit_package_condition": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "general_unmentioned_population": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "general_unmentioned_interaction": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "calls": [
+    {
+      "case_id": "regression_indication_scope",
+      "category": "regression",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 1316.083,
+      "observed_model": "sabia-4",
+      "sequence": 1,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": "scope",
+      "has_decoded_limitation": true,
+      "input_tokens": 781,
+      "output_tokens": 29,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_indication_scope",
+      "category": "regression",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 680.567,
+      "observed_model": "sabia-4",
+      "sequence": 2,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": "scope",
+      "has_decoded_limitation": true,
+      "input_tokens": 785,
+      "output_tokens": 29,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_age_with_renal_table",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [
+          "E2"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 961.516,
+      "observed_model": "sabia-4",
+      "sequence": 3,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 1631,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_age_with_renal_table",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [
+          "E2"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 651.277,
+      "observed_model": "sabia-4",
+      "sequence": 4,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 1629,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_absence_not_safety",
+      "category": "regression",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 611.072,
+      "observed_model": "sabia-4",
+      "sequence": 5,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 974,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_absence_not_safety",
+      "category": "regression",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 607.709,
+      "observed_model": "sabia-4",
+      "sequence": 6,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 974,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_express_use_condition",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E2",
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 676.415,
+      "observed_model": "sabia-4",
+      "sequence": 7,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": "individual",
+      "has_decoded_limitation": true,
+      "input_tokens": 816,
+      "output_tokens": 29,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_express_use_condition",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [
+          "E6"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 653.809,
+      "observed_model": "sabia-4",
+      "sequence": 8,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": "scope",
+      "has_decoded_limitation": true,
+      "input_tokens": 814,
+      "output_tokens": 24,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_direct",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 771.599,
+      "observed_model": "sabia-4",
+      "sequence": 9,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 672,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_direct",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 627.887,
+      "observed_model": "sabia-4",
+      "sequence": 10,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 674,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_administration_route",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 662.478,
+      "observed_model": "sabia-4",
+      "sequence": 11,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 672,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_administration_route",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 628.883,
+      "observed_model": "sabia-4",
+      "sequence": 12,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 671,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_two_facts",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 651.8,
+      "observed_model": "sabia-4",
+      "sequence": 13,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 715,
+      "output_tokens": 28,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_two_facts",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 670.154,
+      "observed_model": "sabia-4",
+      "sequence": 14,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 717,
+      "output_tokens": 28,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_route_and_meal",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E3"
+      ],
+      "selected_ids": [
+        "E1",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 675.427,
+      "observed_model": "sabia-4",
+      "sequence": 15,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 705,
+      "output_tokens": 28,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_route_and_meal",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E3"
+      ],
+      "selected_ids": [
+        "E1",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 1171.185,
+      "observed_model": "sabia-4",
+      "sequence": 16,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 703,
+      "output_tokens": 28,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_presentation_scope_contrast",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 642.879,
+      "observed_model": "sabia-4",
+      "sequence": 17,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 666,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_presentation_scope_contrast",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 642.117,
+      "observed_model": "sabia-4",
+      "sequence": 18,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 669,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_explicit_package_condition",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 634.095,
+      "observed_model": "sabia-4",
+      "sequence": 19,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 680,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_explicit_package_condition",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 907.144,
+      "observed_model": "sabia-4",
+      "sequence": 20,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 675,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_population",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 625.409,
+      "observed_model": "sabia-4",
+      "sequence": 21,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 665,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_population",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 614.897,
+      "observed_model": "sabia-4",
+      "sequence": 22,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 669,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_interaction",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 614.754,
+      "observed_model": "sabia-4",
+      "sequence": 23,
+      "variant": "paraphrase",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 676,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_interaction",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 714.511,
+      "observed_model": "sabia-4",
+      "sequence": 24,
+      "variant": "original",
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 674,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    }
+  ],
+  "summaries": {
+    "original": {
+      "scheduled_calls": 12,
+      "comparable_calls": 12,
+      "fallback_calls": 0,
+      "technical_failure_count": 0,
+      "technical_failure_rate": 0.0,
+      "identity_excluded_calls": 0,
+      "semantic_metrics_comparable_only": {
+        "attempted_cases": 12,
+        "valid_cases": 12,
+        "valid_positive_cases": 9,
+        "valid_negative_cases": 3,
+        "precision_micro": 1.0,
+        "recall_micro": 0.8571428571428571,
+        "precision_macro": 1.0,
+        "recall_macro": 0.8888888888888888,
+        "precision_defined_cases": 9,
+        "recall_defined_cases": 9,
+        "exact_set_match_count": 10,
+        "exact_set_match_rate": 0.8333333333333334,
+        "selected_evidence_count": 12,
+        "tangential_evidence_count": 0,
+        "tangential_evidence_rate": 0.0,
+        "cases_with_tangential_evidence": 0,
+        "case_tangential_rate": 0.0,
+        "false_abstention_count": 0,
+        "false_abstention_rate": 0.0,
+        "negative_case_error_count": 0,
+        "negative_case_error_rate": 0.0,
+        "technical_failure_count": 0,
+        "technical_failure_rate": 0.0
+      },
+      "positive_calls_with_any_gold": 9,
+      "positive_coverage_rate": 1.0,
+      "mean_latency_ms_all_calls": 778.80425,
+      "input_tokens_reported": 9639,
+      "output_tokens_reported": 272,
+      "calls_with_token_usage": 12
+    },
+    "paraphrase": {
+      "scheduled_calls": 12,
+      "comparable_calls": 12,
+      "fallback_calls": 0,
+      "technical_failure_count": 0,
+      "technical_failure_rate": 0.0,
+      "identity_excluded_calls": 0,
+      "semantic_metrics_comparable_only": {
+        "attempted_cases": 12,
+        "valid_cases": 12,
+        "valid_positive_cases": 9,
+        "valid_negative_cases": 3,
+        "precision_micro": 1.0,
+        "recall_micro": 0.9285714285714286,
+        "precision_macro": 1.0,
+        "recall_macro": 0.9444444444444444,
+        "precision_defined_cases": 9,
+        "recall_defined_cases": 9,
+        "exact_set_match_count": 11,
+        "exact_set_match_rate": 0.9166666666666666,
+        "selected_evidence_count": 13,
+        "tangential_evidence_count": 0,
+        "tangential_evidence_rate": 0.0,
+        "cases_with_tangential_evidence": 0,
+        "case_tangential_rate": 0.0,
+        "false_abstention_count": 0,
+        "false_abstention_rate": 0.0,
+        "negative_case_error_count": 0,
+        "negative_case_error_rate": 0.0,
+        "technical_failure_count": 0,
+        "technical_failure_rate": 0.0
+      },
+      "positive_calls_with_any_gold": 9,
+      "positive_coverage_rate": 1.0,
+      "mean_latency_ms_all_calls": 672.3346666666666,
+      "input_tokens_reported": 9668,
+      "output_tokens_reported": 277,
+      "calls_with_token_usage": 12
+    }
+  }
+}

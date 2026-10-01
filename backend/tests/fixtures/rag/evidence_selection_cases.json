@@ -1,0 +1,530 @@
+[
+  {
+    "id": "regression_indication_scope",
+    "category": "regression",
+    "source_origin": "frozen local amoxicillin selection candidates, subset of prior case 2",
+    "question": "Esse antibiótico trata virose, certo?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "PARA QUE ESTE MEDICAMENTO É INDICADO?",
+        "kind": "prose",
+        "text": "A amoxicilina + clavulanato de potássio é um antibiótico usado em adultos e crianças indicado para tratamento de infecções em diferentes partes do corpo que são causadas por determinados tipos de bactérias."
+      },
+      {
+        "id": "E2",
+        "source": 2,
+        "section": "COMO ESTE MEDICAMENTO FUNCIONA?",
+        "kind": "prose",
+        "text": "A amoxicilina + clavulanato de potássio é um antibiótico que age eliminando as bactérias que causam infecções."
+      },
+      {
+        "id": "E3",
+        "source": 2,
+        "section": "COMO ESTE MEDICAMENTO FUNCIONA?",
+        "kind": "prose",
+        "text": "O medicamento contém duas diferentes substâncias ativas denominadas amoxicilina e ácido clavulânico."
+      }
+    ],
+    "gold_ids": [
+      "E1",
+      "E2"
+    ],
+    "annotation_notes": "E1 delimita a indicação bacteriana; E2 explicita a atuação em bactérias. Ambas contribuem ao contraste de escopo, sem inferir proibição universal ou ineficácia absoluta. E3 apenas descreve composição."
+  },
+  {
+    "id": "regression_age_with_renal_table",
+    "category": "regression",
+    "source_origin": "full frozen case 8 evidence units after table structural-context preservation",
+    "question": "Uma criança de 5 anos pode usar estes comprimidos?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 2,
+        "section": "Posologia para tratamento de infecções",
+        "kind": "prose",
+        "text": "Tabela posológica de amoxicilina + clavulanato de potássio"
+      },
+      {
+        "id": "E2",
+        "source": 2,
+        "section": "Posologia para tratamento de infecções",
+        "kind": "table_row",
+        "text": "## Posologia para tratamento de infecções\nTabela posológica de amoxicilina + clavulanato de potássio\n| Idade | Apresentação | Dosagem |\n| --- | --- | --- |\n| Adultos e crianças acima de<br>12 anos* | Comprimidos revestidos 500 mg<br>+ 125 mg | 1 comprimido três vezes ao dia (de<br>8 em 8 horas) |"
+      },
+      {
+        "id": "E3",
+        "source": 2,
+        "section": "Posologia para tratamento de infecções",
+        "kind": "prose",
+        "text": "*A dose diária usual recomendada é de 25 mg**/kg, dividida por meio da administração de 8 em 8 horas."
+      },
+      {
+        "id": "E4",
+        "source": 2,
+        "section": "Posologia para tratamento de infecções",
+        "kind": "prose",
+        "text": "Nos casos de infecções graves, a posologia deve ser aumentada, a critério de seu médico, até 50 mg/kg/dia, dose dividida por meio da administração de 8 em 8 horas."
+      },
+      {
+        "id": "E5",
+        "source": 2,
+        "section": "Posologia para tratamento de infecções",
+        "kind": "prose",
+        "text": "**Cada dose de 25 mg de amoxicilina + clavulanato de potássio fornece 20 mg de amoxicilina e 5 mg de ácido clavulânico."
+      },
+      {
+        "id": "E6",
+        "source": 2,
+        "section": "Posologia para tratamento de infecções",
+        "kind": "prose",
+        "text": "Os comprimidos de amoxicilina + clavulanato de potássio não são recomendados para crianças menores de 12 anos."
+      },
+      {
+        "id": "E7",
+        "source": 3,
+        "section": "Aspecto do medicamento:",
+        "kind": "prose",
+        "text": "Comprimido revestido na cor branca, oblongo, biconvexo e monossectado."
+      },
+      {
+        "id": "E8",
+        "source": 3,
+        "section": "Aspecto do medicamento:",
+        "kind": "prose",
+        "text": "**Antes de usar, observe o aspecto do medicamento."
+      },
+      {
+        "id": "E9",
+        "source": 3,
+        "section": "Aspecto do medicamento:",
+        "kind": "prose",
+        "text": "Caso ele esteja no prazo de validade e você observe alguma mudança no aspecto, consulte o farmacêutico para saber se poderá utilizá-lo."
+      },
+      {
+        "id": "E10",
+        "source": 3,
+        "section": "Aspecto do medicamento:",
+        "kind": "prose",
+        "text": "Todo medicamento deve ser mantido fora do alcance das crianças.**"
+      },
+      {
+        "id": "E11",
+        "source": 4,
+        "section": "Posologia para insuficiência renal (dos rins)",
+        "kind": "prose",
+        "text": "Adultos"
+      },
+      {
+        "id": "E12",
+        "source": 4,
+        "section": "Posologia para insuficiência renal (dos rins)",
+        "kind": "table_row",
+        "text": "## Posologia para insuficiência renal (dos rins)\nAdultos\n| Insuficiência leve | Insuficiência moderada | Insuficiência grave |\n| --- | --- | --- |\n| Sem alterações de dosagem | 1 comprimido de 500 mg + 125<br>mg de 12 em 12 horas | Os comprimidos de 500mg + 125mg<br>não são recomendados |"
+      },
+      {
+        "id": "E13",
+        "source": 4,
+        "section": "Posologia para insuficiência renal (dos rins)",
+        "kind": "prose",
+        "text": "Crianças"
+      },
+      {
+        "id": "E14",
+        "source": 4,
+        "section": "Posologia para insuficiência renal (dos rins)",
+        "kind": "table_row",
+        "text": "## Posologia para insuficiência renal (dos rins)\nCrianças\n| Insuficiência leve | Insuficiência moderada | Insuficiência grave |\n| --- | --- | --- |\n| Sem alterações de dosagem | 18,75 mg*/kg duas vezes ao dia<br>(de 12 em 12 horas) (máximo de<br>duas doses de 625 mg ao dia) | 18,75 mg*/kg em dose única diária<br>(máximo de 625 mg) |"
+      },
+      {
+        "id": "E15",
+        "source": 4,
+        "section": "Posologia para insuficiência renal (dos rins)",
+        "kind": "prose",
+        "text": "*Cada dose de 18,75 mg de amoxicilina + clavulanato de potássio fornece 15 mg de amoxicilina e 3,75 mg de ácido clavulânico."
+      }
+    ],
+    "gold_ids": [
+      "E2",
+      "E6"
+    ],
+    "annotation_notes": "E2 explicita apresentação/faixa etária e E6 expressa a restrição abaixo de 12 anos. As duas contribuem; escolher ambas não é tangente. E12 é de adultos com insuficiência renal e E14 também trata de insuficiência renal, condição não perguntada. Doses sem contexto etário e aspecto/conservação não respondem à proposição."
+  },
+  {
+    "id": "regression_absence_not_safety",
+    "category": "regression",
+    "source_origin": "full frozen case 10 evidence units; unchanged by table representation",
+    "question": "Se diabetes não foi citado, isso comprova que é seguro para diabéticos?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "QUANDO NÃO DEVO USAR ESTE MEDICAMENTO?",
+        "kind": "prose",
+        "text": "A amoxicilina + clavulanato de potássio é contraindicada para pacientes que apresentam reações alérgicas e hipersensibilidade às penicilinas, além de disfunção do fígado ou icterícia (amarelamento da pele e dos olhos) associadas ao uso de amoxicilina + clavulanato de potássio ou de outras penicilinas."
+      },
+      {
+        "id": "E2",
+        "source": 2,
+        "section": "Aspecto do medicamento:",
+        "kind": "prose",
+        "text": "Comprimido revestido na cor branca, oblongo, biconvexo e monossectado."
+      },
+      {
+        "id": "E3",
+        "source": 2,
+        "section": "Aspecto do medicamento:",
+        "kind": "prose",
+        "text": "**Antes de usar, observe o aspecto do medicamento."
+      },
+      {
+        "id": "E4",
+        "source": 2,
+        "section": "Aspecto do medicamento:",
+        "kind": "prose",
+        "text": "Caso ele esteja no prazo de validade e você observe alguma mudança no aspecto, consulte o farmacêutico para saber se poderá utilizá-lo."
+      },
+      {
+        "id": "E5",
+        "source": 2,
+        "section": "Aspecto do medicamento:",
+        "kind": "prose",
+        "text": "Todo medicamento deve ser mantido fora do alcance das crianças.**"
+      },
+      {
+        "id": "E6",
+        "source": 3,
+        "section": "PARA QUE ESTE MEDICAMENTO É INDICADO?",
+        "kind": "prose",
+        "text": "A amoxicilina + clavulanato de potássio é um antibiótico usado em adultos e crianças indicado para tratamento de infecções em diferentes partes do corpo que são causadas por determinados tipos de bactérias."
+      }
+    ],
+    "gold_ids": [],
+    "annotation_notes": "Nenhuma unit sustenta segurança para diabetes ou uma conclusão documental sobre essa condição. Contraindicações de outras condições e indicação bacteriana são tangenciais. A abstenção esperada refere-se ao suporte documental disponível, não a uma conclusão médica nem a uma prova sobre toda a bula."
+  },
+  {
+    "id": "regression_express_use_condition",
+    "category": "regression",
+    "source_origin": "frozen dipyrone case 9 evidence candidates, subset",
+    "question": "Estou no segundo trimestre da gravidez. Então está liberado usar?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "Gravidez e amamentação",
+        "kind": "prose",
+        "text": "Não utilizar dipirona durante os primeiros 3 meses da gravidez."
+      },
+      {
+        "id": "E2",
+        "source": 1,
+        "section": "Gravidez e amamentação",
+        "kind": "prose",
+        "text": "O uso de dipirona durante o segundo trimestre da gravidez só deve ocorrer após cuidadosa avaliação do potencial risco/benefício pelo médico."
+      },
+      {
+        "id": "E3",
+        "source": 1,
+        "section": "Gravidez e amamentação",
+        "kind": "prose",
+        "text": "Não usar dipirona durante os últimos 3 meses da gravidez."
+      },
+      {
+        "id": "E4",
+        "source": 1,
+        "section": "Gravidez e amamentação",
+        "kind": "prose",
+        "text": "A amamentação deve ser evitada durante e por até 48 horas após o uso de dipirona."
+      },
+      {
+        "id": "E6",
+        "source": 1,
+        "section": "Gravidez e amamentação",
+        "kind": "prose",
+        "text": "Este medicamento não deve ser utilizado por mulheres grávidas sem orientação médica."
+      }
+    ],
+    "gold_ids": [
+      "E2",
+      "E6"
+    ],
+    "annotation_notes": "E2 condiciona o segundo trimestre à avaliação risco/benefício e E6 exige orientação médica na gravidez; ambas delimitam a permissão. Primeiro/último trimestre e lactação não contribuem para a condição do segundo trimestre. Gold avalia evidência, não tratamento individual."
+  },
+  {
+    "id": "general_storage_direct",
+    "category": "generalist",
+    "source_origin": "synthetic_development_fixture_not_a_real_leaflet_or_medical_guidance",
+    "question": "Como este documento orienta conservar o produto?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "Conservação",
+        "kind": "prose",
+        "text": "Conservar em temperatura ambiente, protegido da luz e da umidade."
+      },
+      {
+        "id": "E2",
+        "source": 2,
+        "section": "Identificação",
+        "kind": "prose",
+        "text": "O produto é apresentado em comprimidos."
+      },
+      {
+        "id": "E3",
+        "source": 3,
+        "section": "Indicação",
+        "kind": "prose",
+        "text": "O produto é indicado para a condição descrita nesta seção."
+      }
+    ],
+    "gold_ids": [
+      "E1"
+    ],
+    "annotation_notes": "Só E1 informa as condições de conservação. Forma e indicação são distratores."
+  },
+  {
+    "id": "general_administration_route",
+    "category": "generalist",
+    "source_origin": "synthetic_development_fixture_not_a_real_leaflet_or_medical_guidance",
+    "question": "Qual é a via de administração informada?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "Aspecto",
+        "kind": "prose",
+        "text": "O comprimido é branco e arredondado."
+      },
+      {
+        "id": "E2",
+        "source": 2,
+        "section": "Modo de usar",
+        "kind": "prose",
+        "text": "Esta apresentação destina-se exclusivamente ao uso oral."
+      },
+      {
+        "id": "E3",
+        "source": 3,
+        "section": "Apresentação",
+        "kind": "prose",
+        "text": "A embalagem contém unidades de comprimidos."
+      }
+    ],
+    "gold_ids": [
+      "E2"
+    ],
+    "annotation_notes": "E2 estabelece a via. Aspecto e tipo de embalagem não estabelecem via por si."
+  },
+  {
+    "id": "general_storage_two_facts",
+    "category": "generalist",
+    "source_origin": "synthetic_development_fixture_not_a_real_leaflet_or_medical_guidance",
+    "question": "Quais são as condições de conservação e o prazo de uso após a abertura?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "Conservação",
+        "kind": "prose",
+        "text": "Conservar em temperatura ambiente, protegido da luz."
+      },
+      {
+        "id": "E2",
+        "source": 1,
+        "section": "Conservação",
+        "kind": "prose",
+        "text": "Após a abertura, utilizar em até 30 dias."
+      },
+      {
+        "id": "E3",
+        "source": 2,
+        "section": "Prazo de validade",
+        "kind": "prose",
+        "text": "O prazo de validade da embalagem fechada está impresso no rótulo."
+      },
+      {
+        "id": "E4",
+        "source": 3,
+        "section": "Aspecto",
+        "kind": "prose",
+        "text": "A solução é transparente."
+      }
+    ],
+    "gold_ids": [
+      "E1",
+      "E2"
+    ],
+    "annotation_notes": "A pergunta tem duas partes documentais: condições e prazo após abertura. E1 e E2 são complementares. Validade da embalagem fechada não substitui prazo após abertura."
+  },
+  {
+    "id": "general_route_and_meal",
+    "category": "generalist",
+    "source_origin": "synthetic_development_fixture_not_a_real_leaflet_or_medical_guidance",
+    "question": "Qual é a via de uso e quando devo usar em relação às refeições, segundo o documento?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "Modo de usar",
+        "kind": "prose",
+        "text": "Esta apresentação é para uso oral."
+      },
+      {
+        "id": "E2",
+        "source": 2,
+        "section": "Composição",
+        "kind": "prose",
+        "text": "O produto contém a substância descrita na composição."
+      },
+      {
+        "id": "E3",
+        "source": 1,
+        "section": "Modo de usar",
+        "kind": "prose",
+        "text": "Administrar após as refeições."
+      },
+      {
+        "id": "E4",
+        "source": 3,
+        "section": "Conservação",
+        "kind": "prose",
+        "text": "Manter na embalagem original."
+      }
+    ],
+    "gold_ids": [
+      "E1",
+      "E3"
+    ],
+    "annotation_notes": "Via e momento em relação à refeição são duas partes necessárias. Composição e conservação não respondem a nenhuma delas."
+  },
+  {
+    "id": "general_presentation_scope_contrast",
+    "category": "generalist",
+    "source_origin": "synthetic_development_fixture_not_a_real_leaflet_or_medical_guidance",
+    "question": "Esta apresentação é para aplicação na pele?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "Modo de usar",
+        "kind": "prose",
+        "text": "Esta apresentação destina-se exclusivamente ao uso oral."
+      },
+      {
+        "id": "E2",
+        "source": 2,
+        "section": "Aspecto",
+        "kind": "prose",
+        "text": "A solução é límpida e incolor."
+      },
+      {
+        "id": "E3",
+        "source": 3,
+        "section": "Cuidados",
+        "kind": "prose",
+        "text": "Evite contato acidental com os olhos."
+      }
+    ],
+    "gold_ids": [
+      "E1"
+    ],
+    "annotation_notes": "O escopo explícito de E1 contradiz o uso sugerido sem exigir o termo pele. O aspecto não determina via. Contato acidental com olhos não estabelece aplicação na pele."
+  },
+  {
+    "id": "general_explicit_package_condition",
+    "category": "generalist",
+    "source_origin": "synthetic_development_fixture_not_a_real_leaflet_or_medical_guidance",
+    "question": "O documento permite utilizar o produto com a embalagem danificada?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "Apresentação",
+        "kind": "prose",
+        "text": "O produto é acondicionado em embalagem lacrada."
+      },
+      {
+        "id": "E2",
+        "source": 2,
+        "section": "Cuidados",
+        "kind": "prose",
+        "text": "Não utilize o produto se a embalagem estiver danificada."
+      },
+      {
+        "id": "E3",
+        "source": 3,
+        "section": "Conservação",
+        "kind": "prose",
+        "text": "Guarde na embalagem original."
+      }
+    ],
+    "gold_ids": [
+      "E2"
+    ],
+    "annotation_notes": "E2 responde diretamente à condição perguntada. Embalagem lacrada e conservação não estabelecem sozinhas a permissão para embalagem danificada."
+  },
+  {
+    "id": "general_unmentioned_population",
+    "category": "generalist",
+    "source_origin": "synthetic_development_fixture_not_a_real_leaflet_or_medical_guidance",
+    "question": "O documento traz orientação específica para pessoas do grupo Y?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "Populações",
+        "kind": "prose",
+        "text": "O uso no grupo X requer avaliação profissional."
+      },
+      {
+        "id": "E2",
+        "source": 2,
+        "section": "Aspecto",
+        "kind": "prose",
+        "text": "O comprimido é branco e arredondado."
+      },
+      {
+        "id": "E3",
+        "source": 3,
+        "section": "Conservação",
+        "kind": "prose",
+        "text": "Manter na embalagem original."
+      }
+    ],
+    "gold_ids": [],
+    "annotation_notes": "Grupo X não pode ser transferido para grupo Y. As outras units não trazem orientação para Y; ausência nos candidatos não prova ausência em todo o documento."
+  },
+  {
+    "id": "general_unmentioned_interaction",
+    "category": "generalist",
+    "source_origin": "synthetic_development_fixture_not_a_real_leaflet_or_medical_guidance",
+    "question": "O documento informa se posso combinar este produto com o medicamento B?",
+    "units": [
+      {
+        "id": "E1",
+        "source": 1,
+        "section": "Interações",
+        "kind": "prose",
+        "text": "Não utilize este produto junto com o medicamento C."
+      },
+      {
+        "id": "E2",
+        "source": 2,
+        "section": "Modo de usar",
+        "kind": "prose",
+        "text": "Esta apresentação é para uso oral."
+      },
+      {
+        "id": "E3",
+        "source": 3,
+        "section": "Cuidados",
+        "kind": "prose",
+        "text": "Siga as orientações fornecidas pelo profissional de saúde."
+      }
+    ],
+    "gold_ids": [],
+    "annotation_notes": "Uma restrição envolvendo C não informa a combinação com B. Via e cautela genérica não sustentam a interação perguntada."
+  }
+]

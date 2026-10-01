@@ -1,0 +1,74 @@
+[
+  {
+    "case_id": "regression_indication_scope",
+    "original_question": "Esse antibiótico trata virose, certo?",
+    "paraphrase": "Esse antibiótico serve para tratar virose, não é?",
+    "review": "Preserva o tratamento de virose e o pedido de confirmação; não introduz bactérias ou a resposta esperada."
+  },
+  {
+    "case_id": "regression_age_with_renal_table",
+    "original_question": "Uma criança de 5 anos pode usar estes comprimidos?",
+    "paraphrase": "Estes comprimidos podem ser usados por uma criança de 5 anos?",
+    "review": "Preserva idade, apresentação e possibilidade de uso; não adiciona condição renal nem limite etário."
+  },
+  {
+    "case_id": "regression_absence_not_safety",
+    "original_question": "Se diabetes não foi citado, isso comprova que é seguro para diabéticos?",
+    "paraphrase": "O fato de não terem mencionado diabetes prova que é seguro para quem tem diabetes?",
+    "review": "Preserva a inferência proposta de ausência de menção para comprovação de segurança e a população."
+  },
+  {
+    "case_id": "regression_express_use_condition",
+    "original_question": "Estou no segundo trimestre da gravidez. Então está liberado usar?",
+    "paraphrase": "Minha gravidez está no segundo trimestre. Isso significa que posso usar?",
+    "review": "Preserva o segundo trimestre e a inferência de permissão individual; não acrescenta avaliação médica."
+  },
+  {
+    "case_id": "general_storage_direct",
+    "original_question": "Como este documento orienta conservar o produto?",
+    "paraphrase": "Segundo este documento, como devo guardar o produto?",
+    "review": "Preserva a consulta documental sobre conservação, sem especificar condições ausentes da pergunta."
+  },
+  {
+    "case_id": "general_administration_route",
+    "original_question": "Qual é a via de administração informada?",
+    "paraphrase": "Que via de administração é indicada no texto?",
+    "review": "Preserva a identificação da via documentada; não sugere nenhuma via."
+  },
+  {
+    "case_id": "general_storage_two_facts",
+    "original_question": "Quais são as condições de conservação e o prazo de uso após a abertura?",
+    "paraphrase": "Como devo conservar o produto e por quanto tempo posso usá-lo depois de aberto?",
+    "review": "Preserva ambas as informações solicitadas: condições de conservação e prazo após abertura."
+  },
+  {
+    "case_id": "general_route_and_meal",
+    "original_question": "Qual é a via de uso e quando devo usar em relação às refeições, segundo o documento?",
+    "paraphrase": "Segundo o documento, por qual via devo usar o produto e em que momento em relação às refeições?",
+    "review": "Preserva as duas relações perguntadas e a referência documental; não antecipa via ou horário."
+  },
+  {
+    "case_id": "general_presentation_scope_contrast",
+    "original_question": "Esta apresentação é para aplicação na pele?",
+    "paraphrase": "Esta apresentação foi feita para ser aplicada na pele?",
+    "review": "Preserva a finalidade de aplicação cutânea desta apresentação, sem sugerir via alternativa."
+  },
+  {
+    "case_id": "general_explicit_package_condition",
+    "original_question": "O documento permite utilizar o produto com a embalagem danificada?",
+    "paraphrase": "Segundo o documento, pode usar o produto se a embalagem estiver danificada?",
+    "review": "Preserva a condição de embalagem danificada e a permissão documental de uso."
+  },
+  {
+    "case_id": "general_unmentioned_population",
+    "original_question": "O documento traz orientação específica para pessoas do grupo Y?",
+    "paraphrase": "Há neste documento alguma orientação específica para quem faz parte do grupo Y?",
+    "review": "Preserva a população Y e a existência de orientação específica, sem substituir por grupo X."
+  },
+  {
+    "case_id": "general_unmentioned_interaction",
+    "original_question": "O documento informa se posso combinar este produto com o medicamento B?",
+    "paraphrase": "Neste documento há informação sobre se posso usar este produto junto com o medicamento B?",
+    "review": "Preserva a combinação com B e a pergunta documental de possibilidade, sem substituir a substância."
+  }
+]

@@ -1,0 +1,6135 @@
+{
+  "purpose": "auxiliary_groundedness_model_comparison_12_cases_not_72_independent_cases",
+  "started_at": "2026-09-30T23:04:39.414253+00:00",
+  "completed_at": "2026-09-30T23:07:57.576280+00:00",
+  "fixtures_sha256": "c32832b346e86c649d360e34e3a8d77313df7ee6d6c27b50175971e87300fe16",
+  "prompt_sha256": "60041f2820b2dd80d6dbe4ca554862039544c00f0a0b87ab85897ca643238850",
+  "schema_sha256": "2d764ffb05bda932361cba39c04e3ffe87f530b1de7a7774841956e1ff04f2af",
+  "models": [
+    "sabia-4",
+    "sabia-4-thinking"
+  ],
+  "repetitions": [
+    1,
+    2,
+    3
+  ],
+  "temperature": 0.2,
+  "configured_provider": "auto",
+  "configured_fallback_enabled": true,
+  "configured_fallback_model": "openai/gpt-5.4-mini",
+  "model_timeout_seconds": 60,
+  "benchmark_timeout_seconds": 30,
+  "execution_order": "Repetition, then fixed case order; first model alternates with (case_index + repetition - 1) parity. Unit order never changes.",
+  "unit_order_by_case": {
+    "regression_indication_scope": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "regression_age_with_renal_table": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6",
+      "E7",
+      "E8",
+      "E9",
+      "E10",
+      "E11",
+      "E12",
+      "E13",
+      "E14",
+      "E15"
+    ],
+    "regression_absence_not_safety": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E5",
+      "E6"
+    ],
+    "regression_express_use_condition": [
+      "E1",
+      "E2",
+      "E3",
+      "E4",
+      "E6"
+    ],
+    "general_storage_direct": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "general_administration_route": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "general_storage_two_facts": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ],
+    "general_route_and_meal": [
+      "E1",
+      "E2",
+      "E3",
+      "E4"
+    ],
+    "general_presentation_scope_contrast": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "general_explicit_package_condition": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "general_unmentioned_population": [
+      "E1",
+      "E2",
+      "E3"
+    ],
+    "general_unmentioned_interaction": [
+      "E1",
+      "E2",
+      "E3"
+    ]
+  },
+  "messages_sha256_by_case": {
+    "regression_indication_scope": "38b83dd4ca13ed6f6dbafa63762b571ff79ea50a123f249c4690ad828b1e01ba",
+    "regression_age_with_renal_table": "c8a4891ef2933f4b39538c4555831b5a38331c4cb8f14a5c4a138ae2b6e34c65",
+    "regression_absence_not_safety": "c2d2526d2501476d29b3ab8c376fa1e9b538ef2e07aef4d9181d6e9d2b26bd55",
+    "regression_express_use_condition": "b52ad69f4345cf8ac368b253a83026e151300882adf01ed5d0e8864e973da780",
+    "general_storage_direct": "fd3c3bd6db7c174dd86403897f414ecb47c3d294e38f8d64db0bcf06f69a22f0",
+    "general_administration_route": "47b94232175c634667130585ad55e7d52a10e7beff06898eeb749683779d6d43",
+    "general_storage_two_facts": "0e8a86e14000863c29711932b8ca330f075ad6e583e4f919a41a737e78c9b4f6",
+    "general_route_and_meal": "f034d786b9db3dcba8c78218529023a283daf02744dff537de8bcc50cc832e54",
+    "general_presentation_scope_contrast": "c97651fc7c9d9c0fc4ef3312e848ff66adcbe93269174c952d7fe2a26fadddb6",
+    "general_explicit_package_condition": "64ed3f817a5a1ded84c95c2404a6fb804f08d584e5a236a82ed0c1fb3c82b34e",
+    "general_unmentioned_population": "3a0f1884f28551ec9e34cb1d77c4c239dd7b9c0f75c3c7cd6804cf821cdbfd7a",
+    "general_unmentioned_interaction": "730901b45beaafad3db2352c112c60128c516d5bf023b384a1d7524f05851099"
+  },
+  "calls": [
+    {
+      "case_id": "regression_indication_scope",
+      "category": "regression",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 1937.272,
+      "observed_model": "sabia-4",
+      "sequence": 1,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": "scope",
+      "has_decoded_limitation": true,
+      "input_tokens": 781,
+      "output_tokens": 29,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_indication_scope",
+      "category": "regression",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3368.713,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 2,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 781,
+      "output_tokens": 275,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_age_with_renal_table",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E6",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 6770.392,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 3,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 1629,
+      "output_tokens": 513,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_age_with_renal_table",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [
+          "E2"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 980.127,
+      "observed_model": "sabia-4",
+      "sequence": 4,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 1629,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_absence_not_safety",
+      "category": "regression",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 627.787,
+      "observed_model": "sabia-4",
+      "sequence": 5,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 974,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_absence_not_safety",
+      "category": "regression",
+      "gold_ids": [],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": 0.0,
+        "recall": null,
+        "exact_set_match": false,
+        "tangential_ids": [
+          "E1"
+        ],
+        "tangential_count": 1,
+        "tangential_rate": 1.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": true
+      },
+      "technical_failure": null,
+      "duration_ms": 4502.821,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 6,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": "missing",
+      "has_decoded_limitation": true,
+      "input_tokens": 974,
+      "output_tokens": 316,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_express_use_condition",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E2",
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3781.605,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 7,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 814,
+      "output_tokens": 279,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_express_use_condition",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [
+          "E6"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 743.471,
+      "observed_model": "sabia-4",
+      "sequence": 8,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 814,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_direct",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 962.482,
+      "observed_model": "sabia-4",
+      "sequence": 9,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 672,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_direct",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3842.495,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 10,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 672,
+      "output_tokens": 231,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_administration_route",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3324.814,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 11,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 671,
+      "output_tokens": 233,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_administration_route",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 676.057,
+      "observed_model": "sabia-4",
+      "sequence": 12,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 671,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_two_facts",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 3,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "exact_set_match": false,
+        "tangential_ids": [
+          "E3"
+        ],
+        "tangential_count": 1,
+        "tangential_rate": 0.3333333333333333,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 736.424,
+      "observed_model": "sabia-4",
+      "sequence": 13,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 715,
+      "output_tokens": 33,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_two_facts",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3723.485,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 14,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 715,
+      "output_tokens": 244,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_route_and_meal",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E3"
+      ],
+      "selected_ids": [
+        "E1",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3470.822,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 15,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 703,
+      "output_tokens": 196,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_route_and_meal",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E3"
+      ],
+      "selected_ids": [
+        "E1",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 748.342,
+      "observed_model": "sabia-4",
+      "sequence": 16,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 703,
+      "output_tokens": 28,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_presentation_scope_contrast",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 685.356,
+      "observed_model": "sabia-4",
+      "sequence": 17,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 666,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_presentation_scope_contrast",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 4963.345,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 18,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 666,
+      "output_tokens": 359,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_explicit_package_condition",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 4563.766,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 19,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 675,
+      "output_tokens": 292,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_explicit_package_condition",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 642.689,
+      "observed_model": "sabia-4",
+      "sequence": 20,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 675,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_population",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 906.073,
+      "observed_model": "sabia-4",
+      "sequence": 21,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 665,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_population",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 2518.413,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 22,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 665,
+      "output_tokens": 198,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_interaction",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 8089.071,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 23,
+      "repetition": 1,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 674,
+      "output_tokens": 595,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_interaction",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 843.847,
+      "observed_model": "sabia-4",
+      "sequence": 24,
+      "repetition": 1,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 674,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_indication_scope",
+      "category": "regression",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3892.956,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 25,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 781,
+      "output_tokens": 275,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_indication_scope",
+      "category": "regression",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 871.224,
+      "observed_model": "sabia-4",
+      "sequence": 26,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 781,
+      "output_tokens": 28,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_age_with_renal_table",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [
+          "E2"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 1513.506,
+      "observed_model": "sabia-4",
+      "sequence": 27,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 1629,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_age_with_renal_table",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [
+          "E2"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 7318.636,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 28,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 1629,
+      "output_tokens": 524,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_absence_not_safety",
+      "category": "regression",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 6775.824,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 29,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 974,
+      "output_tokens": 413,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_absence_not_safety",
+      "category": "regression",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 851.696,
+      "observed_model": "sabia-4",
+      "sequence": 30,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 974,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_express_use_condition",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E2",
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 847.664,
+      "observed_model": "sabia-4",
+      "sequence": 31,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": "individual",
+      "has_decoded_limitation": true,
+      "input_tokens": 814,
+      "output_tokens": 29,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_express_use_condition",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E2",
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 5718.578,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 32,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 814,
+      "output_tokens": 318,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_direct",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 2865.853,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 33,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 672,
+      "output_tokens": 202,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_direct",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 1134.164,
+      "observed_model": "sabia-4",
+      "sequence": 34,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 672,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_administration_route",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 1274.112,
+      "observed_model": "sabia-4",
+      "sequence": 35,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 671,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_administration_route",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3784.306,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 36,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 671,
+      "output_tokens": 243,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_two_facts",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 3,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "exact_set_match": false,
+        "tangential_ids": [
+          "E3"
+        ],
+        "tangential_count": 1,
+        "tangential_rate": 0.3333333333333333,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 4204.502,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 37,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 715,
+      "output_tokens": 334,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_two_facts",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 3,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "exact_set_match": false,
+        "tangential_ids": [
+          "E3"
+        ],
+        "tangential_count": 1,
+        "tangential_rate": 0.3333333333333333,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 951.832,
+      "observed_model": "sabia-4",
+      "sequence": 38,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 715,
+      "output_tokens": 33,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_route_and_meal",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E3"
+      ],
+      "selected_ids": [
+        "E1",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 830.122,
+      "observed_model": "sabia-4",
+      "sequence": 39,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 703,
+      "output_tokens": 28,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_route_and_meal",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E3"
+      ],
+      "selected_ids": [
+        "E1",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3935.51,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 40,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 703,
+      "output_tokens": 251,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_presentation_scope_contrast",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 5274.37,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 41,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 666,
+      "output_tokens": 379,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_presentation_scope_contrast",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 743.419,
+      "observed_model": "sabia-4",
+      "sequence": 42,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 666,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_explicit_package_condition",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 702.92,
+      "observed_model": "sabia-4",
+      "sequence": 43,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 675,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_explicit_package_condition",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 5501.895,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 44,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 675,
+      "output_tokens": 341,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_population",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 5902.972,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 45,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 665,
+      "output_tokens": 227,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_population",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 658.389,
+      "observed_model": "sabia-4",
+      "sequence": 46,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 665,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_interaction",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 626.646,
+      "observed_model": "sabia-4",
+      "sequence": 47,
+      "repetition": 2,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 674,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_interaction",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 3739.652,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 48,
+      "repetition": 2,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 674,
+      "output_tokens": 255,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_indication_scope",
+      "category": "regression",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 1091.067,
+      "observed_model": "sabia-4",
+      "sequence": 49,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": "scope",
+      "has_decoded_limitation": true,
+      "input_tokens": 781,
+      "output_tokens": 29,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_indication_scope",
+      "category": "regression",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 2674.372,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 50,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 781,
+      "output_tokens": 210,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_age_with_renal_table",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [
+          "E2"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 5524.805,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 51,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 1629,
+      "output_tokens": 406,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_age_with_renal_table",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [
+          "E2"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 703.823,
+      "observed_model": "sabia-4",
+      "sequence": 52,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 1629,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_absence_not_safety",
+      "category": "regression",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 939.396,
+      "observed_model": "sabia-4",
+      "sequence": 53,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 974,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_absence_not_safety",
+      "category": "regression",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 6897.708,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 54,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": "missing",
+      "has_decoded_limitation": true,
+      "input_tokens": 974,
+      "output_tokens": 463,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_express_use_condition",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E2",
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 5235.285,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 55,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 814,
+      "output_tokens": 296,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "regression_express_use_condition",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [
+          "E6"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 818.55,
+      "observed_model": "sabia-4",
+      "sequence": 56,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": "scope",
+      "has_decoded_limitation": true,
+      "input_tokens": 814,
+      "output_tokens": 24,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_direct",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 707.783,
+      "observed_model": "sabia-4",
+      "sequence": 57,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 672,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_direct",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3642.22,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 58,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 672,
+      "output_tokens": 200,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_administration_route",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3503.574,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 59,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 671,
+      "output_tokens": 248,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_administration_route",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 672.009,
+      "observed_model": "sabia-4",
+      "sequence": 60,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 671,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_two_facts",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 3,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "exact_set_match": false,
+        "tangential_ids": [
+          "E3"
+        ],
+        "tangential_count": 1,
+        "tangential_rate": 0.3333333333333333,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 1956.548,
+      "observed_model": "sabia-4",
+      "sequence": 61,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 715,
+      "output_tokens": 33,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_storage_two_facts",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 6385.474,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 62,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 715,
+      "output_tokens": 452,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_route_and_meal",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E3"
+      ],
+      "selected_ids": [
+        "E1",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 3491.351,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 63,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 703,
+      "output_tokens": 195,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_route_and_meal",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E3"
+      ],
+      "selected_ids": [
+        "E1",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 727.109,
+      "observed_model": "sabia-4",
+      "sequence": 64,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 703,
+      "output_tokens": 28,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_presentation_scope_contrast",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 1080.467,
+      "observed_model": "sabia-4",
+      "sequence": 65,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 666,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_presentation_scope_contrast",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 5088.421,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 66,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 666,
+      "output_tokens": 378,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_explicit_package_condition",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 4039.849,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 67,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 675,
+      "output_tokens": 232,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_explicit_package_condition",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1.0,
+        "recall": 1.0,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0.0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 673.956,
+      "observed_model": "sabia-4",
+      "sequence": 68,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 675,
+      "output_tokens": 23,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_population",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 848.499,
+      "observed_model": "sabia-4",
+      "sequence": 69,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 665,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_population",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 2133.728,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 70,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 665,
+      "output_tokens": 180,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_interaction",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 5235.621,
+      "observed_model": "sabia-4-thinking",
+      "sequence": 71,
+      "repetition": 3,
+      "requested_model": "sabia-4-thinking",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 674,
+      "output_tokens": 338,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4-thinking"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    },
+    {
+      "case_id": "general_unmentioned_interaction",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [],
+      "metrics": {
+        "selected_count": 0,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": null,
+        "recall": null,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": null,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": false
+      },
+      "technical_failure": null,
+      "duration_ms": 658.303,
+      "observed_model": "sabia-4",
+      "sequence": 72,
+      "repetition": 3,
+      "requested_model": "sabia-4",
+      "limitation": null,
+      "has_decoded_limitation": true,
+      "input_tokens": 674,
+      "output_tokens": 16,
+      "provider_attempts": [
+        {
+          "role": "primary",
+          "status": "success",
+          "observed_model": "sabia-4"
+        }
+      ],
+      "fallback_used": false,
+      "is_comparable": true
+    }
+  ],
+  "summaries": {
+    "sabia-4": {
+      "all_calls": {
+        "scheduled_calls": 36,
+        "comparable_calls": 36,
+        "fallback_calls": 0,
+        "technical_failure_count": 0,
+        "technical_failure_rate": 0.0,
+        "identity_excluded_calls": 0,
+        "semantic_metrics_comparable_only": {
+          "attempted_cases": 36,
+          "valid_cases": 36,
+          "valid_positive_cases": 27,
+          "valid_negative_cases": 9,
+          "precision_micro": 0.925,
+          "recall_micro": 0.8809523809523809,
+          "precision_macro": 0.9629629629629629,
+          "recall_macro": 0.9074074074074074,
+          "precision_defined_cases": 27,
+          "recall_defined_cases": 27,
+          "exact_set_match_count": 28,
+          "exact_set_match_rate": 0.7777777777777778,
+          "selected_evidence_count": 40,
+          "tangential_evidence_count": 3,
+          "tangential_evidence_rate": 0.075,
+          "cases_with_tangential_evidence": 3,
+          "case_tangential_rate": 0.08333333333333333,
+          "false_abstention_count": 0,
+          "false_abstention_rate": 0.0,
+          "negative_case_error_count": 0,
+          "negative_case_error_rate": 0.0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0
+        },
+        "positive_calls_with_any_gold": 27,
+        "positive_coverage_rate": 1.0,
+        "mean_latency_ms_all_calls": 899.2536388888889,
+        "input_tokens_reported": 28917,
+        "output_tokens_reported": 834,
+        "calls_with_token_usage": 36
+      },
+      "by_repetition": {
+        "1": {
+          "scheduled_calls": 12,
+          "comparable_calls": 12,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 12,
+            "valid_cases": 12,
+            "valid_positive_cases": 9,
+            "valid_negative_cases": 3,
+            "precision_micro": 0.9230769230769231,
+            "recall_micro": 0.8571428571428571,
+            "precision_macro": 0.9629629629629629,
+            "recall_macro": 0.8888888888888888,
+            "precision_defined_cases": 9,
+            "recall_defined_cases": 9,
+            "exact_set_match_count": 9,
+            "exact_set_match_rate": 0.75,
+            "selected_evidence_count": 13,
+            "tangential_evidence_count": 1,
+            "tangential_evidence_rate": 0.07692307692307693,
+            "cases_with_tangential_evidence": 1,
+            "case_tangential_rate": 0.08333333333333333,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": 0.0,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 9,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 874.1605833333333,
+          "input_tokens_reported": 9639,
+          "output_tokens_reported": 276,
+          "calls_with_token_usage": 12
+        },
+        "2": {
+          "scheduled_calls": 12,
+          "comparable_calls": 12,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 12,
+            "valid_cases": 12,
+            "valid_positive_cases": 9,
+            "valid_negative_cases": 3,
+            "precision_micro": 0.9285714285714286,
+            "recall_micro": 0.9285714285714286,
+            "precision_macro": 0.9629629629629629,
+            "recall_macro": 0.9444444444444444,
+            "precision_defined_cases": 9,
+            "recall_defined_cases": 9,
+            "exact_set_match_count": 10,
+            "exact_set_match_rate": 0.8333333333333334,
+            "selected_evidence_count": 14,
+            "tangential_evidence_count": 1,
+            "tangential_evidence_rate": 0.07142857142857142,
+            "cases_with_tangential_evidence": 1,
+            "case_tangential_rate": 0.08333333333333333,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": 0.0,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 9,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 917.1411666666667,
+          "input_tokens_reported": 9639,
+          "output_tokens_reported": 281,
+          "calls_with_token_usage": 12
+        },
+        "3": {
+          "scheduled_calls": 12,
+          "comparable_calls": 12,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 12,
+            "valid_cases": 12,
+            "valid_positive_cases": 9,
+            "valid_negative_cases": 3,
+            "precision_micro": 0.9230769230769231,
+            "recall_micro": 0.8571428571428571,
+            "precision_macro": 0.9629629629629629,
+            "recall_macro": 0.8888888888888888,
+            "precision_defined_cases": 9,
+            "recall_defined_cases": 9,
+            "exact_set_match_count": 9,
+            "exact_set_match_rate": 0.75,
+            "selected_evidence_count": 13,
+            "tangential_evidence_count": 1,
+            "tangential_evidence_rate": 0.07692307692307693,
+            "cases_with_tangential_evidence": 1,
+            "case_tangential_rate": 0.08333333333333333,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": 0.0,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 9,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 906.4591666666666,
+          "input_tokens_reported": 9639,
+          "output_tokens_reported": 277,
+          "calls_with_token_usage": 12
+        }
+      },
+      "mean_and_range_by_repetition": {
+        "attempted_cases": {
+          "mean": 12,
+          "min": 12,
+          "max": 12,
+          "defined_repetitions": 3
+        },
+        "valid_cases": {
+          "mean": 12,
+          "min": 12,
+          "max": 12,
+          "defined_repetitions": 3
+        },
+        "valid_positive_cases": {
+          "mean": 9,
+          "min": 9,
+          "max": 9,
+          "defined_repetitions": 3
+        },
+        "valid_negative_cases": {
+          "mean": 3,
+          "min": 3,
+          "max": 3,
+          "defined_repetitions": 3
+        },
+        "precision_micro": {
+          "mean": 0.924908424908425,
+          "min": 0.9230769230769231,
+          "max": 0.9285714285714286,
+          "defined_repetitions": 3
+        },
+        "recall_micro": {
+          "mean": 0.8809523809523809,
+          "min": 0.8571428571428571,
+          "max": 0.9285714285714286,
+          "defined_repetitions": 3
+        },
+        "precision_macro": {
+          "mean": 0.9629629629629629,
+          "min": 0.9629629629629629,
+          "max": 0.9629629629629629,
+          "defined_repetitions": 3
+        },
+        "recall_macro": {
+          "mean": 0.9074074074074073,
+          "min": 0.8888888888888888,
+          "max": 0.9444444444444444,
+          "defined_repetitions": 3
+        },
+        "precision_defined_cases": {
+          "mean": 9,
+          "min": 9,
+          "max": 9,
+          "defined_repetitions": 3
+        },
+        "recall_defined_cases": {
+          "mean": 9,
+          "min": 9,
+          "max": 9,
+          "defined_repetitions": 3
+        },
+        "exact_set_match_count": {
+          "mean": 9.333333333333334,
+          "min": 9,
+          "max": 10,
+          "defined_repetitions": 3
+        },
+        "exact_set_match_rate": {
+          "mean": 0.7777777777777778,
+          "min": 0.75,
+          "max": 0.8333333333333334,
+          "defined_repetitions": 3
+        },
+        "selected_evidence_count": {
+          "mean": 13.333333333333334,
+          "min": 13,
+          "max": 14,
+          "defined_repetitions": 3
+        },
+        "tangential_evidence_count": {
+          "mean": 1,
+          "min": 1,
+          "max": 1,
+          "defined_repetitions": 3
+        },
+        "tangential_evidence_rate": {
+          "mean": 0.07509157509157509,
+          "min": 0.07142857142857142,
+          "max": 0.07692307692307693,
+          "defined_repetitions": 3
+        },
+        "cases_with_tangential_evidence": {
+          "mean": 1,
+          "min": 1,
+          "max": 1,
+          "defined_repetitions": 3
+        },
+        "case_tangential_rate": {
+          "mean": 0.08333333333333333,
+          "min": 0.08333333333333333,
+          "max": 0.08333333333333333,
+          "defined_repetitions": 3
+        },
+        "false_abstention_count": {
+          "mean": 0,
+          "min": 0,
+          "max": 0,
+          "defined_repetitions": 3
+        },
+        "false_abstention_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "defined_repetitions": 3
+        },
+        "negative_case_error_count": {
+          "mean": 0,
+          "min": 0,
+          "max": 0,
+          "defined_repetitions": 3
+        },
+        "negative_case_error_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "defined_repetitions": 3
+        },
+        "technical_failure_count": {
+          "mean": 0,
+          "min": 0,
+          "max": 0,
+          "defined_repetitions": 3
+        },
+        "technical_failure_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "defined_repetitions": 3
+        },
+        "positive_coverage_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "defined_repetitions": 3
+        },
+        "positive_calls_with_any_gold": {
+          "mean": 9,
+          "min": 9,
+          "max": 9,
+          "defined_repetitions": 3
+        },
+        "mean_latency_ms_all_calls": {
+          "mean": 899.2536388888889,
+          "min": 874.1605833333333,
+          "max": 917.1411666666667,
+          "defined_repetitions": 3
+        }
+      },
+      "by_case": [
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 6,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 1299.8543333333332,
+          "input_tokens_reported": 2343,
+          "output_tokens_reported": 86,
+          "calls_with_token_usage": 3,
+          "case_id": "regression_indication_scope",
+          "gold_ids": [
+            "E1",
+            "E2"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1",
+                "E2"
+              ],
+              "limitation": "scope",
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E1",
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E1",
+                "E2"
+              ],
+              "limitation": "scope",
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 3,
+            "E2": 3,
+            "E3": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1",
+                "E2"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "scope": 2,
+            "None": 1
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 0.5,
+            "precision_macro": 1.0,
+            "recall_macro": 0.5,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 0,
+            "exact_set_match_rate": 0.0,
+            "selected_evidence_count": 3,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 1065.8186666666666,
+          "input_tokens_reported": 4887,
+          "output_tokens_reported": 69,
+          "calls_with_token_usage": 3,
+          "case_id": "regression_age_with_renal_table",
+          "gold_ids": [
+            "E2",
+            "E6"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E6"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E6"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E6"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 0,
+            "E3": 0,
+            "E4": 0,
+            "E5": 0,
+            "E6": 3,
+            "E7": 0,
+            "E8": 0,
+            "E9": 0,
+            "E10": 0,
+            "E11": 0,
+            "E12": 0,
+            "E13": 0,
+            "E14": 0,
+            "E15": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E6"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 0,
+            "valid_negative_cases": 3,
+            "precision_micro": null,
+            "recall_micro": null,
+            "precision_macro": null,
+            "recall_macro": null,
+            "precision_defined_cases": 0,
+            "recall_defined_cases": 0,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 0,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": null,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": null,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": 0.0,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 0,
+          "positive_coverage_rate": null,
+          "mean_latency_ms_all_calls": 806.293,
+          "input_tokens_reported": 2922,
+          "output_tokens_reported": 48,
+          "calls_with_token_usage": 3,
+          "case_id": "regression_absence_not_safety",
+          "gold_ids": [],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 0,
+            "E3": 0,
+            "E4": 0,
+            "E5": 0,
+            "E6": 0
+          },
+          "empty_selection_count": 3,
+          "empty_selection_rate": 1.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 0.6666666666666666,
+            "precision_macro": 1.0,
+            "recall_macro": 0.6666666666666666,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 1,
+            "exact_set_match_rate": 0.3333333333333333,
+            "selected_evidence_count": 4,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 803.2283333333334,
+          "input_tokens_reported": 2442,
+          "output_tokens_reported": 76,
+          "calls_with_token_usage": 3,
+          "case_id": "regression_express_use_condition",
+          "gold_ids": [
+            "E2",
+            "E6"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E2",
+                "E6"
+              ],
+              "limitation": "individual",
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": "scope",
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 3,
+            "E3": 0,
+            "E4": 0,
+            "E6": 1
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 2,
+          "identical_across_all_three": false,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E2"
+              ],
+              "count": 2
+            },
+            {
+              "ids": [
+                "E2",
+                "E6"
+              ],
+              "count": 1
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 1,
+            "individual": 1,
+            "scope": 1
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 3,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 934.8096666666667,
+          "input_tokens_reported": 2016,
+          "output_tokens_reported": 69,
+          "calls_with_token_usage": 3,
+          "case_id": "general_storage_direct",
+          "gold_ids": [
+            "E1"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 3,
+            "E2": 0,
+            "E3": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 3,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 874.0593333333334,
+          "input_tokens_reported": 2013,
+          "output_tokens_reported": 69,
+          "calls_with_token_usage": 3,
+          "case_id": "general_administration_route",
+          "gold_ids": [
+            "E2"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 3,
+            "E3": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E2"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 0.6666666666666666,
+            "recall_micro": 1.0,
+            "precision_macro": 0.6666666666666666,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 0,
+            "exact_set_match_rate": 0.0,
+            "selected_evidence_count": 9,
+            "tangential_evidence_count": 3,
+            "tangential_evidence_rate": 0.3333333333333333,
+            "cases_with_tangential_evidence": 3,
+            "case_tangential_rate": 1.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 1214.9346666666665,
+          "input_tokens_reported": 2145,
+          "output_tokens_reported": 99,
+          "calls_with_token_usage": 3,
+          "case_id": "general_storage_two_facts",
+          "gold_ids": [
+            "E1",
+            "E2"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1",
+                "E2",
+                "E3"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E1",
+                "E2",
+                "E3"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E1",
+                "E2",
+                "E3"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 3,
+            "E2": 3,
+            "E3": 3,
+            "E4": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1",
+                "E2",
+                "E3"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 6,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 768.5243333333333,
+          "input_tokens_reported": 2109,
+          "output_tokens_reported": 84,
+          "calls_with_token_usage": 3,
+          "case_id": "general_route_and_meal",
+          "gold_ids": [
+            "E1",
+            "E3"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1",
+                "E3"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E1",
+                "E3"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E1",
+                "E3"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 3,
+            "E2": 0,
+            "E3": 3,
+            "E4": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1",
+                "E3"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 3,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 836.414,
+          "input_tokens_reported": 1998,
+          "output_tokens_reported": 69,
+          "calls_with_token_usage": 3,
+          "case_id": "general_presentation_scope_contrast",
+          "gold_ids": [
+            "E1"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 3,
+            "E2": 0,
+            "E3": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 3,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 673.1883333333333,
+          "input_tokens_reported": 2025,
+          "output_tokens_reported": 69,
+          "calls_with_token_usage": 3,
+          "case_id": "general_explicit_package_condition",
+          "gold_ids": [
+            "E2"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 3,
+            "E3": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E2"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 0,
+            "valid_negative_cases": 3,
+            "precision_micro": null,
+            "recall_micro": null,
+            "precision_macro": null,
+            "recall_macro": null,
+            "precision_defined_cases": 0,
+            "recall_defined_cases": 0,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 0,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": null,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": null,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": 0.0,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 0,
+          "positive_coverage_rate": null,
+          "mean_latency_ms_all_calls": 804.3203333333333,
+          "input_tokens_reported": 1995,
+          "output_tokens_reported": 48,
+          "calls_with_token_usage": 3,
+          "case_id": "general_unmentioned_population",
+          "gold_ids": [],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 0,
+            "E3": 0
+          },
+          "empty_selection_count": 3,
+          "empty_selection_rate": 1.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 0,
+            "valid_negative_cases": 3,
+            "precision_micro": null,
+            "recall_micro": null,
+            "precision_macro": null,
+            "recall_macro": null,
+            "precision_defined_cases": 0,
+            "recall_defined_cases": 0,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 0,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": null,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": null,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": 0.0,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 0,
+          "positive_coverage_rate": null,
+          "mean_latency_ms_all_calls": 709.5986666666666,
+          "input_tokens_reported": 2022,
+          "output_tokens_reported": 48,
+          "calls_with_token_usage": 3,
+          "case_id": "general_unmentioned_interaction",
+          "gold_ids": [],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 0,
+            "E3": 0
+          },
+          "empty_selection_count": 3,
+          "empty_selection_rate": 1.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        }
+      ]
+    },
+    "sabia-4-thinking": {
+      "all_calls": {
+        "scheduled_calls": 36,
+        "comparable_calls": 36,
+        "fallback_calls": 0,
+        "technical_failure_count": 0,
+        "technical_failure_rate": 0.0,
+        "identity_excluded_calls": 0,
+        "semantic_metrics_comparable_only": {
+          "attempted_cases": 36,
+          "valid_cases": 36,
+          "valid_positive_cases": 27,
+          "valid_negative_cases": 9,
+          "precision_micro": 0.9523809523809523,
+          "recall_micro": 0.9523809523809523,
+          "precision_macro": 0.9523809523809524,
+          "recall_macro": 0.9629629629629629,
+          "precision_defined_cases": 28,
+          "recall_defined_cases": 27,
+          "exact_set_match_count": 32,
+          "exact_set_match_rate": 0.8888888888888888,
+          "selected_evidence_count": 42,
+          "tangential_evidence_count": 2,
+          "tangential_evidence_rate": 0.047619047619047616,
+          "cases_with_tangential_evidence": 2,
+          "case_tangential_rate": 0.05555555555555555,
+          "false_abstention_count": 0,
+          "false_abstention_rate": 0.0,
+          "negative_case_error_count": 1,
+          "negative_case_error_rate": 0.1111111111111111,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0
+        },
+        "positive_calls_with_any_gold": 27,
+        "positive_coverage_rate": 1.0,
+        "mean_latency_ms_all_calls": 4602.422333333333,
+        "input_tokens_reported": 28917,
+        "output_tokens_reported": 11091,
+        "calls_with_token_usage": 36
+      },
+      "by_repetition": {
+        "1": {
+          "scheduled_calls": 12,
+          "comparable_calls": 12,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 12,
+            "valid_cases": 12,
+            "valid_positive_cases": 9,
+            "valid_negative_cases": 3,
+            "precision_micro": 0.9333333333333333,
+            "recall_micro": 1.0,
+            "precision_macro": 0.9,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 10,
+            "recall_defined_cases": 9,
+            "exact_set_match_count": 11,
+            "exact_set_match_rate": 0.9166666666666666,
+            "selected_evidence_count": 15,
+            "tangential_evidence_count": 1,
+            "tangential_evidence_rate": 0.06666666666666667,
+            "cases_with_tangential_evidence": 1,
+            "case_tangential_rate": 0.08333333333333333,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 1,
+            "negative_case_error_rate": 0.3333333333333333,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 9,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 4409.9785,
+          "input_tokens_reported": 9639,
+          "output_tokens_reported": 3731,
+          "calls_with_token_usage": 12
+        },
+        "2": {
+          "scheduled_calls": 12,
+          "comparable_calls": 12,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 12,
+            "valid_cases": 12,
+            "valid_positive_cases": 9,
+            "valid_negative_cases": 3,
+            "precision_micro": 0.9285714285714286,
+            "recall_micro": 0.9285714285714286,
+            "precision_macro": 0.9629629629629629,
+            "recall_macro": 0.9444444444444444,
+            "precision_defined_cases": 9,
+            "recall_defined_cases": 9,
+            "exact_set_match_count": 10,
+            "exact_set_match_rate": 0.8333333333333334,
+            "selected_evidence_count": 14,
+            "tangential_evidence_count": 1,
+            "tangential_evidence_rate": 0.07142857142857142,
+            "cases_with_tangential_evidence": 1,
+            "case_tangential_rate": 0.08333333333333333,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": 0.0,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 9,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 4909.587833333333,
+          "input_tokens_reported": 9639,
+          "output_tokens_reported": 3762,
+          "calls_with_token_usage": 12
+        },
+        "3": {
+          "scheduled_calls": 12,
+          "comparable_calls": 12,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 12,
+            "valid_cases": 12,
+            "valid_positive_cases": 9,
+            "valid_negative_cases": 3,
+            "precision_micro": 1.0,
+            "recall_micro": 0.9285714285714286,
+            "precision_macro": 1.0,
+            "recall_macro": 0.9444444444444444,
+            "precision_defined_cases": 9,
+            "recall_defined_cases": 9,
+            "exact_set_match_count": 11,
+            "exact_set_match_rate": 0.9166666666666666,
+            "selected_evidence_count": 13,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": 0.0,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 9,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 4487.700666666667,
+          "input_tokens_reported": 9639,
+          "output_tokens_reported": 3598,
+          "calls_with_token_usage": 12
+        }
+      },
+      "mean_and_range_by_repetition": {
+        "attempted_cases": {
+          "mean": 12,
+          "min": 12,
+          "max": 12,
+          "defined_repetitions": 3
+        },
+        "valid_cases": {
+          "mean": 12,
+          "min": 12,
+          "max": 12,
+          "defined_repetitions": 3
+        },
+        "valid_positive_cases": {
+          "mean": 9,
+          "min": 9,
+          "max": 9,
+          "defined_repetitions": 3
+        },
+        "valid_negative_cases": {
+          "mean": 3,
+          "min": 3,
+          "max": 3,
+          "defined_repetitions": 3
+        },
+        "precision_micro": {
+          "mean": 0.953968253968254,
+          "min": 0.9285714285714286,
+          "max": 1.0,
+          "defined_repetitions": 3
+        },
+        "recall_micro": {
+          "mean": 0.9523809523809524,
+          "min": 0.9285714285714286,
+          "max": 1.0,
+          "defined_repetitions": 3
+        },
+        "precision_macro": {
+          "mean": 0.9543209876543209,
+          "min": 0.9,
+          "max": 1.0,
+          "defined_repetitions": 3
+        },
+        "recall_macro": {
+          "mean": 0.9629629629629629,
+          "min": 0.9444444444444444,
+          "max": 1.0,
+          "defined_repetitions": 3
+        },
+        "precision_defined_cases": {
+          "mean": 9.333333333333334,
+          "min": 9,
+          "max": 10,
+          "defined_repetitions": 3
+        },
+        "recall_defined_cases": {
+          "mean": 9,
+          "min": 9,
+          "max": 9,
+          "defined_repetitions": 3
+        },
+        "exact_set_match_count": {
+          "mean": 10.666666666666666,
+          "min": 10,
+          "max": 11,
+          "defined_repetitions": 3
+        },
+        "exact_set_match_rate": {
+          "mean": 0.8888888888888888,
+          "min": 0.8333333333333334,
+          "max": 0.9166666666666666,
+          "defined_repetitions": 3
+        },
+        "selected_evidence_count": {
+          "mean": 14,
+          "min": 13,
+          "max": 15,
+          "defined_repetitions": 3
+        },
+        "tangential_evidence_count": {
+          "mean": 0.6666666666666666,
+          "min": 0,
+          "max": 1,
+          "defined_repetitions": 3
+        },
+        "tangential_evidence_rate": {
+          "mean": 0.04603174603174603,
+          "min": 0.0,
+          "max": 0.07142857142857142,
+          "defined_repetitions": 3
+        },
+        "cases_with_tangential_evidence": {
+          "mean": 0.6666666666666666,
+          "min": 0,
+          "max": 1,
+          "defined_repetitions": 3
+        },
+        "case_tangential_rate": {
+          "mean": 0.05555555555555555,
+          "min": 0.0,
+          "max": 0.08333333333333333,
+          "defined_repetitions": 3
+        },
+        "false_abstention_count": {
+          "mean": 0,
+          "min": 0,
+          "max": 0,
+          "defined_repetitions": 3
+        },
+        "false_abstention_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "defined_repetitions": 3
+        },
+        "negative_case_error_count": {
+          "mean": 0.3333333333333333,
+          "min": 0,
+          "max": 1,
+          "defined_repetitions": 3
+        },
+        "negative_case_error_rate": {
+          "mean": 0.1111111111111111,
+          "min": 0.0,
+          "max": 0.3333333333333333,
+          "defined_repetitions": 3
+        },
+        "technical_failure_count": {
+          "mean": 0,
+          "min": 0,
+          "max": 0,
+          "defined_repetitions": 3
+        },
+        "technical_failure_rate": {
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "defined_repetitions": 3
+        },
+        "positive_coverage_rate": {
+          "mean": 1.0,
+          "min": 1.0,
+          "max": 1.0,
+          "defined_repetitions": 3
+        },
+        "positive_calls_with_any_gold": {
+          "mean": 9,
+          "min": 9,
+          "max": 9,
+          "defined_repetitions": 3
+        },
+        "mean_latency_ms_all_calls": {
+          "mean": 4602.422333333333,
+          "min": 4409.9785,
+          "max": 4909.587833333333,
+          "defined_repetitions": 3
+        }
+      },
+      "by_case": [
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 6,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 3312.0136666666667,
+          "input_tokens_reported": 2343,
+          "output_tokens_reported": 760,
+          "calls_with_token_usage": 3,
+          "case_id": "regression_indication_scope",
+          "gold_ids": [
+            "E1",
+            "E2"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1",
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E1",
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E1",
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 3,
+            "E2": 3,
+            "E3": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1",
+                "E2"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 0.6666666666666666,
+            "precision_macro": 1.0,
+            "recall_macro": 0.6666666666666666,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 1,
+            "exact_set_match_rate": 0.3333333333333333,
+            "selected_evidence_count": 4,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 6537.944333333334,
+          "input_tokens_reported": 4887,
+          "output_tokens_reported": 1443,
+          "calls_with_token_usage": 3,
+          "case_id": "regression_age_with_renal_table",
+          "gold_ids": [
+            "E2",
+            "E6"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E6",
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E6"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E6"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 1,
+            "E3": 0,
+            "E4": 0,
+            "E5": 0,
+            "E6": 3,
+            "E7": 0,
+            "E8": 0,
+            "E9": 0,
+            "E10": 0,
+            "E11": 0,
+            "E12": 0,
+            "E13": 0,
+            "E14": 0,
+            "E15": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 2,
+          "identical_across_all_three": false,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E2",
+                "E6"
+              ],
+              "count": 1
+            },
+            {
+              "ids": [
+                "E6"
+              ],
+              "count": 2
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 0,
+            "valid_negative_cases": 3,
+            "precision_micro": 0.0,
+            "recall_micro": null,
+            "precision_macro": 0.0,
+            "recall_macro": null,
+            "precision_defined_cases": 1,
+            "recall_defined_cases": 0,
+            "exact_set_match_count": 2,
+            "exact_set_match_rate": 0.6666666666666666,
+            "selected_evidence_count": 1,
+            "tangential_evidence_count": 1,
+            "tangential_evidence_rate": 1.0,
+            "cases_with_tangential_evidence": 1,
+            "case_tangential_rate": 0.3333333333333333,
+            "false_abstention_count": 0,
+            "false_abstention_rate": null,
+            "negative_case_error_count": 1,
+            "negative_case_error_rate": 0.3333333333333333,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 0,
+          "positive_coverage_rate": null,
+          "mean_latency_ms_all_calls": 6058.784333333333,
+          "input_tokens_reported": 2922,
+          "output_tokens_reported": 1192,
+          "calls_with_token_usage": 3,
+          "case_id": "regression_absence_not_safety",
+          "gold_ids": [],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": "missing",
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [],
+              "limitation": "missing",
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 1,
+            "E2": 0,
+            "E3": 0,
+            "E4": 0,
+            "E5": 0,
+            "E6": 0
+          },
+          "empty_selection_count": 2,
+          "empty_selection_rate": 0.6666666666666666,
+          "distinct_selected_sets": 2,
+          "identical_across_all_three": false,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1"
+              ],
+              "count": 1
+            },
+            {
+              "ids": [],
+              "count": 2
+            }
+          ],
+          "limitation_frequencies": {
+            "missing": 2,
+            "None": 1
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 6,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 4911.822666666667,
+          "input_tokens_reported": 2442,
+          "output_tokens_reported": 893,
+          "calls_with_token_usage": 3,
+          "case_id": "regression_express_use_condition",
+          "gold_ids": [
+            "E2",
+            "E6"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E2",
+                "E6"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E2",
+                "E6"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E2",
+                "E6"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 3,
+            "E3": 0,
+            "E4": 0,
+            "E6": 3
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E2",
+                "E6"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 3,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 3450.1893333333333,
+          "input_tokens_reported": 2016,
+          "output_tokens_reported": 633,
+          "calls_with_token_usage": 3,
+          "case_id": "general_storage_direct",
+          "gold_ids": [
+            "E1"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 3,
+            "E2": 0,
+            "E3": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 3,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 3537.5646666666667,
+          "input_tokens_reported": 2013,
+          "output_tokens_reported": 724,
+          "calls_with_token_usage": 3,
+          "case_id": "general_administration_route",
+          "gold_ids": [
+            "E2"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 3,
+            "E3": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E2"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 0.8571428571428571,
+            "recall_micro": 1.0,
+            "precision_macro": 0.8888888888888888,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 2,
+            "exact_set_match_rate": 0.6666666666666666,
+            "selected_evidence_count": 7,
+            "tangential_evidence_count": 1,
+            "tangential_evidence_rate": 0.14285714285714285,
+            "cases_with_tangential_evidence": 1,
+            "case_tangential_rate": 0.3333333333333333,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 4771.153666666667,
+          "input_tokens_reported": 2145,
+          "output_tokens_reported": 1030,
+          "calls_with_token_usage": 3,
+          "case_id": "general_storage_two_facts",
+          "gold_ids": [
+            "E1",
+            "E2"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1",
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E1",
+                "E2",
+                "E3"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E1",
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 3,
+            "E2": 3,
+            "E3": 1,
+            "E4": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 2,
+          "identical_across_all_three": false,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1",
+                "E2"
+              ],
+              "count": 2
+            },
+            {
+              "ids": [
+                "E1",
+                "E2",
+                "E3"
+              ],
+              "count": 1
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 6,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 3632.561,
+          "input_tokens_reported": 2109,
+          "output_tokens_reported": 642,
+          "calls_with_token_usage": 3,
+          "case_id": "general_route_and_meal",
+          "gold_ids": [
+            "E1",
+            "E3"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1",
+                "E3"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E1",
+                "E3"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E1",
+                "E3"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 3,
+            "E2": 0,
+            "E3": 3,
+            "E4": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1",
+                "E3"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 3,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 5108.712,
+          "input_tokens_reported": 1998,
+          "output_tokens_reported": 1116,
+          "calls_with_token_usage": 3,
+          "case_id": "general_presentation_scope_contrast",
+          "gold_ids": [
+            "E1"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E1"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 3,
+            "E2": 0,
+            "E3": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E1"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 3,
+            "valid_negative_cases": 0,
+            "precision_micro": 1.0,
+            "recall_micro": 1.0,
+            "precision_macro": 1.0,
+            "recall_macro": 1.0,
+            "precision_defined_cases": 3,
+            "recall_defined_cases": 3,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 3,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": 0.0,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": 0.0,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": null,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 3,
+          "positive_coverage_rate": 1.0,
+          "mean_latency_ms_all_calls": 4701.836666666667,
+          "input_tokens_reported": 2025,
+          "output_tokens_reported": 865,
+          "calls_with_token_usage": 3,
+          "case_id": "general_explicit_package_condition",
+          "gold_ids": [
+            "E2"
+          ],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [
+                "E2"
+              ],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 3,
+            "E3": 0
+          },
+          "empty_selection_count": 0,
+          "empty_selection_rate": 0.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [
+                "E2"
+              ],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 0,
+            "valid_negative_cases": 3,
+            "precision_micro": null,
+            "recall_micro": null,
+            "precision_macro": null,
+            "recall_macro": null,
+            "precision_defined_cases": 0,
+            "recall_defined_cases": 0,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 0,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": null,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": null,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": 0.0,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 0,
+          "positive_coverage_rate": null,
+          "mean_latency_ms_all_calls": 3518.371,
+          "input_tokens_reported": 1995,
+          "output_tokens_reported": 605,
+          "calls_with_token_usage": 3,
+          "case_id": "general_unmentioned_population",
+          "gold_ids": [],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 0,
+            "E3": 0
+          },
+          "empty_selection_count": 3,
+          "empty_selection_rate": 1.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        },
+        {
+          "scheduled_calls": 3,
+          "comparable_calls": 3,
+          "fallback_calls": 0,
+          "technical_failure_count": 0,
+          "technical_failure_rate": 0.0,
+          "identity_excluded_calls": 0,
+          "semantic_metrics_comparable_only": {
+            "attempted_cases": 3,
+            "valid_cases": 3,
+            "valid_positive_cases": 0,
+            "valid_negative_cases": 3,
+            "precision_micro": null,
+            "recall_micro": null,
+            "precision_macro": null,
+            "recall_macro": null,
+            "precision_defined_cases": 0,
+            "recall_defined_cases": 0,
+            "exact_set_match_count": 3,
+            "exact_set_match_rate": 1.0,
+            "selected_evidence_count": 0,
+            "tangential_evidence_count": 0,
+            "tangential_evidence_rate": null,
+            "cases_with_tangential_evidence": 0,
+            "case_tangential_rate": 0.0,
+            "false_abstention_count": 0,
+            "false_abstention_rate": null,
+            "negative_case_error_count": 0,
+            "negative_case_error_rate": 0.0,
+            "technical_failure_count": 0,
+            "technical_failure_rate": 0.0
+          },
+          "positive_calls_with_any_gold": 0,
+          "positive_coverage_rate": null,
+          "mean_latency_ms_all_calls": 5688.114666666666,
+          "input_tokens_reported": 2022,
+          "output_tokens_reported": 1188,
+          "calls_with_token_usage": 3,
+          "case_id": "general_unmentioned_interaction",
+          "gold_ids": [],
+          "selections_by_repetition": [
+            {
+              "repetition": 1,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 2,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            },
+            {
+              "repetition": 3,
+              "selected_ids": [],
+              "limitation": null,
+              "is_comparable": true,
+              "technical_failure": null
+            }
+          ],
+          "id_frequency": {
+            "E1": 0,
+            "E2": 0,
+            "E3": 0
+          },
+          "empty_selection_count": 3,
+          "empty_selection_rate": 1.0,
+          "distinct_selected_sets": 1,
+          "identical_across_all_three": true,
+          "selected_set_frequencies": [
+            {
+              "ids": [],
+              "count": 3
+            }
+          ],
+          "limitation_frequencies": {
+            "None": 3
+          }
+        }
+      ]
+    }
+  }
+}

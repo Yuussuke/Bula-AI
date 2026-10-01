@@ -1,0 +1,379 @@
+{
+  "purpose": "auxiliary_groundedness_development_check_not_main_TCC_evaluation",
+  "created_at": "2026-09-29T02:45:11.988860+00:00",
+  "fixtures_sha256": "c32832b346e86c649d360e34e3a8d77313df7ee6d6c27b50175971e87300fe16",
+  "prompt_sha256": "60041f2820b2dd80d6dbe4ca554862039544c00f0a0b87ab85897ca643238850",
+  "configured_provider": "auto",
+  "configured_maritaca_model": "sabiazinho-4",
+  "configured_openrouter_model": "openai/gpt-5.4-mini",
+  "configured_fallback_enabled": true,
+  "aggregate": {
+    "attempted_cases": 12,
+    "valid_cases": 12,
+    "valid_positive_cases": 9,
+    "valid_negative_cases": 3,
+    "precision_micro": 0.6875,
+    "recall_micro": 0.7857142857142857,
+    "precision_macro": 0.7083333333333334,
+    "recall_macro": 0.8333333333333334,
+    "precision_defined_cases": 12,
+    "recall_defined_cases": 9,
+    "exact_set_match_count": 6,
+    "exact_set_match_rate": 0.5,
+    "selected_evidence_count": 16,
+    "tangential_evidence_count": 5,
+    "tangential_evidence_rate": 0.3125,
+    "cases_with_tangential_evidence": 4,
+    "case_tangential_rate": 0.3333333333333333,
+    "false_abstention_count": 0,
+    "false_abstention_rate": 0,
+    "negative_case_error_count": 3,
+    "negative_case_error_rate": 1,
+    "technical_failure_count": 0,
+    "technical_failure_rate": 0
+  },
+  "cases": [
+    {
+      "case_id": "regression_indication_scope",
+      "category": "regression",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0,
+        "missing_gold_ids": [
+          "E2"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 651.514,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "regression_age_with_renal_table",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E6",
+        "E14"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 0.5,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [
+          "E14"
+        ],
+        "tangential_count": 1,
+        "tangential_rate": 0.5,
+        "missing_gold_ids": [
+          "E2"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 271.94,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "regression_absence_not_safety",
+      "category": "regression",
+      "gold_ids": [],
+      "selected_ids": [
+        "E1",
+        "E6"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": 0,
+        "recall": null,
+        "exact_set_match": false,
+        "tangential_ids": [
+          "E1",
+          "E6"
+        ],
+        "tangential_count": 2,
+        "tangential_rate": 1,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": true
+      },
+      "technical_failure": null,
+      "duration_ms": 197.876,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "regression_express_use_condition",
+      "category": "regression",
+      "gold_ids": [
+        "E2",
+        "E6"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 2,
+        "true_positive_count": 1,
+        "precision": 1,
+        "recall": 0.5,
+        "exact_set_match": false,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0,
+        "missing_gold_ids": [
+          "E6"
+        ],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 186.132,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "general_storage_direct",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1,
+        "recall": 1,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 170.519,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "general_administration_route",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1,
+        "recall": 1,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 167.56,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "general_storage_two_facts",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E2"
+      ],
+      "selected_ids": [
+        "E1",
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1,
+        "recall": 1,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 185.151,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "general_route_and_meal",
+      "category": "generalist",
+      "gold_ids": [
+        "E1",
+        "E3"
+      ],
+      "selected_ids": [
+        "E1",
+        "E3"
+      ],
+      "metrics": {
+        "selected_count": 2,
+        "gold_count": 2,
+        "true_positive_count": 2,
+        "precision": 1,
+        "recall": 1,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 190.49,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "general_presentation_scope_contrast",
+      "category": "generalist",
+      "gold_ids": [
+        "E1"
+      ],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1,
+        "recall": 1,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 169.44,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "general_explicit_package_condition",
+      "category": "generalist",
+      "gold_ids": [
+        "E2"
+      ],
+      "selected_ids": [
+        "E2"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 1,
+        "true_positive_count": 1,
+        "precision": 1,
+        "recall": 1,
+        "exact_set_match": true,
+        "tangential_ids": [],
+        "tangential_count": 0,
+        "tangential_rate": 0,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": null
+      },
+      "technical_failure": null,
+      "duration_ms": 182.514,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "general_unmentioned_population",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": 0,
+        "recall": null,
+        "exact_set_match": false,
+        "tangential_ids": [
+          "E1"
+        ],
+        "tangential_count": 1,
+        "tangential_rate": 1,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": true
+      },
+      "technical_failure": null,
+      "duration_ms": 194.798,
+      "observed_model": "sabiazinho-4"
+    },
+    {
+      "case_id": "general_unmentioned_interaction",
+      "category": "generalist",
+      "gold_ids": [],
+      "selected_ids": [
+        "E1"
+      ],
+      "metrics": {
+        "selected_count": 1,
+        "gold_count": 0,
+        "true_positive_count": 0,
+        "precision": 0,
+        "recall": null,
+        "exact_set_match": false,
+        "tangential_ids": [
+          "E1"
+        ],
+        "tangential_count": 1,
+        "tangential_rate": 1,
+        "missing_gold_ids": [],
+        "false_abstention": false,
+        "negative_case_error": true
+      },
+      "technical_failure": null,
+      "duration_ms": 179.691,
+      "observed_model": "sabiazinho-4"
+    }
+  ]
+}
