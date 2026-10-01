@@ -4,8 +4,6 @@ import asyncio
 from typing import Any
 
 import httpx
-from langchain_community.chat_models import ChatMaritalk
-from langchain_community.chat_models.maritalk import MaritalkHTTPError
 from langchain_core.callbacks import (
     AsyncCallbackManagerForLLMRun,
     CallbackManagerForLLMRun,
@@ -26,6 +24,7 @@ from app.core.config import Settings, settings
 
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+MARITACA_BASE_URL = "https://chat.maritaca.ai/api"
 TRANSIENT_HTTP_STATUS_CODES = {408, 409, 425, 429, 500, 502, 503, 504}
 
 
@@ -116,10 +115,6 @@ def get_llm(settings: Settings = settings) -> BaseChatModel:
     )
 
 
-def get_maritalk_llm(settings: Settings = settings) -> ChatMaritalk:
-    return _build_maritaca_llm(settings=settings)
-
-
 def is_transient_provider_error(exc: Exception) -> bool:
     if isinstance(exc, (TimeoutError, APITimeoutError)):
         return True
@@ -136,21 +131,21 @@ def is_transient_provider_error(exc: Exception) -> bool:
     if isinstance(exc, APIStatusError):
         return exc.status_code in TRANSIENT_HTTP_STATUS_CODES
 
-    if isinstance(exc, MaritalkHTTPError):
-        return exc.status_code in TRANSIENT_HTTP_STATUS_CODES
-
     return False
 
 
-def _build_maritaca_llm(*, settings: Settings) -> ChatMaritalk:
+def _build_maritaca_llm(*, settings: Settings) -> ChatOpenAI:
     api_key = _clean_optional_api_key(settings.maritaca_api_key)
     if api_key is None:
         raise LLMConfigurationError("MARITACA_API_KEY is required for Maritaca chat.")
 
-    return ChatMaritalk(
-        api_key=api_key,
+    return ChatOpenAI(
+        api_key=SecretStr(api_key),
+        base_url=MARITACA_BASE_URL,
         model=settings.maritaca_model,
         temperature=0.2,
+        timeout=settings.llm.timeout_seconds,
+        max_retries=0,
     )
 
 
@@ -168,6 +163,7 @@ def _build_openrouter_llm(*, settings: Settings) -> ChatOpenAI:
         temperature=0.2,
         timeout=settings.llm.timeout_seconds,
         max_retries=0,
+        extra_body={"provider": {"require_parameters": True}},
     )
 
 
