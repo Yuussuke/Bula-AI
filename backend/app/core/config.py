@@ -9,7 +9,7 @@ class MaritacaSettings(BaseSettings):
     # Optional so the app and CI can boot without a paid API key.
     # Endpoints that require the LLM should validate this at call time.
     maritaca_api_key: str | None = None
-    maritaca_model: str = "sabiazinho-4"
+    maritaca_model: str = "sabia-4"
 
 
 class LLMSettings(BaseSettings):
