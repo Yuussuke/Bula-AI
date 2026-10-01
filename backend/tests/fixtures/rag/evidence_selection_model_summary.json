@@ -1,0 +1,71 @@
+{
+  "purpose": "auxiliary evidence-selection model comparisons",
+  "cases": 12,
+  "positive_cases": 9,
+  "negative_cases": 3,
+  "repetitions_per_model": 3,
+  "temperature": 0.2,
+  "fixtures_sha256": "c32832b346e86c649d360e34e3a8d77313df7ee6d6c27b50175971e87300fe16",
+  "prompt_sha256": "60041f2820b2dd80d6dbe4ca554862039544c00f0a0b87ab85897ca643238850",
+  "schema_sha256": "2d764ffb05bda932361cba39c04e3ffe87f530b1de7a7774841956e1ff04f2af",
+  "comparisons": [
+    {
+      "id": "sabiazinho_4_vs_sabia_4",
+      "report": "evidence_selection_model_comparison_results.md",
+      "calls": 72,
+      "models": [
+        {
+          "requested_and_observed": "sabiazinho-4",
+          "calls": 36,
+          "negative_errors": "3/9",
+          "calls_with_tangential_evidence": "6/36",
+          "positive_calls_with_any_gold": "27/27",
+          "false_abstentions": "0/27",
+          "technical_failures": "0/36",
+          "fallback_calls": 0,
+          "mean_latency_ms": 675.1
+        },
+        {
+          "requested_and_observed": "sabia-4",
+          "calls": 36,
+          "negative_errors": "0/9",
+          "calls_with_tangential_evidence": "0/36",
+          "positive_calls_with_any_gold": "27/27",
+          "false_abstentions": "0/27",
+          "technical_failures": "0/36",
+          "fallback_calls": 0,
+          "mean_latency_ms": 738.4
+        }
+      ]
+    },
+    {
+      "id": "sabia_4_vs_sabia_4_thinking",
+      "report": "evidence_selection_thinking_results.md",
+      "calls": 72,
+      "models": [
+        {
+          "requested_and_observed": "sabia-4",
+          "calls": 36,
+          "negative_errors": "0/9",
+          "calls_with_tangential_evidence": "3/36",
+          "positive_calls_with_any_gold": "27/27",
+          "false_abstentions": "0/27",
+          "technical_failures": "0/36",
+          "fallback_calls": 0,
+          "mean_latency_ms": 899.3
+        },
+        {
+          "requested_and_observed": "sabia-4-thinking",
+          "calls": 36,
+          "negative_errors": "1/9",
+          "calls_with_tangential_evidence": "2/36",
+          "positive_calls_with_any_gold": "27/27",
+          "false_abstentions": "0/27",
+          "technical_failures": "0/36",
+          "fallback_calls": 0,
+          "mean_latency_ms": 4602.4
+        }
+      ]
+    }
+  ]
+}

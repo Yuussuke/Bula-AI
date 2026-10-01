@@ -47,11 +47,9 @@ remaining tangential-selection case. The benchmark is an auxiliary groundedness
 check, not a new production stage or the TCC's primary evaluation. We did not
 change the prompt or golds in response to these final runs.
 
-Sanitized per-call data and hashes for reproducibility are in the matching JSON
-reports: [baseline](evidence_selection_base_results.json),
-[paired models](evidence_selection_model_comparison_results.json),
-[paraphrases](evidence_selection_paraphrase_results.json) and
-[Thinking](evidence_selection_thinking_results.json). The
+The compact [model-comparison summary](evidence_selection_model_summary.json)
+records the aggregate results and experiment hashes. The baseline and
+paraphrase JSON reports retain their case-level data. The
 [frozen cases](evidence_selection_cases.json) and
 [reviewed paraphrases](evidence_selection_paraphrases.json) are versioned.
 No credentials, raw provider answers or user sessions are stored in these

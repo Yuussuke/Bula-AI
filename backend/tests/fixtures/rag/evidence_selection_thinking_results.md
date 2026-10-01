@@ -26,11 +26,12 @@ earlier model comparison. Frozen fixture SHA256:
 Production file hashes remained unchanged before/after. No retrieval,
 embeddings, database, renderer or answer post-processing participates here.
 
-`evidence_selection_thinking_results.json` contains all call records, per-case
-ID frequencies (including zeros), per-repetition metrics, means/ranges, observed
-models, limitations, latencies and reported token usage. No raw provider answer,
-internal reasoning or credentials were saved. Model aliases are observed API
-identifiers, not a guarantee of a pinned internal provider revision.
+The [compact model summary](evidence_selection_model_summary.json) records the
+aggregate comparison and experiment hashes. The tables below retain per-case
+and per-repetition results. Complete per-call records remain outside this PR.
+No raw provider answer, internal reasoning or credentials were saved. Model
+aliases are observed API identifiers, not a guarantee of a pinned internal
+provider revision.
 
 ## Main results
 
@@ -206,7 +207,8 @@ content or user understanding. This auxiliary benchmark does not measure
 generation, claim support of final answers, retrieval recall, readability or
 clinical safety. Recall@K/MRR, documentary fidelity, readability and operational
 indicators remain the main TCC evaluation. No production configuration was
-changed to either model in this task.
+changed during the experiment; the subsequent application change sets
+`sabia-4` as the default.
 
 Implementation changes are evaluation-only: the existing comparison runner now
 accepts the requested model pair; the paraphrase runner, frozen manifest,

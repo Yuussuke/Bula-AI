@@ -169,7 +169,7 @@ Não há nota composta nem inferência de generalização a partir das 36 execu�
 
 ## Artefatos e verificações
 
-- [Registro por chamada e agregados JSON](evidence_selection_model_comparison_results.json).
+- [Resumo estruturado dos dois experimentos finais](evidence_selection_model_summary.json).
 - Executor: `backend/scripts/compare_evidence_selection_models.py`.
 - Testes: `backend/tests/unit/scripts/test_compare_evidence_selection_models.py`.
 - 25 testes offline passaram (19 do benchmark-base e seis do executor/contabilidade/observação). Ruff e git diff --check passaram.
@@ -180,4 +180,4 @@ Fixture SHA-256: `c32832b346e86c649d360e34e3a8d77313df7ee6d6c27b50175971e87300fe
 Prompt SHA-256: `60041f2820b2dd80d6dbe4ca554862039544c00f0a0b87ab85897ca643238850`.
 Structured output SHA-256: `2d764ffb05bda932361cba39c04e3ffe87f530b1de7a7774841956e1ff04f2af`.
 
-Não foram feitos commits ou publicação nesta etapa.
+Os registros completos por chamada foram mantidos fora da PR para reduzir o diff.
