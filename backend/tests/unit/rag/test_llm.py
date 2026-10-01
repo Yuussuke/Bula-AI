@@ -69,14 +69,15 @@ def test_llm_factory_uses_maritaca_default_model(
         created_kwargs.update(kwargs)
         return FakeChatModel()
 
-    monkeypatch.setattr(rag_llm, "ChatMaritalk", fake_maritaca)
-    monkeypatch.setattr(rag_llm, "ChatOpenAI", lambda **kwargs: FakeChatModel())
+    monkeypatch.setattr(rag_llm, "ChatOpenAI", fake_maritaca)
 
     model = get_llm(settings=build_settings(enable_fallback=False))
 
     assert isinstance(model, FakeChatModel)
-    assert created_kwargs["api_key"] == "maritaca-test-key"
+    assert isinstance(created_kwargs["api_key"], SecretStr)
+    assert created_kwargs["api_key"].get_secret_value() == "maritaca-test-key"
     assert created_kwargs["model"] == "sabiazinho-4"
+    assert created_kwargs["base_url"] == rag_llm.MARITACA_BASE_URL
 
 
 def test_llm_factory_uses_openrouter_fallback_model(
@@ -84,10 +85,9 @@ def test_llm_factory_uses_openrouter_fallback_model(
 ) -> None:
     created_kwargs: dict[str, object] = {}
 
-    monkeypatch.setattr(rag_llm, "ChatMaritalk", lambda **kwargs: FakeChatModel())
-
     def fake_openrouter(**kwargs: object) -> FakeChatModel:
-        created_kwargs.update(kwargs)
+        if kwargs["base_url"] == rag_llm.OPENROUTER_BASE_URL:
+            created_kwargs.update(kwargs)
         return FakeChatModel()
 
     monkeypatch.setattr(rag_llm, "ChatOpenAI", fake_openrouter)

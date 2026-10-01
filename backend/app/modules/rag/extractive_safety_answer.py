@@ -4,46 +4,87 @@ import json
 import re
 import unicodedata
 from dataclasses import dataclass
+from enum import StrEnum
 
 from langchain_core.documents import Document
-from pydantic import BaseModel, ConfigDict, Field, ValidationError
+from pydantic import ValidationError
 
-
-HIGH_RISK_QUESTION_PATTERN = re.compile(
-    r"\b(?:alerg\w*|hipersensib\w*|contraindic\w*|dose\w*|dosagem\w*|"
-    r"posolog\w*|gravidez|gravid\w*|amament\w*|crianc\w*|pediatric\w*|"
-    r"intera\w*|reac\w*|efeitos? adversos?|segur\w*)\b"
-    r"|\b(?:quem|quando) nao (?:pode|deve|posso|devo) usar\b"
-    r"|\b(?:posso|pode|devo|deve) (?:tomar|usar)\b"
+from app.modules.rag.context_assessment import (
+    ContextAssessment,
+    EvidenceAssessmentDecoder,
+    EvidenceLimitation,
+    EvidenceSupport,
 )
+
+from app.modules.rag.evidence_units import EvidenceUnit, build_evidence_units
+
+
 ALLERGY_TARGET_PATTERN = re.compile(
-    r"\b(?:alerg\w*|hipersensib\w*)\s+(?:a|as|ao|aos|de)\s+(\w+)"
+    r"\b(?:alerg\w*|hipersensib\w*)\s+(?:a|as|ao|aos|de)\s+"
+    r"([\w-]+(?:\s+[\w-]+){0,2})(?=[.,;?!]|$)"
 )
 FOLLOW_UP_TARGET_PATTERN = re.compile(r"^(?:e|mas e)\s+(?:a|as|ao|aos)\s+(\w+)")
-MAX_EVIDENCE_ITEMS = 2
-
-
-class SafetyEvidenceItem(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    source_number: int = Field(strict=True, ge=1)
-    quote: str = Field(min_length=8, max_length=600)
-
-
-class SafetyEvidenceSelection(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
-    evidence: list[SafetyEvidenceItem] = Field(max_length=MAX_EVIDENCE_ITEMS)
+EXPLICIT_RESTRICTION_PATTERN = re.compile(
+    r"\b(?:nao\s+(?:(?:e|sao)\s+)?(?:utiliz\w*|us\w*|tom\w*|"
+    r"recomend\w*|indicad\w*)|"
+    r"contraindic\w*|proibid\w*)\b"
+)
+NEGATED_RESTRICTION_PATTERN = re.compile(
+    r"\bnao\s+(?:e|sao)\s+(?:contraindic\w*|proibid\w*)\b"
+)
+PERMISSION_QUESTION_PATTERN = re.compile(
+    r"\b(?:posso|pode|podem|devo|deve|proibid\w*|segur\w*)\b"
+)
+CAUTION_ONLY_PATTERN = re.compile(
+    r"\b(?:inform\w*|consult\w*|convers\w*|cautel\w*|"
+    r"avali\w*|pesquisa cuidadosa|pode causar)\b"
+)
 
 
 @dataclass(frozen=True)
 class ExtractiveSafetyAnswer:
     answer: str
     documents: list[Document]
+    support: EvidenceSupport
 
 
-def is_high_risk_question(question: str) -> bool:
-    return HIGH_RISK_QUESTION_PATTERN.search(_without_accents(question)) is not None
+class EvidenceRejectionReason(StrEnum):
+    INVALID_JSON = "invalid_json"
+    INVALID_SELECTION_SCHEMA = "invalid_selection_schema"
+    UNKNOWN_EVIDENCE_ID = "unknown_evidence_id"
+    ALLERGY_TARGET_MISMATCH = "allergy_target_mismatch"
+    EMPTY_VERIFIED_EVIDENCE = "empty_verified_evidence"
+
+
+@dataclass(frozen=True)
+class EvidenceValidationResult:
+    answer: ExtractiveSafetyAnswer | None = None
+    rejection_reason: EvidenceRejectionReason | None = None
+    assessment: ContextAssessment | None = None
+    validation_error: json.JSONDecodeError | ValidationError | None = None
+
+    def error_details(self) -> dict[str, object]:
+        """Describe original failures without logging input or exception prose."""
+        if isinstance(self.validation_error, json.JSONDecodeError):
+            return {
+                "error_type": "JSONDecodeError",
+                "json_line": self.validation_error.lineno,
+                "json_column": self.validation_error.colno,
+                "json_reason": self.validation_error.msg,
+            }
+        if isinstance(self.validation_error, ValidationError):
+            issues = []
+            for issue in self.validation_error.errors(include_input=False):
+                # Unknown keys may contain arbitrary provider output.
+                location = [
+                    part
+                    if part in {"unit_ids", "limitation"} or isinstance(part, int)
+                    else "<unknown_field>"
+                    for part in issue["loc"]
+                ]
+                issues.append({"location": location, "type": issue["type"]})
+            return {"error_type": "ValidationError", "issues": issues}
+        return {}
 
 
 def has_specific_allergy_target(
@@ -58,102 +99,164 @@ def has_specific_allergy_target(
 def select_allergy_evidence(
     *, documents: list[Document], question: str, previous_question: str | None
 ) -> str:
-    """Select a complete statement mentioning the named allergen, without an LLM."""
+    """Select one source-derived unit mentioning the named allergen, without an LLM."""
     allergy_target = _get_allergy_target(
         question=question, previous_question=previous_question
     )
     if allergy_target is None:
-        return _encode_selection(source_number=None, quote=None)
+        return _encode_selection(unit_id=None, support=EvidenceSupport.INSUFFICIENT)
 
-    indexed_documents = list(enumerate(documents, start=1))
-    indexed_documents.sort(key=lambda item: _allergy_section_priority(item[1]))
+    units = build_evidence_units(documents)
+    units.sort(key=lambda unit: _allergy_section_priority(unit.document))
 
-    for source_number, document in indexed_documents:
-        for statement in _source_statements(document.page_content):
-            if len(statement) < 8 or len(statement) > 600:
-                continue
-            if _contains_multiple_sentences(statement):
-                continue
-            if not _contains_target(statement, allergy_target):
-                continue
-            return _encode_selection(source_number=source_number, quote=statement)
+    candidates: list[tuple[int, EvidenceUnit]] = []
+    for unit in units:
+        if not _contains_target(unit.text, allergy_target):
+            continue
+        restriction_priority = int(_has_explicit_restriction(unit.text))
+        candidates.append((restriction_priority, unit))
 
-    return _encode_selection(source_number=None, quote=None)
+    if not candidates:
+        return _encode_selection(unit_id=None, support=EvidenceSupport.INSUFFICIENT)
+
+    # A direct restriction takes precedence over a cautionary mention of the
+    # same allergen. Equal-ranked candidates retain source/section order.
+    restriction_priority, selected_unit = max(
+        candidates, key=lambda candidate: candidate[0]
+    )
+    support = (
+        EvidenceSupport.SUPPORTED
+        if restriction_priority
+        else EvidenceSupport.PARTIALLY_SUPPORTED
+    )
+    return _encode_selection(unit_id=selected_unit.unit_id, support=support)
 
 
-def build_extractive_safety_answer(
+def validate_extractive_safety_answer(
     *,
     raw_response: str,
     documents: list[Document],
     question: str,
     previous_question: str | None = None,
-) -> ExtractiveSafetyAnswer | None:
-    """Fail closed if the model's selected text is not in the cited chunk."""
+) -> EvidenceValidationResult:
+    """Resolve model-selected IDs to source-owned text, failing closed on invalid IDs."""
     try:
-        selection = SafetyEvidenceSelection.model_validate_json(raw_response)
-    except ValidationError:
-        return None
+        selection = EvidenceAssessmentDecoder().decode(raw_response)
+    except json.JSONDecodeError as error:
+        return EvidenceValidationResult(
+            rejection_reason=EvidenceRejectionReason.INVALID_JSON,
+            validation_error=error,
+        )
+    except ValidationError as error:
+        return EvidenceValidationResult(
+            rejection_reason=EvidenceRejectionReason.INVALID_SELECTION_SCHEMA,
+            validation_error=error,
+        )
 
-    if not selection.evidence:
-        return None
+    if not selection.unit_ids:
+        return EvidenceValidationResult(
+            answer=ExtractiveSafetyAnswer(
+                answer="", documents=[], support=EvidenceSupport.INSUFFICIENT
+            ),
+            assessment=selection,
+        )
 
+    units_by_id = {unit.unit_id: unit for unit in build_evidence_units(documents)}
     allergy_target = _get_allergy_target(
         question=question, previous_question=previous_question
     )
-    verified_evidence: list[tuple[int, str, Document]] = []
-    seen_quotes: set[tuple[int, str]] = set()
+    verified_evidence: list[EvidenceUnit] = []
+    seen_unit_ids: set[str] = set()
 
-    for evidence in selection.evidence:
-        if evidence.source_number > len(documents):
-            return None
-
-        document = documents[evidence.source_number - 1]
-        quote = _collapse_whitespace(evidence.quote)
-        section_title = str(document.metadata.get("section_title", "")).strip()
-
-        if not _is_complete_source_statement(
-            quote=quote, source_text=document.page_content
-        ):
-            return None
-        if _contains_multiple_sentences(quote):
-            return None
-        if _without_accents(quote.lstrip("# ")) == _without_accents(section_title):
-            return None
-        if allergy_target and not _contains_target(quote, allergy_target):
-            return None
-
-        quote_identity = (evidence.source_number, quote)
-        if quote_identity in seen_quotes:
+    for unit_id in selection.unit_ids:
+        unit = units_by_id.get(unit_id)
+        if unit is None:
+            return EvidenceValidationResult(
+                rejection_reason=EvidenceRejectionReason.UNKNOWN_EVIDENCE_ID
+            )
+        if allergy_target and not _contains_target(unit.text, allergy_target):
+            return EvidenceValidationResult(
+                rejection_reason=EvidenceRejectionReason.ALLERGY_TARGET_MISMATCH
+            )
+        if unit_id in seen_unit_ids:
             continue
-
-        seen_quotes.add(quote_identity)
-        verified_evidence.append((evidence.source_number, quote, document))
+        seen_unit_ids.add(unit_id)
+        verified_evidence.append(unit)
 
     if not verified_evidence:
-        return None
-
-    answer_lines: list[str] = []
-    cited_documents: list[Document] = []
-    displayed_numbers_by_source: dict[int, int] = {}
-    for source_number, quote, document in verified_evidence:
-        section_title = str(document.metadata.get("section_title", "")).strip()
-        displayed_number = displayed_numbers_by_source.get(source_number)
-        if displayed_number is None:
-            displayed_number = len(cited_documents) + 1
-            displayed_numbers_by_source[source_number] = displayed_number
-            cited_documents.append(document)
-        answer_lines.append(
-            f'Na seção "{section_title}", a bula informa:\n\n'
-            f'> "{quote}" [{displayed_number}]'
+        return EvidenceValidationResult(
+            rejection_reason=EvidenceRejectionReason.EMPTY_VERIFIED_EVIDENCE
         )
 
-    answer_lines.append(
-        "Esses trechos não determinam, sozinhos, se o medicamento é adequado "
-        "ao seu caso. Consulte um médico ou farmacêutico antes de usá-lo."
+    support = selection.support
+    if (
+        support is EvidenceSupport.SUPPORTED
+        and PERMISSION_QUESTION_PATTERN.search(_without_accents(question))
+        and any(_is_caution_only(unit.text) for unit in verified_evidence)
+    ):
+        has_explicit_restriction = any(
+            _has_explicit_restriction(unit.text) for unit in verified_evidence
+        )
+        if not has_explicit_restriction:
+            support = EvidenceSupport.PARTIALLY_SUPPORTED
+            selection = selection.model_copy(
+                update={"limitation": EvidenceLimitation.INDIVIDUAL}
+            )
+
+    answer_lines: list[str] = []
+    selected_source_numbers = {unit.source_number for unit in verified_evidence}
+    ranked_source_numbers = sorted(
+        sorted(selected_source_numbers),
+        key=lambda source_number: _get_relevance_score(documents[source_number - 1]),
+        reverse=True,
     )
-    return ExtractiveSafetyAnswer(
-        answer="\n\n".join(answer_lines), documents=cited_documents
+    cited_documents = [documents[number - 1] for number in ranked_source_numbers]
+    displayed_numbers_by_source = {
+        source_number: displayed_number
+        for displayed_number, source_number in enumerate(ranked_source_numbers, start=1)
+    }
+    previous_source_number: int | None = None
+    for unit in verified_evidence:
+        displayed_number = displayed_numbers_by_source[unit.source_number]
+        if unit.source_number != previous_source_number:
+            section_title = unit.section_title or "Seção não identificada"
+            answer_lines.append(f'Na seção "{section_title}", a bula informa:')
+        previous_source_number = unit.source_number
+        quoted_lines = "\n".join(f"> {line}" for line in unit.text.splitlines())
+        answer_lines.append(f"{quoted_lines} [{displayed_number}]")
+
+    if support is EvidenceSupport.PARTIALLY_SUPPORTED:
+        if selection.limitation is EvidenceLimitation.INDIVIDUAL:
+            answer_lines.append(
+                "O trecho é relacionado à pergunta, mas não basta para concluir "
+                "se esta apresentação é adequada ao seu caso. Consulte um médico "
+                "ou farmacêutico antes de usá-la."
+            )
+        elif selection.limitation is EvidenceLimitation.SCOPE:
+            answer_lines.append(
+                "O trecho informa o que a bula descreve, mas não estabelece a "
+                "finalidade ou conclusão sugerida na pergunta. Isso não constitui "
+                "uma avaliação individual de uso do medicamento."
+            )
+        else:
+            answer_lines.append(
+                "Os trechos respondem parte da pergunta, mas não sustentam "
+                "todas as conclusões solicitadas. Consulte a bula completa ou "
+                "um profissional de saúde para esclarecer o que falta."
+            )
+    return EvidenceValidationResult(
+        answer=ExtractiveSafetyAnswer(
+            answer="\n\n".join(answer_lines), documents=cited_documents, support=support
+        ),
+        assessment=selection,
     )
+
+
+def _get_relevance_score(document: Document) -> float:
+    try:
+        return float(document.metadata.get("score", 0.0))
+    except TypeError, ValueError:
+        return 0.0
 
 
 def _get_allergy_target(*, question: str, previous_question: str | None) -> str | None:
@@ -179,7 +282,7 @@ def _get_explicit_allergy_target(question: str) -> str | None:
 
 
 def _normalize_target(target: str) -> str | None:
-    normalized_target = target.rstrip("s")
+    normalized_target = target.strip().rstrip("s")
     if len(normalized_target) < 5 or normalized_target in {
         "medicamento",
         "remedio",
@@ -194,38 +297,15 @@ def _contains_target(quote: str, target: str) -> bool:
     return re.search(rf"\b{re.escape(target)}s?\b", normalized_quote) is not None
 
 
-def _collapse_whitespace(value: str) -> str:
-    return " ".join(value.split())
+def _has_explicit_restriction(statement: str) -> bool:
+    normalized_statement = _without_accents(statement)
+    if NEGATED_RESTRICTION_PATTERN.search(normalized_statement):
+        return False
+    return EXPLICIT_RESTRICTION_PATTERN.search(normalized_statement) is not None
 
 
-def _contains_multiple_sentences(quote: str) -> bool:
-    return re.search(r"[.!?]\s+\S", quote) is not None
-
-
-def _is_complete_source_statement(*, quote: str, source_text: str) -> bool:
-    return quote in _source_statements(source_text)
-
-
-def _source_statements(source_text: str) -> list[str]:
-    statements: list[str] = []
-    for paragraph in re.split(r"\n\s*\n", source_text):
-        content_lines = [
-            line
-            for line in paragraph.splitlines()
-            if not re.match(r"^\s{0,3}#{1,6}\s", line)
-        ]
-        if not content_lines:
-            continue
-
-        for line in content_lines:
-            is_structured_line = line.lstrip().startswith(("|", "- ", "* "))
-            if is_structured_line:
-                statements.append(_collapse_whitespace(line))
-
-        paragraph_text = _collapse_whitespace(" ".join(content_lines))
-        statements.extend(re.split(r"(?<=[.!?])\s+(?=\S)", paragraph_text))
-
-    return statements
+def _is_caution_only(statement: str) -> bool:
+    return CAUTION_ONLY_PATTERN.search(_without_accents(statement)) is not None
 
 
 def _allergy_section_priority(document: Document) -> int:
@@ -235,13 +315,13 @@ def _allergy_section_priority(document: Document) -> int:
     return 1
 
 
-def _encode_selection(*, source_number: int | None, quote: str | None) -> str:
-    if source_number is None or quote is None:
-        return json.dumps({"evidence": []})
-    return json.dumps(
-        {"evidence": [{"source_number": source_number, "quote": quote}]},
-        ensure_ascii=False,
-    )
+def _encode_selection(*, unit_id: str | None, support: EvidenceSupport) -> str:
+    return ContextAssessment(
+        unit_ids=[unit_id] if unit_id is not None else [],
+        limitation=EvidenceLimitation.INDIVIDUAL
+        if support is EvidenceSupport.PARTIALLY_SUPPORTED
+        else None,
+    ).model_dump_json()
 
 
 def _without_accents(value: str) -> str:
