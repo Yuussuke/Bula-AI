@@ -76,7 +76,7 @@ def test_llm_factory_uses_maritaca_default_model(
     assert isinstance(model, FakeChatModel)
     assert isinstance(created_kwargs["api_key"], SecretStr)
     assert created_kwargs["api_key"].get_secret_value() == "maritaca-test-key"
-    assert created_kwargs["model"] == "sabiazinho-4"
+    assert created_kwargs["model"] == "sabia-4"
     assert created_kwargs["base_url"] == rag_llm.MARITACA_BASE_URL
 
 
