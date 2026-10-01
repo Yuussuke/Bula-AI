@@ -77,3 +77,30 @@ destructive for local data. The volume is declared as `postgres_data` in
 `docker-compose.yml` and is usually materialized by Docker as
 `bula-ai_postgres_data`. PostgreSQL 18 mounts it at `/var/lib/postgresql` so the
 image can create its major-version-specific data directory.
+
+## 6) RAG evidence selector model
+
+The default `MARITACA_MODEL` is `sabia-4`. An explicitly configured environment
+value still overrides this default. This setting applies to the chat LLM, not
+only to evidence selection; restart the API after changing the environment.
+
+The choice followed an auxiliary evaluation of the evidence selector using 12
+frozen cases (nine positive and three negative), three repetitions per model,
+the same evidence units, prompt, structured output, temperature 0.2, and
+alternating model order. Repetitions are not independent test cases.
+
+| Comparison | Model | Negative errors | Calls with tangential evidence | Positive coverage |
+| --- | --- | ---: | ---: | ---: |
+| Original model comparison | `sabiazinho-4` | 3/9 | 6/36 | 27/27 |
+| Original model comparison | `sabia-4` | 0/9 | 0/36 | 27/27 |
+| Later Thinking comparison | `sabia-4` | 0/9 | 3/36 | 27/27 |
+| Later Thinking comparison | `sabia-4-thinking` | 1/9 | 2/36 | 27/27 |
+
+The paraphrase check kept adequate selection in all 12 paired cases; 11 pairs
+selected identical ID sets. There were no false abstentions or technical
+failures in these comparisons. Thinking averaged 4.60 seconds per selection
+versus 0.90 seconds for `sabia-4` in the later comparison. The remaining
+tangential-selection case and qualification differences still require
+full-pipeline review. This small benchmark supports the default change; it
+does not establish generalization to other leaflets or clinical safety. Raw
+experimental outputs and benchmark-only scripts are not part of production.
