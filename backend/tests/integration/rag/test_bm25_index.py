@@ -154,6 +154,130 @@ async def test_section_evidence_reads_only_body_chunks_from_selected_bula(
 
 
 @pytest.mark.anyio
+@pytest.mark.parametrize(
+    "source_title",
+    [
+        "4. O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO?",
+        "4) O que devo saber antes de usar este medicamento?",
+        " 4.2. O QUE  DEVO\tSABER ANTES DE USAR ESTE MEDICAMENTO?\t",
+        "O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO?",
+    ],
+)
+async def test_section_identity_matches_numbered_and_unnumbered_sources(
+    bm25_context: BM25Context,
+    source_title: str,
+) -> None:
+    index, _, bulas = bm25_context
+    requested_title = "O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO?"
+    source = make_chunk(bulas[0], "Texto original de advertência.").model_copy(
+        update={"section_title": source_title}
+    )
+    other_bula = make_chunk(bulas[1], "Não deve cruzar o escopo.").model_copy(
+        update={"section_title": source_title}
+    )
+    unrelated_section = make_chunk(
+        bulas[0], "Seção diferente.", "different"
+    ).model_copy(update={"section_title": f"{requested_title} INFORMAÇÕES ADICIONAIS"})
+    await index.upsert_chunks([source, other_bula, unrelated_section])
+
+    results = await index.find_section_evidence(
+        bula_id=bulas[0].id,
+        section_titles=[requested_title],
+        limit=4,
+    )
+
+    assert results == [source]
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("k", [1, 4])
+async def test_administrative_filter_precedes_bm25_top_k_and_preserves_audit_sources(
+    bm25_context: BM25Context,
+    k: int,
+) -> None:
+    index, _, bulas = bm25_context
+    unique_term = f"documento{uuid4().hex}"
+    administrative_chunks = [
+        make_chunk(bulas[0], f"{unique_term} " * 20, f"admin-{number}").model_copy(
+            update={"section_title": title}
+        )
+        for number, title in enumerate(
+            [
+                "Histórico de alteração para a bula",
+                "Histórico de alterações para a bula",
+                "9. DIZERES LEGAIS",
+                "VENDA SOB PRESCRIÇÃO COM RETENÇÃO DA RECEITA",
+            ]
+        )
+    ]
+    clinical_chunks = [
+        make_chunk(bulas[0], f"{unique_term} orientação da bula.", f"clinical-{number}")
+        for number in range(4)
+    ]
+    foreign_chunk = make_chunk(bulas[1], unique_term, "foreign")
+    await index.upsert_chunks([*administrative_chunks, *clinical_chunks, foreign_chunk])
+
+    # Audit/index reads retain the sources; answer retrieval excludes them
+    # before top-k, rather than returning fewer results after filtering.
+    audit_results = await index.search(unique_term, bula_id=bulas[0].id, k=k)
+    administrative_ids = {chunk.chunk_id for chunk in administrative_chunks}
+    assert all(result.chunk_id in administrative_ids for result in audit_results)
+    retriever = BM25Retriever(index=index, bula_id=bulas[0].id, k=k)
+    documents = await retriever.ainvoke(unique_term)
+
+    assert len(documents) == k
+    assert {document.id for document in documents} <= {
+        chunk.chunk_id for chunk in clinical_chunks
+    }
+    assert all(
+        document.page_content == clinical_chunks[0].chunk_text for document in documents
+    )
+    assert all(
+        document.metadata["section_title"] == "Advertências" for document in documents
+    )
+    audit_documents = await BM25Retriever(
+        index=index,
+        bula_id=bulas[0].id,
+        k=k,
+        include_administrative_sections=True,
+    ).ainvoke(unique_term)
+    assert {document.id for document in audit_documents} <= administrative_ids
+
+
+@pytest.mark.anyio
+async def test_section_identity_ignores_accents_without_rewriting_source(
+    bm25_context: BM25Context,
+) -> None:
+    index, _, bulas = bm25_context
+    source = make_chunk(bulas[0], "Texto original.").model_copy(
+        update={"section_title": "4. ADVERTÊNCIAS"}
+    )
+    await index.upsert_chunks([source])
+
+    assert await index.find_section_evidence(
+        bula_id=bulas[0].id,
+        section_titles=["advertencias"],
+        limit=1,
+    ) == [source]
+
+
+@pytest.mark.anyio
+async def test_administrative_only_bula_returns_no_answer_evidence(
+    bm25_context: BM25Context,
+) -> None:
+    index, _, bulas = bm25_context
+    source = make_chunk(bulas[0], "Dados de submissão eletrônica.").model_copy(
+        update={"section_title": "Histórico de alteração para a bula"}
+    )
+    await index.upsert_chunks([source])
+
+    assert (
+        await BM25Retriever(index=index, bula_id=bulas[0].id).ainvoke("submissão") == []
+    )
+    assert len(await index.search("submissão", bula_id=bulas[0].id)) == 1
+
+
+@pytest.mark.anyio
 async def test_filtered_top_k_and_corpus_isolation(bm25_context: BM25Context) -> None:
     index, _, bulas = bm25_context
     unique_term = f"seletor{uuid4().hex}"

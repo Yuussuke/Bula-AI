@@ -624,6 +624,15 @@ diagnostics (`dense_score` and `bm25_score`) and are never compared directly.
 The final `score` is the RRF score. Results also expose source-specific ranks and
 `retrieval_sources` so evaluations can explain why a chunk was selected.
 
+Answer retrievers exclude administrative history, legal notices and prescription
+footers before filling their candidate slots. BM25 applies eligibility before
+ranking/top-k; dense retrieval applies it within its existing bounded candidate
+fetch, before returning candidates to fusion. No fetch limits are increased.
+The sources remain stored: direct index reads include them by default, and
+retrievers can explicitly set `include_administrative_sections=True` for audits.
+The dense candidate window can still be exhausted; this is not an exhaustive
+search or a relevance guarantee.
+
 `EnrichingRetriever` performs one batched Qdrant payload lookup after final
 top-k selection. It fills only allowlisted source metadata such as medication,
 manufacturer and section. Existing values are never silently overwritten. A
@@ -687,7 +696,10 @@ For contraindication or allergy questions, each strategy also reads up to two
 original body chunks from the selected bula's contraindication and warning
 sections. This bounded section lookup runs after the selected retriever and
 never broadens access to other bulas. It does not require another embedding
-call. Direct questions such as "Who cannot use this medication?" pass only
+call. Section identity comparison ignores numeric heading prefixes, case,
+accents and whitespace, while preserving the original title, text and chunk ID.
+This lookup correction requires no reindexing or PDF reprocessing.
+Direct questions such as "Who cannot use this medication?" pass only
 explicit contraindication sections to the answer model when those sections are
 available. Specific allergy questions retain both restrictions and warnings.
 Only sources cited in the answer are returned to the user. A narrow

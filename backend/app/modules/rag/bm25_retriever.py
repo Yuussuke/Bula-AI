@@ -27,6 +27,7 @@ class BM25SearchIndex(Protocol):
         k: int = 10,
         bula_id: UUID | None = None,
         corpus: Sequence[BulaCorpus] | None = None,
+        include_administrative_sections: bool = True,
     ) -> list[BM25SearchResult]: ...
 
 
@@ -46,6 +47,7 @@ class BM25Retriever(BaseRetriever):
     k: int = Field(default=10, ge=1, le=100)
     bula_id: UUID | None = None
     corpus: tuple[BulaCorpus, ...] | None = None
+    include_administrative_sections: bool = False
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -59,7 +61,11 @@ class BM25Retriever(BaseRetriever):
             return []
 
         results = await self.index.search(
-            query, k=self.k, bula_id=self.bula_id, corpus=self.corpus
+            query,
+            k=self.k,
+            bula_id=self.bula_id,
+            corpus=self.corpus,
+            include_administrative_sections=self.include_administrative_sections,
         )
         # Preserve the index ranking, original source text, and chunk identities.
         return [self._to_document(result) for result in results]
@@ -103,10 +109,12 @@ class BM25RetrieverFactory:
         bula_id: UUID | None,
         corpus: Sequence[BulaCorpus] | None = None,
         k: int = 10,
+        include_administrative_sections: bool = False,
     ) -> BM25Retriever:
         return BM25Retriever(
             index=self.index,
             bula_id=bula_id,
             corpus=tuple(corpus) if corpus is not None else None,
             k=k,
+            include_administrative_sections=include_administrative_sections,
         )
