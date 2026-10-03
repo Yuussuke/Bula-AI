@@ -10,7 +10,8 @@ from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.retriever import DenseBulaRetriever
 
 
-HYBRID_CANDIDATE_MULTIPLIER = 2
+HYBRID_CANDIDATE_MULTIPLIER = 3
+MAX_HYBRID_CANDIDATES = 100
 MAX_HYBRID_RESULTS = 50
 
 
@@ -37,7 +38,8 @@ class HybridRetrieverFactory:
         if k < 1 or k > MAX_HYBRID_RESULTS:
             raise ValueError(f"k must be between 1 and {MAX_HYBRID_RESULTS}.")
 
-        candidate_k = k * HYBRID_CANDIDATE_MULTIPLIER
+        # Preserve the supported final-k range without exceeding BM25's limit.
+        candidate_k = min(k * HYBRID_CANDIDATE_MULTIPLIER, MAX_HYBRID_CANDIDATES)
         dense_retriever = DenseBulaRetriever(
             bula_id=str(bula_id),
             k=candidate_k,

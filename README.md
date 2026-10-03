@@ -615,7 +615,8 @@ uv run pytest -q tests/integration/rag/test_bm25_index.py
 
 `HybridRetrieverFactory` builds one retrieval pipeline for an already authorized
 bula. Both the dense and BM25 retrievers receive the same `bula_id` and fetch
-`2 * k` candidates. `HybridRetriever` then combines their ranks with equal-weight
+`min(3 * k, 100)` candidates: 12 per method for the default final `k = 4`.
+`HybridRetriever` then combines their ranks with equal-weight
 Reciprocal Rank Fusion (RRF), using the standard constant `60`, deduplicates by
 the stable `chunk_id`, and returns at most `k` documents.
 
@@ -627,7 +628,7 @@ The final `score` is the RRF score. Results also expose source-specific ranks an
 Answer retrievers exclude administrative history, legal notices and prescription
 footers before filling their candidate slots. BM25 applies eligibility before
 ranking/top-k; dense retrieval applies it within its existing bounded candidate
-fetch, before returning candidates to fusion. No fetch limits are increased.
+fetch, before returning candidates to fusion. Eligibility adds no retrieval retry.
 The sources remain stored: direct index reads include them by default, and
 retrievers can explicitly set `include_administrative_sections=True` for audits.
 The dense candidate window can still be exhausted; this is not an exhaustive
@@ -652,6 +653,8 @@ component itself requires no migration, backfill, re-embedding or PDF
 reprocessing. Existing bulas still need the previously documented lexical
 backfill if they predate the PostgreSQL index. Its consistency contracts are in
 [the hybrid retrieval decision](docs/decisions/2026-09-22-hybrid-retrieval-rrf.md).
+The candidate-depth choice and structural fixes are summarized in
+[the retrieval eligibility update](docs/decisions/2026-10-02-retrieval-eligibility.md).
 
 ### Chat retrieval mode selection
 
