@@ -128,9 +128,10 @@ async def test_strategy_composition_uses_only_selected_stores_and_preserves_scop
     else:
         index.search.assert_awaited_once_with(
             "Indicações",
-            k=8 if mode == RetrievalMode.HYBRID else 4,
+            k=12 if mode == RetrievalMode.HYBRID else 4,
             bula_id=bula_id,
             corpus=None,
+            include_administrative_sections=False,
         )
     if mode == RetrievalMode.BM25:
         client.query_points.assert_not_awaited()
@@ -140,7 +141,7 @@ async def test_strategy_composition_uses_only_selected_stores_and_preserves_scop
         assert len(initialized_embeddings) == 1
         query_arguments = client.query_points.call_args.kwargs
         assert query_arguments["query_filter"].must[0].match.value == str(bula_id)
-        assert query_arguments["limit"] == (24 if mode == RetrievalMode.HYBRID else 12)
+        assert query_arguments["limit"] == (36 if mode == RetrievalMode.HYBRID else 12)
     if mode == RetrievalMode.HYBRID:
         client.retrieve.assert_awaited_once()
         assert documents[0].metadata["retrieval_sources"] == ["dense", "bm25"]

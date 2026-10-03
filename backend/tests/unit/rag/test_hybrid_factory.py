@@ -37,6 +37,7 @@ class StubBM25Index:
         k: int = 10,
         bula_id: UUID | None = None,
         corpus: tuple[BulaCorpus, ...] | None = None,
+        include_administrative_sections: bool = True,
     ) -> list[BM25SearchResult]:
         _ = query
         _ = k
@@ -71,26 +72,32 @@ def build_factory() -> tuple[
     )
 
 
-def test_factory_builds_scoped_overfetching_retrievers_and_enricher() -> None:
+@pytest.mark.parametrize(
+    ("k", "candidate_k"), [(1, 3), (4, 12), (33, 99), (34, 100), (50, 100)]
+)
+def test_factory_builds_scoped_overfetching_retrievers_and_enricher(
+    k: int,
+    candidate_k: int,
+) -> None:
     factory, qdrant_store, embeddings = build_factory()
     bula_id = UUID("11111111-1111-1111-1111-111111111111")
 
-    enriched_retriever = factory.build(bula_id=bula_id, k=4)
+    enriched_retriever = factory.build(bula_id=bula_id, k=k)
 
     assert isinstance(enriched_retriever, EnrichingRetriever)
     assert enriched_retriever.payload_store is qdrant_store
     hybrid_retriever = enriched_retriever.wrapped_retriever
     assert isinstance(hybrid_retriever, HybridRetriever)
-    assert hybrid_retriever.k == 4
+    assert hybrid_retriever.k == k
     dense_retriever, bm25_retriever = hybrid_retriever.retrievers
     assert isinstance(dense_retriever, DenseBulaRetriever)
     assert dense_retriever.bula_id == str(bula_id)
-    assert dense_retriever.k == 8
+    assert dense_retriever.k == candidate_k
     assert dense_retriever.qdrant_store is qdrant_store
     assert dense_retriever.embeddings is embeddings
     assert isinstance(bm25_retriever, BM25Retriever)
     assert bm25_retriever.bula_id == bula_id
-    assert bm25_retriever.k == 8
+    assert bm25_retriever.k == candidate_k
 
 
 @pytest.mark.parametrize("k", [0, 51])

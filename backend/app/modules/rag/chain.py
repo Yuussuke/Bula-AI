@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import unicodedata
 from collections.abc import Callable
 from typing import Literal, cast
 from uuid import UUID, uuid4
@@ -34,6 +33,7 @@ from app.modules.rag.section_evidence_retriever import (
     is_contraindication_section,
     is_direct_contraindication_question,
 )
+from app.modules.rag.section_titles import is_administrative_section
 
 logger = structlog.get_logger(__name__)
 
@@ -267,8 +267,9 @@ def _select_answer_documents(inputs: dict[str, object]) -> list[Document]:
     documents = [
         document
         for document in documents
-        if not _is_administrative_history(document)
-        and not _is_prescription_footer(document)
+        if not is_administrative_section(
+            str(document.metadata.get("section_title", ""))
+        )
     ]
     if is_direct_contraindication_question(question):
         contraindication_documents = [
@@ -287,16 +288,6 @@ def _select_answer_documents(inputs: dict[str, object]) -> list[Document]:
         evidence_unit_count=len(build_evidence_units(documents)),
     )
     return documents
-
-
-def _is_administrative_history(document: Document) -> bool:
-    section_title = _without_accents(str(document.metadata.get("section_title", "")))
-    return "historico de alterac" in section_title and "bula" in section_title
-
-
-def _is_prescription_footer(document: Document) -> bool:
-    section_title = _without_accents(str(document.metadata.get("section_title", "")))
-    return "venda sob prescricao" in section_title or "dizeres legais" in section_title
 
 
 def _build_chain_output(inputs: dict[str, object]) -> dict[str, object]:
@@ -391,13 +382,6 @@ def _log_evidence_decision(
         selected_unit_count=selected_unit_count,
         limitation=limitation,
         validation_error=validation_error or {},
-    )
-
-
-def _without_accents(value: str) -> str:
-    normalized = unicodedata.normalize("NFKD", value.casefold())
-    return "".join(
-        character for character in normalized if not unicodedata.combining(character)
     )
 
 

@@ -17,7 +17,8 @@ Use LangChain's `EnsembleRetriever` execution model with a project-specific
 
 - Run one dense and one BM25 retriever asynchronously for the same question and
   authorized `bula_id`.
-- Request `2 * k` candidates from each source before fusion.
+- Request `min(3 * k, 100)` candidates from each source before fusion (updated
+  from `2 * k` on 2026-10-02; see [the validation summary](2026-10-02-retrieval-eligibility.md)).
 - Apply equal-weight Reciprocal Rank Fusion with `c = 60` and one-based ranks.
 - Deduplicate exclusively by the logical `chunk_id`; never hash text or use the
   physical Qdrant point UUID as a fallback identity.

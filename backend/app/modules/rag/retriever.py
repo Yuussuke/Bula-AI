@@ -13,6 +13,7 @@ from qdrant_client.models import FieldCondition, Filter, MatchValue, ScoredPoint
 
 from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.qdrant_store import QdrantVectorStore
+from app.modules.rag.section_titles import is_administrative_section
 
 
 CITATION_METADATA_KEYS = ("section_title", "chunk_id", "drug_name", "bula_id")
@@ -31,6 +32,7 @@ class DenseBulaRetriever(BaseRetriever):
     qdrant_store: QdrantVectorStore
     embeddings: EmbeddingAdapter
     candidate_multiplier: int = DEFAULT_CANDIDATE_MULTIPLIER
+    include_administrative_sections: bool = False
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -63,6 +65,10 @@ class DenseBulaRetriever(BaseRetriever):
                 continue
 
             document = self._point_to_document(point)
+            if not self.include_administrative_sections and is_administrative_section(
+                str(document.metadata.get("section_title", ""))
+            ):
+                continue
             if not self._has_evidence_beyond_markdown_headings(document.page_content):
                 continue
 

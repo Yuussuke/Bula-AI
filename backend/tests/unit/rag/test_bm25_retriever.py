@@ -29,6 +29,7 @@ class StubSearchIndex:
         k: int = 10,
         bula_id: UUID | None = None,
         corpus: Sequence[BulaCorpus] | None = None,
+        include_administrative_sections: bool = True,
     ) -> list[BM25SearchResult]:
         if self.error is not None:
             raise self.error

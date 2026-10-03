@@ -46,6 +46,7 @@ def build_scored_point(
     chunk_id: str = "chunk-1",
     chunk_text: str = "Dose usual: 1 comprimido.",
     score: float = 0.93,
+    section_title: str = "Posologia",
 ) -> ScoredPoint:
     return ScoredPoint(
         id=point_id,
@@ -56,7 +57,7 @@ def build_scored_point(
             "chunk_id": chunk_id,
             "chunk_text": chunk_text,
             "drug_name": "Dipirona",
-            "section_title": "Posologia",
+            "section_title": section_title,
             "chunk_index": 0,
             "manufacturer": "Example Pharma",
             "corpus": "private",
@@ -143,6 +144,71 @@ def test_retriever_rejects_invalid_candidate_multiplier() -> None:
             qdrant_store=FakeQdrantStore(),
             embeddings=build_embedding_adapter(),
         )
+
+
+@pytest.mark.anyio
+async def test_administrative_candidates_do_not_displace_answer_evidence() -> None:
+    administrative_points = [
+        build_scored_point(
+            point_id=f"admin-point-{number}",
+            chunk_id=f"admin-chunk-{number}",
+            section_title=section_title,
+            chunk_text="Registro documental com conteúdo, não apenas heading.",
+        )
+        for number, section_title in enumerate(
+            (
+                "Histórico de alteração para a bula",
+                "9. DIZERES LEGAIS",
+                "VENDA SOB PRESCRIÇÃO COM RETENÇÃO DA RECEITA",
+            )
+        )
+    ]
+    source_text = "A bula informa que a avaliação deve ser feita pelo médico."
+    evidence_point = build_scored_point(
+        chunk_id="evidence", section_title="4. Advertências", chunk_text=source_text
+    )
+    store = FakeQdrantStore(points=[*administrative_points, evidence_point])
+    retriever = DenseBulaRetriever(
+        bula_id="bula-123",
+        k=2,
+        qdrant_store=store,
+        embeddings=build_embedding_adapter(),
+    )
+
+    documents = await retriever.ainvoke("O que a bula informa?")
+
+    assert [document.metadata["chunk_id"] for document in documents] == ["evidence"]
+    assert documents[0].metadata["section_title"] == "4. Advertências"
+    assert documents[0].page_content == source_text
+    assert store.requested_limit == 6
+
+
+@pytest.mark.anyio
+async def test_administrative_sources_remain_available_when_explicitly_requested() -> (
+    None
+):
+    store = FakeQdrantStore(
+        points=[
+            build_scored_point(
+                section_title="Histórico de alteração para a bula",
+                chunk_text="Registro da submissão eletrônica.",
+            )
+        ]
+    )
+    retriever = DenseBulaRetriever(
+        bula_id="bula-123",
+        qdrant_store=store,
+        embeddings=build_embedding_adapter(),
+    )
+
+    assert await retriever.ainvoke("submissão") == []
+    documents = await retriever.model_copy(
+        update={"include_administrative_sections": True}
+    ).ainvoke("submissão")
+    assert (
+        documents[0].metadata["section_title"] == "Histórico de alteração para a bula"
+    )
+    assert documents[0].page_content == "Registro da submissão eletrônica."
 
 
 def test_retriever_rejects_invalid_k() -> None:
