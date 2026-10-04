@@ -613,8 +613,8 @@ uv run pytest -q tests/integration/rag/test_bm25_index.py
 
 ### Scoped hybrid retriever
 
-`HybridRetrieverFactory` builds one retrieval pipeline for an already authorized
-bula. Both the dense and BM25 retrievers receive the same `bula_id` and fetch
+`HybridRetrieverFactory` builds a retrieval pipeline for an already authorized
+bula or explicit corpus scope. Both dense and BM25 receive the same filters and fetch
 `min(3 * k, 100)` candidates: 12 per method for the default final `k = 4`.
 `HybridRetriever` then combines their ranks with equal-weight
 Reciprocal Rank Fusion (RRF), using the standard constant `60`, deduplicates by
@@ -647,6 +647,31 @@ retriever only after the service has authorized access to the selected bula:
 retriever = factory.build(bula_id=authorized_bula.id, k=4)
 documents = await retriever.ainvoke(question)
 ```
+
+Internal factories also support a corpus filter, including across bulas:
+
+```python
+retriever = factory.build(
+    bula_id=None,
+    corpus=[BulaCorpus.SHARED, BulaCorpus.SYSTEM],
+    k=4,
+)
+```
+
+The dense factory and strategy registry accept the same scope. Bula and corpus
+filters intersect when both are provided; an empty corpus returns no documents.
+Dense/hybrid factories reject a call with neither filter. These are internal
+components, not access controls: callers must authorize the scope, and `system`
+does not mean `published`. Corpus-only searches must not be exposed through an
+endpoint without publication/ownership authorization. The current chat still
+requires an authorized individual bula; this change does not add cross-bula chat.
+
+For bula-scoped chat, every mode retains the existing bounded PostgreSQL
+safety-section supplement (up to two chunks for allergy/contraindication queries).
+Thus `dense` means Qdrant as the primary strategy, not exclusively Qdrant as the
+final source of chat evidence. Corpus-only factory searches do not apply this
+single-bula supplement. Evaluate raw retrievers separately when comparing dense,
+BM25 and RRF; track the safety supplement separately in end-to-end evaluations.
 
 This component is used by the chat's default hybrid strategy. The retrieval
 component itself requires no migration, backfill, re-embedding or PDF
