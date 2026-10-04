@@ -221,6 +221,25 @@ def test_retriever_rejects_invalid_k() -> None:
         )
 
 
+def test_dense_retriever_rejects_an_unscoped_search() -> None:
+    with pytest.raises(ValueError, match="explicit corpus scope"):
+        DenseBulaRetriever(
+            qdrant_store=FakeQdrantStore(),
+            embeddings=build_embedding_adapter(),
+        )
+
+
+@pytest.mark.anyio
+async def test_empty_corpus_does_not_query_qdrant() -> None:
+    store = FakeQdrantStore()
+    adapter = build_embedding_adapter()
+    retriever = DenseBulaRetriever(corpus=(), qdrant_store=store, embeddings=adapter)
+
+    assert await retriever.ainvoke("Como tomar?") == []
+    assert store.query_filter is None
+    assert store.requested_limit is None
+
+
 def test_retriever_sync_path_rejects_direct_use() -> None:
     retriever = DenseBulaRetriever(
         bula_id="bula-123",

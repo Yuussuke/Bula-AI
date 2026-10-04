@@ -17,6 +17,7 @@ from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.retrievers import BaseRetriever
 from pydantic import ConfigDict, Field
 
+from app.modules.bulas.models import BulaCorpus
 from app.modules.rag.chain import (
     INSUFFICIENT_SPECIFIC_EVIDENCE_MESSAGE,
     NO_CONTEXT_MESSAGE,
@@ -36,10 +37,14 @@ async def test_swapping_llm_keeps_selected_retriever_and_sources(
 ) -> None:
     selected_retriever = FakeRetriever(documents=[build_document()])
 
-    def build_selected(*, bula_id: UUID, k: int) -> BaseRetriever:
+    def build_selected(
+        *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+    ) -> BaseRetriever:
         return selected_retriever
 
-    def build_unselected(*, bula_id: UUID, k: int) -> BaseRetriever:
+    def build_unselected(
+        *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+    ) -> BaseRetriever:
         raise AssertionError("An unrelated retriever was constructed.")
 
     builders = {strategy: build_unselected for strategy in RetrievalMode}

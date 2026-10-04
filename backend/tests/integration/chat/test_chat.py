@@ -54,8 +54,14 @@ class ModeEvidenceRetriever(BaseRetriever):
 
 
 def build_mode_evidence_retriever(
-    *, mode: RetrievalMode, bula_id: UUID, k: int
+    *,
+    mode: RetrievalMode,
+    bula_id: UUID | None,
+    corpus: tuple[BulaCorpus, ...] | None,
+    k: int,
 ) -> BaseRetriever:
+    assert bula_id is not None
+    assert corpus is None
     return ModeEvidenceRetriever(mode=mode, bula_id=bula_id)
 
 

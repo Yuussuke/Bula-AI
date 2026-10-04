@@ -9,8 +9,16 @@ from langchain_core.callbacks import (
 from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 from pydantic import ConfigDict, model_validator
-from qdrant_client.models import FieldCondition, Filter, MatchValue, ScoredPoint
+from qdrant_client.models import (
+    Condition,
+    FieldCondition,
+    Filter,
+    MatchAny,
+    MatchValue,
+    ScoredPoint,
+)
 
+from app.modules.bulas.models import BulaCorpus
 from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.section_titles import is_administrative_section
@@ -27,7 +35,10 @@ SYNC_RETRIEVER_ERROR = (
 
 
 class DenseBulaRetriever(BaseRetriever):
-    bula_id: str
+    """Internal scoped search; callers must authorize bula/corpus access first."""
+
+    bula_id: str | None = None
+    corpus: tuple[BulaCorpus, ...] | None = None
     k: int = 4
     qdrant_store: QdrantVectorStore
     embeddings: EmbeddingAdapter
@@ -37,12 +48,17 @@ class DenseBulaRetriever(BaseRetriever):
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
     @model_validator(mode="after")
-    def validate_k(self) -> Self:
+    def validate_scope_and_limits(self) -> Self:
         if self.k < 1:
             raise ValueError("k must be >= 1")
 
         if self.candidate_multiplier < 1:
             raise ValueError("candidate_multiplier must be >= 1")
+
+        if self.bula_id is not None and not self.bula_id.strip():
+            raise ValueError("A bula ID cannot be blank.")
+        if self.bula_id is None and self.corpus is None:
+            raise ValueError("A bula ID or explicit corpus scope is required.")
 
         return self
 
@@ -53,6 +69,8 @@ class DenseBulaRetriever(BaseRetriever):
         run_manager: AsyncCallbackManagerForRetrieverRun,
     ) -> list[Document]:
         _ = run_manager
+        if self.corpus == ():
+            return []
         query_vector = await asyncio.to_thread(self.embeddings.embed_query, query)
         search_result = await self.qdrant_store.search_similar(
             vector=query_vector,
@@ -89,18 +107,28 @@ class DenseBulaRetriever(BaseRetriever):
         raise RuntimeError(SYNC_RETRIEVER_ERROR)
 
     def _build_bula_filter(self) -> Filter:
-        return Filter(
-            must=[
+        conditions: list[Condition] = []
+        if self.bula_id is not None:
+            conditions.append(
                 FieldCondition(
                     key="bula_id",
                     match=MatchValue(value=self.bula_id),
-                ),
-                FieldCondition(
-                    key="embedding_profile",
-                    match=MatchValue(value=self.embeddings.embedding_profile),
-                ),
-            ]
+                )
+            )
+        conditions.append(
+            FieldCondition(
+                key="embedding_profile",
+                match=MatchValue(value=self.embeddings.embedding_profile),
+            )
         )
+        if self.corpus is not None:
+            conditions.append(
+                FieldCondition(
+                    key="corpus",
+                    match=MatchAny(any=[corpus.value for corpus in self.corpus]),
+                )
+            )
+        return Filter(must=conditions)
 
     def _point_to_document(self, point: ScoredPoint) -> Document:
         payload = point.payload or {}

@@ -106,3 +106,10 @@ def test_factory_bounds_final_result_count(k: int) -> None:
 
     with pytest.raises(ValueError, match="between 1 and 50"):
         factory.build(bula_id=UUID(int=1), k=k)
+
+
+def test_hybrid_factory_rejects_an_unscoped_search() -> None:
+    factory, _, _ = build_factory()
+
+    with pytest.raises(ValueError, match="explicit corpus scope"):
+        factory.build(bula_id=None)

@@ -1,7 +1,9 @@
 """Request-scoped construction of the hybrid retrieval strategy."""
 
+from collections.abc import Sequence
 from uuid import UUID
 
+from app.modules.bulas.models import BulaCorpus
 from app.modules.rag.bm25_retriever import BM25RetrieverFactory
 from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.enriching_retriever import EnrichingRetriever
@@ -16,7 +18,7 @@ MAX_HYBRID_RESULTS = 50
 
 
 class HybridRetrieverFactory:
-    """Build one authorized bula-scoped hybrid retriever per request."""
+    """Build a scoped hybrid retriever after the caller authorizes the scope."""
 
     def __init__(
         self,
@@ -32,22 +34,32 @@ class HybridRetrieverFactory:
     def build(
         self,
         *,
-        bula_id: UUID,
+        bula_id: UUID | None,
+        corpus: Sequence[BulaCorpus] | None = None,
         k: int = 4,
     ) -> EnrichingRetriever:
         if k < 1 or k > MAX_HYBRID_RESULTS:
             raise ValueError(f"k must be between 1 and {MAX_HYBRID_RESULTS}.")
+        if bula_id is not None and not isinstance(bula_id, UUID):
+            raise ValueError("A bula ID must be a UUID.")
+        if bula_id is None and corpus is None:
+            raise ValueError("A bula UUID or explicit corpus scope is required.")
+        corpus_scope = (
+            tuple(BulaCorpus(value) for value in corpus) if corpus is not None else None
+        )
 
         # Preserve the supported final-k range without exceeding BM25's limit.
         candidate_k = min(k * HYBRID_CANDIDATE_MULTIPLIER, MAX_HYBRID_CANDIDATES)
         dense_retriever = DenseBulaRetriever(
-            bula_id=str(bula_id),
+            bula_id=str(bula_id) if bula_id is not None else None,
+            corpus=corpus_scope,
             k=candidate_k,
             qdrant_store=self.qdrant_store,
             embeddings=self.embeddings,
         )
         bm25_retriever = self.bm25_retriever_factory.build(
             bula_id=bula_id,
+            corpus=corpus_scope,
             k=candidate_k,
         )
         hybrid_retriever = HybridRetriever.from_retrievers(
