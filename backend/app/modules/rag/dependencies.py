@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import Settings, get_settings
 from app.core.database import get_db
 from app.modules.bulas.dependencies import get_bula_repository
+from app.modules.bulas.models import BulaCorpus
 from app.modules.bulas.repository import BulaRepository
 from app.modules.rag.base_chunker import BaseChunker
 from app.modules.rag.bm25_index import PostgreSQLBM25Index
@@ -104,13 +105,15 @@ def get_qdrant_store(
 
 
 def get_dense_retriever(
-    bula_id: str,
+    bula_id: str | None,
     k: int = 4,
+    corpus: tuple[BulaCorpus, ...] | None = None,
     qdrant_store: QdrantVectorStore = Depends(get_qdrant_store),
     embeddings: EmbeddingAdapter = Depends(get_embeddings),
 ) -> BaseRetriever:
     return DenseBulaRetriever(
         bula_id=bula_id,
+        corpus=corpus,
         k=k,
         qdrant_store=qdrant_store,
         embeddings=embeddings,
@@ -192,36 +195,54 @@ def get_retriever_strategy_factory(
             qdrant_client=get_qdrant_client(request=request), settings=settings
         )
 
-    def build_dense(*, bula_id: UUID, k: int) -> BaseRetriever:
+    def build_dense(
+        *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+    ) -> BaseRetriever:
         retriever = DenseBulaRetriever(
-            bula_id=str(bula_id),
+            bula_id=str(bula_id) if bula_id is not None else None,
+            corpus=corpus,
             k=k,
             qdrant_store=build_vector_store(),
             embeddings=get_embeddings(settings=settings),
         )
+        if bula_id is None:
+            return retriever
         return SectionEvidenceRetriever(
             wrapped_retriever=retriever,
             index=section_index,
             bula_id=bula_id,
+            corpus=corpus,
         )
 
-    def build_bm25(*, bula_id: UUID, k: int) -> BaseRetriever:
+    def build_bm25(
+        *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+    ) -> BaseRetriever:
+        retriever = bm25_factory.build(bula_id=bula_id, corpus=corpus, k=k)
+        if bula_id is None:
+            return retriever
         return SectionEvidenceRetriever(
-            wrapped_retriever=bm25_factory.build(bula_id=bula_id, k=k),
+            wrapped_retriever=retriever,
             index=section_index,
             bula_id=bula_id,
+            corpus=corpus,
         )
 
-    def build_hybrid(*, bula_id: UUID, k: int) -> BaseRetriever:
+    def build_hybrid(
+        *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+    ) -> BaseRetriever:
         factory = HybridRetrieverFactory(
             qdrant_store=build_vector_store(),
             embeddings=get_embeddings(settings=settings),
             bm25_retriever_factory=bm25_factory,
         )
+        retriever = factory.build(bula_id=bula_id, corpus=corpus, k=k)
+        if bula_id is None:
+            return retriever
         return SectionEvidenceRetriever(
-            wrapped_retriever=factory.build(bula_id=bula_id, k=k),
+            wrapped_retriever=retriever,
             index=section_index,
             bula_id=bula_id,
+            corpus=corpus,
         )
 
     return RetrieverStrategyFactory(

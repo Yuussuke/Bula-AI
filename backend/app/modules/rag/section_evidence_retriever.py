@@ -14,6 +14,7 @@ from langchain_core.documents import Document
 from langchain_core.retrievers import BaseRetriever
 from pydantic import ConfigDict, Field
 
+from app.modules.bulas.models import BulaCorpus
 from app.modules.rag.schemas import ChunkMetadataInput
 
 
@@ -76,6 +77,7 @@ class SectionEvidenceRetriever(BaseRetriever):
     wrapped_retriever: BaseRetriever
     index: SectionEvidenceIndex = Field(exclude=True, repr=False)
     bula_id: UUID
+    corpus: tuple[BulaCorpus, ...] | None = None
     section_limit: int = Field(default=2, ge=1, le=4)
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
@@ -87,6 +89,8 @@ class SectionEvidenceRetriever(BaseRetriever):
         run_manager: AsyncCallbackManagerForRetrieverRun,
     ) -> list[Document]:
         documents = await self.wrapped_retriever.ainvoke(query)
+        if self.corpus == ():
+            return []
         if not is_contraindication_question(query):
             return documents
 
@@ -102,6 +106,8 @@ class SectionEvidenceRetriever(BaseRetriever):
         for chunk in section_chunks:
             if chunk.bula_id != self.bula_id:
                 raise ValueError("Section evidence belongs to another bula.")
+            if self.corpus is not None and chunk.corpus not in self.corpus:
+                continue
             if chunk.chunk_id in seen_chunk_ids:
                 continue
             seen_chunk_ids.add(chunk.chunk_id)

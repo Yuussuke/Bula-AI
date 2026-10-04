@@ -135,3 +135,27 @@ async def test_rejects_section_evidence_from_another_bula() -> None:
 
     with pytest.raises(ValueError, match="another bula"):
         await retriever.ainvoke("Quais são as contraindicações?")
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("corpus", [(BulaCorpus.SHARED,), (BulaCorpus.SYSTEM,), ()])
+async def test_section_supplement_respects_corpus_scope(
+    corpus: tuple[BulaCorpus, ...],
+) -> None:
+    bula_id = UUID(int=1)
+    section_index = AsyncMock(spec=SectionEvidenceIndex)
+    section_index.find_section_evidence.return_value = [safety_chunk(bula_id)]
+    retriever = SectionEvidenceRetriever(
+        wrapped_retriever=ExistingResultsRetriever(documents=[]),
+        index=section_index,
+        bula_id=bula_id,
+        corpus=corpus,
+    )
+
+    documents = await retriever.ainvoke("Tenho alergia. Posso usar?")
+
+    assert [document.metadata["chunk_id"] for document in documents] == (
+        ["contra"] if BulaCorpus.SYSTEM in corpus else []
+    )
+    if not corpus:
+        section_index.find_section_evidence.assert_not_awaited()
