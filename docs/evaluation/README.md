@@ -1,35 +1,23 @@
-# Avaliação do TCC — preparação do piloto
+# TCC evaluation preparation
 
-Esta pasta versiona os artefatos finais de preparação, não resultados de uma
-avaliação já executada. A investigação isolada do seletor permanece auxiliar;
-não substitui a avaliação principal do assistente RAG.
+Preparation artifacts only: the pilot and main evaluation have not been run.
+The evidence-selector benchmark remains an auxiliary development check.
 
-## Artefatos canônicos
+- [Corpus A](corpus/corpus_final.csv): 50 documents selected for documentary
+  diversity; [selection rationale](corpus/corpus_selection_report.md).
+- [Corpus B](corpus_b/corpus_b_final.csv): 50 documents in five recurring
+  therapeutic groups; [selection rationale](corpus_b/corpus_b_selection_report.md).
+- [Pilot](corpus/corpus_pilot.csv): P001, PETIVIT BC, outside both corpora.
+- [Download audit](corpus/download_audit_report.md): historical eligibility checks.
+- [Experimental decisions](experimental_design_decisions.md): design and metrics.
+- [Pilot readiness](pilot_readiness.md): implementation gaps and next steps.
 
-- [Corpus A](corpus/corpus_final.csv): 50 PDFs selecionados por diversidade
-  documental; [justificativa e características](corpus/corpus_selection_report.md).
-- [Corpus B](corpus_b/corpus_b_final.csv): 50 PDFs organizados em cinco grupos
-  recorrentes; [justificativa e características](corpus_b/corpus_b_selection_report.md).
-- [Piloto](corpus/corpus_pilot.csv): PETIVIT BC, P001, fora dos dois corpus.
-- [Auditoria de downloads](corpus/download_audit_report.md): registro histórico
-  do lote inicial, anterior à seleção final.
-- [Decisões experimentais](experimental_design_decisions.md): desenho-alvo,
-  métricas, dimensionamento, limites e decisões ainda abertas.
-- [Prontidão do piloto](pilot_readiness.md): diagnóstico técnico fixado à versão
-  examinada e sequência de implementação/avaliação.
+The manifests contain 101 distinct PDF hashes and registration numbers. Keep
+IDs, registrations, processes and CNPJ values as text. Portuguese field names
+and source annotations are preserved; the CSVs are unchanged by this editorial update.
+PDFs, personal absolute paths and intermediate experiment outputs are excluded.
+Archive PDFs outside temporary directories before cleanup.
 
-Os três manifestos têm 101 hashes e registros distintos. Importar IDs, registros,
-processos e CNPJ como texto. Não usar desempenho do RAG para mudar a seleção.
-PDFs, caminhos pessoais absolutos, filas exploratórias, scripts temporários e
-manifestos intermediários duplicados não estão incluídos. Os PDFs precisam ser
-preservados fora das pastas temporárias; um caminho de arquivo no CSV não
-significa que o arquivo esteja distribuído pelo Git.
-
-## Próximo passo
-
-Preparar e conferir as dez necessidades do piloto (oito positivas e duas
-negativas). Implementar a resposta natural fundamentada sobre a base existente,
-preservando autorização e rastreabilidade; depois conectar o runner de avaliação
-com ranking original, fontes finais, métricas e tratamento separado de falhas.
-Cross-bula e isolamento por coleção também precisam ser verificados antes da
-rodada principal. Nenhuma dessas funcionalidades é entregue por estes documentos.
+Next: review ten pilot references, implement natural grounded generation and
+instrument the evaluation runner. Verify cross-document access and corpus
+isolation before the main evaluation.
