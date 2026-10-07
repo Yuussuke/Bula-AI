@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import pytest
+
 from app.modules.rag.parsers.document_cleaner import (
     BulaDocumentCleaner,
     render_front_matter,
@@ -96,6 +98,74 @@ def test_cleaner_does_not_treat_iquego_company_name_as_product() -> None:
     assert result.front_matter["manufacturer"] == (
         "IQUEGO - INDÚSTRIA QUÍMICA DO ESTADO DE GOIÁS S.A."
     )
+
+
+def test_cleaner_preserves_product_repeated_on_cover_and_identity_page() -> None:
+    pages = [
+        build_page(
+            1,
+            [
+                ExtractedLine(text="BULA DO PACIENTE", page_number=1),
+                ExtractedLine(text="ibuprofeno", page_number=1, is_bold=True),
+                ExtractedLine(
+                    text="Laboratório Exemplo Farmacêutico Ltda.", page_number=1
+                ),
+                ExtractedLine(text="Suspensão gotas", page_number=1),
+                ExtractedLine(text="100 mg/mL", page_number=1),
+            ],
+        ),
+        build_page(
+            2,
+            [
+                ExtractedLine(text="BULA DO PACIENTE", page_number=2),
+                ExtractedLine(text="I - IDENTIFICAÇÃO DO MEDICAMENTO", page_number=2),
+                ExtractedLine(text="ibuprofeno", page_number=2),
+                ExtractedLine(text="APRESENTAÇÕES", page_number=2),
+                ExtractedLine(text="Suspensão gotas 100 mg/mL", page_number=2),
+                ExtractedLine(text="COMPOSIÇÃO", page_number=2),
+                ExtractedLine(
+                    text="Cada mL contém 100 mg de ibuprofeno.", page_number=2
+                ),
+            ],
+        ),
+    ]
+
+    result = BulaDocumentCleaner().clean(pages)
+
+    assert result.front_matter["product"] == "ibuprofeno"
+    assert result.front_matter["manufacturer"] == (
+        "Laboratório Exemplo Farmacêutico Ltda."
+    )
+    assert result.front_matter["dosage_form"] == "Suspensão gotas"
+    assert result.front_matter["strength"] == "100 mg/mL"
+
+
+@pytest.mark.parametrize(
+    "dosage_form",
+    ["Suspensão gotas", "Solução oral", "Comprimidos revestidos"],
+)
+def test_cleaner_does_not_promote_dosage_form_when_product_is_missing(
+    dosage_form: str,
+) -> None:
+    pages = [
+        build_page(
+            1,
+            [
+                ExtractedLine(
+                    text="Laboratório Exemplo Farmacêutico Ltda.", page_number=1
+                ),
+                ExtractedLine(text=dosage_form, page_number=1),
+                ExtractedLine(text="100 mg/mL", page_number=1),
+                ExtractedLine(text="COMPOSIÇÃO", page_number=1),
+                ExtractedLine(text="Cada mL contém 100 mg.", page_number=1),
+            ],
+        )
+    ]
+
+    result = BulaDocumentCleaner().clean(pages)
+
+    assert "product" not in result.front_matter
+    assert result.front_matter["dosage_form"] == dosage_form
 
 
 def test_cleaner_removes_page_furniture_and_joins_only_wrapped_prose() -> None:

@@ -211,6 +211,12 @@ PDF ingestion runs through a separate PGQueuer worker. On a new local database,
 run `make migrate` for application tables and `make pgq-install` for queue
 tables before uploading bulas.
 
+The backend source is bind-mounted into the containers, but the long-running
+worker does not reload imported Python modules when parser or ingestion code
+changes. After changing that code locally, let any active ingestion finish and
+run `docker compose restart worker` before testing a new upload. Restarting the
+worker does not reprocess bulas that are already marked `ready`.
+
 The ingestion worker relies on the Compose restart policy for database listener
 resilience: `docker-compose.yml` runs it with `restart: always` and
 `--shutdown-on-listener-failure`, so a broken PGQueuer listener exits and is
