@@ -847,6 +847,25 @@ def test_metadata_extractor_uses_filename_as_low_priority_drug_name() -> None:
     assert metadata["manufacturer"] is None
 
 
+def test_metadata_extractor_rejects_dosage_form_as_front_matter_product() -> None:
+    lines = [
+        ExtractedLine(text="Suspensão gotas", page_number=1),
+        ExtractedLine(text="ibuprofeno", page_number=1),
+    ]
+
+    metadata = MetadataExtractor().extract(
+        lines=lines,
+        filename="bula.pdf",
+        markdown_sections=[],
+        detected_sections=[],
+        quality_signals={},
+        front_matter={"product": "Suspensão gotas", "dosage_form": "Suspensão gotas"},
+    )
+
+    assert metadata["drug_name"] == "ibuprofeno"
+    assert metadata["drug_name_source"] == "text"
+
+
 def test_metadata_extractor_recovers_iquego_product_from_description() -> None:
     lines = [
         ExtractedLine(text="COMPOSIÇÃO", page_number=1),

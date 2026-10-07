@@ -56,16 +56,25 @@ CORPORATE_MARKERS = (
 )
 DOSAGE_FORM_MARKERS = (
     "COMPRIMIDO",
+    "COMPRIMIDOS",
     "CAPSULA",
+    "CAPSULAS",
     "CREME",
+    "CREMES",
     "GEL",
+    "GEIS",
     "GOTAS",
     "INJETAVEL",
+    "INJETAVEIS",
     "POMADA",
+    "POMADAS",
     "PO PARA",
     "SOLUCAO",
+    "SOLUCOES",
     "SUSPENSAO",
+    "SUSPENSOES",
     "XAROPE",
+    "XAROPES",
 )
 CORE_SECTION_MARKERS = (
     "COMPOSICAO",
@@ -82,6 +91,15 @@ FRONT_MATTER_FIELD_ORDER = (
 )
 
 
+def is_dosage_form_label(value: str) -> bool:
+    """Distinguish a standalone formulation label from a medicine name."""
+    normalized_value = normalize_for_matching(value).strip("*_# ")
+    return any(
+        normalized_value == marker or normalized_value.startswith(f"{marker} ")
+        for marker in DOSAGE_FORM_MARKERS
+    )
+
+
 @dataclass(frozen=True)
 class DocumentCleanupResult:
     lines: list[ExtractedLine]
@@ -94,13 +112,14 @@ class BulaDocumentCleaner:
 
     def clean(self, pages: list[ExtractedPage]) -> DocumentCleanupResult:
         repeated_furniture = self._find_repeated_page_furniture(pages)
+        cover_product_key = self._find_cover_product_key(pages)
         clean_lines: list[ExtractedLine] = []
         removed_page_number_count = 0
         removed_picture_marker_count = 0
         removed_repeated_furniture_count = 0
         soft_hyphen_count = 0
 
-        for page in pages:
+        for page_index, page in enumerate(pages):
             page_lines: list[ExtractedLine] = []
             is_inside_picture_text = False
             for extracted_line in page.lines:
@@ -138,7 +157,10 @@ class BulaDocumentCleaner:
                     continue
 
                 furniture_key = self._build_furniture_key(clean_text)
-                if furniture_key in repeated_furniture:
+                is_cover_product = (
+                    page_index == 0 and furniture_key == cover_product_key
+                )
+                if furniture_key in repeated_furniture and not is_cover_product:
                     removed_repeated_furniture_count += 1
                     continue
 
@@ -227,6 +249,29 @@ class BulaDocumentCleaner:
         return {
             key for key, count in occurrences.items() if count >= minimum_occurrences
         }
+
+    def _find_cover_product_key(self, pages: list[ExtractedPage]) -> str | None:
+        """Preserve a cover identity also printed on the identification page."""
+        if not pages:
+            return None
+
+        cover_values = [
+            normalize_spaces(line.text).strip("*_# ")
+            for line in pages[0].lines
+            if not line.is_paragraph_break and line.text.strip()
+        ]
+        if self._find_manufacturer(cover_values) is None:
+            return None
+
+        dosage_form, strength = self._find_form_and_strength(cover_values)
+        if dosage_form is None or strength is None:
+            return None
+
+        product = self._find_product(cover_values)
+        if product is None:
+            return None
+
+        return self._build_furniture_key(product)
 
     def _can_be_page_furniture(self, value: str) -> bool:
         clean_value = normalize_spaces(value)
@@ -442,6 +487,8 @@ class BulaDocumentCleaner:
             if any(marker in normalized_value for marker in ignored_markers):
                 continue
             if any(marker in normalized_value for marker in CORPORATE_MARKERS):
+                continue
+            if is_dosage_form_label(value):
                 continue
             if STRENGTH_PATTERN.search(value):
                 break

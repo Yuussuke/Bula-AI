@@ -5,7 +5,10 @@ from __future__ import annotations
 from pathlib import Path
 import re
 
-from app.modules.rag.parsers.document_cleaner import CORPORATE_MARKERS
+from app.modules.rag.parsers.document_cleaner import (
+    CORPORATE_MARKERS,
+    is_dosage_form_label,
+)
 from app.modules.rag.parsers.handlers import ExtractedLine, normalize_for_matching
 from app.modules.rag.parsers.markdown_renderer import normalize_spaces
 from app.modules.rag.parsers.section_detector import DetectedSection
@@ -35,7 +38,7 @@ class MetadataExtractor:
         front_matter_product = safe_front_matter.get("product")
         drug_name: str | None
         drug_name_source: str | None
-        if front_matter_product is not None:
+        if front_matter_product and self._is_likely_drug_name(front_matter_product):
             drug_name = front_matter_product
             drug_name_source = "front_matter"
         else:
@@ -110,6 +113,8 @@ class MetadataExtractor:
 
     def _is_likely_drug_name(self, text: str) -> bool:
         if not text:
+            return False
+        if is_dosage_form_label(text):
             return False
 
         normalized_text = normalize_for_matching(text)
