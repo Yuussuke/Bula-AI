@@ -98,3 +98,24 @@ structural changes are recorded as parser version `native_markdown_tables_v3`.
 See [the decision and local benchmark](../../../../../docs/decisions/2026-09-21-geometric-table-preservation.md)
 for limitations, tests and rollout. Existing indexed chunks are not changed by
 updating the parser code. Do not repeat BM25 backfill expecting it to repair PDFs.
+
+## Identity and prose continuity
+
+`native_markdown_identity_prose_v4` removes balanced inline bold markers before
+unwrapping emphasis, preserving product text and trademark symbols. Strength
+uses an explicit presentation when available, excludes standalone package
+volumes, and compares written ratios exactly within the same units. The emitted
+value remains literal source text; no dose is calculated. Distinct strengths
+leave the scalar `strength` absent while the presentation remains available.
+Unsupported units and mass-based packaging can still require documentary review;
+this is not a complete pharmaceutical-expression parser.
+
+Native Markdown blank lines are removed only for an unfinished prose sentence
+whose complete text matches consecutive PDF lines in the same block, aligned
+and closely spaced with comparable line heights. Physical blank lines, headings,
+lists, tables, column/indent changes and missing geometry prevent reconciliation.
+These conservative conditions may leave some artificial breaks; they do not
+guarantee all layouts are repaired. Chunking and retrieval are unchanged.
+
+Validate parsing before freezing ingestion. Existing indexed text and chunk IDs
+are not updated by this code change; reprocess explicitly when adopting it.
