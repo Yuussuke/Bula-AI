@@ -6,7 +6,11 @@ from app.modules.rag.parsers.document_cleaner import (
     BulaDocumentCleaner,
     render_front_matter,
 )
-from app.modules.rag.parsers.handlers import ExtractedLine, ExtractedPage
+from app.modules.rag.parsers.handlers import (
+    ExtractedLine,
+    ExtractedPage,
+    PyMuPDF4LLMHandler,
+)
 
 
 def build_page(page_number: int, lines: list[ExtractedLine]) -> ExtractedPage:
@@ -71,6 +75,83 @@ def test_cleaner_extracts_identity_block_as_front_matter() -> None:
     assert 'product: "dipirona monoidratada"' in render_front_matter(
         result.front_matter
     )
+
+
+@pytest.mark.parametrize(
+    ("source_name", "expected_name"),
+    [
+        ("**ALFA**<sup>**®**</sup> **BC**", "ALFA® BC"),
+        ("**Ômega** **Plus**", "Ômega Plus"),
+        ("__Beta__ __XR__", "Beta XR"),
+        ("ALFA_BETA®", "ALFA_BETA®"),
+    ],
+)
+def test_formatted_identity_becomes_plain_metadata_without_losing_symbols(
+    source_name: str,
+    expected_name: str,
+) -> None:
+    source = f"# {source_name}\n\nXarope\n\n5 mg/mL\n\nCOMPOSIÇÃO"
+    lines = PyMuPDF4LLMHandler()._build_markdown_lines(text=source, page_number=1)
+
+    result = BulaDocumentCleaner().clean([build_page(1, lines)])
+
+    assert result.front_matter["product"] == expected_name
+
+
+@pytest.mark.parametrize(
+    ("cover_strength", "presentation", "expected_strength"),
+    [
+        ("5 mg", "Solução oral 5 mg/mL. Frasco com 100 mL.", "5 mg/mL"),
+        ("5 mg", "Solução oral 5 mg/5 mL. Frasco com 100 mL.", "5 mg/5 mL"),
+        (
+            "500 mg",
+            "Comprimidos 500 mg + 125 mg. Caixa com 20 unidades.",
+            "500 mg + 125 mg",
+        ),
+        ("5 mg", "Comprimidos 5 mg e 10 mg. Caixa com 20 unidades.", None),
+        ("5 mg", "Solução oral. Frasco com 100 mL.", "5 mg"),
+        ("5 mg", "Comprimidos 5 mg. Caixas com 10 e 30 unidades.", "5 mg"),
+        (
+            "250 mg/5 mL",
+            "Solução oral 50 mg/mL (equivalente a 250 mg/5 mL). Frasco com 60 mL.",
+            "50 mg/mL",
+        ),
+        ("5 mg", "Solução oral 5 mg/mL e 5 mg/g.", None),
+        ("5 mg", "Comprimidos 5 mg e 5,0 mg.", "5 mg"),
+    ],
+)
+def test_strength_uses_presentation_not_cover_or_package_volume(
+    cover_strength: str,
+    presentation: str,
+    expected_strength: str | None,
+) -> None:
+    lines = [
+        ExtractedLine("Produto Alfa", 1),
+        ExtractedLine("Laboratório Exemplo Ltda.", 1),
+        ExtractedLine("Solução oral", 1),
+        ExtractedLine(cover_strength, 1),
+        ExtractedLine("APRESENTAÇÕES", 1),
+        ExtractedLine(presentation, 1),
+        ExtractedLine("USO ORAL", 1),
+        ExtractedLine("COMPOSIÇÃO", 1),
+    ]
+
+    result = BulaDocumentCleaner().clean([build_page(1, lines)])
+
+    assert result.front_matter.get("strength") == expected_strength
+    assert result.front_matter["presentation"] == presentation
+
+
+def test_distinct_identity_strengths_are_not_silently_reduced_to_one() -> None:
+    lines = [
+        ExtractedLine("Produto Alfa", 1),
+        ExtractedLine("Comprimidos 5 mg e 10 mg", 1),
+        ExtractedLine("COMPOSIÇÃO", 1),
+    ]
+
+    result = BulaDocumentCleaner().clean([build_page(1, lines)])
+
+    assert "strength" not in result.front_matter
 
 
 def test_cleaner_does_not_treat_iquego_company_name_as_product() -> None:

@@ -710,7 +710,20 @@ def strip_markdown_emphasis(value: str) -> tuple[str, bool]:
         clean_value = clean_value[2:-2].strip()
         is_bold = True
 
-    return clean_value, is_bold
+    # Remove balanced inline runs before discarding an outer wrapper. A line
+    # may contain several independently bold spans, including a trademark.
+    plain_value = value.strip()
+    while True:
+        without_emphasis = re.sub(
+            r"(?<!\w)(\*\*|__)(?=\S)(.+?)(?<=\S)\1",
+            r"\2",
+            plain_value,
+        )
+        if without_emphasis == plain_value:
+            break
+        plain_value = without_emphasis
+
+    return plain_value, is_bold
 
 
 def has_bold_font(*, font_names: list[str]) -> bool:

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pymupdf
+import pytest
 
 from app.modules.rag.parsers.document_cleaner import BulaDocumentCleaner
 from app.modules.rag.parsers.geometric_tables import (
@@ -13,6 +14,7 @@ from app.modules.rag.parsers.handlers import (
     ExtractedPage,
     PdfTextLineEvidence,
     PyMuPDF4LLMHandler,
+    strip_markdown_emphasis,
 )
 from app.modules.rag.parsers.section_detector import SectionDetector
 
@@ -105,6 +107,16 @@ def test_escaped_html_is_removed_without_changing_source_words() -> None:
     result = BulaDocumentCleaner().clean([ExtractedPage(1, "", lines)])
 
     assert result.lines[0].text == "Dose diária e acompanhamento"
+
+
+@pytest.mark.parametrize(
+    "source",
+    ["25 mg**/kg e *dose usual", "ALFA_BETA", "Aviso com **marcador incompleto"],
+)
+def test_emphasis_cleanup_preserves_footnotes_and_unpaired_markers(source: str) -> None:
+    plain_text, _ = strip_markdown_emphasis(source)
+
+    assert plain_text == source
 
 
 def test_literal_pipe_in_table_cell_remains_escaped() -> None:

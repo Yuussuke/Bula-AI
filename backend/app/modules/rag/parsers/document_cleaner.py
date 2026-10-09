@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections import Counter
 from dataclasses import dataclass
+from fractions import Fraction
 import html
 import json
 import math
@@ -29,8 +30,8 @@ EMBEDDED_NUMBERED_HEADING_PATTERN = re.compile(
     r"^(.+[.!?])\s+((?:[0-9]{1,2})\.\s+[A-ZÁÀÂÃÉÊÍÓÔÕÚÇ][A-ZÁÀÂÃÉÊÍÓÔÕÚÇ ]+)$"
 )
 STRENGTH_COMPONENT = (
-    r"\d+(?:[.,]\d+)?\s*(?:mg|g|mcg|µg|mL|UI)"
-    r"(?:\s*/\s*(?:\d+(?:[.,]\d+)?\s*)?(?:mg|g|mL))?"
+    r"(\d+(?:[.,]\d+)?)\s*(mg|g|mcg|µg|UI)"
+    r"(?:\s*/\s*(\d+(?:[.,]\d+)?\s*)?(mg|g|mL))?"
 )
 STRENGTH_PATTERN = re.compile(
     rf"\b{STRENGTH_COMPONENT}(?:\s*\+\s*{STRENGTH_COMPONENT})*\b",
@@ -256,7 +257,7 @@ class BulaDocumentCleaner:
             return None
 
         cover_values = [
-            normalize_spaces(line.text).strip("*_# ")
+            self._normalize_line_text(line.text)[0].strip("*_# ")
             for line in pages[0].lines
             if not line.is_paragraph_break and line.text.strip()
         ]
@@ -458,6 +459,13 @@ class BulaDocumentCleaner:
         )
         if presentation is not None:
             front_matter["presentation"] = presentation
+            # Presentation is more specific than a shortened cover label.
+            # Multiple explicit strengths cannot be represented by one scalar.
+            if STRENGTH_PATTERN.search(presentation):
+                presentation_strength = self._find_unique_strength([presentation])
+                front_matter.pop("strength", None)
+                if presentation_strength is not None:
+                    front_matter["strength"] = presentation_strength
 
         audience_values = [
             value
@@ -523,7 +531,6 @@ class BulaDocumentCleaner:
         values: list[str],
     ) -> tuple[str | None, str | None]:
         dosage_form: str | None = None
-        strength: str | None = None
 
         for value in values:
             normalized_value = normalize_for_matching(value)
@@ -540,13 +547,44 @@ class BulaDocumentCleaner:
                     )
                 dosage_form = dosage_form_candidate.strip(" :-") or None
 
-            if strength is None and strength_match is not None:
-                strength = strength_match.group(0)
-
-            if dosage_form is not None and strength is not None:
+            if dosage_form is not None:
                 break
 
-        return dosage_form, strength
+        return dosage_form, self._find_unique_strength(values)
+
+    def _find_unique_strength(self, values: list[str]) -> str | None:
+        strengths_by_key: dict[str, str] = {}
+        for value in values:
+            for strength_match in STRENGTH_PATTERN.finditer(value):
+                strength = normalize_spaces(strength_match.group(0))
+                strength_key = self._build_strength_key(strength)
+                strengths_by_key.setdefault(strength_key, strength)
+
+        if len(strengths_by_key) != 1:
+            return None
+
+        return next(iter(strengths_by_key.values()))
+
+    def _build_strength_key(self, strength: str) -> str:
+        components: list[str] = []
+        for component in re.split(r"\s*\+\s*", strength):
+            match = re.fullmatch(STRENGTH_COMPONENT, component, re.IGNORECASE)
+            if match is None:
+                return strength.casefold()
+            amount_text, numerator_unit, denominator_text, denominator_unit = (
+                match.groups()
+            )
+            amount = Fraction(amount_text.replace(",", "."))
+            denominator = Fraction((denominator_text or "1").strip().replace(",", "."))
+            if denominator == 0:
+                return strength.casefold()
+            # Compare equivalent written ratios; never emit a calculated dose
+            # or combine different units. Keep the first literal source value.
+            components.append(
+                f"{amount / denominator}:{numerator_unit.casefold()}:"
+                f"{(denominator_unit or '').casefold()}"
+            )
+        return "+".join(components)
 
     def _find_values_after_marker(
         self,
