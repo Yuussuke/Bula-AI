@@ -621,7 +621,11 @@ uv run pytest -q tests/integration/rag/test_bm25_index.py
 
 `HybridRetrieverFactory` builds a retrieval pipeline for an already authorized
 bula or explicit corpus scope. Both dense and BM25 receive the same filters and fetch
-`min(3 * k, 100)` candidates: 12 per method for the default final `k = 4`.
+12 eligible candidates per branch for the default final `k = 10`; dense fetches
+36 raw points before eligibility filtering. Final K and candidate pools are
+independent: an explicit `candidate_k` can change the branch pool (at most 100,
+never below K). If omitted, the pool is `max(k, 12)` so larger explicit cuts
+remain supported without multiplying K automatically.
 `HybridRetriever` then combines their ranks with equal-weight
 Reciprocal Rank Fusion (RRF), using the standard constant `60`, deduplicates by
 the stable `chunk_id`, and returns at most `k` documents.
@@ -650,7 +654,7 @@ Inject `get_hybrid_retriever_factory` with FastAPI `Depends` and build the
 retriever only after the service has authorized access to the selected bula:
 
 ```python
-retriever = factory.build(bula_id=authorized_bula.id, k=4)
+retriever = factory.build(bula_id=authorized_bula.id, k=10)
 documents = await retriever.ainvoke(question)
 ```
 
@@ -660,12 +664,17 @@ Internal factories also support a corpus filter, including across bulas:
 retriever = factory.build(
     bula_id=None,
     corpus=[BulaCorpus.SHARED, BulaCorpus.SYSTEM],
-    k=4,
+    k=10,
 )
 ```
 
-The dense factory and strategy registry accept the same scope. Bula and corpus
-filters intersect when both are provided; an empty corpus returns no documents.
+The dense factory and strategy registry accept the same scope. Standard dense
+retrieval returns up to 10 evidence chunks from 12 raw points; BM25 returns up
+to 10 eligible chunks. The existing six-unit selector cap is unchanged: ten
+retrieved candidates do not imply ten displayed sources. The decision and
+pilot limitations are in [the evidence-budget note](docs/rag-evidence-eligibility.md).
+Bula and corpus filters intersect when both are provided; an empty corpus
+returns no documents.
 Dense/hybrid factories reject a call with neither filter. These are internal
 components, not access controls: callers must authorize the scope, and `system`
 does not mean `published`. Corpus-only searches must not be exposed through an
