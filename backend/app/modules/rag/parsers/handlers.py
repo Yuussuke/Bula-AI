@@ -3,7 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from io import BytesIO
+import html
 import importlib
+import math
 import re
 from typing import Any
 import unicodedata
@@ -48,6 +50,8 @@ class PdfTextLineEvidence:
     x0: float
     y0: float
     has_bullet_marker: bool
+    y1: float | None = None
+    block_index: int | None = None
 
 
 @dataclass
@@ -452,6 +456,7 @@ class PyMuPDF4LLMHandler(ParserHandler):
         previous_line_was_break = False
         physical_cursor = 0
         previous_bullet_line: PdfTextLineEvidence | None = None
+        previous_prose_span: tuple[int, int] | None = None
 
         for raw_line in text.splitlines():
             clean_line = raw_line.strip()
@@ -490,6 +495,34 @@ class PyMuPDF4LLMHandler(ParserHandler):
                         ):
                             is_list_continuation = True
                             previous_bullet_line = evidence
+            is_structural_line = (
+                heading_level is not None
+                or re.match(r"^(?:[-*+]\s+|\d+[.)]\s+|\|)", line_without_emphasis)
+                is not None
+            )
+            prose_span = None
+            if physical_lines and not is_structural_line:
+                prose_span = self._match_physical_prose_span(
+                    line_without_emphasis, physical_lines, physical_cursor
+                )
+                if prose_span is not None:
+                    physical_cursor = prose_span[1] + 1
+            if (
+                previous_line_was_break
+                and len(extracted_lines) >= 2
+                and physical_lines
+                and previous_prose_span is not None
+                and prose_span is not None
+                and self._can_reconcile_paragraph_break(
+                    extracted_lines[-2].text,
+                    line_without_emphasis,
+                    physical_lines,
+                    previous_prose_span,
+                    prose_span,
+                )
+            ):
+                extracted_lines.pop()
+            previous_prose_span = prose_span
             extracted_lines.append(
                 ExtractedLine(
                     text=line_without_emphasis,
@@ -508,12 +541,10 @@ class PyMuPDF4LLMHandler(ParserHandler):
 
     def _get_physical_lines(self, page: Any) -> list[PdfTextLineEvidence]:
         lines: list[PdfTextLineEvidence] = []
-        for block in page.get_text("dict").get("blocks", []):
+        for block_index, block in enumerate(page.get_text("dict").get("blocks", [])):
             for line in block.get("lines", []):
                 spans = line.get("spans", [])
                 text = "".join(str(span.get("text", "")) for span in spans).strip()
-                if not text:
-                    continue
                 bounds = line.get("bbox", (0, 0, 0, 0))
                 lines.append(
                     PdfTextLineEvidence(
@@ -521,9 +552,75 @@ class PyMuPDF4LLMHandler(ParserHandler):
                         x0=float(bounds[0]),
                         y0=float(bounds[1]),
                         has_bullet_marker=bool(re.match(r"^[-•●▪–]\s+", text)),
+                        y1=float(bounds[3]),
+                        block_index=block_index,
                     )
                 )
         return sorted(lines, key=lambda line: (line.y0, line.x0))
+
+    def _match_physical_prose_span(
+        self,
+        markdown_content: str,
+        physical_lines: list[PdfTextLineEvidence],
+        start_index: int,
+    ) -> tuple[int, int] | None:
+        # Match the complete visible text, not only a common sentence prefix.
+        visible_content = re.sub(
+            r"</?(?:u|strong|b|em|i|sup|sub)>", "", html.unescape(markdown_content)
+        )
+        expected_text = " ".join(visible_content.split())
+        for first_index in range(start_index, len(physical_lines)):
+            source_parts: list[str] = []
+            for last_index in range(first_index, len(physical_lines)):
+                source_line = physical_lines[last_index]
+                if not source_line.text or source_line.has_bullet_marker:
+                    break
+                if source_line.block_index != physical_lines[first_index].block_index:
+                    break
+                source_parts.append(source_line.text)
+                source_text = " ".join(" ".join(source_parts).split())
+                if source_text == expected_text:
+                    return first_index, last_index
+                if not expected_text.startswith(source_text):
+                    break
+        return None
+
+    def _can_reconcile_paragraph_break(
+        self,
+        previous_text: str,
+        next_text: str,
+        physical_lines: list[PdfTextLineEvidence],
+        previous_span: tuple[int, int],
+        next_span: tuple[int, int],
+    ) -> bool:
+        if previous_text.endswith((".", "?", "!", ":", ";")):
+            return False
+        if not next_text[:1].islower():
+            return False
+        if next_span[0] != previous_span[1] + 1:
+            return False
+        previous_line = physical_lines[previous_span[1]]
+        next_line = physical_lines[next_span[0]]
+        if previous_line.block_index is None:
+            return False
+        if previous_line.block_index != next_line.block_index:
+            return False
+        if previous_line.y1 is None or next_line.y1 is None:
+            return False
+        line_height = previous_line.y1 - previous_line.y0
+        next_line_height = next_line.y1 - next_line.y0
+        if line_height <= 0 or not 0.8 <= next_line_height / line_height <= 1.2:
+            return False
+        vertical_gap = next_line.y0 - previous_line.y1
+        # Adjacent font bounds can differ by a sub-point rounding error.
+        is_nonnegative_gap = vertical_gap >= 0 or math.isclose(
+            vertical_gap, 0, abs_tol=0.001
+        )
+        return (
+            is_nonnegative_gap
+            and vertical_gap <= line_height * 0.6
+            and abs(next_line.x0 - previous_line.x0) <= line_height * 0.5
+        )
 
     def _match_physical_line(
         self,
