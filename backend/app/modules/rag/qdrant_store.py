@@ -18,6 +18,7 @@ from qdrant_client.models import (
 
 from app.modules.bulas.models import Bula, BulaCorpus
 from app.modules.rag.schemas import DocumentChunk
+from app.modules.rag.source_content import classify_chunk_content
 
 
 SHARED_COLLECTION = "bulaai_chunks"
@@ -47,6 +48,7 @@ def build_qdrant_point(
         "chunk_id": chunk.chunk_id,
         "chunk_index": chunk.index,
         "embedding_profile": embedding_profile,
+        "content_role": classify_chunk_content(chunk.text).value,
     }
 
     return PointStruct(

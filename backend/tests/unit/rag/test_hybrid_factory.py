@@ -38,6 +38,7 @@ class StubBM25Index:
         bula_id: UUID | None = None,
         corpus: tuple[BulaCorpus, ...] | None = None,
         include_administrative_sections: bool = True,
+        include_document_metadata: bool = True,
     ) -> list[BM25SearchResult]:
         _ = query
         _ = k

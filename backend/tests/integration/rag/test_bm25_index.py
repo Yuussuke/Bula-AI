@@ -124,6 +124,62 @@ async def test_real_bm25_portuguese_accents_stemming_and_nonmatches(
 
 
 @pytest.mark.anyio
+async def test_metadata_is_retained_for_discovery_but_cannot_consume_evidence_budget(
+    bm25_context: BM25Context,
+) -> None:
+    index, _, bulas = bm25_context
+    envelope = '---\nproduct: "ProdutoZX ProdutoZX ProdutoZX"\n---'
+    identity = make_chunk(bulas[0], envelope, "identity")
+    evidence = make_chunk(bulas[0], "ProdutoZX: proteger da luz.", "evidence")
+    await index.upsert_chunks([identity, evidence])
+    documents = await BM25Retriever(index=index, bula_id=bulas[0].id, k=1).ainvoke(
+        "ProdutoZX"
+    )
+    assert [document.metadata["chunk_id"] for document in documents] == [
+        evidence.chunk_id
+    ]
+    discovery = await index.search(
+        "ProdutoZX", bula_id=bulas[0].id, k=10, include_document_metadata=True
+    )
+    assert {match.chunk_id for match in discovery} == {
+        identity.chunk_id,
+        evidence.chunk_id,
+    }
+    assert (
+        next(
+            match.chunk_text
+            for match in discovery
+            if match.chunk_id == identity.chunk_id
+        )
+        == envelope
+    )
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    "envelope",
+    [
+        '---\nproduct: "ProdutoZX"\n...',
+        '\ufeff \r\n---\r\nproduct: "ProdutoZX"\r\n---',
+        "---\n---",
+    ],
+)
+async def test_metadata_filter_handles_envelopes_and_preserves_mixed_prose(
+    bm25_context: BM25Context,
+    envelope: str,
+) -> None:
+    index, _, bulas = bm25_context
+    mixed_text = envelope + "\n\n## Advertências\nProdutoZX: proteger da luz."
+    mixed = make_chunk(bulas[0], mixed_text, "mixed")
+    identity = make_chunk(bulas[0], envelope, "identity")
+    await index.upsert_chunks([identity, mixed])
+    documents = await BM25Retriever(index=index, bula_id=bulas[0].id).ainvoke(
+        "ProdutoZX"
+    )
+    assert [document.page_content for document in documents] == [mixed_text]
+
+
+@pytest.mark.anyio
 async def test_section_evidence_reads_only_body_chunks_from_selected_bula(
     bm25_context: BM25Context,
 ) -> None:
@@ -138,10 +194,15 @@ async def test_section_evidence_reads_only_body_chunks_from_selected_bula(
     heading_only = make_chunk(
         selected_bula, "## QUANDO NÃO DEVO USAR ESTE MEDICAMENTO?", "heading"
     ).model_copy(update={"section_title": section_title})
+    front_matter_only = make_chunk(
+        selected_bula, '---\nproduct: "Produto"\n---', "metadata"
+    ).model_copy(update={"section_title": section_title})
     other = make_chunk(
         other_bula, "Outra bula contém informações diferentes.", "other"
     ).model_copy(update={"section_title": section_title})
-    await index.upsert_chunks([contraindication, heading_only, other])
+    await index.upsert_chunks(
+        [contraindication, heading_only, front_matter_only, other]
+    )
 
     results = await index.find_section_evidence(
         bula_id=selected_bula.id,

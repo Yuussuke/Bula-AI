@@ -22,6 +22,7 @@ from app.modules.bulas.models import BulaCorpus
 from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.section_titles import is_administrative_section
+from app.modules.rag.source_content import ChunkContentRole, without_front_matter
 
 
 CITATION_METADATA_KEYS = ("section_title", "chunk_id", "drug_name", "bula_id")
@@ -44,6 +45,7 @@ class DenseBulaRetriever(BaseRetriever):
     embeddings: EmbeddingAdapter
     candidate_multiplier: int = DEFAULT_CANDIDATE_MULTIPLIER
     include_administrative_sections: bool = False
+    include_document_metadata: bool = False
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -128,7 +130,15 @@ class DenseBulaRetriever(BaseRetriever):
                     match=MatchAny(any=[corpus.value for corpus in self.corpus]),
                 )
             )
-        return Filter(must=conditions)
+        metadata_exclusions: list[Condition] = []
+        if not self.include_document_metadata:
+            metadata_exclusions.append(
+                FieldCondition(
+                    key="content_role",
+                    match=MatchValue(value=ChunkContentRole.DOCUMENT_METADATA.value),
+                )
+            )
+        return Filter(must=conditions, must_not=metadata_exclusions or None)
 
     def _point_to_document(self, point: ScoredPoint) -> Document:
         payload = point.payload or {}
@@ -155,5 +165,7 @@ class DenseBulaRetriever(BaseRetriever):
         return metadata
 
     def _has_evidence_beyond_markdown_headings(self, chunk_text: str) -> bool:
+        if not self.include_document_metadata:
+            chunk_text = without_front_matter(chunk_text)
         text_without_headings = STRUCTURAL_HEADING_PATTERN.sub("", chunk_text)
         return bool(text_without_headings.strip())

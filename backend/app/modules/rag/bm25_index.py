@@ -42,6 +42,7 @@ class PostgreSQLBM25Index:
         bula_id: UUID | None = None,
         corpus: Sequence[BulaCorpus] | None = None,
         include_administrative_sections: bool = True,
+        include_document_metadata: bool = True,
     ) -> list[BM25SearchResult]:
         if k < 1 or k > 100:
             raise ValueError("k must be between 1 and 100.")
@@ -53,6 +54,7 @@ class PostgreSQLBM25Index:
             bula_id=bula_id,
             corpus=corpus,
             include_administrative_sections=include_administrative_sections,
+            include_document_metadata=include_document_metadata,
         )
 
     async def find_section_evidence(

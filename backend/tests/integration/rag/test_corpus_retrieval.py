@@ -76,6 +76,7 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
         bula_id: UUID | None,
         corpus: tuple[BulaCorpus, ...] | None,
         include_administrative_sections: bool,
+        include_document_metadata: bool,
     ) -> list[BM25SearchResult]:
         return [
             result
@@ -156,6 +157,7 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
                 bula_id=bula_id,
                 corpus=corpus,
                 include_administrative_sections=False,
+                include_document_metadata=False,
             )
     finally:
         await client.close()

@@ -30,6 +30,7 @@ class StubSearchIndex:
         bula_id: UUID | None = None,
         corpus: Sequence[BulaCorpus] | None = None,
         include_administrative_sections: bool = True,
+        include_document_metadata: bool = True,
     ) -> list[BM25SearchResult]:
         if self.error is not None:
             raise self.error

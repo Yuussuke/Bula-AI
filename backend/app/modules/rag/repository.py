@@ -15,6 +15,10 @@ from app.modules.rag.section_titles import (
     NUMBERED_SECTION_PREFIX_PATTERN,
     normalize_section_title,
 )
+from app.modules.rag.source_content import (
+    FRONT_MATTER_ENVELOPE_PATTERN,
+    FRONT_MATTER_PREFIX_PATTERN,
+)
 
 
 class ChunkIndexPersistenceError(RuntimeError):
@@ -87,12 +91,18 @@ class ChunkMetadataRepository:
         bula_id: UUID | None,
         corpus: Sequence[BulaCorpus] | None,
         include_administrative_sections: bool = True,
+        include_document_metadata: bool = True,
     ) -> list[BM25SearchResult]:
         # ATX headings alone are navigation, not answer evidence. Filter before
         # top-k so even many short heading-only matches cannot consume slots.
         # Only the eligibility expression is cleaned; source text stays intact.
+        source_text = (
+            ChunkMetadata.chunk_text
+            if include_document_metadata
+            else self._source_evidence_text()
+        )
         text_without_headings = func.regexp_replace(
-            ChunkMetadata.chunk_text,
+            source_text,
             r"^[ \t]{0,3}#{1,6}([ \t]+[^\r\n]*|[ \t]*$)",
             "",
             "gn",
@@ -141,6 +151,23 @@ class ChunkMetadataRepository:
         result = await self.db.execute(statement)
         return [BM25SearchResult.model_validate(row) for row in result.mappings()]
 
+    def _source_evidence_text(self) -> ColumnElement[str]:
+        """Filter envelopes before Top-K; never rewrite the stored source/index."""
+        has_envelope = ChunkMetadata.chunk_text.regexp_match(
+            FRONT_MATTER_ENVELOPE_PATTERN, flags="s"
+        )
+        has_prefix = ChunkMetadata.chunk_text.regexp_match(FRONT_MATTER_PREFIX_PATTERN)
+        return case(
+            (
+                has_envelope,
+                func.regexp_replace(
+                    ChunkMetadata.chunk_text, FRONT_MATTER_ENVELOPE_PATTERN, "", "s"
+                ),
+            ),
+            (has_prefix, ""),
+            else_=ChunkMetadata.chunk_text,
+        )
+
     async def find_section_evidence(
         self,
         *,
@@ -155,7 +182,7 @@ class ChunkMetadataRepository:
         normalized_titles = [normalize_section_title(title) for title in section_titles]
         normalized_section = self._section_title_key()
         text_without_headings = func.regexp_replace(
-            ChunkMetadata.chunk_text,
+            self._source_evidence_text(),
             r"^[ \t]{0,3}#{1,6}([ \t]+[^\r\n]*|[ \t]*$)",
             "",
             "gn",

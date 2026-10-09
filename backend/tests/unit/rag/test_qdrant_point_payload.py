@@ -52,4 +52,5 @@ def test_build_qdrant_point_uses_bula_and_chunk_payload_fields() -> None:
         "chunk_id": "bula-123_chunk-0",
         "chunk_index": 0,
         "embedding_profile": "test-model;input=plain-v1",
+        "content_role": "evidence",
     }

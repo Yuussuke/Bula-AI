@@ -75,6 +75,32 @@ def build_embedding_adapter() -> EmbeddingAdapter:
 
 
 @pytest.mark.anyio
+async def test_metadata_does_not_displace_evidence_and_remains_discoverable() -> None:
+    metadata = build_scored_point(
+        chunk_id="identity", chunk_text='---\nproduct: "Produto"\n---', score=0.99
+    )
+    evidence = build_scored_point(
+        chunk_id="evidence", chunk_text="Guarde na embalagem original.", score=0.8
+    )
+    store = FakeQdrantStore(points=[metadata, evidence])
+    retriever = DenseBulaRetriever(
+        bula_id="bula-123",
+        k=1,
+        qdrant_store=store,
+        embeddings=build_embedding_adapter(),
+    )
+    assert [
+        document.metadata["chunk_id"]
+        for document in await retriever.ainvoke("Como guardar?")
+    ] == ["evidence"]
+    discovery = retriever.model_copy(update={"include_document_metadata": True})
+    assert [
+        document.metadata["chunk_id"] for document in await discovery.ainvoke("Produto")
+    ] == ["identity"]
+    assert metadata.payload["chunk_text"] == '---\nproduct: "Produto"\n---'
+
+
+@pytest.mark.anyio
 async def test_retriever_returns_section_metadata() -> None:
     qdrant_store = FakeQdrantStore()
     retriever = DenseBulaRetriever(

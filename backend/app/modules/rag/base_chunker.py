@@ -35,6 +35,7 @@ from app.modules.rag.semantic_chunking import (
     SemanticRequestDiagnostic,
 )
 from app.modules.rag.token_estimator import HeuristicTokenEstimator, TokenEstimator
+from app.modules.rag.source_content import classify_chunk_content
 
 
 logger = structlog.get_logger(__name__)
@@ -908,6 +909,7 @@ class BaseChunker(ABC):
             "section_title": chunk_draft.section_title,
             "chunk_title": chunk_draft.chunk_title,
             "method": chunk_draft.method,
+            "content_role": classify_chunk_content(chunk_draft.text).value,
         }
         if chunk_draft.reason is not None:
             metadata["fallback_reason"] = chunk_draft.reason
