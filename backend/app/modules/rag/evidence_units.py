@@ -9,6 +9,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 
 from langchain_core.documents import Document
+from app.modules.rag.source_content import without_front_matter
 
 
 HEADING_PATTERN = re.compile(r"^\s{0,3}#{1,6}\s+")
@@ -63,7 +64,7 @@ def format_evidence_units(units: list[EvidenceUnit]) -> str:
 
 def _extract_document_units(source_text: str) -> list[tuple[EvidenceUnitKind, str]]:
     extracted: list[tuple[EvidenceUnitKind, str]] = []
-    source_text = _without_front_matter(source_text)
+    source_text = without_front_matter(source_text)
     active_headings: list[str] = []
     preceding_label: str | None = None
     for block in re.split(r"\n\s*\n", source_text):
@@ -128,18 +129,6 @@ def _get_local_table_label(lines: list[str]) -> str | None:
     if not label.strip("-*_ ") or label.rstrip("*_ ").endswith((".", "!", "?")):
         return None
     return label
-
-
-def _without_front_matter(source_text: str) -> str:
-    """Front matter is metadata, never a source-owned prose sentence."""
-    lines = source_text.lstrip("\ufeff \t\r\n").splitlines(keepends=True)
-    if not lines or lines[0].strip() != "---":
-        return source_text
-    for index, line in enumerate(lines[1:], start=1):
-        if line.strip() in {"---", "..."}:
-            return "".join(lines[index + 1 :])
-    # An unterminated envelope must not leak metadata as clinical evidence.
-    return ""
 
 
 def _append_text_units(

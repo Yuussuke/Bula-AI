@@ -8,6 +8,7 @@ from langchain_core.retrievers import BaseRetriever
 
 from app.modules.bulas.models import BulaCorpus
 from app.modules.rag.retrieval_mode import RetrievalMode
+from app.modules.rag.retrieval_limits import DEFAULT_RETRIEVAL_K
 
 
 class RetrieverBuilder(Protocol):
@@ -28,7 +29,7 @@ class RetrieverStrategyFactory:
         mode: RetrievalMode,
         bula_id: UUID | None,
         corpus: Sequence[BulaCorpus] | None = None,
-        k: int = 4,
+        k: int = DEFAULT_RETRIEVAL_K,
     ) -> BaseRetriever:
         if bula_id is not None and not isinstance(bula_id, UUID):
             raise ValueError("A bula ID must be a UUID.")

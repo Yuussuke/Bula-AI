@@ -35,6 +35,7 @@ from app.modules.rag.semantic_chunking import (
     SemanticRequestDiagnostic,
 )
 from app.modules.rag.token_estimator import HeuristicTokenEstimator, TokenEstimator
+from app.modules.rag.source_content import classify_chunk_content
 
 
 logger = structlog.get_logger(__name__)
@@ -443,6 +444,10 @@ class BaseChunker(ABC):
                 request_started_at=request_started_at,
                 validation_outcome="failed",
                 fallback_reason=self._safe_failure_reason(exc),
+                section_indices=tuple(
+                    section.index for section in section_batch.sections
+                ),
+                error=exc,
             )
             raise
 
@@ -452,6 +457,7 @@ class BaseChunker(ABC):
             request_started_at=request_started_at,
             validation_outcome="passed",
             fallback_reason=None,
+            section_indices=tuple(section.index for section in section_batch.sections),
         )
         return chunks
 
@@ -512,7 +518,12 @@ class BaseChunker(ABC):
             return "timeout"
 
         if isinstance(exc, ValidationError):
-            return "invalid_json"
+            if any(
+                item["type"] == "json_invalid"
+                for item in exc.errors(include_input=False)
+            ):
+                return "invalid_json"
+            return "invalid_schema"
 
         return "provider_error"
 
@@ -547,6 +558,8 @@ class BaseChunker(ABC):
                 request_started_at=request_started_at,
                 validation_outcome="failed",
                 fallback_reason=self._safe_failure_reason(exc),
+                section_indices=(section.index,),
+                error=exc,
             )
             raise
 
@@ -556,6 +569,7 @@ class BaseChunker(ABC):
             request_started_at=request_started_at,
             validation_outcome="passed",
             fallback_reason=None,
+            section_indices=(section.index,),
         )
         return chunks
 
@@ -567,14 +581,30 @@ class BaseChunker(ABC):
         request_started_at: float,
         validation_outcome: ValidationOutcome,
         fallback_reason: str | None,
+        section_indices: tuple[int, ...],
+        error: Exception | None = None,
     ) -> None:
         diagnostic = self.request_contract.build_diagnostic(
             response=response,
             latency_ms=self._elapsed_ms(request_started_at),
             validation_outcome=validation_outcome,
             fallback_reason=fallback_reason,
+            section_indices=section_indices,
+            error=error,
         )
         metrics.semantic_requests.append(diagnostic)
+        if error is not None:
+            logger.warning(
+                "rag_chunking_request_failed",
+                request_index=len(metrics.semantic_requests) - 1,
+                section_indices=list(section_indices),
+                error_type=diagnostic.error_type,
+                failure_reason=fallback_reason,
+                validation_errors=list(diagnostic.validation_errors),
+                finish_reason=diagnostic.finish_reason,
+                observed_model=diagnostic.observed_model,
+                observed_provider=diagnostic.observed_provider,
+            )
 
     def _build_semantic_chunking_metadata(
         self,
@@ -908,6 +938,7 @@ class BaseChunker(ABC):
             "section_title": chunk_draft.section_title,
             "chunk_title": chunk_draft.chunk_title,
             "method": chunk_draft.method,
+            "content_role": classify_chunk_content(chunk_draft.text).value,
         }
         if chunk_draft.reason is not None:
             metadata["fallback_reason"] = chunk_draft.reason

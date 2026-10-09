@@ -75,6 +75,32 @@ def build_embedding_adapter() -> EmbeddingAdapter:
 
 
 @pytest.mark.anyio
+async def test_metadata_does_not_displace_evidence_and_remains_discoverable() -> None:
+    metadata = build_scored_point(
+        chunk_id="identity", chunk_text='---\nproduct: "Produto"\n---', score=0.99
+    )
+    evidence = build_scored_point(
+        chunk_id="evidence", chunk_text="Guarde na embalagem original.", score=0.8
+    )
+    store = FakeQdrantStore(points=[metadata, evidence])
+    retriever = DenseBulaRetriever(
+        bula_id="bula-123",
+        k=1,
+        qdrant_store=store,
+        embeddings=build_embedding_adapter(),
+    )
+    assert [
+        document.metadata["chunk_id"]
+        for document in await retriever.ainvoke("Como guardar?")
+    ] == ["evidence"]
+    discovery = retriever.model_copy(update={"include_document_metadata": True})
+    assert [
+        document.metadata["chunk_id"] for document in await discovery.ainvoke("Produto")
+    ] == ["identity"]
+    assert metadata.payload["chunk_text"] == '---\nproduct: "Produto"\n---'
+
+
+@pytest.mark.anyio
 async def test_retriever_returns_section_metadata() -> None:
     qdrant_store = FakeQdrantStore()
     retriever = DenseBulaRetriever(
@@ -180,6 +206,22 @@ async def test_administrative_candidates_do_not_displace_answer_evidence() -> No
     assert [document.metadata["chunk_id"] for document in documents] == ["evidence"]
     assert documents[0].metadata["section_title"] == "4. Advertências"
     assert documents[0].page_content == source_text
+    assert store.requested_limit == 12
+
+
+@pytest.mark.anyio
+async def test_multiplier_mode_remains_an_explicit_candidate_budget_option() -> None:
+    store = FakeQdrantStore()
+    retriever = DenseBulaRetriever(
+        bula_id="bula-123",
+        k=2,
+        candidate_limit=None,
+        candidate_multiplier=3,
+        qdrant_store=store,
+        embeddings=build_embedding_adapter(),
+    )
+    documents = await retriever.ainvoke("Pergunta documental")
+    assert documents[0].metadata["chunk_id"] == "chunk-1"
     assert store.requested_limit == 6
 
 
@@ -249,3 +291,29 @@ def test_retriever_sync_path_rejects_direct_use() -> None:
 
     with pytest.raises(RuntimeError, match=re.escape(SYNC_RETRIEVER_ERROR)):
         retriever.invoke("Como tomar?")
+
+
+def test_raw_candidate_limit_cannot_be_smaller_than_final_cut() -> None:
+    with pytest.raises(ValueError, match="candidate_limit must be >= k"):
+        DenseBulaRetriever(
+            bula_id="bula-123",
+            candidate_limit=9,
+            qdrant_store=FakeQdrantStore(),
+            embeddings=build_embedding_adapter(),
+        )
+
+
+@pytest.mark.anyio
+async def test_default_dense_cut_returns_ten_sources_without_expanding_raw_pool() -> (
+    None
+):
+    points = [build_scored_point(chunk_id=f"chunk-{index}") for index in range(12)]
+    store = FakeQdrantStore(points=points)
+    retriever = DenseBulaRetriever(
+        bula_id="bula-123", qdrant_store=store, embeddings=build_embedding_adapter()
+    )
+    documents = await retriever.ainvoke("Pergunta documental")
+    assert [document.metadata["chunk_id"] for document in documents] == [
+        f"chunk-{index}" for index in range(10)
+    ]
+    assert store.requested_limit == 12

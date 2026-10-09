@@ -634,7 +634,50 @@ async def test_extra_model_metadata_is_rejected_by_strict_json_contract() -> Non
 
     assert result.chunks[0].method == "deterministic"
     assert result.chunks[0].chunk_title == "POSOLOGIA"
-    assert result.chunks[0].metadata["fallback_reason"] == "invalid_json"
+    assert result.chunks[0].metadata["fallback_reason"] == "invalid_schema"
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize(
+    ("response", "reason", "error_type"),
+    [
+        ("not-json-private-input", "invalid_json", "json_invalid"),
+        (
+            '{"chunks":[{"chunk_text":"private-input","unexpected-private-field":"private-input"}]}',
+            "invalid_schema",
+            "extra_forbidden",
+        ),
+        ('{"chunks":[{}]}', "invalid_schema", "missing"),
+    ],
+)
+async def test_chunking_failure_preserves_safe_error_details_without_source_values(
+    response: str,
+    reason: str,
+    error_type: str,
+) -> None:
+    chunker, fake_client = build_chunker(
+        responses=[
+            FakeCompletionResponse(
+                content=response,
+                prompt_tokens=12,
+                completion_tokens=8,
+            )
+        ]
+    )
+    result = await chunker.chunk_markdown(
+        markdown="## POSOLOGIA\nFonte original preservada.", doc_id="diagnostic"
+    )
+    diagnostic = result.metadata["semantic_chunking"]["requests"][0]
+    assert result.chunks[0].text == "## POSOLOGIA\nFonte original preservada."
+    assert result.chunks[0].metadata["fallback_reason"] == reason
+    assert diagnostic["error_type"] == "ValidationError"
+    assert diagnostic["validation_errors"][0]["type"] == error_type
+    assert diagnostic["section_indices"] == [0]
+    assert diagnostic["finish_reason"] == "stop"
+    assert diagnostic["usage"]["completion_tokens"] == 8
+    assert "private-input" not in json.dumps(diagnostic)
+    assert "unexpected-private-field" not in json.dumps(diagnostic)
+    assert len(fake_client.completions.requests) == 1
 
 
 @pytest.mark.anyio
@@ -671,8 +714,12 @@ async def test_deterministic_fallback_logs_safe_model_failure_context(
         if call["event"] == "rag_section_chunked" and call["method"] == "deterministic"
     )
     assert result.chunks[0].method == "deterministic"
-    assert len(warning_calls) == 1
-    assert warning_calls[0] == {
+    failure_log = next(
+        call
+        for call in warning_calls
+        if call["event"] == "rag_section_chunking_model_failed"
+    )
+    assert failure_log == {
         "event": "rag_section_chunking_model_failed",
         "doc_id": "bula-123",
         "section_index": 0,

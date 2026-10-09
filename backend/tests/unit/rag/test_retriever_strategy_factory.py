@@ -68,6 +68,7 @@ def test_strategy_accepts_corpus_scope_without_a_bula(mode: RetrievalMode) -> No
     )
 
     assert isinstance(retriever, StrategyRetriever)
+    assert retriever.k == 10
     assert retriever.bula_id is None
     assert retriever.corpus == (BulaCorpus.SHARED, BulaCorpus.SYSTEM)
     assert [strategy for strategy, builder in builders.items() if builder.is_built] == [

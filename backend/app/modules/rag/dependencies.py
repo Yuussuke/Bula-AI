@@ -32,6 +32,10 @@ from app.modules.rag.qdrant_client import QDRANT_CLIENT_STATE_KEY
 from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.retriever import DenseBulaRetriever
 from app.modules.rag.retrieval_mode import RetrievalMode
+from app.modules.rag.retrieval_limits import (
+    DEFAULT_DENSE_CANDIDATE_LIMIT,
+    DEFAULT_RETRIEVAL_K,
+)
 from app.modules.rag.retriever_factory import RetrieverStrategyFactory
 from app.modules.rag.schemas import ChunkingConfig
 from app.modules.rag.section_evidence_retriever import SectionEvidenceRetriever
@@ -106,7 +110,7 @@ def get_qdrant_store(
 
 def get_dense_retriever(
     bula_id: str | None,
-    k: int = 4,
+    k: int = DEFAULT_RETRIEVAL_K,
     corpus: tuple[BulaCorpus, ...] | None = None,
     qdrant_store: QdrantVectorStore = Depends(get_qdrant_store),
     embeddings: EmbeddingAdapter = Depends(get_embeddings),
@@ -115,6 +119,7 @@ def get_dense_retriever(
         bula_id=bula_id,
         corpus=corpus,
         k=k,
+        candidate_limit=max(k, DEFAULT_DENSE_CANDIDATE_LIMIT),
         qdrant_store=qdrant_store,
         embeddings=embeddings,
     )
@@ -202,6 +207,7 @@ def get_retriever_strategy_factory(
             bula_id=str(bula_id) if bula_id is not None else None,
             corpus=corpus,
             k=k,
+            candidate_limit=max(k, DEFAULT_DENSE_CANDIDATE_LIMIT),
             qdrant_store=build_vector_store(),
             embeddings=get_embeddings(settings=settings),
         )

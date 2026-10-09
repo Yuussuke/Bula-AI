@@ -38,6 +38,7 @@ class StubBM25Index:
         bula_id: UUID | None = None,
         corpus: tuple[BulaCorpus, ...] | None = None,
         include_administrative_sections: bool = True,
+        include_document_metadata: bool = True,
     ) -> list[BM25SearchResult]:
         _ = query
         _ = k
@@ -73,7 +74,7 @@ def build_factory() -> tuple[
 
 
 @pytest.mark.parametrize(
-    ("k", "candidate_k"), [(1, 3), (4, 12), (33, 99), (34, 100), (50, 100)]
+    ("k", "candidate_k"), [(1, 12), (4, 12), (10, 12), (33, 33), (50, 50)]
 )
 def test_factory_builds_scoped_overfetching_retrievers_and_enricher(
     k: int,
@@ -93,11 +94,33 @@ def test_factory_builds_scoped_overfetching_retrievers_and_enricher(
     assert isinstance(dense_retriever, DenseBulaRetriever)
     assert dense_retriever.bula_id == str(bula_id)
     assert dense_retriever.k == candidate_k
+    assert dense_retriever.candidate_limit == candidate_k * 3
     assert dense_retriever.qdrant_store is qdrant_store
     assert dense_retriever.embeddings is embeddings
     assert isinstance(bm25_retriever, BM25Retriever)
     assert bm25_retriever.bula_id == bula_id
     assert bm25_retriever.k == candidate_k
+
+
+def test_default_final_cut_preserves_the_pilot_candidate_pools() -> None:
+    factory, _, _ = build_factory()
+    retriever = factory.build(bula_id=UUID(int=1)).wrapped_retriever
+    assert isinstance(retriever, HybridRetriever)
+    assert retriever.k == 10
+    dense, lexical = retriever.retrievers
+    assert isinstance(dense, DenseBulaRetriever)
+    assert isinstance(lexical, BM25Retriever)
+    assert dense.k == lexical.k == 12
+    assert dense.candidate_limit == 36
+
+
+@pytest.mark.parametrize("candidate_k", [9, 101])
+def test_candidate_budget_must_cover_final_cut_and_respect_index_limit(
+    candidate_k: int,
+) -> None:
+    factory, _, _ = build_factory()
+    with pytest.raises(ValueError, match="candidate_k must"):
+        factory.build(bula_id=UUID(int=1), candidate_k=candidate_k)
 
 
 @pytest.mark.parametrize("k", [0, 51])
