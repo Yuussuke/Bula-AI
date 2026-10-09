@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import re
 from typing import Any
 
 from openai.types.chat import ChatCompletionMessageParam
 from openai.types.shared_params import ResponseFormatJSONSchema
+from pydantic import ValidationError
 
 from app.modules.rag.schemas import ChunkingConfig, ValidationOutcome
 
@@ -44,6 +46,12 @@ class SemanticRequestDiagnostic:
     cost_usd: float | None
     validation_outcome: ValidationOutcome
     fallback_reason: str | None
+    section_indices: tuple[int, ...]
+    observed_model: str | None
+    observed_provider: str | None
+    finish_reason: str | None
+    error_type: str | None
+    validation_errors: tuple[dict[str, object], ...]
 
     def to_metadata(self) -> dict[str, object]:
         return {
@@ -62,6 +70,12 @@ class SemanticRequestDiagnostic:
             },
             "validation_outcome": self.validation_outcome,
             "fallback_reason": self.fallback_reason,
+            "section_indices": list(self.section_indices),
+            "observed_model": self.observed_model,
+            "observed_provider": self.observed_provider,
+            "finish_reason": self.finish_reason,
+            "error_type": self.error_type,
+            "validation_errors": list(self.validation_errors),
         }
 
 
@@ -105,8 +119,11 @@ class SemanticChunkingRequestContract:
         latency_ms: float,
         validation_outcome: ValidationOutcome,
         fallback_reason: str | None,
+        section_indices: tuple[int, ...] = (),
+        error: Exception | None = None,
     ) -> SemanticRequestDiagnostic:
         usage = getattr(response, "usage", None)
+        choices = getattr(response, "choices", [])
         return SemanticRequestDiagnostic(
             model=self.config.model,
             prompt_version=self.config.prompt_version,
@@ -121,7 +138,52 @@ class SemanticChunkingRequestContract:
             cost_usd=self._extract_cost(usage=usage),
             validation_outcome=validation_outcome,
             fallback_reason=fallback_reason,
+            section_indices=section_indices,
+            observed_model=self._optional_string(response, "model"),
+            observed_provider=self._optional_string(response, "provider"),
+            finish_reason=self._optional_string(choices[0], "finish_reason")
+            if choices
+            else None,
+            error_type=type(error).__name__ if error is not None else None,
+            validation_errors=self._safe_validation_errors(error),
         )
+
+    def _optional_string(self, source: Any, attribute_name: str) -> str | None:
+        value = getattr(source, attribute_name, None)
+        return value if isinstance(value, str) else None
+
+    def _safe_validation_errors(
+        self, error: Exception | None
+    ) -> tuple[dict[str, object], ...]:
+        if not isinstance(error, ValidationError):
+            return ()
+        # Never serialize exception strings, input values, or custom contexts.
+        # Unknown field names can originate in provider content; redact them.
+        known_fields = {
+            "chunks",
+            "chunk_text",
+            "section_index",
+            "choices",
+            "message",
+            "content",
+            "model",
+            "usage",
+        }
+        details: list[dict[str, object]] = []
+        for item in error.errors(
+            include_input=False, include_context=False, include_url=False
+        )[:5]:
+            location = [
+                part if isinstance(part, int) or part in known_fields else "<field>"
+                for part in item["loc"]
+            ]
+            detail: dict[str, object] = {"type": item["type"], "location": location}
+            position = re.search(r"line (\d+) column (\d+)", item["msg"])
+            if position is not None:
+                detail["line"] = int(position.group(1))
+                detail["column"] = int(position.group(2))
+            details.append(detail)
+        return tuple(details)
 
     def _optional_int(self, source: Any, attribute_name: str) -> int | None:
         value = getattr(source, attribute_name, None)
