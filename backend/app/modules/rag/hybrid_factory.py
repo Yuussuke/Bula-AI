@@ -9,10 +9,13 @@ from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.enriching_retriever import EnrichingRetriever
 from app.modules.rag.hybrid_retriever import HybridRetriever
 from app.modules.rag.qdrant_store import QdrantVectorStore
-from app.modules.rag.retriever import DenseBulaRetriever
+from app.modules.rag.retriever import DEFAULT_CANDIDATE_MULTIPLIER, DenseBulaRetriever
+from app.modules.rag.retrieval_limits import (
+    DEFAULT_HYBRID_CANDIDATE_K,
+    DEFAULT_RETRIEVAL_K,
+)
 
 
-HYBRID_CANDIDATE_MULTIPLIER = 3
 MAX_HYBRID_CANDIDATES = 100
 MAX_HYBRID_RESULTS = 50
 
@@ -36,7 +39,8 @@ class HybridRetrieverFactory:
         *,
         bula_id: UUID | None,
         corpus: Sequence[BulaCorpus] | None = None,
-        k: int = 4,
+        k: int = DEFAULT_RETRIEVAL_K,
+        candidate_k: int | None = None,
     ) -> EnrichingRetriever:
         if k < 1 or k > MAX_HYBRID_RESULTS:
             raise ValueError(f"k must be between 1 and {MAX_HYBRID_RESULTS}.")
@@ -48,12 +52,17 @@ class HybridRetrieverFactory:
             tuple(BulaCorpus(value) for value in corpus) if corpus is not None else None
         )
 
-        # Preserve the supported final-k range without exceeding BM25's limit.
-        candidate_k = min(k * HYBRID_CANDIDATE_MULTIPLIER, MAX_HYBRID_CANDIDATES)
+        # Final K no longer multiplies the pool: preserve the pilot's 12 per
+        # branch. Larger explicit cuts still need at least K candidates.
+        if candidate_k is None:
+            candidate_k = max(k, DEFAULT_HYBRID_CANDIDATE_K)
+        if candidate_k < k or candidate_k > MAX_HYBRID_CANDIDATES:
+            raise ValueError("candidate_k must be >= k and <= 100.")
         dense_retriever = DenseBulaRetriever(
             bula_id=str(bula_id) if bula_id is not None else None,
             corpus=corpus_scope,
             k=candidate_k,
+            candidate_limit=candidate_k * DEFAULT_CANDIDATE_MULTIPLIER,
             qdrant_store=self.qdrant_store,
             embeddings=self.embeddings,
         )

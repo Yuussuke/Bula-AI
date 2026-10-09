@@ -117,9 +117,7 @@ async def test_strategy_composition_uses_only_selected_stores_and_preserves_scop
     )
     assert initialized_embeddings == []
 
-    documents = await factory.build(mode=mode, bula_id=bula_id, k=4).ainvoke(
-        "Indicações"
-    )
+    documents = await factory.build(mode=mode, bula_id=bula_id).ainvoke("Indicações")
 
     assert documents[0].page_content == "Trecho da bula."
     assert documents[0].metadata["bula_id"] == str(bula_id)
@@ -128,7 +126,7 @@ async def test_strategy_composition_uses_only_selected_stores_and_preserves_scop
     else:
         index.search.assert_awaited_once_with(
             "Indicações",
-            k=12 if mode == RetrievalMode.HYBRID else 4,
+            k=12 if mode == RetrievalMode.HYBRID else 10,
             bula_id=bula_id,
             corpus=None,
             include_administrative_sections=False,

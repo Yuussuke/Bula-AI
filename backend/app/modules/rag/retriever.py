@@ -23,6 +23,10 @@ from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.qdrant_store import QdrantVectorStore
 from app.modules.rag.section_titles import is_administrative_section
 from app.modules.rag.source_content import ChunkContentRole, without_front_matter
+from app.modules.rag.retrieval_limits import (
+    DEFAULT_DENSE_CANDIDATE_LIMIT,
+    DEFAULT_RETRIEVAL_K,
+)
 
 
 CITATION_METADATA_KEYS = ("section_title", "chunk_id", "drug_name", "bula_id")
@@ -40,10 +44,12 @@ class DenseBulaRetriever(BaseRetriever):
 
     bula_id: str | None = None
     corpus: tuple[BulaCorpus, ...] | None = None
-    k: int = 4
+    k: int = DEFAULT_RETRIEVAL_K
     qdrant_store: QdrantVectorStore
     embeddings: EmbeddingAdapter
     candidate_multiplier: int = DEFAULT_CANDIDATE_MULTIPLIER
+    # An explicit raw limit takes precedence; None retains multiplier mode.
+    candidate_limit: int | None = DEFAULT_DENSE_CANDIDATE_LIMIT
     include_administrative_sections: bool = False
     include_document_metadata: bool = False
 
@@ -56,6 +62,9 @@ class DenseBulaRetriever(BaseRetriever):
 
         if self.candidate_multiplier < 1:
             raise ValueError("candidate_multiplier must be >= 1")
+
+        if self.candidate_limit is not None and self.candidate_limit < self.k:
+            raise ValueError("candidate_limit must be >= k")
 
         if self.bula_id is not None and not self.bula_id.strip():
             raise ValueError("A bula ID cannot be blank.")
@@ -76,7 +85,9 @@ class DenseBulaRetriever(BaseRetriever):
         query_vector = await asyncio.to_thread(self.embeddings.embed_query, query)
         search_result = await self.qdrant_store.search_similar(
             vector=query_vector,
-            limit=self.k * self.candidate_multiplier,
+            limit=self.candidate_limit
+            if self.candidate_limit is not None
+            else self.k * self.candidate_multiplier,
             query_filter=self._build_bula_filter(),
         )
         evidence_documents: list[Document] = []

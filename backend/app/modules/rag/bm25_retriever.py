@@ -14,6 +14,7 @@ from pydantic import ConfigDict, Field
 
 from app.modules.bulas.models import BulaCorpus
 from app.modules.rag.schemas import BM25SearchResult
+from app.modules.rag.retrieval_limits import DEFAULT_RETRIEVAL_K
 
 
 @runtime_checkable
@@ -45,7 +46,7 @@ class BM25Retriever(BaseRetriever):
     """
 
     index: BM25SearchIndex = Field(exclude=True, repr=False)
-    k: int = Field(default=10, ge=1, le=100)
+    k: int = Field(default=DEFAULT_RETRIEVAL_K, ge=1, le=100)
     bula_id: UUID | None = None
     corpus: tuple[BulaCorpus, ...] | None = None
     include_administrative_sections: bool = False
@@ -111,7 +112,7 @@ class BM25RetrieverFactory:
         *,
         bula_id: UUID | None,
         corpus: Sequence[BulaCorpus] | None = None,
-        k: int = 10,
+        k: int = DEFAULT_RETRIEVAL_K,
         include_administrative_sections: bool = False,
         include_document_metadata: bool = False,
     ) -> BM25Retriever:
