@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pymupdf
+import pytest
 
 from app.modules.rag.parsers.document_cleaner import BulaDocumentCleaner
 from app.modules.rag.parsers.geometric_tables import (
@@ -13,6 +14,7 @@ from app.modules.rag.parsers.handlers import (
     ExtractedPage,
     PdfTextLineEvidence,
     PyMuPDF4LLMHandler,
+    strip_markdown_emphasis,
 )
 from app.modules.rag.parsers.section_detector import SectionDetector
 
@@ -88,6 +90,138 @@ def test_continuous_paragraph_crosses_page_without_new_paragraph() -> None:
     ]
 
 
+def test_native_blank_line_is_reconciled_only_with_physical_continuity() -> None:
+    source = "**A orientação depende da avaliação do**\n\n**profissional responsável.**"
+    with pymupdf.open() as document:
+        page = document.new_page()
+        page.insert_text(
+            (80, 100),
+            "A orientação depende da avaliação do\nprofissional responsável.",
+            fontsize=10,
+        )
+        handler = PyMuPDF4LLMHandler()
+        lines = handler._build_markdown_lines(
+            text=source,
+            page_number=1,
+            physical_lines=handler._get_physical_lines(page),
+        )
+
+    result = BulaDocumentCleaner().clean([ExtractedPage(1, source, lines)])
+
+    assert [line.text for line in result.lines] == [
+        "A orientação depende da avaliação do profissional responsável."
+    ]
+
+
+@pytest.mark.parametrize(
+    "next_line_position",
+    [(80, 145), (300, 114), (95, 114)],
+    ids=["paragraph-gap", "different-column", "indentation"],
+)
+def test_native_blank_line_is_preserved_for_separate_physical_blocks(
+    next_line_position: tuple[int, int],
+) -> None:
+    source = "A orientação depende da avaliação do\n\nprofissional responsável."
+    with pymupdf.open() as document:
+        page = document.new_page()
+        page.insert_text((80, 100), "A orientação depende da avaliação do", fontsize=10)
+        page.insert_text(next_line_position, "profissional responsável.", fontsize=10)
+        handler = PyMuPDF4LLMHandler()
+        lines = handler._build_markdown_lines(
+            text=source,
+            page_number=1,
+            physical_lines=handler._get_physical_lines(page),
+        )
+
+    assert any(line.is_paragraph_break for line in lines)
+
+
+@pytest.mark.parametrize(
+    "source",
+    [
+        "A orientação depende da avaliação do\n\nprofissional responsável.",
+        "Uma orientação completa.\n\noutra orientação independente.",
+        "A orientação depende de\n\n## nova seção",
+        "A orientação depende de\n\n- uma lista independente.",
+        "A orientação depende de\n\n| Coluna | Outra coluna |",
+    ],
+)
+def test_paragraph_break_is_not_removed_without_documentary_geometry(
+    source: str,
+) -> None:
+    lines = PyMuPDF4LLMHandler()._build_markdown_lines(text=source, page_number=1)
+
+    assert any(line.is_paragraph_break for line in lines)
+
+
+@pytest.mark.parametrize(
+    ("first_text", "next_text"),
+    [
+        ("Uma orientação completa.", "outra orientação independente."),
+        ("Uma condição necessária", "Nova orientação independente."),
+        ("Uma condição necessária", "## nova seção"),
+        ("Uma condição necessária", "- uma lista independente."),
+        ("Uma condição necessária", "| Coluna | Outra coluna |"),
+    ],
+)
+def test_physical_proximity_does_not_override_structural_boundaries(
+    first_text: str,
+    next_text: str,
+) -> None:
+    lines = PyMuPDF4LLMHandler()._build_markdown_lines(
+        text=f"{first_text}\n\n{next_text}",
+        page_number=1,
+        physical_lines=[
+            PdfTextLineEvidence(first_text, 80, 100, False, y1=110, block_index=0),
+            PdfTextLineEvidence(
+                next_text, 80, 113, next_text.startswith("- "), y1=123, block_index=0
+            ),
+        ],
+    )
+
+    assert any(line.is_paragraph_break for line in lines)
+
+
+def test_explicit_blank_physical_line_preserves_paragraph_boundary() -> None:
+    lines = PyMuPDF4LLMHandler()._build_markdown_lines(
+        text="Uma condição necessária\n\noutra orientação independente.",
+        page_number=1,
+        physical_lines=[
+            PdfTextLineEvidence(
+                "Uma condição necessária", 80, 100, False, y1=110, block_index=0
+            ),
+            PdfTextLineEvidence("", 80, 113, False, y1=123, block_index=0),
+            PdfTextLineEvidence(
+                "outra orientação independente.", 80, 126, False, y1=136, block_index=0
+            ),
+        ],
+    )
+
+    assert any(line.is_paragraph_break for line in lines)
+
+
+def test_geometry_requires_full_text_match_not_only_a_shared_prefix() -> None:
+    lines = PyMuPDF4LLMHandler()._build_markdown_lines(
+        text="Uma condição necessária de 10 mg\n\noutra orientação independente.",
+        page_number=1,
+        physical_lines=[
+            PdfTextLineEvidence(
+                "Uma condição necessária de 20 mg",
+                80,
+                100,
+                False,
+                y1=110,
+                block_index=0,
+            ),
+            PdfTextLineEvidence(
+                "outra orientação independente.", 80, 113, False, y1=123, block_index=0
+            ),
+        ],
+    )
+
+    assert any(line.is_paragraph_break for line in lines)
+
+
 def test_compound_strength_is_not_truncated_to_first_component() -> None:
     lines = [
         ExtractedLine("Medicamento genérico", 1),
@@ -105,6 +239,16 @@ def test_escaped_html_is_removed_without_changing_source_words() -> None:
     result = BulaDocumentCleaner().clean([ExtractedPage(1, "", lines)])
 
     assert result.lines[0].text == "Dose diária e acompanhamento"
+
+
+@pytest.mark.parametrize(
+    "source",
+    ["25 mg**/kg e *dose usual", "ALFA_BETA", "Aviso com **marcador incompleto"],
+)
+def test_emphasis_cleanup_preserves_footnotes_and_unpaired_markers(source: str) -> None:
+    plain_text, _ = strip_markdown_emphasis(source)
+
+    assert plain_text == source
 
 
 def test_literal_pipe_in_table_cell_remains_escaped() -> None:
