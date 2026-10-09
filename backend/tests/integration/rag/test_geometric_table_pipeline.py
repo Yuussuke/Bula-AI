@@ -12,7 +12,7 @@ import pytest
 
 from app.modules.rag.chunker import BulaChunker
 from app.modules.rag.debug_artifacts import RAGIngestionDebugArtifacts
-from app.modules.rag.parsers.pdf_parser import BulaParser
+from app.modules.rag.parsers.pdf_parser import BulaParser, PARSER_VERSION
 from app.modules.rag.schemas import ChunkingConfig
 
 
@@ -110,7 +110,7 @@ async def test_ems_pdf_preserves_table_relationships_through_fallback_and_debug(
     manifest = json.loads(
         next(tmp_path.rglob("manifest.json")).read_text(encoding="utf-8")
     )
-    assert manifest["parser_version"] == "native_markdown_tables_v3"
+    assert manifest["parser_version"] == PARSER_VERSION
     tables = manifest["cleanup_summary"]["table_extraction"]["tables"]
     assert [table["columns"] for table in tables if table["page"] == 4] == [3, 3, 3]
     assert "api_key" not in json.dumps(manifest)
