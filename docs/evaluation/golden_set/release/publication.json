@@ -1,0 +1,1104 @@
+{
+  "artifact_type": "Portable publication inventory, not a replacement for the immutable freeze manifest",
+  "release_id": "golden-set-v1.0.0",
+  "status": "methodologically_accepted_frozen",
+  "authoritative_manifest": {
+    "path": "docs/evaluation/golden_set/frozen/v1/manifest.json",
+    "sha256": "0b59a882ab360efbf7fcb51bb4c6ba1794f0d6c9d72fc2a88f88fcadb53b4fd7",
+    "external": true,
+    "manifest_fingerprint_sha256": "33ecd26d18b82925ec4c4e83b0eebf8e8edd39b432039926fd0c51f746ed7de0"
+  },
+  "counts": {
+    "records": 1000,
+    "positive": 800,
+    "negative": 200,
+    "pdfs": 100,
+    "corpus_A_pdfs": 50,
+    "corpus_B_pdfs": 50,
+    "per_pdf": {
+      "positive": 8,
+      "negative": 2
+    }
+  },
+  "effective_inputs": [
+    {
+      "path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "sha256": "241481392c794d6427c948e2f0c8a25b6462280f1573af97cc16aa02b1a2d8b5",
+      "record_count": 50
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "sha256": "91c195c65e3fa997727b5442bee0a62ba573d2a6afc67fe935b25ce386449e4c",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "sha256": "da02a31983e4dd2dec894ebb457bc4134c3229058ebabb0b01c0fd0d23d1e275",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "sha256": "3df4b6e62bf6f3deb98d1bc6ea39ec65e658498b708dc461b92d363f6aa92a38",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "sha256": "eff2d8d11cd7dd1424e5f207043abd8a8db93940ab744ecf1b5cc529c0eac9f7",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "sha256": "367ae9c8a9062a363244f6688e767cd36f6f4f98be77cb03e813dca233b706e0",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "sha256": "95023498278b61695af98be1b38b79c2d0ed0a868fc252db64d552b3d21c3fb6",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "sha256": "1eb729c8cc48d12f27debf1c20d42f128a8e39563fb5645d9c71f53ddb066be2",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "sha256": "242520fe25f686d2fae3fadde0f1ab750c1068ba2226bd0ac412e3d4ff3c572b",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "sha256": "bbab89435b127bb78c7440a30ab906140656063464187a76ec00fafd516348f6",
+      "record_count": 50
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/questions.overrides.draft.jsonl",
+      "sha256": "cac68b5f2cd2a9c9524d1b9f27870264e2674cee29d80a15d77d18f4a76f4e99",
+      "record_count": 7
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/questions.overrides.draft.jsonl",
+      "sha256": "b39bd270957005069c9f65a31c9e434162b2bd48ef9598709664112cc9732b6d",
+      "record_count": 3
+    }
+  ],
+  "record_bindings_path": "docs/evaluation/golden_set/frozen/v1/record_bindings.jsonl",
+  "effective_records_fingerprint_sha256": "df430fdecc08b4ba10f9e0226190784dcfbb683bcf213fbac62563fb00655158",
+  "effective_input_fingerprint_sha256": "820d12bc4545f2cddc0a62a1aaca8e753388e3ccc184f204fa1e07b0356d3e88",
+  "audit": {
+    "seed": 20261009,
+    "core_ids": [
+      "A-B001-Q10",
+      "A-B002-Q06",
+      "A-B003-Q01",
+      "A-B004-Q08",
+      "A-B005-Q05",
+      "A-B006-Q03",
+      "A-B007-Q04",
+      "A-B008-Q01",
+      "A-B009-Q09",
+      "A-B010-Q08",
+      "A-B011-Q04",
+      "A-B012-Q01",
+      "A-B013-Q05",
+      "A-B014-Q09",
+      "A-B015-Q03",
+      "A-B016-Q10",
+      "A-B017-Q04",
+      "A-B018-Q04",
+      "A-B019-Q05",
+      "A-B020-Q02",
+      "A-B021-Q10",
+      "A-B022-Q06",
+      "A-B023-Q07",
+      "A-B024-Q06",
+      "A-B025-Q04",
+      "A-B026-Q09",
+      "A-B027-Q03",
+      "A-B028-Q03",
+      "A-B029-Q03",
+      "A-B030-Q09",
+      "A-B031-Q03",
+      "A-B032-Q01",
+      "A-B033-Q01",
+      "A-B034-Q01",
+      "A-B035-Q03",
+      "A-B036-Q05",
+      "A-B037-Q03",
+      "A-B038-Q10",
+      "A-B039-Q04",
+      "A-B040-Q10",
+      "A-B041-Q08",
+      "A-B042-Q06",
+      "A-B043-Q01",
+      "A-B044-Q07",
+      "A-B045-Q09",
+      "A-B046-Q06",
+      "A-B047-Q01",
+      "A-B048-Q05",
+      "A-B049-Q06",
+      "A-B050-Q08",
+      "B-CB001-Q01",
+      "B-CB002-Q06",
+      "B-CB003-Q06",
+      "B-CB004-Q06",
+      "B-CB005-Q01",
+      "B-CB006-Q03",
+      "B-CB007-Q04",
+      "B-CB008-Q01",
+      "B-CB009-Q01",
+      "B-CB010-Q01",
+      "B-CB011-Q02",
+      "B-CB012-Q03",
+      "B-CB013-Q09",
+      "B-CB014-Q08",
+      "B-CB015-Q04",
+      "B-CB016-Q03",
+      "B-CB017-Q03",
+      "B-CB018-Q06",
+      "B-CB019-Q07",
+      "B-CB020-Q08",
+      "B-CB021-Q08",
+      "B-CB022-Q02",
+      "B-CB023-Q06",
+      "B-CB024-Q08",
+      "B-CB025-Q06",
+      "B-CB026-Q09",
+      "B-CB027-Q09",
+      "B-CB028-Q07",
+      "B-CB029-Q10",
+      "B-CB030-Q10",
+      "B-CB031-Q09",
+      "B-CB032-Q08",
+      "B-CB033-Q03",
+      "B-CB034-Q06",
+      "B-CB035-Q02",
+      "B-CB036-Q04",
+      "B-CB037-Q04",
+      "B-CB038-Q01",
+      "B-CB039-Q07",
+      "B-CB040-Q06",
+      "B-CB041-Q09",
+      "B-CB042-Q09",
+      "B-CB043-Q09",
+      "B-CB044-Q02",
+      "B-CB045-Q09",
+      "B-CB046-Q03",
+      "B-CB047-Q08",
+      "B-CB048-Q07",
+      "B-CB049-Q04",
+      "B-CB050-Q01"
+    ],
+    "additional_risk_ids": [
+      "B-CB025-Q05",
+      "B-CB021-Q01",
+      "A-B017-Q05",
+      "B-CB038-Q04",
+      "A-B026-Q08",
+      "A-B025-Q01",
+      "A-B025-Q03",
+      "A-B025-Q05",
+      "A-B025-Q07",
+      "A-B025-Q08",
+      "A-B025-Q02",
+      "A-B025-Q06",
+      "A-B016-Q08",
+      "A-B016-Q07",
+      "B-CB013-Q08",
+      "B-CB003-Q03",
+      "A-B042-Q02",
+      "B-CB050-Q04",
+      "B-CB023-Q05",
+      "B-CB021-Q04"
+    ]
+  },
+  "protocol": {
+    "reference_policy": "docs/evaluation/golden_set/phase1/reference_policy.md",
+    "fidelity_policy": "docs/evaluation/golden_set/answer_fidelity_policy.md",
+    "linguistic_policy": "docs/evaluation/golden_set/phase1/linguistic_policy.md",
+    "retrieval_relevance": "Relevant chunks of the specific reference PDF only, in both scoped and cross-leaflet retrieval. Equivalent other-PDF evidence is not target retrieval success.",
+    "cross_leaflet_search": "Corresponding frozen corpus, without hidden target-document filtering; retain non-target positions in the ranking.",
+    "recall": "Recall@10 = retrieved annotated target-PDF gold chunks / all annotated target-PDF gold chunks; positives only.",
+    "mrr": "First relevant target-PDF chunk reciprocal rank, retaining the existing evaluation ranking/cutoff convention. This release does not redefine its cutoff; record the inherited convention in the later experiment manifest.",
+    "negative_abstention": "Evaluate the 200 negatives per reference leaflet only. Cross-leaflet variants do not establish unsupported queries over the whole corpus.",
+    "multi_fragment_limits": "Recall@10 and MRR do not guarantee complete evidentiary coverage, interpretation or a faithful answer. Assess response fidelity separately.",
+    "answer_fidelity": "Required requested information and indispensable qualifiers differ from optional complementary context. Correct answers are not penalized for omitting unrequested complementary details; included factual claims still require documentary support.",
+    "main_evaluation": "Preserve dense/BM25/hybrid comparisons, target retrieval Recall@10/MRR, separate documentary fidelity, readability and operational indicators. No new metric or judge implementation.",
+    "pipeline_parameters": "Unchanged; this is a documentary collection freeze, not a new pipeline/configuration freeze."
+  },
+  "limitations": [
+    "No independent clinical validation.",
+    "No individual human approval of all 1,000 records.",
+    "No exhaustive full-corpus documentary-absence proof.",
+    "Human inspection was sampled and excerpt-based; AI-assisted full-PDF checks remain separately attributed.",
+    "Automated citation/hash checks establish mechanical traceability, not independent semantic validation or table interpretation.",
+    "Existing authored draft/pending metadata and historical not-frozen notices remain immutable; this release supplies separate collection-level acceptance.",
+    "No chunk IDs are mapped by this release; expected_chunk_ids remain unchanged."
+  ],
+  "published_files": [
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "sha256": "91c195c65e3fa997727b5442bee0a62ba573d2a6afc67fe935b25ce386449e4c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "sha256": "da02a31983e4dd2dec894ebb457bc4134c3229058ebabb0b01c0fd0d23d1e275"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "sha256": "3df4b6e62bf6f3deb98d1bc6ea39ec65e658498b708dc461b92d363f6aa92a38"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "sha256": "eff2d8d11cd7dd1424e5f207043abd8a8db93940ab744ecf1b5cc529c0eac9f7"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "sha256": "367ae9c8a9062a363244f6688e767cd36f6f4f98be77cb03e813dca233b706e0"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "sha256": "95023498278b61695af98be1b38b79c2d0ed0a868fc252db64d552b3d21c3fb6"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "sha256": "1eb729c8cc48d12f27debf1c20d42f128a8e39563fb5645d9c71f53ddb066be2"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "sha256": "242520fe25f686d2fae3fadde0f1ab750c1068ba2226bd0ac412e3d4ff3c572b"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "sha256": "bbab89435b127bb78c7440a30ab906140656063464187a76ec00fafd516348f6"
+    },
+    {
+      "path": "docs/evaluation/golden_set/frozen/v1/record_bindings.jsonl",
+      "sha256": "798c347cd04f26f4a95299c410c5aa090ae5aade4b71280cd106ff1a1b769514"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "sha256": "241481392c794d6427c948e2f0c8a25b6462280f1573af97cc16aa02b1a2d8b5"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/questions.overrides.draft.jsonl",
+      "sha256": "b39bd270957005069c9f65a31c9e434162b2bd48ef9598709664112cc9732b6d"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/questions.overrides.draft.jsonl",
+      "sha256": "cac68b5f2cd2a9c9524d1b9f27870264e2674cee29d80a15d77d18f4a76f4e99"
+    }
+  ],
+  "pdfs": [
+    {
+      "corpus_id": "A",
+      "document_id": "B023",
+      "medication": "TIMEOLATE",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B023/bula_1791246901366.pdf",
+      "sha256": "a80d5fc0eb0553b52d958fb3ef665d21500b835daf814423ca15373b30b595e0",
+      "pages": 7
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B001",
+      "medication": "SINGULAIR",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B001/bula_1791246623844.pdf",
+      "sha256": "105cd1abc112b3fc2ad801d8ac1c3af5d0266e17702dab250e1ec59742b64692",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B024",
+      "medication": "NIMENRIX",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B024/bula_1791246901688.pdf",
+      "sha256": "2fc26b8f082a0bf554b683b2cc55899746fbc9ddded35cacbee6b4efffcda4a8",
+      "pages": 14
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB001",
+      "medication": "losartana potássica",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB001/bula_1791329435703.pdf",
+      "sha256": "edbfe7b9ec409218457402d8ccbbd4ab8a05c00169e322fab2d3eee2854aef87",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB034",
+      "medication": "CIPRAMIL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB034/bula_1791247042757.pdf",
+      "sha256": "7d23769df530f7cbbcf7bde4001fef5a05b500f04568fa078640d606ba3ad427",
+      "pages": 13
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B002",
+      "medication": "SOLUÇÃO GLICOFISIOLÓGICA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B002/bula_1791246686506.pdf",
+      "sha256": "c5175435076de7074fd6afc3ba71bab41bc572e14937547a5521b46243a2b65c",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B003",
+      "medication": "CLORIDRATO DE DOXORRUBICINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B003/bula_1791246691948.pdf",
+      "sha256": "bcd9cf05bacf29c54fc269f2feaa89687eb7ba324a9f81f89ee4f8c92b201eb9",
+      "pages": 10
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B004",
+      "medication": "TRILAX",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B004/bula_1791246696116.pdf",
+      "sha256": "84bf559f735387f65f5c19d7d938580baa0e2703360fbc9b3bc11f3be77ba01d",
+      "pages": 12
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B005",
+      "medication": "Fluibron A / Fluibron",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B005/bula_1791246729901.pdf",
+      "sha256": "78d833d4c99b7f9aeec7899a2d5035fec0501fcebb36ac96fea6ae5eca2fc618",
+      "pages": 17
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B006",
+      "medication": "ARNICA WELEDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B006/bula_1791246732987.pdf",
+      "sha256": "d6dd74d4c973b9c406795fab606a167fa68628e65dde414952b4464755850652",
+      "pages": 17
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB002",
+      "medication": "HIDROCLOROTIAZIDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB002/bula_1791329439872.pdf",
+      "sha256": "688791db3755ee3c12a59081f885bd9fd2544960600de19b18e565647c205986",
+      "pages": 15
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB003",
+      "medication": "CAPTOPRIL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB003/bula_1791329442902.pdf",
+      "sha256": "a8ff9d494dc035d2674f16a157888c2634cb9bc54c2743f8479e3ba5db8295f2",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB004",
+      "medication": "maleato de enalapril",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB004/bula_1791329445649.pdf",
+      "sha256": "9dd47df5d651b65e3130c2b916eae6905e63ce31e39d233edd3393ef6ac14db5",
+      "pages": 11
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB005",
+      "medication": "TENOLON",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB005/bula_1791329448696.pdf",
+      "sha256": "5713913d2953a37f5a7b1ef81f6400a21fe539d27958e3b89434a5d2c981162d",
+      "pages": 14
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB006",
+      "medication": "besilato de anlodipino",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB006/bula_1791329451238.pdf",
+      "sha256": "e5fa58695e3c7aa939467bbfca43ce46d02d8552be12369bd9f7d034355fad0f",
+      "pages": 11
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B007",
+      "medication": "AMPLOSPEC",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B007/bula_1791246736061.pdf",
+      "sha256": "b06c6761037ce03395a19d6e686baed64efa4bbce5cdbbb8bf65850072227c2c",
+      "pages": 16
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B008",
+      "medication": "hemitartarato de rivastigmina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B008/bula_1791246774800.pdf",
+      "sha256": "5c1660eab718c12b0d1952b348fbb98bbc327842c4f686d4533d1d797580a7fa",
+      "pages": 10
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B009",
+      "medication": "LIPOFUNDIN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B009/bula_1791246779068.pdf",
+      "sha256": "07d1af1a55961b0b300d66f7ff77d15f88fd6522e03585feeeb48f81345d7cbb",
+      "pages": 12
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B010",
+      "medication": "Prolopa DR / dispersível / BD / HBS",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B010/bula_1791246782934.pdf",
+      "sha256": "46b09e4a582ff0bb81783c7894c02b63f2fd9269b3b9e74b90ec935cbaaafa5f",
+      "pages": 50
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B011",
+      "medication": "AMOXIL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B011/bula_1791246785289.pdf",
+      "sha256": "c79815cbdb393617be76a61ff2bf1a9403695829251a466b785e5329af7f8695",
+      "pages": 21
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB007",
+      "medication": "cloridrato de propranolol",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB007/bula_1791329461722.pdf",
+      "sha256": "50b1449946106b5dc460c38dedc3407d0307c718657bc8758001ae57ca2e7bf8",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB008",
+      "medication": "DIURIT",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB008/bula_1791329499197.pdf",
+      "sha256": "b5aaed38f93ac943ebcf1ddb0fb5733fb6842fb653f8784501ecd6220631c0b2",
+      "pages": 11
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB009",
+      "medication": "NIFEDIPRESS",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB009/bula_1791329502750.pdf",
+      "sha256": "3bd30087cbbb48384e7fa7c05a30eb2fecf56c61fed96e50c422daed98699ba9",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB010",
+      "medication": "clortalidona",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB010/bula_1791329506273.pdf",
+      "sha256": "f06fec156057c26ba1b59e99fe4d85b9e8ddf14466ac7c66374157c66d7458a7",
+      "pages": 11
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB011",
+      "medication": "CLORIDRATO DE METFORMINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB011/bula_1791329509872.pdf",
+      "sha256": "e56c40afc2b62c3130f4a615b1696c28b732436c57265a2797f3fac44f8e04cc",
+      "pages": 15
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B012",
+      "medication": "OTO - XILODASE",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B012/bula_1791246786356.pdf",
+      "sha256": "b0f1b9ab783566bb737a7f7b109b70a1d053811f9f0cc3a5d2a8426ab4498677",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B013",
+      "medication": "MALVATRICIN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B013/bula_1791246828833.pdf",
+      "sha256": "48b7e398c494c5f78745ac163f1fa0ea848c8b8efb2b3d2ed0e4fe3f77e6da38",
+      "pages": 15
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B014",
+      "medication": "Pred Fort / Pred Mild",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B014/bula_1791246832147.pdf",
+      "sha256": "073b06975ba201c153fd9d58a9ed09f1f638875165c2e776246809bf44c47d81",
+      "pages": 26
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B015",
+      "medication": "FIBROGAMMIN P",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B015/bula_1791246834028.pdf",
+      "sha256": "2d934a07fd314a493f4e98a1f7dc716c7310fbe499424b4d26fa815e8d4c97d5",
+      "pages": 17
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B016",
+      "medication": "IMUNO  BCG",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B016/bula_1791246837814.pdf",
+      "sha256": "53eac092c91276dd34b899a286f2b20b3b31eec972f10492e0080b13abf33fe4",
+      "pages": 4
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB012",
+      "medication": "Glibenclamida",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB012/bula_1791329513517.pdf",
+      "sha256": "4b356a7fa1c87e0d30b1434b941eb6d8e8fcf1d4e05ced760c2fbf4aa8c1c801",
+      "pages": 12
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB013",
+      "medication": "gliclazida",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB013/bula_1791329516988.pdf",
+      "sha256": "a6e22a82de8a2a9a5f03f0a8f16907d50a5bc0169a9e5fb50b6a5a0c2edbe826",
+      "pages": 11
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB014",
+      "medication": "GLIMEPIRIDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB014/bula_1791329519793.pdf",
+      "sha256": "7151ca50d34f6b5ef9f14e967d89c9f00ab0ac300b22cb2a322bf4d4a5623106",
+      "pages": 11
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB015",
+      "medication": "cloridrato de pioglitazona",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB015/bula_1791329522882.pdf",
+      "sha256": "cb0a1820ea78b74b2e119e116628bf94235cba05460ce249d53406159d0b855a",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB016",
+      "medication": "dapagliflozina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB016/bula_1791329525463.pdf",
+      "sha256": "689c86348c8e9b37117b9bc3e1d6fba58eff17533a1c4564aec982de6bdae027",
+      "pages": 10
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B017",
+      "medication": "CAPSFEN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B017/bula_1791246840451.pdf",
+      "sha256": "7e3b8525ce01e98b77ab7c5f8d1da2dbc1e7388d6227bbd2118655489bbcf4f4",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B018",
+      "medication": "LAFEPE BENZNIDAZOL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B018/bula_1791246890013.pdf",
+      "sha256": "13e524b83eab65964b7852d1e096894d79a8a02d27eadf30d80472c01fbd93d3",
+      "pages": 5
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B019",
+      "medication": "GENTAMISAN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B019/bula_1791246892067.pdf",
+      "sha256": "64d7fda2018a7276f3f0ea3ca76a69957614f0ecc12257a250d064339e328c31",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B020",
+      "medication": "MONOFER",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B020/bula_1791246894188.pdf",
+      "sha256": "262320f02a0080fc67eb54c99d29689a6a0e01d49a31ee82c2533eaf49f0d98f",
+      "pages": 6
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B021",
+      "medication": "CAMOMILINA C",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B021/bula_1791246895251.pdf",
+      "sha256": "db4c16b6b044a1234f66dc5c06468bd49ebac99189c249d35bced4f32f282d64",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB017",
+      "medication": "empagliflozina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB017/bula_1791329528383.pdf",
+      "sha256": "0ad60b91f5223877d5459c70e4e533ada52a62d659e6e55530185dbdcd195f3f",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB018",
+      "medication": "fosfato de sitagliptina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB018/bula_1791329531264.pdf",
+      "sha256": "f4ad75953080c61882a71cad1aad0b36f17420458c6b03f92f3ae2b5597e9e77",
+      "pages": 6
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB019",
+      "medication": "vildagliptina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB019/bula_1791329586213.pdf",
+      "sha256": "3b54b99a53529e8733c1ad66fda701c1bd392e26407a65d4db7e377c858547bb",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB020",
+      "medication": "fosfato de sitagliptina + cloridrato de metformina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB020/bula_1791329589987.pdf",
+      "sha256": "7c1e9f381f0a54cbf98a323be3eb1f087cd338c70401393b46c63207ef1953e9",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB021",
+      "medication": "dipirona",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB021/bula_1791329599897.pdf",
+      "sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db",
+      "pages": 11
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B022",
+      "medication": "piperacilina sódica + tazobactam sódico",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B022/bula_1791246897208.pdf",
+      "sha256": "9a1aadc219a75ce611df32ccbec2961a32565e02c92e9aab3280a3e8952e2fa3",
+      "pages": 4
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B025",
+      "medication": "OLINA ESSÊNCIA DE VIDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B025/bula_1791246961983.pdf",
+      "sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+      "pages": 2
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B026",
+      "medication": "GLICERINA 12%",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B026/bula_1791246964608.pdf",
+      "sha256": "b16d579b142fb69d6435ad5d90b2b699e036ffd1d4a6109736350f9f8e250bf5",
+      "pages": 7
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B027",
+      "medication": "Atrovent / Atrovent N",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B027/bula_1791246971053.pdf",
+      "sha256": "2419f85d1426f6c8439d28203100025ad036b5c64e2fd5404a71364241d04be2",
+      "pages": 13
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B028",
+      "medication": "COLPATRIN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B028/bula_1791246973219.pdf",
+      "sha256": "86ba065ac51792dcbe2f284081e57026ca457d7201eb5ef38139e2834c9dbf2a",
+      "pages": 14
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB022",
+      "medication": "PARACETAMOL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB022/bula_1791329605125.pdf",
+      "sha256": "880a41737adf4074c1812fbf3d43fd5d2f15cbaf6f3e0b008a71e2b0fae5186b",
+      "pages": 6
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB023",
+      "medication": "ibuprofeno",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB023/bula_1791329608990.pdf",
+      "sha256": "81103836456eabbd08d844f5195499966c55d1096c0e1674c04dcea8f3db3056",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB024",
+      "medication": "naproxeno sodico",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB024/bula_1791329613221.pdf",
+      "sha256": "66c541f306b4737a2839eb56a25943fc44ce5b50fea1b86dd2c0412297742076",
+      "pages": 8
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB025",
+      "medication": "DICLOFENACO SÓDICO",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB025/bula_1791329617813.pdf",
+      "sha256": "7d7cdf890bd46c0375c3d99bf47e5ac77a4142555811f5795b96fab2d9f59df8",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB026",
+      "medication": "NIMESULIDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB026/bula_1791329621948.pdf",
+      "sha256": "06a05ae6e200e3d9e31aef6fc44a467ea7cf96c49b1f92069c4971977d7026b9",
+      "pages": 10
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B029",
+      "medication": "BIOVICERIN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B029/bula_1791247053173.pdf",
+      "sha256": "bc1161a2eab60cc5ca87b14593e5a398b8a94078cfcb0442c75ac5cfc3c065ba",
+      "pages": 5
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B030",
+      "medication": "HIRUDOID",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B030/bula_1791247046273.pdf",
+      "sha256": "955bbd5eef54efdac8c98e55974b1b399539aff78f812c7a38d114069f312aed",
+      "pages": 19
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B031",
+      "medication": "ESPINHEIRA SANTA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B031/bula_1791247042640.pdf",
+      "sha256": "fb604e6e84546dced852fb548f7eef98244d07fbb7cb13a37f376b8cc770c874",
+      "pages": 6
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B032",
+      "medication": "DEXAMETRAT",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B032/bula_1791247113528.pdf",
+      "sha256": "86caa59660df3eeb9c7391eef26c3d4ee35024661b8eba01fbebc642ca7ed799",
+      "pages": 7
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B033",
+      "medication": "DRENOGRIP",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B033/bula_1791247129315.pdf",
+      "sha256": "75d56e686e69a986b5cdb50bdc55bf7baa8a9f101a037da919821ae36895b934",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB027",
+      "medication": "meloxicam",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB027/bula_1791329625718.pdf",
+      "sha256": "95982b216523fe6b8ae72fc2551877dfe119527e8c660b621d70a8ade34b4a85",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB028",
+      "medication": "CETOPROFENO",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB028/bula_1791329629038.pdf",
+      "sha256": "99736d18e7b3c154103f110cd1df7458407a4793a117c1cc2593df1f8363c8b5",
+      "pages": 17
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB029",
+      "medication": "trometamol cetorolaco",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB029/bula_1791329632161.pdf",
+      "sha256": "25b4fe58fccff61a2a522845767bb78b6bd6e8744f4345ca290a17b6f36f54be",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB030",
+      "medication": "CALMADOR",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB030/bula_1791246726579.pdf",
+      "sha256": "61d8fb8db6763fd3ebea0ed76baba62c052f2587b68838f6514cfc845c6bb9c2",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB031",
+      "medication": "cloridrato de fluoxetina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB031/bula_1791329635147.pdf",
+      "sha256": "51b7bec49c8aa2ae935fb9e3cda8d280c5bcff9f02423b5bef8745732310895e",
+      "pages": 16
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B034",
+      "medication": "LUR",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B034/bula_1791247133192.pdf",
+      "sha256": "4d1c470fbfbec475bf4dd73aa6c3c53177b7e3a401e7f39764befb117c867d6f",
+      "pages": 11
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B035",
+      "medication": "IMUSSUPREX",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B035/bula_1791247139052.pdf",
+      "sha256": "6a3255668e798ff56f9bb41027ae282152b7b1129a3945aa8bb8168b87c85f81",
+      "pages": 11
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B036",
+      "medication": "PROCTYL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B036/bula_1791247144089.pdf",
+      "sha256": "7b4ec98a6e4d911df1be8d2cf528c31247ba2b324ecdeabc5dcc2a556f93b1ed",
+      "pages": 18
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B037",
+      "medication": "SOLUPREN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B037/bula_1791247296210.pdf",
+      "sha256": "b2e2e2121098ab3adb22cb61583e2d687b209e00dce9ca29b82458f780c82f76",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B038",
+      "medication": "DIANEAL PD-2",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B038/bula_1791247291427.pdf",
+      "sha256": "6af0132b12d269b8997c6085e335fbe0a183d8f0acd32d8d6076806db4001456",
+      "pages": 28
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB032",
+      "medication": "cloridrato de amitriptilina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB032/bula_1791329638185.pdf",
+      "sha256": "4ef8513bae5afc3b322bbc5f92cb7b69d96753a599642edcdb183c0204b60a1a",
+      "pages": 8
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB033",
+      "medication": "CLORIDRATO DE SERTRALINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB033/bula_1791329641140.pdf",
+      "sha256": "c07d6436bdd2456ecdc914a697a718ab250ba3562c73e11dbde07e6820d0fd9c",
+      "pages": 12
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB035",
+      "medication": "CLORIDRATO DE PAROXETINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB035/bula_1791329644445.pdf",
+      "sha256": "2152cb976ffadf07f9c720735bd23e2b2634c57533decb4416451553e9650323",
+      "pages": 12
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB036",
+      "medication": "cloridrato de venlafaxina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB036/bula_1791329687037.pdf",
+      "sha256": "e91ffc935328cbcfafc693a9debd462f79dc7b834c2140a7e315533a84a68a77",
+      "pages": 13
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB037",
+      "medication": "oxalato de escitalopram",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB037/bula_1791329690930.pdf",
+      "sha256": "51c070166631290367ae086b73a60749e515f3aa0c665762ca7c3ccf45a57f00",
+      "pages": 13
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B039",
+      "medication": "cloridrato de dexmedetomidina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B039/bula_1791247275568.pdf",
+      "sha256": "9a2a902154f079f061ae3d55dca34f07125196b6f748e40011ddfc50db6d6585",
+      "pages": 11
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B040",
+      "medication": "DODOY",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B040/bula_1791247250853.pdf",
+      "sha256": "8d18fe70ec6b52c6c47293c04fe0b96a0d1103cb42d359d2be667ff83a7fc7a0",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B041",
+      "medication": "VOMISTOP",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B041/bula_1791247250064.pdf",
+      "sha256": "bf49fef0fa31f56f58f5e118276120e7329f558df7d5da1ebf90f87597d75b40",
+      "pages": 10
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B042",
+      "medication": "SOVALDI",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B042/bula_1791247345598.pdf",
+      "sha256": "621636da74328b5eea20fd341a9a6e8307273c79cdb31cd7c969d4d01df74b4d",
+      "pages": 15
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B043",
+      "medication": "CRONOBÊ",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B043/bula_1791247358820.pdf",
+      "sha256": "36cbc73e5f397832a9aa1c165bc8727571c6353af6d181c4c918b726cf937f6c",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB038",
+      "medication": "cloridrato de duloxetina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB038/bula_1791329694894.pdf",
+      "sha256": "f54cac847bdfccdc10420329c24fa626cc1c6ff78c3fb86cb9784d620abc3490",
+      "pages": 13
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB039",
+      "medication": "mirtazapina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB039/bula_1791329698726.pdf",
+      "sha256": "8012b7dc3dbd959e1170e122bb77b27dd7a291d0868f7752b996dcda61c1ea04",
+      "pages": 8
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB040",
+      "medication": "cloridrato de trazodona",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB040/bula_1791329702857.pdf",
+      "sha256": "6ccabdc700eaa30fcbc8307b73481125f7276ae799394af28ad1989ae47aa54c",
+      "pages": 13
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB041",
+      "medication": "SINVASTATINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB041/bula_1791329706258.pdf",
+      "sha256": "a035d824170c0971803bbc1b48899f5f662f6aed326c009dfde483de99a7e482",
+      "pages": 6
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB042",
+      "medication": "ATORVASTATINA CÁLCICA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB042/bula_1791329709865.pdf",
+      "sha256": "f424f5a25f2fe5e76e80a72b3e67982e8714ae76d8d9af3c7cf0f57ed0a3427b",
+      "pages": 7
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B044",
+      "medication": "CYCLOFEMINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B044/bula_1791247373784.pdf",
+      "sha256": "9555875042d263b7f706f1ccec809e8467184fbc7497a6ccb8a4f41c478ed712",
+      "pages": 8
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B045",
+      "medication": "Air Salonpas / Salonpas Gel / Salonsip",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B045/bula_1791247383810.pdf",
+      "sha256": "1a18cf5583b059f5ec7164ad44ef8d98b574e132e3c0b96d5570daf9f39fb266",
+      "pages": 15
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B046",
+      "medication": "Fração Ácida com Cálcio 3,5 mEq/L (Farmace)",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B046/bula_1791247394764.pdf",
+      "sha256": "3d52abbef565ebcf1f9b02429ca6632dbafc8ad4f77d4b7f421e717a915c025e",
+      "pages": 5
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B047",
+      "medication": "FUNED ÁCIDO FÓLICO",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B047/bula_1791247427635.pdf",
+      "sha256": "532adebf87780c2a10fa8d5ed1e72cedbb92c2fe2542c43a412795f28431bfab",
+      "pages": 6
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B048",
+      "medication": "LAQFA-ISONIAZIDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B048/bula_1791247430452.pdf",
+      "sha256": "aebaef75c30f65cb4dfdabbc0cfe0b4b269a63f9ffa3567a4d28432ced51b271",
+      "pages": 8
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB043",
+      "medication": "rosuvastatina cálcica",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB043/bula_1791329713235.pdf",
+      "sha256": "1f88a64dc5819933e252dae6c347f24fc32c89a4f5d818feb70dce6045eee30c",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB044",
+      "medication": "CIPROLIP",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB044/bula_1791247123073.pdf",
+      "sha256": "f24ff5c39fbd4b9ca5952cf056121d2944af67a935b6817884ee1834bba8984d",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB045",
+      "medication": "ezetimiba + sinvastatina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB045/bula_1791329715920.pdf",
+      "sha256": "1cfb6036ee5dc4dd8b3937839fd0d08b13a103ac226a6259550998c84a57c66d",
+      "pages": 12
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB046",
+      "medication": "fenofibrato",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB046/bula_1791329719056.pdf",
+      "sha256": "8159761d3d09b806e2ba08033fa0e0abb43c8b52fb0ec329758dc49658698225",
+      "pages": 8
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB047",
+      "medication": "EZETIMIBA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB047/bula_1791329721812.pdf",
+      "sha256": "d9bc4c7d12092e81f0eaec51c69406f08d4df01d524842c426cfc4ca191909a2",
+      "pages": 6
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B049",
+      "medication": "SPORANOX",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B049/bula_1791247433429.pdf",
+      "sha256": "7c120618bebaaebdebb15fb19824ba29463fa6e649d5021b8a7e5d4b0d574131",
+      "pages": 19
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B050",
+      "medication": "VYVGART",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B050/bula_1791247437912.pdf",
+      "sha256": "f41b0939a34c2468bcb95df916ca5cc305782c6236706c461cccca9d1bcadab3",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB048",
+      "medication": "bezafibrato",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB048/bula_1791329724624.pdf",
+      "sha256": "1d6dffe47e8247daaa1a63665eecd486c199e5517916c0f21ad5f3405a73dca0",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB049",
+      "medication": "genfibrozila",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB049/bula_1791329727134.pdf",
+      "sha256": "4565961b3883e3f7294ee42d3c499f2911acdad2f852f2c62cdb9f829fe6a712",
+      "pages": 6
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB050",
+      "medication": "Pravastatina Sódica",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB050/bula_1791329730305.pdf",
+      "sha256": "4019f913b8314d822f86dcb39204c43066c99e5dc17ae8fbd44e32e7717971a8",
+      "pages": 15
+    }
+  ],
+  "external_archive": "Original freeze manifest, complete immutable revision/audit history, original reviewer submissions, original verification scripts and 100 PDFs are retained in the author-controlled custodial archive; not hosted by this PR."
+}

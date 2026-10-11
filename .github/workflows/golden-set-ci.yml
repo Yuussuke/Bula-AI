@@ -1,0 +1,31 @@
+name: Golden Set Integrity
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  publication:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Install locked dependencies
+        run: uv sync --frozen --project backend
+      - name: Verify published collection
+        run: uv run --offline --no-sync --project backend python docs/evaluation/golden_set/release/verify.py
+      - name: Test publication integrity
+        run: uv run --offline --no-sync --project backend python -m unittest discover -s docs/evaluation/golden_set/release -p test_verify.py
+      - name: Check verifier
+        run: |
+          uv run --offline --no-sync --project backend ruff check docs/evaluation/golden_set/release/*.py
+          uv run --offline --no-sync --project backend ruff format docs/evaluation/golden_set/release/*.py --check
+          uv run --offline --no-sync --project backend mypy docs/evaluation/golden_set/release/verify.py --follow-imports=silent --disallow-untyped-defs

@@ -1,0 +1,2 @@
+# Retain exact frozen source bytes, including historical CRLF and blank EOF.
+docs/evaluation/golden_set/** -text whitespace=cr-at-eol,-blank-at-eof
