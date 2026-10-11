@@ -8,6 +8,8 @@ import re
 from typing import Any
 import unicodedata
 
+from pymupdf import TEXTFLAGS_WORDS
+
 
 Bounds = tuple[float, float, float, float]
 
@@ -40,6 +42,8 @@ class GeometricTable:
     row_count: int
     column_count: int
     cells: tuple[TableCell, ...]
+    reading_direction: tuple[int, int] = (1, 0)
+    has_header: bool = True
 
     def to_markdown(self, *, is_continuation: bool = False) -> str:
         """Expand proven spans, not empty cells, into a rectangular view.
@@ -75,6 +79,9 @@ class GeometricTable:
         if is_continuation:
             return "\n".join(rendered_rows)
         separator = "| " + " | ".join(["---"] * self.column_count) + " |"
+        if not self.has_header:
+            empty_header = "| " + " | ".join([""] * self.column_count) + " |"
+            return "\n".join([*captions, empty_header, separator, *rendered_rows])
         return "\n".join([*captions, rendered_rows[0], separator, *rendered_rows[1:]])
 
 
@@ -82,18 +89,31 @@ class GeometricTableExtractor:
     """Use ruled cells of arbitrary dimensions and validate word ownership."""
 
     def extract(self, page: Any) -> list[GeometricTable]:
+        if page.rotation:
+            raise TableStructureError("unnormalized_page_rotation", page.number + 1)
         tables: list[GeometricTable] = []
         words = page.get_text("words")
         # Explicit rules only. Borderless/native tables are not guessed here.
         # Do not reuse the learned layout boxes that caused merged columns.
-        finder = page.find_tables(strategy="lines_strict", use_layout=False)
+        finder = page.find_tables(
+            strategy="lines_strict", use_layout=False, add_lines=self._drawn_rules(page)
+        )
+        line_directions = self._line_directions(page)
         for detected in finder.tables:
             if detected.row_count < 2 or detected.col_count < 2:
                 continue  # A decorative box is not sufficient table evidence.
             bounds = tuple(detected.bbox)
             physical_cells = sorted(set(tuple(cell) for cell in detected.cells if cell))
-            x_edges = self._edges(physical_cells, 0, 2)
-            y_edges = self._edges(physical_cells, 1, 3)
+            direction = self._table_direction(physical_cells, words, line_directions)
+            if direction == (0, 0):
+                raise TableStructureError(
+                    "unsupported_table_text_direction", page.number + 1
+                )
+            projected_cells = [
+                self._project_bounds(cell, direction) for cell in physical_cells
+            ]
+            x_edges = self._edges(projected_cells, 0, 2)
+            y_edges = self._edges(projected_cells, 1, 3)
             cells: list[TableCell] = []
             table_words = [word for word in words if self._contains(bounds, word)]
             for word in table_words:
@@ -103,17 +123,24 @@ class GeometricTableExtractor:
                         "ambiguous_cell_ownership", page.number + 1
                     )
             for cell_bounds in physical_cells:
+                projected = self._project_bounds(cell_bounds, direction)
                 cell_words = [
                     word for word in table_words if self._contains(cell_bounds, word)
                 ]
+                try:
+                    cell_text = self._words_to_text(cell_words, line_directions)
+                except ValueError:
+                    raise TableStructureError(
+                        "ambiguous_cell_reading_order", page.number + 1
+                    ) from None
                 cells.append(
                     TableCell(
                         bounds=cell_bounds,
-                        text=self._words_to_text(cell_words),
-                        row_start=self._edge_index(y_edges, cell_bounds[1]),
-                        row_end=self._edge_index(y_edges, cell_bounds[3]),
-                        column_start=self._edge_index(x_edges, cell_bounds[0]),
-                        column_end=self._edge_index(x_edges, cell_bounds[2]),
+                        text=cell_text,
+                        row_start=self._edge_index(y_edges, projected[1]),
+                        row_end=self._edge_index(y_edges, projected[3]),
+                        column_start=self._edge_index(x_edges, projected[0]),
+                        column_end=self._edge_index(x_edges, projected[2]),
                     )
                 )
             occupancy: Counter[tuple[int, int]] = Counter()
@@ -136,6 +163,11 @@ class GeometricTableExtractor:
                     row_count=len(y_edges) - 1,
                     column_count=len(x_edges) - 1,
                     cells=tuple(cells),
+                    reading_direction=direction,
+                    has_header=not any(
+                        self._intersects(bounds, tuple(image["bbox"]))
+                        for image in page.get_image_info()
+                    ),
                 )
             )
         return sorted(tables, key=lambda table: (table.bounds[1], table.bounds[0]))
@@ -157,16 +189,137 @@ class GeometricTableExtractor:
         y_center = (float(word[1]) + float(word[3])) / 2
         return bounds[0] <= x_center < bounds[2] and bounds[1] <= y_center < bounds[3]
 
-    def _words_to_text(self, words: list[Any]) -> str:
+    def _drawn_rules(
+        self, page: Any
+    ) -> list[tuple[tuple[float, float], tuple[float, float]]]:
+        """Expose thin filled borders, not filled backgrounds, to strict detection.
+
+        Slightly tilted strokes use the converter's three-point snap tolerance.
+        Every added segment originates in a physical path; no border is inferred.
+        """
+        rules: list[tuple[tuple[float, float], tuple[float, float]]] = []
+        for drawing in page.get_drawings():
+            items = drawing["items"]
+            is_thin_outline = False
+            if (
+                drawing["type"] == "f"
+                and items
+                and all(item[0] == "l" for item in items)
+            ):
+                area = (
+                    abs(
+                        sum(
+                            item[1].x * item[2].y - item[2].x * item[1].y
+                            for item in items
+                        )
+                    )
+                    / 2
+                )
+                rectangle = drawing["rect"]
+                is_thin_outline = area <= 2 * (rectangle.width + rectangle.height)
+            for item in items:
+                if item[0] == "re" and drawing["type"] == "f":
+                    rectangle = item[1]
+                    if rectangle.width <= 1 and rectangle.height > 3:
+                        x_center = (rectangle.x0 + rectangle.x1) / 2
+                        rules.append(
+                            ((x_center, rectangle.y0), (x_center, rectangle.y1))
+                        )
+                    elif rectangle.height <= 1 and rectangle.width > 3:
+                        y_center = (rectangle.y0 + rectangle.y1) / 2
+                        rules.append(
+                            ((rectangle.x0, y_center), (rectangle.x1, y_center))
+                        )
+                elif item[0] == "l" and ("s" in drawing["type"] or is_thin_outline):
+                    first, second = item[1:3]
+                    if abs(first.x - second.x) <= 3 and abs(first.y - second.y) > 3:
+                        x_center = (first.x + second.x) / 2
+                        rules.append(((x_center, first.y), (x_center, second.y)))
+                    elif abs(first.y - second.y) <= 3 and abs(first.x - second.x) > 3:
+                        y_center = (first.y + second.y) / 2
+                        rules.append(((first.x, y_center), (second.x, y_center)))
+        return rules
+
+    def _line_directions(self, page: Any) -> dict[tuple[int, int], tuple[int, int]]:
+        directions: dict[tuple[int, int], tuple[int, int]] = {}
+        # Match the word extraction flags: including images changes block IDs.
+        for block in page.get_text("dict", flags=TEXTFLAGS_WORDS)["blocks"]:
+            if block["type"] != 0:
+                continue
+            for line_index, line in enumerate(block["lines"]):
+                direction = tuple(round(value) for value in line["dir"])
+                if direction not in ((1, 0), (0, -1), (-1, 0), (0, 1)) or any(
+                    abs(value - rounded) > 0.001
+                    for value, rounded in zip(line["dir"], direction, strict=True)
+                ):
+                    directions[(block["number"], line_index)] = (0, 0)
+                    continue
+                directions[(block["number"], line_index)] = (direction[0], direction[1])
+        return directions
+
+    def _table_direction(
+        self,
+        cells: list[Bounds],
+        words: list[Any],
+        directions: dict[tuple[int, int], tuple[int, int]],
+    ) -> tuple[int, int]:
+        observed = {
+            directions.get((word[5], word[6]), (1, 0))
+            for word in words
+            if any(self._contains(cell, word) for cell in cells)
+        }
+        if len(observed) == 1:
+            return next(iter(observed))
+        return (1, 0)  # Mixed vertical headers do not rotate the whole grid.
+
+    def _project_bounds(self, bounds: Bounds, direction: tuple[int, int]) -> Bounds:
+        dx, dy = direction
+        corners = [
+            (x * dx + y * dy, -x * dy + y * dx)
+            for x in (bounds[0], bounds[2])
+            for y in (bounds[1], bounds[3])
+        ]
+        return (
+            min(point[0] for point in corners),
+            min(point[1] for point in corners),
+            max(point[0] for point in corners),
+            max(point[1] for point in corners),
+        )
+
+    def _intersects(self, first: Bounds, second: Bounds) -> bool:
+        return min(first[2], second[2]) > max(first[0], second[0]) and min(
+            first[3], second[3]
+        ) > max(first[1], second[1])
+
+    def _words_to_text(
+        self,
+        words: list[Any],
+        directions: dict[tuple[int, int], tuple[int, int]] | None = None,
+    ) -> str:
         lines: dict[tuple[int, int], list[Any]] = {}
         for word in words:
             lines.setdefault((word[5], word[6]), []).append(word)
+        directions = directions or {}
+        observed = {directions.get(key, (1, 0)) for key in lines}
+        if (0, 0) in observed:
+            raise ValueError("Unsupported table text direction")
+        if len(observed) > 1:
+            raise ValueError("Mixed text directions within one cell")
+        direction = next(iter(observed), (1, 0))
         ordered_lines = sorted(
             lines.values(),
-            key=lambda line: (min(w[1] for w in line), min(w[0] for w in line)),
+            key=lambda line: self._project_bounds(
+                (
+                    min(w[0] for w in line),
+                    min(w[1] for w in line),
+                    max(w[2] for w in line),
+                    max(w[3] for w in line),
+                ),
+                direction,
+            )[1::-1],
         )
         return "\n".join(
-            " ".join(str(word[4]) for word in sorted(line, key=lambda word: word[0]))
+            " ".join(str(word[4]) for word in sorted(line, key=lambda word: word[7]))
             for line in ordered_lines
         )
 
@@ -208,23 +361,18 @@ class GeometricTableIntegrator:
                 )
             ):
                 continuation_table = tables[0]
-            boxes = [
-                box for box in chunk.get("page_boxes", []) if box["class"] == "table"
-            ]
-            assignments: dict[int, list[GeometricTable]] = {}
-            for table in tables:
-                matches = [
-                    index
-                    for index, box in enumerate(boxes)
-                    if self._covers(box["bbox"], table.bounds)
-                ]
-                if len(matches) != 1:
-                    raise TableStructureError("unmapped_table_region", page_number)
-                assignments.setdefault(matches[0], []).append(table)
+            boxes = chunk.get("page_boxes", [])
+            for box in boxes:
+                start, end = box["pos"]
+                if not 0 <= start <= end <= len(chunk["text"]):
+                    raise TableStructureError("invalid_native_offsets", page_number)
+            # Connected regions support both one grid split into native fragments
+            # and one native box containing multiple grids. Labels are not proof.
+            regions = self._regions(tables, boxes, page_number)
+            assigned_indices = {index for _, indices in regions for index in indices}
             replacements: list[tuple[int, int, str]] = []
             for index, box in enumerate(boxes):
-                selected = assignments.get(index, [])
-                if not selected:
+                if box["class"] == "table" and index not in assigned_indices:
                     native_only_count += 1
                     start, end = box["pos"]
                     native_rows = [
@@ -237,28 +385,28 @@ class GeometricTableIntegrator:
                         raise TableStructureError(
                             "inconsistent_native_columns", page_number
                         )
-                    continue
-                related_boxes = [
-                    candidate
-                    for candidate in chunk.get("page_boxes", [])
-                    if candidate is box
-                    or any(
-                        self._covers(candidate["bbox"], table.bounds)
-                        for table in selected
-                    )
-                ]
+            for selected, indices in regions:
+                related_boxes = [boxes[index] for index in indices]
                 start = min(candidate["pos"][0] for candidate in related_boxes)
                 end = max(candidate["pos"][1] for candidate in related_boxes)
                 if any(
-                    start <= candidate["pos"][0] < end
-                    and candidate not in related_boxes
-                    for candidate in chunk.get("page_boxes", [])
+                    candidate["pos"][0] < candidate["pos"][1]
+                    and max(start, candidate["pos"][0]) < min(end, candidate["pos"][1])
+                    and index not in indices
+                    for index, candidate in enumerate(boxes)
                 ):
                     raise TableStructureError(
                         "region_contains_unrelated_block", page_number
                     )
                 if not 0 <= start < end <= len(chunk["text"]):
                     raise TableStructureError("invalid_native_offsets", page_number)
+                covered_end = start
+                for interval_start, interval_end in sorted(
+                    candidate["pos"] for candidate in related_boxes
+                ):
+                    if chunk["text"][covered_end:interval_start].strip():
+                        raise TableStructureError("unmapped_native_text", page_number)
+                    covered_end = max(covered_end, interval_end)
                 region_bounds = (
                     min(candidate["bbox"][0] for candidate in related_boxes),
                     min(candidate["bbox"][1] for candidate in related_boxes),
@@ -277,6 +425,8 @@ class GeometricTableIntegrator:
                             "rows": table.row_count,
                             "columns": table.column_count,
                             "method": "geometric_lines_strict",
+                            "reading_direction": list(table.reading_direction),
+                            "has_header": table.has_header,
                             "merged_cells": sum(
                                 cell.row_end - cell.row_start > 1
                                 or cell.column_end - cell.column_start > 1
@@ -303,6 +453,29 @@ class GeometricTableIntegrator:
             "diagnostics_truncated": len(diagnostics) > 100,
         }
 
+    def _regions(
+        self, tables: list[GeometricTable], boxes: list[Any], page_number: int
+    ) -> list[tuple[list[GeometricTable], set[int]]]:
+        regions: list[tuple[list[GeometricTable], set[int]]] = []
+        for table in tables:
+            indices = {
+                index
+                for index, box in enumerate(boxes)
+                if box["pos"][0] != box["pos"][1]
+                and self._covers(box["bbox"], table.bounds)
+            }
+            if not indices:
+                raise TableStructureError("unmapped_table_region", page_number)
+            selected = [table]
+            # Merge every connected component, not just the first matching box.
+            for old_selected, old_indices in regions[:]:
+                if indices & old_indices:
+                    selected.extend(old_selected)
+                    indices.update(old_indices)
+                    regions.remove((old_selected, old_indices))
+            regions.append((sorted(selected, key=lambda item: item.bounds[1]), indices))
+        return regions
+
     def _covers(self, outer: Any, inner: Bounds) -> bool:
         # Layout boxes follow text, while ruled grids include cell padding.
         width = max(0, min(outer[2], inner[2]) - max(outer[0], inner[0]))
@@ -321,13 +494,21 @@ class GeometricTableIntegrator:
         previous_page_height: float,
         current_page_height: float,
     ) -> bool:
+        if not previous.has_header or not current.has_header:
+            return False
         if current.page_number != previous.page_number + 1:
             return False
+        if current.reading_direction != (1, 0) or previous.reading_direction != (1, 0):
+            return False  # No cross-page inference across rotated logical grids.
         if current.column_count != previous.column_count:
             return False
         if previous.bounds[3] < previous_page_height * 0.60:
             return False
         if current.bounds[1] > current_page_height * 0.15:
+            return False
+        if self._has_repeated_grouped_header(previous, current):
+            # An explicit repeated two-tier header anchors this page's columns;
+            # retain it rather than inheriting labels across changed geometry.
             return False
         previous_edges = sorted(
             {
@@ -343,9 +524,48 @@ class GeometricTableIntegrator:
                 for edge in (cell.bounds[0], cell.bounds[2])
             }
         )
-        return len(previous_edges) == len(current_edges) and all(
+        is_aligned = len(previous_edges) == len(current_edges) and all(
             abs(before - after) <= 2
             for before, after in zip(previous_edges, current_edges, strict=True)
+        )
+        if not is_aligned:
+            # A likely continuation without a proven column correspondence must
+            # not promote a data row to a new header or inherit guessed labels.
+            raise TableStructureError(
+                "ambiguous_table_continuation", current.page_number
+            )
+        return True
+
+    def _has_repeated_grouped_header(
+        self, previous: GeometricTable, current: GeometricTable
+    ) -> bool:
+        def signature(table: GeometricTable) -> list[tuple[int, int, int, int, str]]:
+            return sorted(
+                (
+                    cell.row_start,
+                    cell.row_end,
+                    cell.column_start,
+                    cell.column_end,
+                    re.sub(r"\s+", " ", cell.text).strip(),
+                )
+                for cell in table.cells
+                if cell.row_start < 2
+            )
+
+        has_grouped_first_row = any(
+            cell.row_start == 0
+            and cell.row_end == 1
+            and cell.column_end - cell.column_start > 1
+            and cell.text.strip()
+            for cell in current.cells
+        )
+        has_named_second_row = any(
+            cell.row_start == 1 and cell.text.strip() for cell in current.cells
+        )
+        return bool(
+            has_grouped_first_row
+            and has_named_second_row
+            and signature(previous) == signature(current)
         )
 
     def _render_region(
@@ -376,9 +596,9 @@ class GeometricTableIntegrator:
         source_text = "".join(str(word[4]) for word in region_words)
         if self._characters(accounted_text) != self._characters(source_text):
             raise TableStructureError("region_text_mismatch", page.number + 1)
-        items: list[tuple[float, str]] = [
+        items: list[tuple[Bounds, str]] = [
             (
-                table.bounds[1],
+                table.bounds,
                 table.to_markdown(is_continuation=table is continuation_table),
             )
             for table in tables
@@ -389,11 +609,40 @@ class GeometricTableIntegrator:
         for word in leftover:
             lines.setdefault((word[5], word[6]), []).append(word)
         for line in lines.values():
-            value = self.extractor._words_to_text(line)
-            items.append((min(word[1] for word in line), value))
-        return "\n\n".join(
-            value for _, value in sorted(items, key=lambda item: item[0])
+            value = self.extractor._words_to_text(
+                line, self.extractor._line_directions(page)
+            )
+            items.append(
+                (
+                    (
+                        min(word[0] for word in line),
+                        min(word[1] for word in line),
+                        max(word[2] for word in line),
+                        max(word[3] for word in line),
+                    ),
+                    value,
+                )
+            )
+        directions = {table.reading_direction for table in tables}
+        direction = next(iter(directions)) if len(directions) == 1 else (1, 0)
+        positioned = sorted(
+            (
+                self.extractor._project_bounds(bounds, direction)[1],
+                self.extractor._project_bounds(bounds, direction)[0],
+                value,
+            )
+            for bounds, value in items
         )
+        values: list[str] = []
+        while positioned:
+            first_y = positioned[0][0]
+            aligned = [item for item in positioned if item[0] - first_y <= 3]
+            # Source borders of side-by-side grids may differ by sub-point noise.
+            values.extend(
+                value for _, _, value in sorted(aligned, key=lambda item: item[1])
+            )
+            positioned = positioned[len(aligned) :]
+        return "\n\n".join(values)
 
     def _characters(self, value: str) -> Counter[str]:
         normalized = unicodedata.normalize("NFKC", value)
