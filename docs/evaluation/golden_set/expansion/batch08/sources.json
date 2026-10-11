@@ -1,0 +1,373 @@
+[
+  {
+    "corpus_id": "A",
+    "document_id": "B039",
+    "document_sha256": "9a2a902154f079f061ae3d55dca34f07125196b6f748e40011ddfc50db6d6585",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B039/bula_1791247275568.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 11,
+    "medication": "cloridrato de dexmedetomidina",
+    "manufacturer": "Gland Pharma Limited",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=107140274",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 30299,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      5,
+      7
+    ],
+    "documentary_notes": [
+      "Gland Pharma is the frozen manufacturer; Sanval identifies the registered product. Hospital IV sedation, not home administration. Patient awakening to stimulation alone is not evidence of inefficacy.",
+      "Visual pages 5/7 confirm conditional milk-expression/discard wording and concentrated versus diluted storage. Renal text on page 7 first allows possible adjustment but subsequently says no renal adjustment; unresolved source tension, no renal-dose fixture.",
+      "Page 2 states sedation without decreased respiratory rate yet requires respiratory monitoring and later lists respiratory events. Do not infer absence of respiratory risk. Pediatric text says do not use under 18; later wording is non-recommendation. No fixture estimates post-discharge fitness to drive."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B040",
+    "document_sha256": "8d18fe70ec6b52c6c47293c04fe0b96a0d1103cb42d359d2be667ff83a7fc7a0",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B040/bula_1791247250853.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 9,
+    "medication": "DODOY",
+    "manufacturer": "",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=109060089",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 32252,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      5,
+      6
+    ],
+    "documentary_notes": [
+      "Frozen manufacturer field is empty and remains unchanged. Jarrell identifies the product in the PDF; do not invent an explicit producer role. Oral dipyrone 500 mg/ml; no transfer from another dipyrone brand.",
+      "Visual pages 5/6 confirm five-day post-opening validity and pediatric row structure. Dose-unique and daily-maximum rows must remain distinct, as must weight and approximate age. Q08 reports the source range, not an individually selected dose.",
+      "Agranulocytosis symptoms require stopping and immediate medical attendance; retain as a priority safety audit. Contraindication below three months OR below five kg is not a conjunction. Second-trimester use requires careful physician benefit/risk assessment. Metabisulfite warning is not a gluten/latex certification."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B041",
+    "document_sha256": "bf49fef0fa31f56f58f5e118276120e7329f558df7d5da1ebf90f87597d75b40",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B041/bula_1791247250064.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 10,
+    "medication": "VOMISTOP",
+    "manufacturer": "Medquímica Indústria Farmacêutica Ltda.",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=109170016",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 30136,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      4,
+      5
+    ],
+    "documentary_notes": [
+      "Medquímica identifies/registers/produces this adult oral metoclopramide 4-mg/ml product. Invert neither this bottle's 45-degree instructions nor the other product's vertical instructions.",
+      "Visual pages 4/5 confirm overlapping severe versus moderate-to-severe renal reduction statements and separate approximate-half starting-dose paragraph. Source tension recorded; no renal-dose choice is authored.",
+      "At least six hours between administrations even after vomiting/rejection. Three-month maximum is not a standard prescribed duration. Lactation prohibition and professional alternatives are explicit. Intravenous adverse-event qualifiers must not transfer automatically to oral drops."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B042",
+    "document_sha256": "621636da74328b5eea20fd341a9a6e8307273c79cdb31cd7c969d4d01df74b4d",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B042/bula_1791247345598.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 15,
+    "medication": "SOVALDI",
+    "manufacturer": "Patheon Inc.",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=109290001",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 48452,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      6,
+      7
+    ],
+    "documentary_notes": [
+      "Gilead identifies/registers Sovaldi; frozen manufacturer Patheon is preserved. Adult oral product used with specified other agents, not as monotherapy. Other-agent rules are not independently attributed to sofosbuvir alone.",
+      "Original tables visually inspected on pages 6/7: coinfected HCV/HIV-1 genotype-2 treatment-experienced patients differ from treatment-naive patients and monoinfection. Preserve population, previous treatment, combination and duration; no individual ribavirin calculation.",
+      "Pregnancy prevention concerns combination therapy and partners, during and six months after treatment. Amiodarone alert concerns Sovaldi with another direct-acting antiviral and conditional cardiac monitoring. Severe renal disease has no established dosage recommendation, not an inferred blanket contraindication.",
+      "HBV screening does not establish HAV vaccine compatibility. The missed-dose paragraph directs physician contact without take-versus-skip instructions. Opening validity is 45 days, not manufacturing shelf life."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B043",
+    "document_sha256": "36cbc73e5f397832a9aa1c165bc8727571c6353af6d181c4c918b726cf937f6c",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B043/bula_1791247358820.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 9,
+    "medication": "CRONOBÊ",
+    "manufacturer": "Eurofarma Laboratórios S.A.",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=109740008",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 19421,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      4
+    ],
+    "documentary_notes": [
+      "Biolab identifies/registers Cronobê; Eurofarma is the frozen producer. Intramuscular adult product administered by qualified health personnel, not IV or self-injection.",
+      "Original page 4 needle table visually inspected: merged thickness/site cells and sex/weight groups must not imply a single individual needle choice. No new needle selection or dose calculation is authored.",
+      "Potassium determination during the first 48 hours is conditional on megaloblastic anemia. Antibiotic interference concerns microbiological B12 assays, not all laboratory methods. Vegetarian indication is not certification of animal-free ingredients. Respiratory adverse-event and overdose warnings remain source alerts."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB038",
+    "document_sha256": "f54cac847bdfccdc10420329c24fa626cc1c6ff78c3fb86cb9784d620abc3490",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB038/bula_1791329694894.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 13,
+    "medication": "cloridrato de duloxetina",
+    "manufacturer": "Anovis Industrial Farmacêutica Ltda.",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=104971526",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 55469,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      6,
+      7
+    ],
+    "documentary_notes": [
+      "União Química identifies/registers; Anovis is the frozen producer. Adult delayed-release 30/60-mg capsules. Fibromyalgia indication includes patients without major depression.",
+      "Visual pages 6/7 confirm no splitting/opening/chewing and individualized gradual withdrawal. Dose reduction is not permission to manipulate capsules; the draft does not prescribe a taper. General age statements must not erase the specific elderly generalized-anxiety initial regimen.",
+      "Direction of IMAO switching intervals differs (14 versus five days). Renal severe-use wording requires a careful benefit/risk assessment; no personal dose is offered. Smoking biodisponibility is one-third lower, not reduced to one-third.",
+      "PPI absorption uncertainty is expressly documented; antiacid/famotidine results cannot resolve omeprazole. Listed blood-test changes do not establish urinary benzodiazepine false positivity. Driving conditional and whole-treatment warnings coexist; no clinical reconciliation."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB039",
+    "document_sha256": "8012b7dc3dbd959e1170e122bb77b27dd7a291d0868f7752b996dcda61c1ea04",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB039/bula_1791329698726.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 8,
+    "medication": "mirtazapina",
+    "manufacturer": "Sandoz do Brasil Indústria Farmacêutica Ltda.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100681146",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 22600,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3
+    ],
+    "documentary_notes": [
+      "Novartis identifies/registers; Sandoz produces this 30/45-mg oral product. Native history pages 7/8 are rotated/scrambled but do not supply body references.",
+      "Visual page 3 confirms different dyes by presentation and conditional lactation wording. Mirtazapine dosage range is not an authorization to split, dissolve or use via feeding tube.",
+      "Effect onset and positive response windows are distinct. Weight gain is very common but does not establish post-treatment reversibility. Overdose wording about generally mild symptoms must not erase possible serious/fatal outcomes; no reassuring overdose question is authored."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB040",
+    "document_sha256": "6ccabdc700eaa30fcbc8307b73481125f7276ae799394af28ad1989ae47aa54c",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB040/bula_1791329702857.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 13,
+    "medication": "cloridrato de trazodona",
+    "manufacturer": "Zydus Lifesciences Limited",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=105350238",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 34514,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      8
+    ],
+    "documentary_notes": [
+      "Globo identifies/registers; Zydus manufactures. Oral 50/100-mg presentations distinguished. Printed body page numbers are offset by the cover; all references use physical pages.",
+      "Visual pages 3/8 confirm urgent priapism instructions and presentation-specific integrity rules. Prohibition on splitting is explicit for 100 mg; the separate 50-mg chewing statement does not establish splitting permission.",
+      "A statement about doses above 800 mg in very severe cases coexists with outpatient/hospital limits; record the source anomaly, do not author a dose-escalation fixture. Priapism and infection-related blood counts require safety audit.",
+      "Before planned surgery, the physician interrupts for as long as possible, but no defined preoperative interval is given. Vomiting as an event/withdrawal symptom is not a redosing protocol. Digoxin interaction is reported, not a universal certainty."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB041",
+    "document_sha256": "a035d824170c0971803bbc1b48899f5f662f6aed326c009dfde483de99a7e482",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB041/bula_1791329706258.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 6,
+    "medication": "SINVASTATINA",
+    "manufacturer": "Sandoz do Brasil Indústria Farmacêutica Ltda.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100470472",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 18546,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      5
+    ],
+    "documentary_notes": [
+      "Sandoz explicitly registers and produces 10/20/40-mg tablets. Clarithromycin is in the do-not-take list; do not weaken that to mere caution.",
+      "Visual page 5 distinguishes immediate contact for muscle symptoms from stop-and-emergency instructions for severe adverse reactions. The drafted symptom question retains that distinction, without diagnostic inference.",
+      "Page 4 refers to another brand (Sinvastacor) in a condition on blood donation; source mismatch retained, no blood-donation fixture created. Lactose and dye statements differ by strength. Target LDL and supplement-iron absorption are not supplied by these statements."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB042",
+    "document_sha256": "f424f5a25f2fe5e76e80a72b3e67982e8714ae76d8d9af3c7cf0f57ed0a3427b",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB042/bula_1791329709865.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 7,
+    "medication": "ATORVASTATINA CÁLCICA",
+    "manufacturer": "Eurofarma Laboratórios S.A.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100431137",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 31277,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      4
+    ],
+    "documentary_notes": [
+      "Eurofarma identifies/manufactures oral 10/20/40-mg tablets. 10/20 mg cover adult and above-ten pediatric use; 40 mg is adult-only. Exact ten-year boundary is not tested or reconciled.",
+      "Visual pages 3/4 confirm daptomycin benefit/risk exception and CK monitoring only if concomitant use cannot be avoided. Unexpected muscle symptoms with malaise/fever require immediate reporting; no individual interruption decision is invented.",
+      "Missed-dose rule is greater than 12 hours, not greater-than-or-equal; Q07 uses 14 hours. Oral contraceptive interaction cannot be transferred to an arm implant. Perioperative risk warning does not establish absorption after gastric bypass."
+    ]
+  }
+]

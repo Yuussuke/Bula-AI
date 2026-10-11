@@ -1,0 +1,18 @@
+{
+  "status": "passed",
+  "phase": "post_freeze_reproduction_using_definitive_manifest",
+  "manifest_file_sha256": "0b59a882ab360efbf7fcb51bb4c6ba1794f0d6c9d72fc2a88f88fcadb53b4fd7",
+  "manifest_fingerprint_sha256": "33ecd26d18b82925ec4c4e83b0eebf8e8edd39b432039926fd0c51f746ed7de0",
+  "effective_input_fingerprint_sha256": "820d12bc4545f2cddc0a62a1aaca8e753388e3ccc184f204fa1e07b0356d3e88",
+  "effective_records_fingerprint_sha256": "df430fdecc08b4ba10f9e0226190784dcfbb683bcf213fbac62563fb00655158",
+  "records": 1000,
+  "documents": 100,
+  "positives": 800,
+  "negatives": 200,
+  "verified_literal_reference_fragments": 1002,
+  "automated_errors": [],
+  "verification_command": "uv run --offline --project backend --no-sync python docs/evaluation/golden_set/frozen/v1/verify.py --manifest docs/evaluation/golden_set/frozen/v1/manifest.json",
+  "human_decisions_created": 0,
+  "provider_calls": 0,
+  "experiments_executed": false
+}

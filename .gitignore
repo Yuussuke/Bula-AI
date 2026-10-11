@@ -14,6 +14,8 @@ build/
 
 # Environment variable files
 .env
+.env.*
+!.env.example
 
 # Logs
 *.log
@@ -25,6 +27,14 @@ backend/tmp/anvisa-bulas-v2/
 backend/tmp/parser-benchmark/
 backend/tmp/parser-benchmark-targets.json
 backend/tmp/semantic-chunking-benchmark/
+
+# Evaluation runtime artifacts and private documentary provenance
+/tmp/evaluation-*/
+/backend/tmp/evaluation-*/
+/backend/evaluation/artifacts/
+/docs/evaluation/experiment_preparation/manifest.prepared*.json
+/docs/evaluation/golden_set/frozen/v1/manifest.json
+/docs/evaluation/golden_set/**/*.original.json
 
 # Test / coverage artefacts
 .coverage

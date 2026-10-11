@@ -1,0 +1,346 @@
+[
+  {
+    "corpus_id": "A",
+    "document_id": "B017",
+    "document_sha256": "7e3b8525ce01e98b77ab7c5f8d1da2dbc1e7388d6227bbd2118655489bbcf4f4",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B017/bula_1791246840451.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 9,
+    "medication": "CAPSFEN",
+    "manufacturer": "Catalent Brasil Ltda.",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=101750021",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 34200,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Catalent is registrant/producer; Cifarma is marketer/cover identity. Manifest unchanged. Adult-labelled product coexists with a juvenile-arthritis dosing passage; no pediatric dosage question relies on that tension.",
+      "Taking with food for gastrointestinal disturbance is not permission for gastric disease: broad section-3 stomach warning remains cited. Historical rows are not additional present clinical instructions. Overdose text includes procedures that must not be converted into unsupervised home instructions."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B018",
+    "document_sha256": "13e524b83eab65964b7852d1e096894d79a8a02d27eadf30d80472c01fbd93d3",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B018/bula_1791246890013.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 5,
+    "medication": "LAFEPE BENZNIDAZOL",
+    "manufacturer": "Laboratório Farmacêutico do Estado de Pernambuco S.A. - LAFEPE",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=101830145",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 11955,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      3
+    ],
+    "documentary_notes": [
+      "The archived patient PDF has a model heading, placeholder approval date and largely empty history. Provenance remains the frozen confirmed archive; no exact approval date is invented.",
+      "Table 1 was visually checked; the wording '1 comprimido ... em duas doses' with total 25 mg/day needs independent dose-interpretation review. No drafted question requires reconciling that table. The preparation question uses explicit prose and Figure 1, not an inferred dose.",
+      "Tablet scoring does not override the no-splitting/no-chewing instruction. Relative renal/hepatic/neurological contraindications and conditional pregnancy use are not broad permissions."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B019",
+    "document_sha256": "64d7fda2018a7276f3f0ea3ca76a69957614f0ecc12257a250d064339e328c31",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B019/bula_1791246892067.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 9,
+    "medication": "GENTAMISAN",
+    "manufacturer": "Santisa Laboratório Farmacêutico S.A.",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=101860002",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 27951,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "The injectable PDF lists systemic, ocular and respiratory routes, requiring trained professionals. It is not a standard oral antibiotic leaflet.",
+      "Section 6 says consult a doctor if a dose is missed, whereas section 7 describes resuming dose timing. No missed-dose question is drafted to reconcile that tension.",
+      "A home-use scenario in overdose text coexists with health-establishment-restricted legal labelling. No question authorizes self-injection. Hearing toxicity may be irreversible; pregnancy and milk-transfer warnings must not be softened."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B020",
+    "document_sha256": "262320f02a0080fc67eb54c99d29689a6a0e01d49a31ee82c2533eaf49f0d98f",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B020/bula_1791246894188.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 6,
+    "medication": "MONOFER",
+    "manufacturer": "Wasserburger Arzneimittelwerk GmbH",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=101880211",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 13463,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Steincares is importer/registrant; Wasserburger is producer. Query identity uses Monofer brand, not an invented manufacturing role.",
+      "Microbiological immediate use and single-use/discard instructions remain distinct from general storage. Possible long-lasting brown discoloration does not supply a recovery duration.",
+      "The source's ferritin description and overdose paragraph contain awkward wording; no question relies on correcting them with external knowledge. A negative duration question retains an alert not to suppress express action for ongoing extravasation."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B021",
+    "document_sha256": "db4c16b6b044a1234f66dc5c06468bd49ebac99189c249d35bced4f32f282d64",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B021/bula_1791246895251.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 7,
+    "medication": "CAMOMILINA C",
+    "manufacturer": "Theraskin Farmacêutica Ltda.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=101910061",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 24816,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Capsules are opened for topical buccal application; they must not be swallowed. Do not confuse with systemic vitamin supplementation. Age is above four months, not an invented minimum-weight rule.",
+      "No interaction reports is not a rule for adjusting a separate vitamin-D supplement. This negative boundary is flagged for independent review.",
+      "Current body and regulatory history distinguish buccal from an earlier oral route. Overdose paragraphs include potentially unsafe procedures if read as home actions and apparently conflicting general claims. No overdose question requires such reconciliation; eye-contact instruction is explicitly retained."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB017",
+    "document_sha256": "0ad60b91f5223877d5459c70e4e533ada52a62d659e6e55530185dbdcd195f3f",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB017/bula_1791329528383.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 9,
+    "medication": "empagliflozina",
+    "manufacturer": "EMS S/A; Novamed Fabricação de Produtos Farmacêuticos Ltda.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=105831024",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 26641,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Germed is registrant; EMS/Novamed are producers. Target query uses Germed; manifest manufacturer unchanged. Present packaging differs from older history entries.",
+      "Pediatric DM2 indication from age ten does not extend adult heart-failure/renal indications to children. Renal efficacy, dialysis and age-related cautions remain indication-specific.",
+      "Lithium concentrations can decrease, unlike the ibuprofen interaction in A-B017. Renal monitoring is at least annual in this PDF, not an invented interval shared with other SGLT-2 documents."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB018",
+    "document_sha256": "f4ad75953080c61882a71cad1aad0b36f17420458c6b03f92f3ae2b5597e9e77",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB018/bula_1791329531264.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 6,
+    "medication": "fosfato de sitagliptina",
+    "manufacturer": "Sandoz Private Limited",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100470660",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 15634,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Sandoz Private Limited is producer; Sandoz do Brasil is registrant/importer. Dose reduction for renal problems is not specified as an eGFR algorithm here.",
+      "The legal approval date and initial-history date differ; record the archive without inferring which date explains the difference. Children 10–17 have stated lack of efficacy, not merely absence of studies.",
+      "The broad 'most medicines' interaction statement is not used to fabricate a specific negative interaction. Negatives instead request procedure timing and a stopping threshold not documented."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB019",
+    "document_sha256": "3b54b99a53529e8733c1ad66fda701c1bd392e26407a65d4db7e377c858547bb",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB019/bula_1791329586213.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 10,
+    "medication": "vildagliptina",
+    "manufacturer": "Sun Pharmaceutical Industries Limited",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=123520293",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 23999,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Ranbaxy is registrant/importer; Sun Pharmaceutical is producer. All main evidence comes from this archived patient PDF, not the potentially newer QR-code version mentioned in the text.",
+      "No hepatic restarting after clinician-directed interruption is explicit. Every-three-month liver testing applies to the first year; later regular checks do not specify the same interval.",
+      "Low interaction potential via CYP does not establish compatibility with berberine. Generic dose-adjustment prose does not override the daily maximum; no dose-escalation question is drafted."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB020",
+    "document_sha256": "7c1e9f381f0a54cbf98a323be3eb1f087cd338c70401393b46c63207ef1953e9",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB020/bula_1791329589987.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 10,
+    "medication": "fosfato de sitagliptina + cloridrato de metformina",
+    "manufacturer": "Annora Pharma Private Limited",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=105350254",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 21701,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Globo is registrant/importer/marketer; Annora is producer. Association identity is retained without adding strengths to a question asking its ingredients.",
+      "This PDF has contrast/procedure cautions but no fixed stop/restart interval or detailed renal thresholds. These must not be imported from metformin-only or sitagliptin-only leaflets.",
+      "Acute lactic-acidosis instructions are distinct from common initial gastric discomfort. Vomiting alone does not establish a repeat-dose rule. Hypoglycemia frequency depends on the stated combination."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB021",
+    "document_sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB021/bula_1791329599897.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 11,
+    "medication": "dipirona",
+    "manufacturer": "Santisa Laboratório Farmacêutico S/A",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=101860036",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 44502,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      6
+    ],
+    "documentary_notes": [
+      "Santisa dipyrone is injectable, not drops. The only dipyrone row in frozen corpus B is CB021; query identity omits the requested form/concentration rather than leaking the answer.",
+      "Physical page 6 table was visually checked: first infant row has separate IV/IM cells; subsequent weight rows share IV/IM dose cells. The question fixes age four, weight 20 kg and IM route, preserving the medical-selection condition.",
+      "IV versus IM age/weight restrictions must remain separate. Tolerating dipyrone previously does not exclude agranulocytosis. Some old/general body phrases and overdose ingestion wording are awkward; no external repair is applied.",
+      "Ringer-lactate is explicitly listed, plain Ringer is not. Specific compatibility remains a flagged negative boundary; the documented diluent list is context, not proof about every other fluid."
+    ]
+  }
+]

@@ -1,0 +1,114 @@
+{
+  "created_on": "2026-10-10",
+  "revision": 2,
+  "input_revision": 1,
+  "actor": "AI_assistant_not_human_reviewer",
+  "input_questions_sha256": "20aa403930320e2117080d55931140487bd9888ff1afe9426101957f0632ec9d",
+  "revised_questions_sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b",
+  "record_hash_serialization": "UTF-8 JSON, ensure_ascii=False, sort_keys=True, separators=(',', ':')",
+  "changes": [
+    {
+      "question_id": "A-B041-Q07",
+      "before_record_sha256": "a6efd19a8e873e2ef54ca9c08fbe609f482b01e9d3714d3a61e943c324f9618a",
+      "after_record_sha256": "e8066a49c3bbd96c5f4b0436ad42ddd45a5230d17d2a219660bbdbae945326e8",
+      "changed_fields": {
+        "reference_evidence": {
+          "before": [
+            {
+              "pdf_page": 4,
+              "section": "4. Interações / CYP2D6",
+              "quote": "Inibidores potentes da CYP2D6 tal como fluoxetina.",
+              "source_region": null
+            }
+          ],
+          "after": [
+            {
+              "pdf_page": 4,
+              "section": "4. Interações / CYP2D6",
+              "quote": "Inibidores potentes da CYP2D6 tal como fluoxetina.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 4,
+              "section": "4. Interações / CYP2D6 — relação de exposição",
+              "quote": "Os níveis de exposição de metoclopramida são aumentados quando coadministrado com inibidores potentes da CYP2D6 como, por exemplo, a fluoxetina.",
+              "source_region": null
+            }
+          ]
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        }
+      }
+    },
+    {
+      "question_id": "A-B042-Q02",
+      "before_record_sha256": "ac1eb5153554b698890aa3b45544624072ccd4afb6127c354e81b286462cb366",
+      "after_record_sha256": "1e7dcb30557b9bfe26b16bc87d28b7a77ffe018613315cb2a4876600cfcad1a6",
+      "changed_fields": {
+        "reference_evidence": {
+          "before": [
+            {
+              "pdf_page": 6,
+              "section": "6. Tabela 3 / título e cabeçalhos",
+              "quote": "Tabela 3 Regimes Recomendados e Duração",
+              "source_region": null
+            },
+            {
+              "pdf_page": 7,
+              "section": "6. Tabela 3 / genótipo 2, experimentados",
+              "quote": "Pacientes com HCC Virgens de Tratamento SOVALDI + 12 semanas genótipo 2 ribavirinaa Experimentados SOVALDI + 24 semanas ribavirinaa",
+              "source_region": null
+            }
+          ],
+          "after": [
+            {
+              "pdf_page": 6,
+              "section": "6. Tabela 3 / título e cabeçalhos",
+              "quote": "Tabela 3 Regimes Recomendados e Duração",
+              "source_region": null
+            },
+            {
+              "pdf_page": 7,
+              "section": "6. Tabela 3 / genótipo 2, experimentados",
+              "quote": "Pacientes com HCC Virgens de Tratamento SOVALDI + 12 semanas genótipo 2 ribavirinaa Experimentados SOVALDI + 24 semanas ribavirinaa",
+              "source_region": null
+            },
+            {
+              "pdf_page": 6,
+              "section": "6. Tabela 3 / coinfecção HCV/HIV-1 e cabeçalhos",
+              "quote": "Tabela 3 Regimes Recomendados e Duração do Tratamento para a Terapia Combinada com SOVALDI em Pacientes com Coinfecção por HCV/HIV-1 Coinfecção por Tratamento anterior Tratamento Duração HCV/HIV-1",
+              "source_region": null
+            }
+          ]
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        }
+      }
+    }
+  ],
+  "unchanged_records": 98,
+  "all_question_variants_unchanged": true,
+  "human_decisions_inherited": false,
+  "immutable_original_artifacts": {
+    "manifest.json": "968fff6cc1d6b7ea469c194f34a317547906b170115490013b7f0ace2de653cd",
+    "qc_summary.json": "5929b37bc1a07911cc313fe5926952581e73a5954402949e7d2a3233f1b6dc97",
+    "questions.draft.jsonl": "20aa403930320e2117080d55931140487bd9888ff1afe9426101957f0632ec9d",
+    "review.md": "1fb07a5bb028c252c7c6f526ea5f1ff060ba46f9e0a9c996ca7866083743b620",
+    "sources.json": "ad18d1abb3dbe811d445f300e6c7bad6252ac49b0d312de59454705d4c6f2dbe",
+    "validation_report.md": "75caaf5a25d2f22977856f38c83406e041142d9dfc3b0d38d751a916fea38f99"
+  },
+  "visual_checks": {
+    "B041": [
+      4
+    ],
+    "B042": [
+      6,
+      7
+    ]
+  },
+  "finding": "Both expected answers are supported. Only literal references and revision numbers were supplemented; merged genotype-2 treatment-history rows were visually checked on the original Sovaldi table."
+}

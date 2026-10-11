@@ -1,0 +1,3316 @@
+{
+  "status": "proposed_triage_awaiting_author_approval_not_human_adjudication",
+  "created_on": "2026-10-10",
+  "actor": "AI_assistant",
+  "authorship_alert_records": 190,
+  "original_flag_text_count": 190,
+  "priority_counts": {
+    "P0": 6,
+    "P1": 90,
+    "P2": 89,
+    "P3": 5
+  },
+  "overlapping_risk_tag_counts": {
+    "ambiguity": 22,
+    "documentary_support": 48,
+    "nonblocking_observation": 5,
+    "potential_blocker": 6,
+    "presentation_difference": 20,
+    "safety": 104,
+    "table_interpretation": 16
+  },
+  "supplemental_author_note_records": 6,
+  "sample_seed_reserved_not_used": 20261009,
+  "sample_drawn": false,
+  "human_decisions_created": 0,
+  "independent_semantic_verification_executed": false,
+  "effective_inputs": [
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "sha256": "241481392c794d6427c948e2f0c8a25b6462280f1573af97cc16aa02b1a2d8b5",
+      "document_count": 5,
+      "question_count": 50,
+      "positive_count": 40,
+      "negative_count": 10,
+      "verified_quote_fragments": 55,
+      "automated_error_count": 0
+    },
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "sha256": "91c195c65e3fa997727b5442bee0a62ba573d2a6afc67fe935b25ce386449e4c",
+      "document_count": 10,
+      "question_count": 100,
+      "positive_count": 80,
+      "negative_count": 20,
+      "verified_quote_fragments": 94,
+      "automated_error_count": 0
+    },
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "sha256": "da02a31983e4dd2dec894ebb457bc4134c3229058ebabb0b01c0fd0d23d1e275",
+      "document_count": 10,
+      "question_count": 100,
+      "positive_count": 80,
+      "negative_count": 20,
+      "verified_quote_fragments": 100,
+      "automated_error_count": 0
+    },
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "sha256": "3df4b6e62bf6f3deb98d1bc6ea39ec65e658498b708dc461b92d363f6aa92a38",
+      "document_count": 10,
+      "question_count": 100,
+      "positive_count": 80,
+      "negative_count": 20,
+      "verified_quote_fragments": 97,
+      "automated_error_count": 0
+    },
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "sha256": "eff2d8d11cd7dd1424e5f207043abd8a8db93940ab744ecf1b5cc529c0eac9f7",
+      "document_count": 10,
+      "question_count": 100,
+      "positive_count": 80,
+      "negative_count": 20,
+      "verified_quote_fragments": 109,
+      "automated_error_count": 0
+    },
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "sha256": "367ae9c8a9062a363244f6688e767cd36f6f4f98be77cb03e813dca233b706e0",
+      "document_count": 10,
+      "question_count": 100,
+      "positive_count": 80,
+      "negative_count": 20,
+      "verified_quote_fragments": 115,
+      "automated_error_count": 0
+    },
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "sha256": "95023498278b61695af98be1b38b79c2d0ed0a868fc252db64d552b3d21c3fb6",
+      "document_count": 10,
+      "question_count": 100,
+      "positive_count": 80,
+      "negative_count": 20,
+      "verified_quote_fragments": 96,
+      "automated_error_count": 0
+    },
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "sha256": "1eb729c8cc48d12f27debf1c20d42f128a8e39563fb5645d9c71f53ddb066be2",
+      "document_count": 10,
+      "question_count": 100,
+      "positive_count": 80,
+      "negative_count": 20,
+      "verified_quote_fragments": 95,
+      "automated_error_count": 0
+    },
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b",
+      "document_count": 10,
+      "question_count": 100,
+      "positive_count": 80,
+      "negative_count": 20,
+      "verified_quote_fragments": 93,
+      "automated_error_count": 0
+    },
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "sha256": "242520fe25f686d2fae3fadde0f1ab750c1068ba2226bd0ac412e3d4ff3c572b",
+      "document_count": 10,
+      "question_count": 100,
+      "positive_count": 80,
+      "negative_count": 20,
+      "verified_quote_fragments": 96,
+      "automated_error_count": 0
+    },
+    {
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "sha256": "bbab89435b127bb78c7440a30ab906140656063464187a76ec00fafd516348f6",
+      "document_count": 5,
+      "question_count": 50,
+      "positive_count": 40,
+      "negative_count": 10,
+      "verified_quote_fragments": 49,
+      "automated_error_count": 0
+    }
+  ],
+  "preserved_artifact_hashes_verified": 112,
+  "conference_sha256": "6c0d67898a6b82ac55d56aec1e70e6606742b3cef1a939536ba199ece9328347",
+  "conference_snapshot_sha256": "12267e3edbfb202f12ff28fe6d9a9bcab74c0c17e06cc0defe7c5b60a50edf5d",
+  "all_source_level_notes_retained_in": "docs/evaluation/golden_set/expansion/batch10/collection_qc.draft.json#inventory",
+  "record_hash_convention": "SHA256 UTF8 json.dumps(record, ensure_ascii=False, sort_keys=True, separators=(',', ':'))",
+  "entries": [
+    {
+      "question_id": "A-B017-Q05",
+      "priority": "P0",
+      "risk_tags": [
+        "potential_blocker",
+        "safety",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "A instrução de tomada com alimento coexiste com advertência ampla sobre problemas no estômago. Auditar escopo sem reconciliar clinicamente a redação da fonte."
+      ],
+      "required_checks": [
+        "Resolve the exact documentary scope/target-identity concern; do not reconcile clinically. Unresolved material uncertainty blocks affected records and final acceptance.",
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "cae21d97fa6a6c308b56348b77fd4f0822883800ca1da631e3990d0bfb9de7bb",
+      "pdf_sha256": "7e3b8525ce01e98b77ab7c5f8d1da2dbc1e7388d6227bbd2118655489bbcf4f4"
+    },
+    {
+      "question_id": "A-B026-Q08",
+      "priority": "P0",
+      "risk_tags": [
+        "potential_blocker",
+        "safety",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Specific human audit: section 2 says no colic/sensitive irritation while section 8 lists colic/diarrhea. Do not reconcile clinically or promise tolerability."
+      ],
+      "required_checks": [
+        "Resolve the exact documentary scope/target-identity concern; do not reconcile clinically. Unresolved material uncertainty blocks affected records and final acceptance.",
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "3c2d0ebc73f7d88833e0b7dc084b1641a5ae52c05f2777fa471270096df53da3",
+      "pdf_sha256": "b16d579b142fb69d6435ad5d90b2b699e036ffd1d4a6109736350f9f8e250bf5"
+    },
+    {
+      "question_id": "A-B035-Q03",
+      "priority": "P0",
+      "risk_tags": [
+        "potential_blocker",
+        "safety",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Source page 6 discusses after-meal nausea relief versus reduced absorption. Preserve the instruction and flag the tension rather than reconcile clinically."
+      ],
+      "required_checks": [
+        "Resolve the exact documentary scope/target-identity concern; do not reconcile clinically. Unresolved material uncertainty blocks affected records and final acceptance.",
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "c7d6b78cfd5e6ad95b4dee52fcb86bab7cc3cf3e497fea1b75516c533e33b623",
+      "pdf_sha256": "6a3255668e798ff56f9bb41027ae282152b7b1129a3945aa8bb8168b87c85f81"
+    },
+    {
+      "question_id": "B-CB021-Q01",
+      "priority": "P0",
+      "risk_tags": [
+        "potential_blocker",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Cross query identifies Santisa, but omits form/concentration because identification is requested. Confirm uniqueness in the frozen corpus before approval."
+      ],
+      "required_checks": [
+        "Resolve the exact documentary scope/target-identity concern; do not reconcile clinically. Unresolved material uncertainty blocks affected records and final acceptance.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "6e0748e360bf159db851a535e5dede81521d39ce4fc5c0104cb13b7c48773575",
+      "pdf_sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db"
+    },
+    {
+      "question_id": "B-CB025-Q05",
+      "priority": "P0",
+      "risk_tags": [
+        "potential_blocker",
+        "safety",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Human audit: broad monitoring text coexists with hepatic/renal contraindications. Do not treat examinations as permission to use in a prohibited group."
+      ],
+      "required_checks": [
+        "Resolve the exact documentary scope/target-identity concern; do not reconcile clinically. Unresolved material uncertainty blocks affected records and final acceptance.",
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "374687ef07f8738ac04360ba6ac1e55eb0d8fc0052263cb7c1b3c880a28fbb5b",
+      "pdf_sha256": "7d7cdf890bd46c0375c3d99bf47e5ac77a4142555811f5795b96fab2d9f59df8"
+    },
+    {
+      "question_id": "B-CB038-Q04",
+      "priority": "P0",
+      "risk_tags": [
+        "potential_blocker",
+        "safety",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "O texto menciona reduzir pela metade ou dias alternados, enquanto a página 6 proíbe partir/abrir: não transformar redação de desmame em manipulação da cápsula; auditoria humana."
+      ],
+      "required_checks": [
+        "Resolve the exact documentary scope/target-identity concern; do not reconcile clinically. Unresolved material uncertainty blocks affected records and final acceptance.",
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "421b9169f018feafc3b30db02f2348877522f2345a88501a79f52c9ef18248d3",
+      "pdf_sha256": "f54cac847bdfccdc10420329c24fa626cc1c6ff78c3fb86cb9784d620abc3490"
+    },
+    {
+      "question_id": "A-B002-Q02",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "A seção 4 também usa termos de precaução para alguns desses grupos; conferir a resposta documental sem reconciliar clinicamente a redação da fonte."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "235a9945e7b57fe5a2368480128a415c4065c7c7a589eec1abbc234a3befc815",
+      "pdf_sha256": "c5175435076de7074fd6afc3ba71bab41bc572e14937547a5521b46243a2b65c"
+    },
+    {
+      "question_id": "A-B005-Q02",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Na seção 4 há linguagem de orientação/avaliação para mucolíticos; a seção 3 expressa a contraindicação desta apresentação. Revisar sem harmonizar clinicamente a fonte."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "97c11431e6c3f2416156e2206947e8c9c9d0243a7aaf93aa7272c7c0b26cd070",
+      "pdf_sha256": "78d833d4c99b7f9aeec7899a2d5035fec0501fcebb36ac96fea6ae5eca2fc618"
+    },
+    {
+      "question_id": "A-B007-Q02",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão específica de segurança neonatal: preservar idade, via do cálcio e contraindicação; não calcular dose."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "4a75335c2e119f837f32ad8ae3163ffd878541081d6224c2a9551ab4da9b9242",
+      "pdf_sha256": "b06c6761037ce03395a19d6e686baed64efa4bbce5cdbbb8bf65850072227c2c"
+    },
+    {
+      "question_id": "A-B007-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão específica de segurança: a resposta deve preservar a urgência documental."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "a2ab1315f696d0bb813ae13ff0c78518ddfad5e0898783c4a0b151098bffeb62",
+      "pdf_sha256": "b06c6761037ce03395a19d6e686baed64efa4bbce5cdbbb8bf65850072227c2c"
+    },
+    {
+      "question_id": "A-B011-Q02",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão específica de segurança de alergia; preservar a proibição expressa da fonte, sem reconciliação clínica externa."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "d0708fd29501471f85b1987e67e2273511f69451755e0684fc2e6363b7e55447",
+      "pdf_sha256": "c79815cbdb393617be76a61ff2bf1a9403695829251a466b785e5329af7f8695"
+    },
+    {
+      "question_id": "A-B015-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Distinguir estabilidade química e orientação microbiológica; não usar 24 horas para autorizar guardar por esse prazo."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "ba94253c603a3b1cb9a33663f6db77ddba7ec39f42ed7aca3789f87108d55461",
+      "pdf_sha256": "2d934a07fd314a493f4e98a1f7dc716c7310fbe499424b4d26fa815e8d4c97d5"
+    },
+    {
+      "question_id": "A-B015-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão específica de segurança: preservar urgência e conduta profissional, sem inventar medidas de emergência como citação documental."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "5e98ca7952a07e8343306a862df04cb070e23aac682536561709959d5d90f49b",
+      "pdf_sha256": "2d934a07fd314a493f4e98a1f7dc716c7310fbe499424b4d26fa815e8d4c97d5"
+    },
+    {
+      "question_id": "A-B016-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão de segurança: hematúria macroscópica também consta entre complicações raras; não usar a lista geral para minimizar sintoma individual."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "7997760fca62eb93a084a1c6264fb225775455a260c49ed2f0860f5c17e684b3",
+      "pdf_sha256": "53eac092c91276dd34b899a286f2b20b3b31eec972f10492e0080b13abf33fe4"
+    },
+    {
+      "question_id": "A-B016-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão específica de segurança: não resumir como febre comum nem acrescentar instruções de emergência como se estivessem literalmente neste trecho."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "98adb0f599f9c89ab81722d4204566343b097c1eaf3b6a559e8ba3fd4fa14620",
+      "pdf_sha256": "53eac092c91276dd34b899a286f2b20b3b31eec972f10492e0080b13abf33fe4"
+    },
+    {
+      "question_id": "A-B017-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Priority safety audit: respiratory symptoms, facial swelling and express immediate-action instruction."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "9ec3e63b7547c814e24243106db00bd7e9327926277e990414d3dcae84a2b519",
+      "pdf_sha256": "7e3b8525ce01e98b77ab7c5f8d1da2dbc1e7388d6227bbd2118655489bbcf4f4"
+    },
+    {
+      "question_id": "A-B019-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: ototoxicity, medical action and possible irreversible loss; do not promise benign resolution."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "12b4c1de0707c6d14975848271b9a2a2f68e9a6416ffd033f754d2164752f539",
+      "pdf_sha256": "64d7fda2018a7276f3f0ea3ca76a69957614f0ecc12257a250d064339e328c31"
+    },
+    {
+      "question_id": "A-B020-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Priority safety audit: immediate team contact and infusion interruption; do not omit severity or replace this with generic reassurance."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "c98117a1afde98f1b12f673a674c5afb7d1f27972240eca549f882e3c8f0a028",
+      "pdf_sha256": "262320f02a0080fc67eb54c99d29689a6a0e01d49a31ee82c2533eaf49f0d98f"
+    },
+    {
+      "question_id": "A-B020-Q10",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "A negative about duration must not suppress the documented immediate-interruption instruction if extravasation is occurring; no new clinical advice is invented."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "31aae5bdf8ab41319462e58b5a5d17323024fac994c07d41106c293f83eea216",
+      "pdf_sha256": "262320f02a0080fc67eb54c99d29689a6a0e01d49a31ee82c2533eaf49f0d98f"
+    },
+    {
+      "question_id": "A-B021-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: natural caregiver wording retains fever and intense irritability; do not reassure solely on teething context."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "330abe5d79008e3300ad367ca8eac61ae765236201054695617b2e32b7cb2480",
+      "pdf_sha256": "db4c16b6b044a1234f66dc5c06468bd49ebac99189c249d35bced4f32f282d64"
+    },
+    {
+      "question_id": "A-B027-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety priority: do not omit immediate ophthalmologist contact or turn possible signs into a diagnosis."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "43e84244fbf270513a9f95ffc8601168457e74b87815e2010ab7ce5eb5ed5f41",
+      "pdf_sha256": "2419f85d1426f6c8439d28203100025ad036b5c64e2fd5404a71364241d04be2"
+    },
+    {
+      "question_id": "A-B027-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety priority: retain immediate action, without reconciling broncho-spasm or prescribing rescue treatment."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "40943b1d567114cb45cba68ea8d99787d45252e3a4dafadf88084ff4fb8f5448",
+      "pdf_sha256": "2419f85d1426f6c8439d28203100025ad036b5c64e2fd5404a71364241d04be2"
+    },
+    {
+      "question_id": "A-B028-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety priority: preserve immediate discontinuation and professional contact, not only routine skin discomfort."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "6f80dd330ccb98d030924d4f1eb3dabc1109e956462df091de2319df54f49f4a",
+      "pdf_sha256": "86ba065ac51792dcbe2f284081e57026ca457d7201eb5ef38139e2834c9dbf2a"
+    },
+    {
+      "question_id": "A-B029-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: urgent professional care despite source stating no known overdose symptoms."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "d9a7ab1d7996e290dc7ce0cc07d99aa1469c8a034469723137465c53e45ce4b5",
+      "pdf_sha256": "bc1161a2eab60cc5ca87b14593e5a398b8a94078cfcb0442c75ac5cfc3c065ba"
+    },
+    {
+      "question_id": "A-B032-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: distinguish periocular adverse effects from prohibited ocular treatment."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "91e7968823676027074beb90e52adbf125ffa4201a450df5747cd2e9d8628e58",
+      "pdf_sha256": "86caa59660df3eeb9c7391eef26c3d4ee35024661b8eba01fbebc642ca7ed799"
+    },
+    {
+      "question_id": "A-B033-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: preserve immediate medical consultation and conditional relation to neutropenia."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "a16b031dc4cdfb8c7ee76732ed2bf209fe8d9a3993d08d7fceb63c27a7ab1e2d",
+      "pdf_sha256": "75d56e686e69a986b5cdb50bdc55bf7baa8a9f101a037da919821ae36895b934"
+    },
+    {
+      "question_id": "A-B034-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Pediatric scope/dose audit; complete infant age retained, no new dose calculation."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "78a0a5322ccc7af512e6cb8fd06a23c98a17eae81f541d48d85f6057db502659",
+      "pdf_sha256": "4d1c470fbfbec475bf4dd73aa6c3c53177b7e3a401e7f39764befb117c867d6f"
+    },
+    {
+      "question_id": "A-B036-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: distinguish persistent blistering allergy from short-lived common local irritation; retain source action."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "4f44b1324632f438e99f234ba72c99dde77bf55ec41a319b7806d6c2bdffe1b2",
+      "pdf_sha256": "7b4ec98a6e4d911df1be8d2cf528c31247ba2b324ecdeabc5dcc2a556f93b1ed"
+    },
+    {
+      "question_id": "A-B037-Q02",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety scope audit: systemic fungal infection, not all local infections."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "f2d3b33c91226e56021dadec89a8323f47be7d4dcc77e6a453c2ab1e3584303d",
+      "pdf_sha256": "b2e2e2121098ab3adb22cb61583e2d687b209e00dce9ca29b82458f780c82f76"
+    },
+    {
+      "question_id": "A-B038-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "High-risk additive: no self-directed compounding; preserve source typo without clinically repairing it."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "ce736c74b0d64b122b9f62a46a19eb4e92f76c030bc4a0bb6efe13f9a5672904",
+      "pdf_sha256": "6af0132b12d269b8997c6085e335fbe0a183d8f0acd32d8d6076806db4001456"
+    },
+    {
+      "question_id": "A-B038-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: preserve possible peritonitis and trained medical setting; no individual infection treatment."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "9e6f142764b642c6c25862f512e2f18b53574b37680cee9e488e7f9737400e0c",
+      "pdf_sha256": "6af0132b12d269b8997c6085e335fbe0a183d8f0acd32d8d6076806db4001456"
+    },
+    {
+      "question_id": "A-B039-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão de segurança: orientação condicional, não uma liberação individual para amamentar após prazo fixo."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "6ebb23178e583b1ffa44e41bc5f9ab66fce74a8c240dfb692a47ec20774763e3",
+      "pdf_sha256": "9a2a902154f079f061ae3d55dca34f07125196b6f748e40011ddfc50db6d6585"
+    },
+    {
+      "question_id": "A-B040-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de auditoria de segurança: verificar o conjunto de sinais e a orientação imediata, inclusive possibilidade de mascaramento descrita na página 3."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "93fe111bc2af96cc54b4c74fc352f5d6b3b0fed3843b04995fb1402807e2ee1c",
+      "pdf_sha256": "8d18fe70ec6b52c6c47293c04fe0b96a0d1103cb42d359d2be667ff83a7fc7a0"
+    },
+    {
+      "question_id": "A-B040-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Tabela pediátrica conferida visualmente; a linha contém dose única e máximo diário distintos. Auditoria humana deve confirmar associação de colunas."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "2788b887c846bcb9fb972fe8ce3b3a5e15bd2f358b57499883380de1097d716a",
+      "pdf_sha256": "8d18fe70ec6b52c6c47293c04fe0b96a0d1103cb42d359d2be667ff83a7fc7a0"
+    },
+    {
+      "question_id": "A-B042-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Auditoria de segurança: preservar o contexto completo da associação e o monitoramento condicional."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "92f245db69efb3cf6249007bbffb42880432a8d9abf9dbfa5347c553a19a7fba",
+      "pdf_sha256": "621636da74328b5eea20fd341a9a6e8307273c79cdb31cd7c969d4d01df74b4d"
+    },
+    {
+      "question_id": "A-B044-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Segurança: preservar risco de gravidez e orientação profissional sem oferecer esquema de reinício."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "aa5fb62e8723b95c5490b1df40d821318151d6f80e50802b08c7f236a782d1e0",
+      "pdf_sha256": "9555875042d263b7f706f1ccec809e8467184fbc7497a6ccb8a4f41c478ed712"
+    },
+    {
+      "question_id": "A-B044-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de segurança: gravidade e possíveis pensamentos suicidas não devem ser minimizados; não criar recomendação clínica individual."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "c53fba2a222cf67931dd9f123126f7060dd8aebec2975517d7cc8eae594e9c45",
+      "pdf_sha256": "9555875042d263b7f706f1ccec809e8467184fbc7497a6ccb8a4f41c478ed712"
+    },
+    {
+      "question_id": "A-B045-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Segurança: não omitir interrupção, lavagem ou atendimento imediato."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "b486c8444c8650be412d488ab102cbc2895eddfd02e5c0ca83a8a9c58a01585b",
+      "pdf_sha256": "1a18cf5583b059f5ec7164ad44ef8d98b574e132e3c0b96d5570daf9f39fb266"
+    },
+    {
+      "question_id": "A-B048-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Segurança: não transferir adiamento da ILTB ao tratamento da TB ativa."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "24af9d9d4cea3ee04531676328814a38000601623e1b4a7a222d143b40faef9f",
+      "pdf_sha256": "aebaef75c30f65cb4dfdabbc0cfe0b4b269a63f9ffa3567a4d28432ced51b271"
+    },
+    {
+      "question_id": "A-B049-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de segurança: parada e contato médico imediato devem ser preservados; não gerar diagnóstico individual."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "a9cb9d976d822248803c96b7c1447ca5c10438326e3fd59ef909f070f3b3077c",
+      "pdf_sha256": "7c120618bebaaebdebb15fb19824ba29463fa6e649d5021b8a7e5d4b0d574131"
+    },
+    {
+      "question_id": "A-B050-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de segurança: manter relato imediato, sem normalizar febre e disúria."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "88b3841a005fc02c2be50bc0180580e0847cdcb0c5b2deddb9a5103bb5aba795",
+      "pdf_sha256": "f41b0939a34c2468bcb95df916ca5cc305782c6236706c461cccca9d1bcadab3"
+    },
+    {
+      "question_id": "B-CB007-Q02",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão de segurança respiratória: não suavizar a contraindicação para mera cautela."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "247255ca535cad563c08527c921afbc5bd8ca0331bad66cf7688f6f3809c5606",
+      "pdf_sha256": "50b1449946106b5dc460c38dedc3407d0307c718657bc8758001ae57ca2e7bf8"
+    },
+    {
+      "question_id": "B-CB008-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão pediátrica específica; manter o pedido em acompanhamento, não em liberação de tratamento."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "339f17a3d6fe7bd7f3f96fdddd3f7f8efa8a0b508af07af9ba0b9aa3d4f19fb7",
+      "pdf_sha256": "b5aaed38f93ac943ebcf1ddb0fb5733fb6842fb653f8784501ecd6220631c0b2"
+    },
+    {
+      "question_id": "B-CB010-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão específica de segurança respiratória e urgência; alerta de autoria, não decisão humana."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "a0e2fd1053236d2fba8c8a93f817c17bc0cb0b3801aab79b00f686cd69a1c902",
+      "pdf_sha256": "f06fec156057c26ba1b59e99fe4d85b9e8ddf14466ac7c66374157c66d7458a7"
+    },
+    {
+      "question_id": "B-CB013-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão específica de segurança: fonte tem instrução explícita de emergência; preservar condição de inconsciência."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "9d17c81cd8907bd0c83cb7bf3313b5a5cca93a7744dda8388cd39d134fc862ea",
+      "pdf_sha256": "a6e22a82de8a2a9a5f03f0a8f16907d50a5bc0169a9e5fb50b6a5a0c2edbe826"
+    },
+    {
+      "question_id": "B-CB015-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão específica de segurança: sinal de alerta não é diagnóstico; não transformar em sintoma sem importância."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "8d292d82150c6576665bd83f35a874b14b322968cb831bdcf7111a8c4a5016a0",
+      "pdf_sha256": "cb0a1820ea78b74b2e119e116628bf94235cba05460ce249d53406159d0b855a"
+    },
+    {
+      "question_id": "B-CB017-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Priority safety audit: nonspecific symptoms with mildly raised glucose, urgent assessment and conditional interruption must remain linked."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "1d17877266503465c9f47e966b15f4a4b7eac4bfb95b162c98668178211a4191",
+      "pdf_sha256": "0ad60b91f5223877d5459c70e4e533ada52a62d659e6e55530185dbdcd195f3f"
+    },
+    {
+      "question_id": "B-CB018-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Priority safety audit: persistent/severe abdominal pain and immediate care, not generic side-effect reassurance."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "8a7a65a369ea1fd7a878c5ef628e7700ff2716b50c8b19e9b8af28e5d718d5af",
+      "pdf_sha256": "f4ad75953080c61882a71cad1aad0b36f17420458c6b03f92f3ae2b5597e9e77"
+    },
+    {
+      "question_id": "B-CB019-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Priority safety audit: airway-related symptoms and immediate care must not become a generic precaution."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "d62af59c388415f260715365d0edd21c12346b5f88b960d3758f69a55d0fdf66",
+      "pdf_sha256": "3b54b99a53529e8733c1ad66fda701c1bd392e26407a65d4db7e377c858547bb"
+    },
+    {
+      "question_id": "B-CB020-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Priority safety audit: symptoms, immediate cessation/contact and hospital emergency must remain associated; no individual diagnosis."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "905266425dcf9e9c1a7b6499f37804a90d71c65809e7589fe5fe627d3cf28d3b",
+      "pdf_sha256": "7c1e9f381f0a54cbf98a323be3eb1f087cd338c70401393b46c63207ef1953e9"
+    },
+    {
+      "question_id": "B-CB021-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Table visually checked on physical page 6: shared IV/IM cell for 16–23 kg; infant first row has distinct columns. Preserve route and do not manufacture a patient-specific dose."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "d841f1854c9865bcd1c5d850a75c85fd9e6d0fecf5f6511e44d6dff740487cdf",
+      "pdf_sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db"
+    },
+    {
+      "question_id": "B-CB021-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Priority safety audit: immediate evaluation for possible agranulocytosis, not reassurance based on previous tolerance."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "ae7873782507d55cd4a03273097a96b14729b7921b065b2bdb0fc9cc1fa4ca96",
+      "pdf_sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db"
+    },
+    {
+      "question_id": "B-CB022-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety priority: absence of symptoms does not remove the source's immediate-care instruction."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "f96ad01edc82c635084c4c26015fb3cf4a862316f9b4ac85001cee27c84568c8",
+      "pdf_sha256": "880a41737adf4074c1812fbf3d43fd5d2f15cbaf6f3e0b008a71e2b0fae5186b"
+    },
+    {
+      "question_id": "B-CB023-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Table visually checked on physical page 5: left and right panels repeat the same columns; high-fever column (≥39°C) is 40 drops at 20 kg. Keep age, weight, route and frequency; no individual calculation."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "21aea4fc9bb74caa2749d4a6570243d2c11fef13530b9f66644f69f077951c99",
+      "pdf_sha256": "81103836456eabbd08d844f5195499966c55d1096c0e1674c04dcea8f3db3056"
+    },
+    {
+      "question_id": "B-CB023-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Specific safety audit: preserve immediate suspension/assistance; do not reduce breathing difficulty to routine adverse-effect reporting."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "4e3657c316c9f9ea6a6004b7c812bf6b901e8749f534d73343bdcae5ea94fa6b",
+      "pdf_sha256": "81103836456eabbd08d844f5195499966c55d1096c0e1674c04dcea8f3db3056"
+    },
+    {
+      "question_id": "B-CB024-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Section 4 separately excludes gastrointestinal-origin pain/stomach problems; food instructions do not override that restriction."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "e6166a82d89184067bd4080e979d4a7059ad6620b164cb38caa1904a43768db6",
+      "pdf_sha256": "66c541f306b4737a2839eb56a25943fc44ce5b50fea1b86dd2c0412297742076"
+    },
+    {
+      "question_id": "B-CB024-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety priority: immediate action and service contact must not be omitted."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "e158fb65c340dd6d023abd3ec4dd5396d838e43d582aa9a9ea4e84cc1f9a3cce",
+      "pdf_sha256": "66c541f306b4737a2839eb56a25943fc44ce5b50fea1b86dd2c0412297742076"
+    },
+    {
+      "question_id": "B-CB025-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Same section then refers to diclofenac under 14 with juvenile-arthritis exception. Keep injectable-specific restriction; do not infer pediatric exception for ampoules."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "381d1d7aa83ed8ec56a6292fdc390e29eba894b0fe1d935d21d9c5a0b58fcaf7",
+      "pdf_sha256": "7d7cdf890bd46c0375c3d99bf47e5ac77a4142555811f5795b96fab2d9f59df8"
+    },
+    {
+      "question_id": "B-CB025-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety priority: source requires immediate contact; do not invent a home-management protocol or automatic clinical diagnosis."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "a7e7863137dfe264a5abc61d17e65400a2e55eabfd73968963864b1f05491268",
+      "pdf_sha256": "7d7cdf890bd46c0375c3d99bf47e5ac77a4142555811f5795b96fab2d9f59df8"
+    },
+    {
+      "question_id": "B-CB026-Q02",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety qualifier: preserve viral-symptom restriction despite general above-12 labelling; no individual diagnosis."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "fffecfd46bc14f29282dd831d5d162c69c05c82c72a5c83a5d0ce9317433d59f",
+      "pdf_sha256": "06a05ae6e200e3d9e31aef6fc44a467ea7cf96c49b1f92069c4971977d7026b9"
+    },
+    {
+      "question_id": "B-CB026-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety priority: no rechallenge after the stated abnormal tests; distinguish this from general discontinuation for improvement."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "227ec5365a19b5a7a274b68c37e5af90aea7fb677c1bf28f591b1355477fa2b3",
+      "pdf_sha256": "06a05ae6e200e3d9e31aef6fc44a467ea7cf96c49b1f92069c4971977d7026b9"
+    },
+    {
+      "question_id": "B-CB027-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Safety scope: severe undialyzed renal disease versus terminal hemodialysis; no tablet-splitting inference."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "a50ef4e46daf736181f7d13ab6daf5fae6863fd0e1e85b82cd0e83287d61a503",
+      "pdf_sha256": "95982b216523fe6b8ae72fc2551877dfe119527e8c660b621d70a8ade34b4a85"
+    },
+    {
+      "question_id": "B-CB027-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: source immediate interruption for skin/mucosal injury; no invented home management."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "77b4140d8805c4f927179e39079dbb3ea0acf285fca4001eb8e93a27090b37ec",
+      "pdf_sha256": "95982b216523fe6b8ae72fc2551877dfe119527e8c660b621d70a8ade34b4a85"
+    },
+    {
+      "question_id": "B-CB028-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: source wording 'Hemostasia' is unclear; preserve the explicit ongoing-anticoagulant/IM clause without clinical reconciliation."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "602c9f3ed4bfc7c997679a0ef904e500c8ce75328e679c158701e42778344ba7",
+      "pdf_sha256": "99736d18e7b3c154103f110cd1df7458407a4793a117c1cc2593df1f8363c8b5"
+    },
+    {
+      "question_id": "B-CB028-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: immediate consultation; source says 'tomar' but presentation remains IM, not oral."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "ea6d22333600cb4c6093564de79cd75d0c48a9169559cd8cd8e3172ab4db500a",
+      "pdf_sha256": "99736d18e7b3c154103f110cd1df7458407a4793a117c1cc2593df1f8363c8b5"
+    },
+    {
+      "question_id": "B-CB029-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Visual table audit page 6: separate age/weight groups and maximum-dose row, not dose-unique column; do not authorize renal use generally."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "15d73669914a0e0fec677f194d3858abd7aaca13c61db93b56dd543d1d4a3534",
+      "pdf_sha256": "25b4fe58fccff61a2a522845767bb78b6bd6e8744f4345ca290a17b6f36f54be"
+    },
+    {
+      "question_id": "B-CB029-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: skin/mucosal lesions and early discontinuation; professional evaluation cannot be replaced by reassurance."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "43ac65e55898a62230ed1f034048cdbd247ee78918cd12c08d1bcd3c8fc4c770",
+      "pdf_sha256": "25b4fe58fccff61a2a522845767bb78b6bd6e8744f4345ca290a17b6f36f54be"
+    },
+    {
+      "question_id": "B-CB030-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: rapid medical help, not only a list of caffeine overdose symptoms."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "6e5f079a0f1a26882c749c495cc66d6151aa4b9e7fb7832a7c0a994d89a04134",
+      "pdf_sha256": "61d8fb8db6763fd3ebea0ed76baba62c052f2587b68838f6514cfc845c6bb9c2"
+    },
+    {
+      "question_id": "B-CB031-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: preserve direction of switch and possible longer medically assessed interval."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "18f73d9ff4126acb9bd6cf7f23e521e823ff24b2d56ebd7a8c476431e897d6b2",
+      "pdf_sha256": "51b7bec49c8aa2ae935fb9e3cda8d280c5bcff9f02423b5bef8745732310895e"
+    },
+    {
+      "question_id": "B-CB032-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: explicit recent-infarction contraindication, not generic cardiovascular caution."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "fd0eaf4bf9eb2c123076d8c9a3ddcf8542bb3155ecc651a784fe707903d59950",
+      "pdf_sha256": "4ef8513bae5afc3b322bbc5f92cb7b69d96753a599642edcdb183c0204b60a1a"
+    },
+    {
+      "question_id": "B-CB033-Q01",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Pediatric exception audit; age complete, no inference from broad adult indications."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "659070a6bdbf9f90ccb069a23ac61cfe1271d4612d61045f21775d895eb571a2",
+      "pdf_sha256": "c07d6436bdd2456ecdc914a697a718ab250ba3562c73e11dbde07e6820d0fd9c"
+    },
+    {
+      "question_id": "B-CB036-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Renal qualifier audit: no independent individual-dose selection and no overlapping-group shortcut."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "d30dd1d3e174e29f8ddc343bddfc21d233d0124c6091c156c782034599e06635",
+      "pdf_sha256": "e91ffc935328cbcfafc693a9debd462f79dc7b834c2140a7e315533a84a68a77"
+    },
+    {
+      "question_id": "B-CB036-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety switch direction audit; no clinically selected exchange regimen."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "217ccb57c82832ade6583250b2467578178aded75f1d50b7697136bee043b18c",
+      "pdf_sha256": "e91ffc935328cbcfafc693a9debd462f79dc7b834c2140a7e315533a84a68a77"
+    },
+    {
+      "question_id": "B-CB037-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Priority safety audit: preserve explicit emergency service for tongue swelling/breathing difficulty; not a new clinical metric."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "1b24d949db5ca9faa6ddcd6298a48d5812501b9c114489c9c81186022cbd7642",
+      "pdf_sha256": "51c070166631290367ae086b73a60749e515f3aa0c665762ca7c3ccf45a57f00"
+    },
+    {
+      "question_id": "B-CB038-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de segurança: troca profissional, não autorização individual baseada apenas no prazo."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "0b2f1de3d1f142e83e2d9b63cd3a599e146d370e53773d6313032c37238edb01",
+      "pdf_sha256": "f54cac847bdfccdc10420329c24fa626cc1c6ff78c3fb86cb9784d620abc3490"
+    },
+    {
+      "question_id": "B-CB038-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Decisão renal de risco exige auditoria; manter contraste documental sem orientar dose individual."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "b8f805a0fa14c5804499d4ff994c62b11015f727cfb254bda755232b305f4e5a",
+      "pdf_sha256": "f54cac847bdfccdc10420329c24fa626cc1c6ff78c3fb86cb9784d620abc3490"
+    },
+    {
+      "question_id": "B-CB040-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de auditoria de segurança: urgência expressa e risco de dano permanente, sem diagnóstico individual ou recomendação de espera."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "55e54556a61a5f35144c3830d7bd8d8761d0bb0a9a32dfc40e83211e01cd648c",
+      "pdf_sha256": "6ccabdc700eaa30fcbc8307b73481125f7276ae799394af28ad1989ae47aa54c"
+    },
+    {
+      "question_id": "B-CB041-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de segurança: não reduzir a proibição explícita a simples risco monitorável."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "c05c060eb51a357246a845579d2e6f99d5cb2fea42e9fe7714a32bf5ee3f0164",
+      "pdf_sha256": "a035d824170c0971803bbc1b48899f5f662f6aed326c009dfde483de99a7e482"
+    },
+    {
+      "question_id": "B-CB041-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de auditoria de segurança: ação e urgência expressas."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "baa6f7fc187439d080d77b734949cf1645825752dcb0741e503115f63477af5a",
+      "pdf_sha256": "a035d824170c0971803bbc1b48899f5f662f6aed326c009dfde483de99a7e482"
+    },
+    {
+      "question_id": "B-CB041-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Auditoria de segurança: preservar a diferença entre alerta inicial de sintomas e instrução subsequente para reações graves."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "3a150f8c4a9285e60d5d13a18c1fe5c349e4a4233ce4888f65f82de409d34739",
+      "pdf_sha256": "a035d824170c0971803bbc1b48899f5f662f6aed326c009dfde483de99a7e482"
+    },
+    {
+      "question_id": "B-CB042-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de auditoria de segurança: condição para suspensão e monitoramento, não intervenção individual."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "c0d5f755ad83cb9e92f29c4c10e6d3c50e94d9942ba9827d37acfbcbd9f933a5",
+      "pdf_sha256": "f424f5a25f2fe5e76e80a72b3e67982e8714ae76d8d9af3c7cf0f57ed0a3427b"
+    },
+    {
+      "question_id": "B-CB042-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de auditoria de segurança: sintomas e urgência expressos."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "f8a79a57d34da3b8ae22153ebe12d99fdbd28c00ab804e6425ea93dd9c5ea9cd",
+      "pdf_sha256": "f424f5a25f2fe5e76e80a72b3e67982e8714ae76d8d9af3c7cf0f57ed0a3427b"
+    },
+    {
+      "question_id": "B-CB042-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de segurança: não transformar contraindicação documental em mera avaliação opcional."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "8e6f97883ffcfb6cbc0d7842675576137404ff9fc22802ae7a6fa7a76d9a2495",
+      "pdf_sha256": "f424f5a25f2fe5e76e80a72b3e67982e8714ae76d8d9af3c7cf0f57ed0a3427b"
+    },
+    {
+      "question_id": "B-CB043-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Segurança: preservar contato imediato e febre, sem minimizar como reação comum."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "1de635b875ca7b9c846ccf51ef92fe38b794ffccde051c14f3ae379410ff013a",
+      "pdf_sha256": "1f88a64dc5819933e252dae6c347f24fc32c89a4f5d818feb70dce6045eee30c"
+    },
+    {
+      "question_id": "B-CB044-Q02",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Revisão de segurança: preservar a diferença entre ajuste moderado e proibição severa."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "db1669f93b9d941baada4f233482b32aaf9898e366111e260f0b8872948f9b53",
+      "pdf_sha256": "f24ff5c39fbd4b9ca5952cf056121d2944af67a935b6817884ee1834bba8984d"
+    },
+    {
+      "question_id": "B-CB044-Q06",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Segurança: não confundir sintomas com diagnóstico confirmado; preservar avaliação imediata de CPK."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "6b3db5701a1c7f375584d351d10770b5920433d3c4ed279e141d030d659cf7e2",
+      "pdf_sha256": "f24ff5c39fbd4b9ca5952cf056121d2944af67a935b6817884ee1834bba8984d"
+    },
+    {
+      "question_id": "B-CB045-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Segurança: preservar interrupção e contato imediato, sem atribuir malformação à gestação específica."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "2628294430c8d1346e742feeb16e8dce485942e21be6ded8adc1733e4bf3be28",
+      "pdf_sha256": "1cfb6036ee5dc4dd8b3937839fd0d08b13a103ac226a6259550998c84a57c66d"
+    },
+    {
+      "question_id": "B-CB045-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de segurança: não reduzir urgência a comentário genérico sobre reações adversas."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "149a3b449c903944fb175a8523529b0906244dd6acbf96f05982d83b90d2e0a0",
+      "pdf_sha256": "1cfb6036ee5dc4dd8b3937839fd0d08b13a103ac226a6259550998c84a57c66d"
+    },
+    {
+      "question_id": "B-CB046-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Segurança: preservar tipo, causa e intensidade na exceção, sem classificação clínica individual."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "6d083c9d5159d244a755bb0aee767effaa15bd4cad1993f1edf579ea8a315b32",
+      "pdf_sha256": "8159761d3d09b806e2ba08033fa0e0abb43c8b52fb0ec329758dc49658698225"
+    },
+    {
+      "question_id": "B-CB046-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Segurança: contato imediato e avaliação médica de suspensão, não simples espera."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "153ecd77e3ef44f14a4f84364f7f322865f6f28b6266eb68e87d161c0b742330",
+      "pdf_sha256": "8159761d3d09b806e2ba08033fa0e0abb43c8b52fb0ec329758dc49658698225"
+    },
+    {
+      "question_id": "B-CB046-Q08",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Segurança: não omitir ausência de doença muscular prévia ou monitoramento da associação."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "b47f25d884a185dc0956222575837dc699fd223c78e6a3d04e5ec34bcfddc763",
+      "pdf_sha256": "8159761d3d09b806e2ba08033fa0e0abb43c8b52fb0ec329758dc49658698225"
+    },
+    {
+      "question_id": "B-CB047-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Segurança: preservar contato imediato, não minimizar como evento comum."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "e90f9296b2623fcf874e50145979d1ff7f1f2724a199c61ed11129d026a1a736",
+      "pdf_sha256": "d9bc4c7d12092e81f0eaec51c69406f08d4df01d524842c426cfc4ca191909a2"
+    },
+    {
+      "question_id": "B-CB049-Q02",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de segurança: preservar contraindicação da associação, sem recomendação de substituição."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "c423eb93fdfaa266e136c020e2a2558cf50fe0d46567e8ed396874e8707b6aeb",
+      "pdf_sha256": "4565961b3883e3f7294ee42d3c499f2911acdad2f852f2c62cdb9f829fe6a712"
+    },
+    {
+      "question_id": "B-CB049-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Ajuste e monitoramento do anticoagulante exigem auditoria de qualificadores; não fazer titulação individual."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "b99506961ead3780bcdc623baf1909f28290900630efd0ac960dcbc720b78c7a",
+      "pdf_sha256": "4565961b3883e3f7294ee42d3c499f2911acdad2f852f2c62cdb9f829fe6a712"
+    },
+    {
+      "question_id": "B-CB050-Q04",
+      "priority": "P1",
+      "risk_tags": [
+        "safety",
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de população e dose: não aplicar a faixa de 14–18 anos ao grupo de 8–13; não avaliar puberdade pela idade apenas."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "644d4a99840d925c594006dd20ee5c78a7c80d32b0beb9d9d23ad562a728525c",
+      "pdf_sha256": "4019f913b8314d822f86dcb39204c43066c99e5dc17ae8fbd44e32e7717971a8"
+    },
+    {
+      "question_id": "B-CB050-Q05",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de segurança: preservar orientação imediata sem minimizar sintomas musculares."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "f7afc70e34519e40b288e9e3c277e6672c3985856bb2c0d9a6567e9854989c67",
+      "pdf_sha256": "4019f913b8314d822f86dcb39204c43066c99e5dc17ae8fbd44e32e7717971a8"
+    },
+    {
+      "question_id": "A-B001-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Confirmar a distinção entre sintomas/reações alérgicas e interferência em exame; não inferir necessidade de suspender o remédio."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "f0e511d44bd1c29b4535ddb05f09bdd7b1c57324b8ca7f8dcae454ee9b285f56",
+      "pdf_sha256": "105cd1abc112b3fc2ad801d8ac1c3af5d0266e17702dab250e1ec59742b64692"
+    },
+    {
+      "question_id": "A-B001-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Sódio elementar é o mineral, não a massa do sal montelucaste de sódio; nenhuma conversão química externa deve preencher a lacuna documental."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "b9b9edcb6a37696b9a5c1d20eff961cf47a7b9095a4c4dd1582ec9b1547e6263",
+      "pdf_sha256": "105cd1abc112b3fc2ad801d8ac1c3af5d0266e17702dab250e1ec59742b64692"
+    },
+    {
+      "question_id": "A-B002-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não inferir compatibilidade nem incompatibilidade; confirmar ausência no PDF inteiro na revisão humana."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "881c05bd7562295afb2edd1f42db84ab1ddf2885873ace6b768c1360bcb2ce67",
+      "pdf_sha256": "c5175435076de7074fd6afc3ba71bab41bc572e14937547a5521b46243a2b65c"
+    },
+    {
+      "question_id": "A-B002-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não estimar início de melhora por conhecimento externo; negativa documental, não falha de recuperação."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "10cadeece15c76db464a37ceb15fd320ab66841ec75572770644dd1bb052f8d6",
+      "pdf_sha256": "c5175435076de7074fd6afc3ba71bab41bc572e14937547a5521b46243a2b65c"
+    },
+    {
+      "question_id": "A-B003-Q06",
+      "priority": "P2",
+      "risk_tags": [
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Conferir o subtítulo: as subseções seguintes admitem temperatura ambiente após diluição, que não responde ao cenário perguntado."
+      ],
+      "required_checks": [
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "982c4953567b230586a88f54ba41b691c4c69c485299042d63dbf194e2aa4646",
+      "pdf_sha256": "bcd9cf05bacf29c54fc269f2feaa89687eb7ba324a9f81f89ee4f8c92b201eb9"
+    },
+    {
+      "question_id": "A-B003-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Manter negativa como ausência de prazo documental; não predizer recuperação individual."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "2d07aca6db7daba066dfb637b3d9bf3677409c0e6375fd63da3a5229ac8487fa",
+      "pdf_sha256": "bcd9cf05bacf29c54fc269f2feaa89687eb7ba324a9f81f89ee4f8c92b201eb9"
+    },
+    {
+      "question_id": "A-B003-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não deduzir ausência de látex pela composição; revisão humana deve confirmar ausência no PDF inteiro."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "3214c56fe3784dc7bbfc0cfec8a1fb7d3458eb47414b10e5f4892f76f258befc",
+      "pdf_sha256": "bcd9cf05bacf29c54fc269f2feaa89687eb7ba324a9f81f89ee4f8c92b201eb9"
+    },
+    {
+      "question_id": "A-B004-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Há orientação relacionada, mas falta o limite quantitativo solicitado; não inventar um número."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "74e6f00f91d8c6eaf200c5d4abca967fd19dee2c4a478f0c7b0abb0a0767bf1d",
+      "pdf_sha256": "84bf559f735387f65f5c19d7d938580baa0e2703360fbc9b3bc11f3be77ba01d"
+    },
+    {
+      "question_id": "A-B004-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não transportar alertas de lactose para glúten nem concluir segurança individual."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "b57866821b2969f979c1a90b42337deb6f2c500c0478dbc046af135cce3bef5a",
+      "pdf_sha256": "84bf559f735387f65f5c19d7d938580baa0e2703360fbc9b3bc11f3be77ba01d"
+    },
+    {
+      "question_id": "A-B005-Q01",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "O PDF reúne duas bulas; preservar rótulo da apresentação em cada referência."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "3988808f7fa3c0756b2c8add349bf53901f6314dfc7dc0c36cb70c035e857753",
+      "pdf_sha256": "78d833d4c99b7f9aeec7899a2d5035fec0501fcebb36ac96fea6ae5eca2fc618"
+    },
+    {
+      "question_id": "A-B005-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Negativa restrita a Fluibron gotas; não concluir segurança individual ou ausência no corpus."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "4d7666d82c6b87c460d85fb573b9f55a946b25c2d1b6b412a30ea729188633b6",
+      "pdf_sha256": "78d833d4c99b7f9aeec7899a2d5035fec0501fcebb36ac96fea6ae5eca2fc618"
+    },
+    {
+      "question_id": "A-B005-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Distinguir duração de início de ação, intervalo entre doses e apresentação."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "cdbfdaf7ce60a3cd99ec1a6812697476fe1fc0560103d8e627ed8965b97dd090",
+      "pdf_sha256": "78d833d4c99b7f9aeec7899a2d5035fec0501fcebb36ac96fea6ae5eca2fc618"
+    },
+    {
+      "question_id": "A-B006-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não converter validade geral ou duração do tratamento em prazo pós-abertura."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "ab9fb280f7f2352414b1ee589187cbdd577fa76acfa61addcf4bf8191c5ce530",
+      "pdf_sha256": "d6dd74d4c973b9c406795fab606a167fa68628e65dde414952b4464755850652"
+    },
+    {
+      "question_id": "A-B006-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Ausência documental de declaração de glúten; não autorização individual para doença celíaca."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "39af584094bc009dbeac322bfc4602dbb8ade33b5425a347c021d2d75a09368f",
+      "pdf_sha256": "d6dd74d4c973b9c406795fab606a167fa68628e65dde414952b4464755850652"
+    },
+    {
+      "question_id": "A-B007-Q08",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Linha e coluna conferidas visualmente na tabela da página física 8."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "785de5f7ade80f64aec95dd75a773cfe8704ec2da2879b8a9b8110c3107b1fec",
+      "pdf_sha256": "b06c6761037ce03395a19d6e686baed64efa4bbce5cdbbb8bf65850072227c2c"
+    },
+    {
+      "question_id": "A-B007-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Negativa restrita ao PDF-alvo; outro documento pode trazer informação, sem mudar a classificação por bula."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "24475f210a4c58ce00013df3f24cfa555325956a544824cc285d5deb948ab073",
+      "pdf_sha256": "b06c6761037ce03395a19d6e686baed64efa4bbce5cdbbb8bf65850072227c2c"
+    },
+    {
+      "question_id": "A-B008-Q08",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Preservar o rótulo da população na associação entre evento e frequência."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "3f839fd1d0bec0d43e1bf992415e0d595e3b8708288ccdc8d746ba25d85d1db4",
+      "pdf_sha256": "5c1660eab718c12b0d1952b348fbb98bbc327842c4f686d4533d1d797580a7fa"
+    },
+    {
+      "question_id": "A-B008-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não transportar recomendações de vacinas de outros PDFs para o alvo."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "ecd1ccaab4d9ecb520c23e01ae9fc3f64241d0b92a4960fa19869dcee730e1f5",
+      "pdf_sha256": "5c1660eab718c12b0d1952b348fbb98bbc327842c4f686d4533d1d797580a7fa"
+    },
+    {
+      "question_id": "A-B009-Q01",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Quantidades e associação por linha conferidas visualmente na página 2; citação mantém a redação nativa 'cadeia de longa'."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "0c2a59eb563299184461920848fcbe5ae90e2877a226945dc9fbac7d4bda38c5",
+      "pdf_sha256": "07d1af1a55961b0b300d66f7ff77d15f88fd6522e03585feeeb48f81345d7cbb"
+    },
+    {
+      "question_id": "A-B009-Q03",
+      "priority": "P2",
+      "risk_tags": [
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Lista de contraindicações continua entre páginas 3 e 4; conferir o vínculo do item ao cabeçalho."
+      ],
+      "required_checks": [
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "0125b73bf4142fe361abaff90f543516c6b5600e3c841ab4298adb989da01b9b",
+      "pdf_sha256": "07d1af1a55961b0b300d66f7ff77d15f88fd6522e03585feeeb48f81345d7cbb"
+    },
+    {
+      "question_id": "A-B009-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não inferir compatibilidade por serem ambos administrados pela veia, nem transformar falta de suporte em proibição comprovada."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "688c694d2bac4973ff60c178ba335c2e9ab3f98dd634d41179f544f79c891677",
+      "pdf_sha256": "07d1af1a55961b0b300d66f7ff77d15f88fd6522e03585feeeb48f81345d7cbb"
+    },
+    {
+      "question_id": "A-B010-Q07",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Necessidade de vincular cada evidência à sua apresentação; páginas impressas reiniciam, referências usam páginas físicas."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "294513466b5e44ddb34b420b7e9739bf11cba9245a522ee6e22d2a414850fc63",
+      "pdf_sha256": "46b09e4a582ff0bb81783c7894c02b63f2fd9269b3b9e74b90ec935cbaaafa5f"
+    },
+    {
+      "question_id": "A-B010-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Revisar insuficiência para o procedimento solicitado; não interpretar a pergunta como autorização para usar por sonda nem transformar instrução oral em protocolo de sonda."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "dfecee79288f804a8b86db5a9a5ead53675010d275635fa1c7588c34c3f6d53d",
+      "pdf_sha256": "46b09e4a582ff0bb81783c7894c02b63f2fd9269b3b9e74b90ec935cbaaafa5f"
+    },
+    {
+      "question_id": "A-B011-Q01",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Não confundir apresentações do corpo da bula com apresentações históricas adicionais."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "e54a21f221078e8f7f6a585b84afd27b2fe8e4079a1d0459c4df161a67425227",
+      "pdf_sha256": "c79815cbdb393617be76a61ff2bf1a9403695829251a466b785e5329af7f8695"
+    },
+    {
+      "question_id": "A-B011-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não transformar informação sobre escovação em prazo de reversão ou garantia para todas as manchas."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "63333cdd90133b19388a3f81e42a1111129d6b14b163c27ad5edea5f9b1de19f",
+      "pdf_sha256": "c79815cbdb393617be76a61ff2bf1a9403695829251a466b785e5329af7f8695"
+    },
+    {
+      "question_id": "A-B015-Q07",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Questão técnica justificada pelo tratamento especializado; não alegar frequência entre pacientes. Conferir visualmente a associação das duas colunas."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "fd53647a6ff5ae4a3909b1936e18ef8706b2272b06f01530c90e75c42fb3dc74",
+      "pdf_sha256": "2d934a07fd314a493f4e98a1f7dc716c7310fbe499424b4d26fa815e8d4c97d5"
+    },
+    {
+      "question_id": "A-B018-Q03",
+      "priority": "P2",
+      "risk_tags": [
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Figure 1 on physical page 3 visually checked against prose; do not confuse preparation volume with the prescribed dose."
+      ],
+      "required_checks": [
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "3bfb1c48049a64ceb4c0d596ea203046a284fa29e4b4469b65d332d3b448d928",
+      "pdf_sha256": "13e524b83eab65964b7852d1e096894d79a8a02d27eadf30d80472c01fbd93d3"
+    },
+    {
+      "question_id": "A-B021-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Audit negative scope: generic absence of interaction reports is documentary context, not support for an individual supplement-dose adjustment."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "29ad106fc7ffdc8caad70b0b58a29d71431966381b808231ebedf194a0a3c0d3",
+      "pdf_sha256": "db4c16b6b044a1234f66dc5c06468bd49ebac99189c249d35bced4f32f282d64"
+    },
+    {
+      "question_id": "A-B022-Q06",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Preserve adult local table/prose scope; source cover says above 12 years but also describes younger pediatric uses. Do not generalize that tension."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "4e35d647bf731719ca31438ac66a0f1c71d558043b55fa7478ebe59ba8a98259",
+      "pdf_sha256": "9a1aadc219a75ce611df32ccbec2961a32565e02c92e9aab3280a3e8952e2fa3"
+    },
+    {
+      "question_id": "A-B023-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Confirmar distinção entre cicatrização e início/duração da anestesia."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "b5993b75e7f65e837d0d2d72b3e4e1cc452be898e17e2be42d15b93fdeaa2a8e",
+      "pdf_sha256": "a80d5fc0eb0553b52d958fb3ef665d21500b835daf814423ca15373b30b595e0"
+    },
+    {
+      "question_id": "A-B023-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Confirmar ausência de orientação que abranja documentalmente a associação específica, incluindo possíveis ingredientes da pomada; não usar conhecimento externo para classificar mupirocina ou seus veículos."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "e82c74ecda614e8340e9f630fd451330c77efe0b68d7ec9d7398e0397dc83ee1",
+      "pdf_sha256": "a80d5fc0eb0553b52d958fb3ef665d21500b835daf814423ca15373b30b595e0"
+    },
+    {
+      "question_id": "A-B024-Q07",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Table association rechecked visually: first row, Faixa etária / Imunização primária / Reforço; physical p. 5, printed p. 4. This is an assistant drafting check, not independent human approval."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "6226c7948f80e57e9e97f9dd5cac95b93944da88019b3821a152a270f60cc76b",
+      "pdf_sha256": "2fc26b8f082a0bf554b683b2cc55899746fbc9ddded35cacbee6b4efffcda4a8"
+    },
+    {
+      "question_id": "A-B024-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não confundir intervalo entre doses com início de proteção."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "aa3f115613b5c71b94585fce65234001806c72edd1f5f16bfffb4b100633feb0",
+      "pdf_sha256": "2fc26b8f082a0bf554b683b2cc55899746fbc9ddded35cacbee6b4efffcda4a8"
+    },
+    {
+      "question_id": "A-B024-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Confirmar que a ausência de látex na lista de ingredientes não prova ausência nos dispositivos; não concluir segurança individual."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "9e016a3a6fb9d616308e3ce142c2399bbf4013f3c73aeb5ca61e23a65018f529",
+      "pdf_sha256": "2fc26b8f082a0bf554b683b2cc55899746fbc9ddded35cacbee6b4efffcda4a8"
+    },
+    {
+      "question_id": "A-B029-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Negative boundary: retain general conservation advice without deciding excursion acceptance."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "693d70a067ba80ee92c3858f5e7778ac8c68f38415cc634f0ccd07d4db59d30e",
+      "pdf_sha256": "bc1161a2eab60cc5ca87b14593e5a398b8a94078cfcb0442c75ac5cfc3c065ba"
+    },
+    {
+      "question_id": "A-B030-Q02",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Visual comparison: gel page 3 versus ointment page 15. Preserve form-specific scope."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "37fb0dc14ff70944abda2b7291dc0a936551d4e745e52bf74490a2ebce88391b",
+      "pdf_sha256": "955bbd5eef54efdac8c98e55974b1b399539aff78f812c7a38d114069f312aed"
+    },
+    {
+      "question_id": "A-B030-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Negative boundary: no reported interactions is not a layering protocol."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "f47a2d9d3de32d72efea48130caf8949d24d4795a8b819c9e058e9e39aa98be9",
+      "pdf_sha256": "955bbd5eef54efdac8c98e55974b1b399539aff78f812c7a38d114069f312aed"
+    },
+    {
+      "question_id": "A-B033-Q02",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation",
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Visual audit: paired tablet colors and separate maxima; cover total strength must not replace individual composition."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose.",
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "593636e798d78b5723304a7cdfc2916f04097fc06c7e4556652f47675745e2a1",
+      "pdf_sha256": "75d56e686e69a986b5cdb50bdc55bf7baa8a9f101a037da919821ae36895b934"
+    },
+    {
+      "question_id": "A-B034-Q01",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Age-boundary wording differs between identification and posology; preserve local form scope."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "48f4e98a9b00c56cce5976f92308e8429a2658f739b33ad11e8aaf80f4b31a9f",
+      "pdf_sha256": "4d1c470fbfbec475bf4dd73aa6c3c53177b7e3a401e7f39764befb117c867d6f"
+    },
+    {
+      "question_id": "A-B035-Q08",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Visually inspect physical page 5 population/frequency alignment; native text interleaves columns. Table rates are not individual probabilities."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "c88ad14ab7ab3f3b07481297cb5aae7136b204d9956b002a115b81630dd8e156",
+      "pdf_sha256": "6a3255668e798ff56f9bb41027ae282152b7b1129a3945aa8bb8168b87c85f81"
+    },
+    {
+      "question_id": "A-B038-Q07",
+      "priority": "P2",
+      "risk_tags": [
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Visual instruction audit page 21: source exception cannot be generalized to pooled solution; uncertainty remains for individual inspection."
+      ],
+      "required_checks": [
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "52cae0faf41ad6bcabb10d22dbd973e5529f1f8cfa5672a3ae36551dec953d0f",
+      "pdf_sha256": "6af0132b12d269b8997c6085e335fbe0a183d8f0acd32d8d6076806db4001456"
+    },
+    {
+      "question_id": "A-B039-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não calcular liberação para dirigir a partir da meia-vida."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "5c019407e6b7ee82c7b07979f6f9032657a4f557e5993729b2ed7010553663d2",
+      "pdf_sha256": "9a2a902154f079f061ae3d55dca34f07125196b6f748e40011ddfc50db6d6585"
+    },
+    {
+      "question_id": "A-B042-Q02",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de auditoria de tabela: cabeçalho na página 6 e células mescladas/linhas na 7; associação confirmada visualmente, sem dose individual."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "1e7dcb30557b9bfe26b16bc87d28b7a77ffe018613315cb2a4876600cfcad1a6",
+      "pdf_sha256": "621636da74328b5eea20fd341a9a6e8307273c79cdb31cd7c969d4d01df74b4d"
+    },
+    {
+      "question_id": "A-B043-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não ensinar mistura ou aplicação; necessidade de avaliação profissional não estabelece compatibilidade documental."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "ee8084ed833b7640c4ff1458f6214b6ff0166ab7a6c0501426e6fd6755de10d5",
+      "pdf_sha256": "36cbc73e5f397832a9aa1c165bc8727571c6353af6d181c4c918b726cf937f6c"
+    },
+    {
+      "question_id": "A-B045-Q02",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Prioridade de apresentação: orientações opostas de cobertura no mesmo PDF; não reconciliar como regra única."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "ee847632df88d4151f25c94b6c2c86eab7ccbdb9d170d9526f8792bb7570e3b5",
+      "pdf_sha256": "1a18cf5583b059f5ec7164ad44ef8d98b574e132e3c0b96d5570daf9f39fb266"
+    },
+    {
+      "question_id": "A-B047-Q08",
+      "priority": "P2",
+      "risk_tags": [
+        "safety",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Revisão de segurança: contextualizar descrição geral sem concluir a causa da urina de uma pessoa."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "a8485eecb7113a93d70e289a65c9fc05f1a56082e4578c8e10148a00815256fa",
+      "pdf_sha256": "532adebf87780c2a10fa8d5ed1e72cedbb92c2fe2542c43a412795f28431bfab"
+    },
+    {
+      "question_id": "A-B048-Q05",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Auditoria de escopo: parágrafo específico de contatos usa critério independente da BCG; não transferir linhas gerais da tabela pediátrica na página 3 nem reconciliar diferenças silenciosamente."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "be7d3aa4e4dcfabd7b3337f45e0f584f051ac89f2773802472399e084fd6296b",
+      "pdf_sha256": "aebaef75c30f65cb4dfdabbc0cfe0b4b269a63f9ffa3567a4d28432ced51b271"
+    },
+    {
+      "question_id": "A-B049-Q05",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Conferência visual da linha bucal e colunas quantidade/frequência/duração na página física 12; auditoria humana pendente."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "8b16c8690a9b64c94f981d16a139a9e09caeb04ee044672971c120ba7c9e50f3",
+      "pdf_sha256": "7c120618bebaaebdebb15fb19824ba29463fa6e649d5021b8a7e5d4b0d574131"
+    },
+    {
+      "question_id": "A-B049-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Trecho relacionado a probiótico não sustenta prevenção de recidiva; ausência não autoriza combinação."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "dc620281fd2fd1f176b20f37077eb1cf04b3bdf90e0fbd4369bc04347276a8be",
+      "pdf_sha256": "7c120618bebaaebdebb15fb19824ba29463fa6e649d5021b8a7e5d4b0d574131"
+    },
+    {
+      "question_id": "A-B050-Q07",
+      "priority": "P2",
+      "risk_tags": [
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Dois prazos com marcos diferentes; não somar como autorização irrestrita de conservação."
+      ],
+      "required_checks": [
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "bfc197e415592fc36f904eda69f4b9019f55d77adae6bb53e7b38a0b067797ff",
+      "pdf_sha256": "f41b0939a34c2468bcb95df916ca5cc305782c6236706c461cccca9d1bcadab3"
+    },
+    {
+      "question_id": "A-B050-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Resposta pode delimitar uso conjunto e ausência de esquema de retirada; não autorizar parar outro tratamento."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "f455320aa8f03e76f40b159d890f47a69d0f468a43edbd784c2c53c67f6a64b1",
+      "pdf_sha256": "f41b0939a34c2468bcb95df916ca5cc305782c6236706c461cccca9d1bcadab3"
+    },
+    {
+      "question_id": "B-CB001-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não confundir duração de controle com início de efeito."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "7545dc61789aacaac15825c8390e5fa1dfe9405f739b0fbc8b2e9b4668825ba0",
+      "pdf_sha256": "edbfe7b9ec409218457402d8ccbbd4ab8a05c00169e322fab2d3eee2854aef87"
+    },
+    {
+      "question_id": "B-CB001-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Confirmar insuficiência da composição para uma declaração de produto livre de glúten; preservar a apresentação e o fabricante porque os excipientes podem variar entre produtos."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "4c5f7c40f885f06e366fdb92d115199c641cf29d7f4d25d043dedb6d00ec32cb",
+      "pdf_sha256": "edbfe7b9ec409218457402d8ccbbd4ab8a05c00169e322fab2d3eee2854aef87"
+    },
+    {
+      "question_id": "B-CB002-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não usar conhecimento externo nem confundir mg do remédio com volume de água."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "fda40463ce1f6a7ed8ab1c654c6f198c729bed1d2282f327de690f0e0f6ed967",
+      "pdf_sha256": "688791db3755ee3c12a59081f885bd9fd2544960600de19b18e565647c205986"
+    },
+    {
+      "question_id": "B-CB002-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não extrapolar interferências em outros exames; ausência no corpus completo não foi verificada."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "afd9113baab796de1255504a867549c979a96ab54263d7b12609830f8e88b2de",
+      "pdf_sha256": "688791db3755ee3c12a59081f885bd9fd2544960600de19b18e565647c205986"
+    },
+    {
+      "question_id": "B-CB003-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Não confundir excipiente sódico, massa do princípio ativo e sódio elementar."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "15140f857925669ae9fa60bd15712b1235538438f2132edd72165ee4593a878a",
+      "pdf_sha256": "a8ff9d494dc035d2674f16a157888c2634cb9bc54c2743f8479e3ba5db8295f2"
+    },
+    {
+      "question_id": "B-CB003-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não inferir prazo de conservação da metade nem autorização para partir pela aparência."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "2da5f306957612701918d56b830e5a3030963c5412101b0a7f0abb883f7519b1",
+      "pdf_sha256": "a8ff9d494dc035d2674f16a157888c2634cb9bc54c2743f8479e3ba5db8295f2"
+    },
+    {
+      "question_id": "B-CB004-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Não deduzir sódio elementar a partir da massa do medicamento ou do nome dos excipientes."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "2d23d63d76bf7ba33c4d2a27ed952d194a99b4b7636d57f26e47aca3470a2384",
+      "pdf_sha256": "9dd47df5d651b65e3130c2b916eae6905e63ce31e39d233edd3393ef6ac14db5"
+    },
+    {
+      "question_id": "B-CB004-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não converter alertas alérgicos em interferência com exame nem inferir que não interfere."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "c51daa2947132ab8a140af418783bed4a32d81c7770d67ada28b4ead13a5ced1",
+      "pdf_sha256": "9dd47df5d651b65e3130c2b916eae6905e63ce31e39d233edd3393ef6ac14db5"
+    },
+    {
+      "question_id": "B-CB005-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não interpretar abreviatura de blister como declaração de ausência de látex."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "fecd6871becb604a78b2798f589c40a3c37268ca4d971c49417b00ead681d6d8",
+      "pdf_sha256": "5713913d2953a37f5a7b1ef81f6400a21fe539d27958e3b89434a5d2c981162d"
+    },
+    {
+      "question_id": "B-CB005-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não orientar parar o tratamento nem estimar prazo por conhecimento externo."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "6464cf039cfa9e4800a0faa3608750844d1d040bfc95d11437c0af516db375a1",
+      "pdf_sha256": "5713913d2953a37f5a7b1ef81f6400a21fe539d27958e3b89434a5d2c981162d"
+    },
+    {
+      "question_id": "B-CB006-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference"
+      ],
+      "original_authorship_flags": [
+        "Não deduzir massa do excipiente nem cálcio elementar a partir de concentração do princípio ativo."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "2d6b152ed9ec7f32cf6f035eea21fd81a58e332f89bb6ce2ef4e021ee50ef0b2",
+      "pdf_sha256": "e5fa58695e3c7aa939467bbfca43ce46d02d8552be12369bd9f7d034355fad0f"
+    },
+    {
+      "question_id": "B-CB006-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não usar tempo de ação de outro anti-hipertensivo nem frequência de doses como tempo de início."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "1867e6988addeae69cc61ae0f56228e3d395e2ebbeab353cf9540a0171b075ca",
+      "pdf_sha256": "e5fa58695e3c7aa939467bbfca43ce46d02d8552be12369bd9f7d034355fad0f"
+    },
+    {
+      "question_id": "B-CB007-Q07",
+      "priority": "P2",
+      "risk_tags": [
+        "table_interpretation"
+      ],
+      "original_authorship_flags": [
+        "Tabela conferida visualmente. Seu mínimo de 80 mg não é convertido em recomendação inicial; a pergunta solicita somente máximo."
+      ],
+      "required_checks": [
+        "Inspect the original page: heading, population, merged cells, row, column, units and footnotes; never calculate a new individual dose."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "354e7d301c65217871ebae1ead1935aa2832031884d35997c497ac9ca64166c2",
+      "pdf_sha256": "50b1449946106b5dc460c38dedc3407d0307c718657bc8758001ae57ca2e7bf8"
+    },
+    {
+      "question_id": "B-CB007-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "A falta de limite não significa que qualquer frequência cardíaca seja segura."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "1ba721a93dd88505be7df671d4025795f59de58b41215e8fccb553f4319faee7",
+      "pdf_sha256": "50b1449946106b5dc460c38dedc3407d0307c718657bc8758001ae57ca2e7bf8"
+    },
+    {
+      "question_id": "B-CB008-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não recomendar interromper por conta própria ou garantir que a audição se recuperará."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "19688977ce54891eed6d84763e353761a5e38a974e395018db5505ab6f7d559a",
+      "pdf_sha256": "b5aaed38f93ac943ebcf1ddb0fb5733fb6842fb653f8784501ecd6220631c0b2"
+    },
+    {
+      "question_id": "B-CB009-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Distinguir a menção a fertilização artificial de prazo documentado para nova tentativa."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "e9e809a28f9f8696ec23e69c2c92f8ca6aa2e1eef438fe9b16a129566a5114b9",
+      "pdf_sha256": "3bd30087cbbb48384e7fa7c05a30eb2fecf56c61fed96e50c422daed98699ba9"
+    },
+    {
+      "question_id": "B-CB010-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Não recomendar intervalo nem usar ausência de prazo como autorização; resposta documental pode repetir evitar álcool sem inventar o número solicitado."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "114cf3d8875ee39ff595dfd7a6c0e8cf2f3c3a000a3fc7a3eb3c6a1dec6dfbaf",
+      "pdf_sha256": "f06fec156057c26ba1b59e99fe4d85b9e8ddf14466ac7c66374157c66d7458a7"
+    },
+    {
+      "question_id": "B-CB010-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Negativa documental sobre prazo para doação de sangue, não sobre necessidade geral de seguir orientação médica."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "902c797b51d552680ca0137bd21c1403a34687e4bec54cd1c329f248c90af57e",
+      "pdf_sha256": "f06fec156057c26ba1b59e99fe4d85b9e8ddf14466ac7c66374157c66d7458a7"
+    },
+    {
+      "question_id": "B-CB011-Q02",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Condição numérica indispensável mantida nos dois cenários, sem exigir esclarecimento."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "3c14f76d61dcb361b4c6c2c987f32c5ca9358cd5f4bd246d5c30dfe269af243d",
+      "pdf_sha256": "e56c40afc2b62c3130f4a615b1696c28b732436c57265a2797f3fac44f8e04cc"
+    },
+    {
+      "question_id": "B-CB011-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não selecionar como tratamento de emagrecimento nem converter perda modesta em promessa quantitativa."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "cc0444e444636accb6889e629b889d62587bf9f1d96651e8f50ef01d88002496",
+      "pdf_sha256": "e56c40afc2b62c3130f4a615b1696c28b732436c57265a2797f3fac44f8e04cc"
+    },
+    {
+      "question_id": "B-CB011-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não confundir creatina com depuração de creatinina; revisão documental humana da insuficiência ainda pendente."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "9d6c6284dfdecbe8abec2b2afd18d072452a210124acadddfb1cf40363534957",
+      "pdf_sha256": "e56c40afc2b62c3130f4a615b1696c28b732436c57265a2797f3fac44f8e04cc"
+    },
+    {
+      "question_id": "B-CB013-Q04",
+      "priority": "P2",
+      "risk_tags": [
+        "safety",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Comprimido é descrito como sulcado na seção 5, mas seção 6 proíbe partir; preservar orientação explícita."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "3b2644aa5fe52f3cd07e0ca38cb38eb6059ec677336192502a29abef6d1a477c",
+      "pdf_sha256": "a6e22a82de8a2a9a5f03f0a8f16907d50a5bc0169a9e5fb50b6a5a0c2edbe826"
+    },
+    {
+      "question_id": "B-CB014-Q05",
+      "priority": "P2",
+      "risk_tags": [
+        "safety",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Vinco na descrição de 4 mg não substitui proibição expressa de partir."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "02a97bf6a5514b5241e3844fa39339a38f46035fa755ff05f6dff2bba28adb23",
+      "pdf_sha256": "7151ca50d34f6b5ef9f14e967d89c9f00ab0ac300b22cb2a322bf4d4a5623106"
+    },
+    {
+      "question_id": "B-CB019-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Audit documentary boundary: generic low interaction potential cannot certify this specific supplement combination."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "b9462d3eda8a1c0ccc320833d30ea137629fbd418832bde6772ea96ab0875d94",
+      "pdf_sha256": "3b54b99a53529e8733c1ad66fda701c1bd392e26407a65d4db7e377c858547bb"
+    },
+    {
+      "question_id": "B-CB021-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Negative scope is specific compatibility, not a request to list permitted diluents. Preserve the explicit source list if providing context; no external compatibility claim."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "bc7bf85ff688d39210bbc0788e3f82c76ceebb9b469764d01338bd03846f0c37",
+      "pdf_sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db"
+    },
+    {
+      "question_id": "B-CB023-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Related warnings are available; do not turn missing alternation instructions into permission to combine or hide the recommendation to consult a doctor."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "9877dbdc65c66e292a49bf0370b3ef53d0accfbe9f6f8a18f0c0b6f5c3665865",
+      "pdf_sha256": "81103836456eabbd08d844f5195499966c55d1096c0e1674c04dcea8f3db3056"
+    },
+    {
+      "question_id": "B-CB023-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Consultation for persistent fluid loss remains relevant safety context, not a documented repeat-dose protocol."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "7f7c37d9519f63d6a32ffd8bdf5043f4cf810168dd2a43321ddb3307c1c05f02",
+      "pdf_sha256": "81103836456eabbd08d844f5195499966c55d1096c0e1674c04dcea8f3db3056"
+    },
+    {
+      "question_id": "B-CB024-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Professional consultation is documented; the requested take-versus-skip decision is not. Human confirmation of this negative boundary remains required."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "f5c3d95c3cdbc5f00214d73e8c0ab381066981eef9216401db0ffe7fb88eab32",
+      "pdf_sha256": "66c541f306b4737a2839eb56a25943fc44ce5b50fea1b86dd2c0412297742076"
+    },
+    {
+      "question_id": "B-CB025-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Local adverse effects and serious reactions need attention; missing compress instructions are not permission to treat complications at home."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "245489d231cd3253b4e12351595266c9a0a93f83a25cea35b351624331d5a74f",
+      "pdf_sha256": "7d7cdf890bd46c0375c3d99bf47e5ac77a4142555811f5795b96fab2d9f59df8"
+    },
+    {
+      "question_id": "B-CB028-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Safety boundary: do not substitute home compress advice for assessment of a local complication."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "c3e976b19995533badac0109f0c864f604d0230f2335534d1b46540ef0505af1",
+      "pdf_sha256": "99736d18e7b3c154103f110cd1df7458407a4793a117c1cc2593df1f8363c8b5"
+    },
+    {
+      "question_id": "B-CB030-Q05",
+      "priority": "P2",
+      "risk_tags": [
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Multi-component audit: opposing described directions are not a net-interaction estimate."
+      ],
+      "required_checks": [
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "9ef7990978536df5fd73bafeafa0ce5b2b4de52d52b3c8d1125f441b26f08f08",
+      "pdf_sha256": "61d8fb8db6763fd3ebea0ed76baba62c052f2587b68838f6514cfc845c6bb9c2"
+    },
+    {
+      "question_id": "B-CB031-Q08",
+      "priority": "P2",
+      "risk_tags": [
+        "presentation_difference",
+        "ambiguity"
+      ],
+      "original_authorship_flags": [
+        "Presentation audit: 10-mg section explicitly skips near-next dose; 20-mg section has different wording. Do not harmonize silently."
+      ],
+      "required_checks": [
+        "Bind each reference and both queries to the same form, route, strength, population and current presentation; exclude history-only alternatives.",
+        "Read the complete local context and necessary fragments; retain natural ambiguity if a bounded conditional answer is documentarily possible."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "825bf6c3019f1e39e17fbd28defe62b4706df2d15ff3eebca23ea24072be3f8f",
+      "pdf_sha256": "51b7bec49c8aa2ae935fb9e3cda8d280c5bcff9f02423b5bef8745732310895e"
+    },
+    {
+      "question_id": "B-CB034-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Confirmar que orientações sobre fertilidade/gravidez não sustentam conclusão sobre eficácia do anticoncepcional; ausência não significa ausência de interação."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "d809be1a8e1b4d0cfc8725297296d6163ccdcb6dacd9f2aab368f8dbfea5bd31",
+      "pdf_sha256": "7d23769df530f7cbbcf7bde4001fef5a05b500f04568fa078640d606ba3ad427"
+    },
+    {
+      "question_id": "B-CB034-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Há afirmação geral sobre alimentos/bebidas; confirmar que não basta para autorizar quantidade de café."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "e39e0f84541d76c540dfcf2b1959468bdd8529f33327070e2d04c12a5983fd96",
+      "pdf_sha256": "7d23769df530f7cbbcf7bde4001fef5a05b500f04568fa078640d606ba3ad427"
+    },
+    {
+      "question_id": "B-CB035-Q02",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Safety audit: source action, not diagnosis or inference of normal harmless anxiety."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "013a8a1dd8c6cc27eac97f68fd8d71168d1c32bd990bf23da158a7cdd816f660",
+      "pdf_sha256": "2152cb976ffadf07f9c720735bd23e2b2634c57533decb4416451553e9650323"
+    },
+    {
+      "question_id": "B-CB040-Q07",
+      "priority": "P2",
+      "risk_tags": [
+        "safety"
+      ],
+      "original_authorship_flags": [
+        "Auditoria de segurança: este pedido é sobre exame, não diagnóstico ou orientação individual de suspensão."
+      ],
+      "required_checks": [
+        "Check source severity, urgency, prohibition/exception, population and action together; do not soften, diagnose or add clinical advice."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "50a496904726e235e7158fbcf7d6e11132dcda753ca5509fa5a7fbf62fa20fa9",
+      "pdf_sha256": "6ccabdc700eaa30fcbc8307b73481125f7276ae799394af28ad1989ae47aa54c"
+    },
+    {
+      "question_id": "B-CB048-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Ausência de preparo por sonda não autoriza triturar; pode explicar a restrição documental sem inventar método."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "e8b151949757b63243f32f17fa8b0beeebd247e5ec61a92eef544de1d951bfc0",
+      "pdf_sha256": "1d6dffe47e8247daaa1a63665eecd486c199e5517916c0f21ad5f3405a73dca0"
+    },
+    {
+      "question_id": "B-CB050-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "original_authorship_flags": [
+        "Não converter menção de hipotireoidismo em interação com levotiroxina nem ausência em autorização."
+      ],
+      "required_checks": [
+        "Confirm the requested proposition and essential qualifiers; for negatives inspect the entire target PDF, including indirect support, not just keyword absence."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "4fc0ce88b05f7fc8ccaffce5e658ada838472c361f74139f341b59e8dab702e4",
+      "pdf_sha256": "4019f913b8314d822f86dcb39204c43066c99e5dc17ae8fbd44e32e7717971a8"
+    },
+    {
+      "question_id": "A-B001-Q01",
+      "priority": "P3",
+      "risk_tags": [
+        "nonblocking_observation"
+      ],
+      "original_authorship_flags": [
+        "PDF native extraction uses a private-use glyph for the trademark in this block; literal quotations start after the brand name, whose identity was checked visually on p. 2."
+      ],
+      "required_checks": [
+        "Retain the extraction/editorial observation without treating it as an error; escalate only if source identity or requested meaning is affected."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "fb265beedd067c6fef2e8748334dc42d98a5c906630547f5a92fc4dd500ec5f6",
+      "pdf_sha256": "105cd1abc112b3fc2ad801d8ac1c3af5d0266e17702dab250e1ec59742b64692"
+    },
+    {
+      "question_id": "A-B005-Q06",
+      "priority": "P3",
+      "risk_tags": [
+        "nonblocking_observation"
+      ],
+      "original_authorship_flags": [
+        "Preservar até mesmo a redação original 'em na' na citação; não corrigir a fonte."
+      ],
+      "required_checks": [
+        "Retain the extraction/editorial observation without treating it as an error; escalate only if source identity or requested meaning is affected."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "e9037e7b30e94bfb1978c3f7f348803c903b57f192d236858bd6c0b1613d3b62",
+      "pdf_sha256": "78d833d4c99b7f9aeec7899a2d5035fec0501fcebb36ac96fea6ae5eca2fc618"
+    },
+    {
+      "question_id": "A-B040-Q03",
+      "priority": "P3",
+      "risk_tags": [
+        "nonblocking_observation"
+      ],
+      "original_authorship_flags": [
+        "Prazo curto confirmado visualmente no PDF; preservar sem correção clínica ou comparação com outras marcas."
+      ],
+      "required_checks": [
+        "Retain the extraction/editorial observation without treating it as an error; escalate only if source identity or requested meaning is affected."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "7820fbeb726b8423e8c6dc327a265c228885b4b2387649d8963a76837611d3ca",
+      "pdf_sha256": "8d18fe70ec6b52c6c47293c04fe0b96a0d1103cb42d359d2be667ff83a7fc7a0"
+    },
+    {
+      "question_id": "A-B046-Q03",
+      "priority": "P3",
+      "risk_tags": [
+        "nonblocking_observation"
+      ],
+      "original_authorship_flags": [
+        "Questão técnica justificada pelo PDF; não alegar frequência entre pacientes nem autorizar preparo leigo."
+      ],
+      "required_checks": [
+        "Retain the extraction/editorial observation without treating it as an error; escalate only if source identity or requested meaning is affected."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "80d0989ad5aaf79036d9767f77f7a4cd925989936b0367dcb28bcdc977cd6ce4",
+      "pdf_sha256": "3d52abbef565ebcf1f9b02429ca6632dbafc8ad4f77d4b7f421e717a915c025e"
+    },
+    {
+      "question_id": "A-B046-Q10",
+      "priority": "P3",
+      "risk_tags": [
+        "nonblocking_observation"
+      ],
+      "original_authorship_flags": [
+        "Necessidade técnica plausível no acompanhamento de diálise, não critério numérico fabricado."
+      ],
+      "required_checks": [
+        "Retain the extraction/editorial observation without treating it as an error; escalate only if source identity or requested meaning is affected."
+      ],
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "390b1eca89aa26ff76e6d01a44dc9457882e74febdc2e7e92a3de946ceeabbc3",
+      "pdf_sha256": "3d52abbef565ebcf1f9b02429ca6632dbafc8ad4f77d4b7f421e717a915c025e"
+    }
+  ],
+  "supplemental_author_notes": [
+    {
+      "question_id": "B-CB003-Q03",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "author_note": "Review breathing/lip swelling and the source's action/urgency; emergency wording must not be invented as a quotation.",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "2a8006c34da03d16d24f9fa4993be41ccab344ddea380838cae6f8dbef9917af",
+      "pdf_sha256": "a8ff9d494dc035d2674f16a157888c2634cb9bc54c2743f8479e3ba5db8295f2"
+    },
+    {
+      "question_id": "A-B032-Q07",
+      "priority": "P1",
+      "risk_tags": [
+        "safety"
+      ],
+      "author_note": "Preserve the bacterial/fungal infection condition.",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "79cd9184155309a2a5ea17e4e70d83d1bd5e2c06e6fc07768df9062e0e3495c9",
+      "pdf_sha256": "86caa59660df3eeb9c7391eef26c3d4ee35024661b8eba01fbebc642ca7ed799"
+    },
+    {
+      "question_id": "A-B041-Q07",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "author_note": "Check the added literal exposure relationship, not only CYP2D6 inhibition.",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "e8066a49c3bbd96c5f4b0436ad42ddd45a5230d17d2a219660bbdbae945326e8",
+      "pdf_sha256": "bf49fef0fa31f56f58f5e118276120e7329f558df7d5da1ebf90f87597d75b40"
+    },
+    {
+      "question_id": "A-B044-Q10",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "author_note": "Acne-treatment non-support permits a bounded adverse-reaction explanation, not absolute clinical impossibility.",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "0a5aab493bc6a84dcd4bd82c0b3f5e177494da72fe83ab48cd00638284522960",
+      "pdf_sha256": "9555875042d263b7f706f1ccec809e8467184fbc7497a6ccb8a4f41c478ed712"
+    },
+    {
+      "question_id": "A-B045-Q09",
+      "priority": "P2",
+      "risk_tags": [
+        "documentary_support"
+      ],
+      "author_note": "Silence about heat with the patch is not evidence of safety.",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "d322c1b8400c51bbc1b18e4343579e1ae8867c4c67fcb1398cbdb5d2926ca160",
+      "pdf_sha256": "1a18cf5583b059f5ec7164ad44ef8d98b574e132e3c0b96d5570daf9f39fb266"
+    },
+    {
+      "question_id": "A-B049-Q02",
+      "priority": "P2",
+      "risk_tags": [
+        "ambiguity"
+      ],
+      "author_note": "Six to nine months means nail-lesion disappearance after treatment, not necessarily onset of visible improvement; preserve the natural question and optional context.",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "6b1c4749126d372d7313c8a7edc26a7cae251a0ef92900361a018bb041da1451",
+      "pdf_sha256": "7c120618bebaaebdebb15fb19824ba29463fa6e649d5021b8a7e5d4b0d574131"
+    }
+  ]
+}

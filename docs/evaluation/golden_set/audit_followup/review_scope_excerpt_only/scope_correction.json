@@ -1,0 +1,19 @@
+{
+  "artifact_type": "Author scope correction, not a decision ledger",
+  "author_statement": "Tire esssa opção. Nenhum dos PDFs eu li o documento inteiro, apenas abri o PDF original perto dos trechos para confirmar se houve alguma incosistência",
+  "human_review_scope": "source_excerpts_in_original_pdf",
+  "human_full_document_reading_claimed": false,
+  "applies_to": "All human PDF reviews declared by the author, including historical full_document_checked checklist answers",
+  "historical_events_rewritten": false,
+  "new_human_decisions_created": 0,
+  "human_full_document_checklist_requirement": "removed_by_explicit_author_request",
+  "negative_absence_independently_confirmed_by_human_full_reading": false,
+  "negative_authorship_and_assisted_checks_remain_separate": true,
+  "dataset_sha256": "820d12bc4545f2cddc0a62a1aaca8e753388e3ccc184f204fa1e07b0356d3e88",
+  "submitted_export_sha256": "c0575a205b176566f10f1735bcd7789e96fce7c593ab0436fb833d04f1cba8df",
+  "archived_events_path": "submitted_events.original.json",
+  "questions_changed": 0,
+  "sample_redrawn": false,
+  "collection_frozen": false,
+  "rag_calls": 0
+}

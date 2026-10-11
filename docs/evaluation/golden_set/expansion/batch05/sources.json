@@ -1,0 +1,352 @@
+[
+  {
+    "corpus_id": "A",
+    "document_id": "B022",
+    "document_sha256": "9a1aadc219a75ce611df32ccbec2961a32565e02c92e9aab3280a3e8952e2fa3",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B022/bula_1791246897208.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 4,
+    "medication": "piperacilina sódica + tazobactam sódico",
+    "manufacturer": "Qilu Tianhe Pharmaceutical Ltd.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=102010062",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 21675,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      1,
+      2,
+      3
+    ],
+    "documentary_notes": [
+      "Qilu is producer; Química Haller is registrant/packager/distributor and cover identity. Preserve manifest manufacturer. Exclusively IV/professional handling, not self-injection.",
+      "Cover says above 12 years, while body contains younger pediatric indications/doses. No question reconciles these scopes. Adult renal-table context was visually checked; no personal dose is calculated."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B025",
+    "document_sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B025/bula_1791246961983.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 2,
+    "medication": "OLINA ESSÊNCIA DE VIDA",
+    "manufacturer": "",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=102990002",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 12298,
+    "full_document_read_pages": [
+      1,
+      2
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      1,
+      2
+    ],
+    "documentary_notes": [
+      "Traditional herbal patient leaflet, two-column layout. Native glyph encoding contains visible-text substitutions (for example proėssional and inespecíėca). References retain literal extracted glyphs and explicit source-column regions; visual source was checked on both pages. No PDF or production parser was edited.",
+      "Wesp appears in legal text; no explicit producer role is invented and empty manifest manufacturer remains empty. Adult above-16 label coexists with under-16 contraindication; no question targets exactly age 16. Claimed unreported product reactions coexist with known constituent reactions; no question generalizes safety.",
+      "After-opening shelf life is not inferred from expiry since manufacture. General herbal/co-medication warnings do not identify a probiotic. Negative absence requires independent human full-document confirmation."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B026",
+    "document_sha256": "b16d579b142fb69d6435ad5d90b2b699e036ffd1d4a6109736350f9f8e250bf5",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B026/bula_1791246964608.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 7,
+    "medication": "GLICERINA 12%",
+    "manufacturer": "",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=103110005",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 13789,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Halex Istar is source identity; explicit manufacturer field remains empty. Product is hospital-restricted, rectal and individualized, despite water-for-injection excipient wording.",
+      "Section 2 says no sensitive colic/irritation whereas section 8 lists colic/diarrhea. Q08 retains a human audit flag; no clinical reconciliation. Empty overdose line and incomplete telephone text are not repaired externally.",
+      "Disposal of residual solution does not specify collection destination for used materials. No procedural fasting protocol is supplied."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B027",
+    "document_sha256": "2419f85d1426f6c8439d28203100025ad036b5c64e2fd5404a71364241d04be2",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B027/bula_1791246971053.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 13,
+    "medication": "Atrovent / Atrovent N",
+    "manufacturer": "Istituto de Angeli S.R.L.; Boehringer Ingelheim Pharma GmbH & Co. KG",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=103670004",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 34911,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      7,
+      9
+    ],
+    "documentary_notes": [
+      "One PDF contains Atrovent nebulization drops on physical pages 1-5 and Atrovent N aerosol on pages 6-11, followed by shared history. Preserve local presentation, age, route and different device instructions.",
+      "Drops and aerosol have different producers; frozen multi-manufacturer field unchanged. Mask instructions are for drops, cleaning is for aerosol mouthpiece; neither establishes spacer-mask or nebulizer-cup disinfection instructions.",
+      "Immediate ophthalmologist contact and rapid respiratory-worsening instructions are safety audit priorities. Instructions for empty-canister estimation are not turned into general device calibration rules."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B028",
+    "document_sha256": "86ba065ac51792dcbe2f284081e57026ca457d7201eb5ef38139e2834c9dbf2a",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B028/bula_1791246973219.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 14,
+    "medication": "COLPATRIN",
+    "manufacturer": "Laboratório Teuto Brasileiro S.A.",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=103700007",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 39649,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Colpatrin is vaginal cream for adults; treatment application is not oral ingestion. Teuto is explicitly registrant/producer.",
+      "Preserve timing of menstruation relative to already-started treatment, minimum post-treatment alcohol interval, disposable applicators and risk to latex barriers. Latex precaution is supported positive evidence, not a missing-material negative.",
+      "The source includes systemic-metronidazole and oral-overdose discussions within a vaginal-product leaflet. No question silently translates them into systemic dosing or partner treatment. Source immune/skin and mental-health warning text remains documentary content, not individualized clinical advice."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB022",
+    "document_sha256": "880a41737adf4074c1812fbf3d43fd5d2f15cbaf6f3e0b008a71e2b0fae5186b",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB022/bula_1791329605125.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 6,
+    "medication": "PARACETAMOL",
+    "manufacturer": "",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=102350764",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 11731,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "EMS appears in cover/legal identification; explicit producer role is not inferred and empty manifest manufacturer stays empty. Five grams is sachet powder mass, 500 mg is paracetamol; query presentation distinguishes sachets without leaking requested administration facts.",
+      "Section 3 contraindicates under 12 but section 6 mentions a medical exception; no question resolves that conflict. Renal/hepatic caution and prohibition language also coexist. Adverse frequency labels contain inconsistent rare/common descriptions; no frequency question is authored.",
+      "Overdose requires immediate care even without symptoms. Laboratory assay interference is not a general antidoping conclusion."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB023",
+    "document_sha256": "81103836456eabbd08d844f5195499966c55d1096c0e1674c04dcea8f3db3056",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB023/bula_1791329608990.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 9,
+    "medication": "ibuprofeno",
+    "manufacturer": "Laboratório Teuto Brasileiro S/A",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=103700539",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 24241,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      5
+    ],
+    "documentary_notes": [
+      "Teuto 50 mg/mL oral suspension is not the other corpus's ibuprofen presentation. Physical page 5 repeats low/high fever table columns in two panels; Q05 uses 20 kg row and ≥39°C column without deriving a new dose.",
+      "Different general duration statements (pain ten days, fever three days, seven-day overall caution) are not reconciled. Under-six-month contraindication remains distinct from under-two-year medical supervision.",
+      "Immediate suspension/medical assistance for allergy is retained. General cautions about combined analgesics and dehydration do not supply an alternating-dose or vomiting-redose protocol; negative boundaries are flagged."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB024",
+    "document_sha256": "66c541f306b4737a2839eb56a25943fc44ce5b50fea1b86dd2c0412297742076",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB024/bula_1791329613221.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 8,
+    "medication": "naproxeno sodico",
+    "manufacturer": "Eurofarma Laboratórios S.A.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100431565",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 28515,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Eurofarma is explicitly registrant/producer. Sodium naproxen amount 550 mg corresponds to 500 mg naproxen; do not conflate forms.",
+      "Section 6 gives ten-day language but next physical page has seven-day warning; no duration question selects a clinically preferred value. Adult label and younger-child exception also coexist. Some tabulated adverse-event wording is malformed; no question repairs it.",
+      "Section 7 says seek professional guidance only, not a take/skip protocol. Negative Q09 concerns that missing decision, not absence of all advice. Lactation contraindication includes explicit alternative-treatment/feed support.",
+      "Low-dose aspirin interaction specifies uncertain clinical relevance; do not equate laboratory pharmacodynamic interaction with a quantified clinical outcome. Food allowance does not override stomach restrictions."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB025",
+    "document_sha256": "7d7cdf890bd46c0375c3d99bf47e5ac77a4142555811f5795b96fab2d9f59df8",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB025/bula_1791329617813.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 9,
+    "medication": "DICLOFENACO SÓDICO",
+    "manufacturer": "",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=103110142",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 30767,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Halex Istar is source identity, not an inferred manufacturer role. Ampoules are specifically IM/adult and single-use.",
+      "Injectable-specific under-18 restriction differs from generic diclofenac under-14/juvenile-arthritis wording. Hepatic/renal monitoring coexists with contraindications; Q05 preserves that caution.",
+      "Text discussing injectable treatment beyond four weeks coexists with section-6 maximum two days. No duration question silently resolves this major source tension. Do not provide self-injection or home management of local complications.",
+      "Section 8 serious skin/mucosal reactions require immediate professional contact. Contraception and hot-versus-cold compress management are not documented."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB026",
+    "document_sha256": "06a05ae6e200e3d9e31aef6fc44a467ea7cf96c49b1f92069c4971977d7026b9",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB026/bula_1791329621948.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 10,
+    "medication": "NIMESULIDA",
+    "manufacturer": "Vitamedic Ind. Farmacêutica Ltda.",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=103920174",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 33030,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Vitamedic is explicitly registrant/producer. Pack sizes 492/504 appear in this source and are not silently corrected to conventional pack sizes.",
+      "Different onset for pain and fever, adolescent viral-symptom restriction, hepatic no-rechallenge condition and losartan interaction retain their local scopes.",
+      "Milk excretion is described as unestablished and later as established; no lactation question resolves that tension. Dose text permits half tablets and exceptional higher dosing; no new personal regimen is generated.",
+      "Viral-illness restriction is not vaccination postponement. Oral tablet instructions do not establish feeding-tube preparation."
+    ]
+  }
+]

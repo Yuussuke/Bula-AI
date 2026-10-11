@@ -1,0 +1,129 @@
+{
+  "created_on": "2026-10-10",
+  "revision": 3,
+  "input_revision": 2,
+  "actor": "AI_assistant_not_human_reviewer",
+  "authorization": "Author authorized continuation after original-table presentation; no individual approvals inferred.",
+  "input_questions_sha256": "1ecc048b5f00030902839607428748cb44c8f7630fc4396c139283e51de48b52",
+  "revised_questions_sha256": "1eb729c8cc48d12f27debf1c20d42f128a8e39563fb5645d9c71f53ddb066be2",
+  "record_hash_serialization": "UTF-8 JSON, ensure_ascii=False, sort_keys=True, separators=(',', ':')",
+  "changes": [
+    {
+      "question_id": "A-B035-Q05",
+      "reason": "Complete paragraph in the frozen PDF explicitly supports professional handling advice. Retain that complement and existing immediate-handwashing quote.",
+      "before_record_sha256": "7232523c8915280816e6bc6d277b4cdf88682000336246f98342a654c1bf8348",
+      "after_record_sha256": "5a714571d07dd751ab38106cf74b45b5e30f3e8da0dc051cc64917bdebee2f96",
+      "changed_fields": {
+        "reference_evidence": {
+          "before": [
+            {
+              "pdf_page": 3,
+              "section": "4. Manuseio",
+              "quote": "Não quebre os comprimidos de IMUSSUPREX® antes de tomá-los. Se você (ou a pessoa que cuida de você) tocar os comprimidos quebrados ou cobertos com pó, não deixe de lavar as mãos imediatamente.",
+              "source_region": null
+            }
+          ],
+          "after": [
+            {
+              "pdf_page": 3,
+              "section": "4. Manuseio",
+              "quote": "Não quebre os comprimidos de IMUSSUPREX® antes de tomá-los. Se você (ou a pessoa que cuida de você) tocar os comprimidos quebrados ou cobertos com pó, não deixe de lavar as mãos imediatamente.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 3,
+              "section": "4. Manuseio — continuação do parágrafo",
+              "quote": "É importante que as pessoas que cuidam dos doentes fiquem cientes da necessidade de manusear com segurança este medicamento. Peça o conselho de seu médico ou farmacêutico.",
+              "source_region": null
+            }
+          ]
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 3
+        }
+      }
+    },
+    {
+      "question_id": "A-B036-Q01",
+      "reason": "Frozen page 13 explicitly confirms soy and lists soy lecithin. Add missing support for unchanged expected information; preserve question and suppository scope.",
+      "before_record_sha256": "0391d17b989363d52866bfd70f4035214e6be924a1f7d9a4c9dd05ffa0b88db2",
+      "after_record_sha256": "86969fcea1d570e4b71055631eba2ba1153cd123f5d25014e726ccf6c5239d9f",
+      "changed_fields": {
+        "reference_evidence": {
+          "before": [
+            {
+              "pdf_page": 13,
+              "section": "3. Contraindicações — supositório",
+              "quote": "Se você é alérgico a soja ou amendoim, não use PROCTYL supositório.",
+              "source_region": null
+            }
+          ],
+          "after": [
+            {
+              "pdf_page": 13,
+              "section": "3. Contraindicações — supositório",
+              "quote": "Se você é alérgico a soja ou amendoim, não use PROCTYL supositório.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 13,
+              "section": "3. Contraindicações — supositório",
+              "quote": "Atenção: PROCTYL supositório contém soja.",
+              "source_region": null
+            }
+          ]
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 3
+        }
+      }
+    },
+    {
+      "question_id": "A-B038-Q07",
+      "reason": "Clarify expected-answer criteria only: preserve natural ambiguity and allow conditional explanation or clarification without assuming liquid identity. Both question variants and source remain unchanged.",
+      "before_record_sha256": "18bedbdce1038bf02c175217a1861923382f068ce1d10ca09fa70841a82980c2",
+      "after_record_sha256": "52cae0faf41ad6bcabb10d22dbd973e5529f1f8cfa5672a3ae36551dec953d0f",
+      "changed_fields": {
+        "expected_information": {
+          "before": "Preparação manda inspecionar segmento Y/bolsa: se solução, descartar; nota aceita algumas gotículas de água. Não generalizar exceção para qualquer quantidade/líquido.",
+          "after": "Explicar condicionalmente: a preparação manda descartar a unidade se houver solução no segmento de drenagem ou na bolsa; a nota aceita algumas gotículas de água. A pergunta não identifica o líquido encontrado: não presumir que seja água ou solução nem autorizar o uso com base nessa suposição. Pode pedir esclarecimento sem deixar de explicar a distinção documental."
+        },
+        "required_qualifiers": {
+          "before": [
+            "Ultrabag, antes da administração, gotículas DE ÁGUA; não criar limite numérico para distinguir solução."
+          ],
+          "after": [
+            "Ultrabag, antes da administração, gotículas DE ÁGUA; não criar limite numérico para distinguir solução.",
+            "Preservar a ambiguidade natural da pergunta; resposta condicional é suficiente, sem exigir identificação do líquido como pré-requisito artificial nem inventar critério visual para distingui-lo."
+          ]
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 3
+        }
+      }
+    }
+  ],
+  "unchanged_records": 97,
+  "all_question_variants_unchanged": true,
+  "unchanged_check": {
+    "question_id": "A-B035-Q08",
+    "record_sha256": "c88ad14ab7ab3f3b07481297cb5aae7136b204d9956b002a115b81630dd8e156",
+    "finding": "Original table visually confirms existing population/frequency associations. No record change or human approval."
+  },
+  "human_decisions_inherited": false,
+  "immutable_prior_batch_artifacts": {
+    "documentary_followup_checks.md": "85da2dbd2c71ff65f4d95e9c3f77bd27295807f0ff709bc45c96fcd4c63133ed",
+    "manifest.json": "2dcdfc4470e6d4c77c149da5112184ef2206369cbb6282a6940a4f80142e82ad",
+    "qc_revision2.json": "a9dd8df7fa0760ed295c44cee1e2a8dc5d0ca528f84c373641612a0cfef66403",
+    "qc_summary.json": "c7c76b9492676978498b0a2ff741f339589f5d9375deb6689ece9010a5329417",
+    "questions.draft.jsonl": "5d4f54932d39f85c382b8db1aa5124eed0e2237b9d031e4077ffb2bb065445af",
+    "questions.revision2.draft.jsonl": "1ecc048b5f00030902839607428748cb44c8f7630fc4396c139283e51de48b52",
+    "review.md": "b36c083fed7308ecf01a4859c2b2aa5e803c480ef923284a668e26da149f838d",
+    "revision_2_changes.json": "39ae9a86539ba198696cfa9111f426b4bd292df93c51052d4977584adeba95e3",
+    "sources.json": "4cf3762ca1b1fd0468719554d4e329dfbc14b1a4de62132feeb8dd9de60b5439",
+    "validation_report.md": "d1ffd4a54f920a80c6dd923ee6f56ff5428942c0e86be1fbaf7d8129727833e2"
+  }
+}

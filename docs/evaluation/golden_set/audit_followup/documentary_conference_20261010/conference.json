@@ -1,0 +1,1115 @@
+{
+  "status": "ai_assisted_documentary_conference_only_proposals_not_applied",
+  "date": "2026-10-10",
+  "method": "Complete native text of all physical pages for the 20 negatives, including exact repeated blocks and administrative pages; targeted visual inspection where layout could change interpretation. Supplemental literal passages are conference notes, not changes to reference_evidence.",
+  "human_decisions_created": 0,
+  "records_modified": 0,
+  "collection_frozen": false,
+  "negative_evaluation_scope": "PDF-target / scoped only; cross-bula absence has not been established over the complete corpus.",
+  "negative_cases": [
+    {
+      "id": "A-B001-Q10",
+      "sections": "Composition, physical page 2",
+      "passages": [
+        {
+          "page": 2,
+          "quote": "Cada comprimido mastigável de 4 mg contém 4,16 mg de montelucaste de sódio, que equivale a 4,0 mg do ácido livre."
+        }
+      ],
+      "analysis": "The salt quantity/equivalent montelukast amount and sodium-containing excipients do not state total elemental sodium in mg per 4 mg chewable tablet. Do not derive a chemical conversion.",
+      "doubt": "None material after assisted full-text conference; a related composition statement is not the requested sodium quantity.",
+      "question_id": "A-B001-Q10",
+      "draft_revision": 4,
+      "record_sha256": "b9b9edcb6a37696b9a5c1d20eff961cf47a7b9095a4c4dd1582ec9b1547e6263",
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "question_scoped": "Quantos miligramas de sódio elementar tem em um comprimido de mastigar de 4 mg?",
+      "question_cross_bula": "Quantos miligramas de sódio elementar tem em um comprimido de mastigar de Singulair de 4 mg?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B001/bula_1791246623844.pdf",
+      "pdf_sha256": "105cd1abc112b3fc2ad801d8ac1c3af5d0266e17702dab250e1ec59742b64692",
+      "pdf_page_count": 9,
+      "medication": "SINGULAIR",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "A-B009-Q09",
+      "sections": "Composition/energy p2; monitoring p4; posology p7",
+      "passages": [
+        {
+          "page": 2,
+          "quote": "Valor calórico: 8095kJ/L= 1935 kcal/L"
+        },
+        {
+          "page": 4,
+          "quote": "O balanço hídrico e/ou peso corporal devem ser monitorados diariamente."
+        },
+        {
+          "page": 7,
+          "quote": "No caso de um paciente que pesa 70 kg, uma dose diária de 2,0 g/kg de peso corporal/dia corresponde a uma dose máxima diária de 700 ml de Lipofundin MCT/LCT 20%."
+        }
+      ],
+      "analysis": "Energy content, daily weight monitoring and infusion volume for a 70 kg adult do not predict kilograms gained in one week. Treatment duration is not a weight-gain forecast.",
+      "doubt": "None material; preserve the distinction between input nutrition/infusion volume and outcome prediction.",
+      "question_id": "A-B009-Q09",
+      "draft_revision": 1,
+      "record_sha256": "88b957dcf62441d08f1466f563d2bdde69cd09be44ab49dd84d96e5f5b1e51cd",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "question_scoped": "Uma pessoa de 70 kg ganha quantos quilos em uma semana recebendo esse produto?",
+      "question_cross_bula": "Uma pessoa de 70 kg ganha quantos quilos em uma semana recebendo Lipofundin MCT/LCT 20%?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B009/bula_1791246779068.pdf",
+      "pdf_sha256": "07d1af1a55961b0b300d66f7ff77d15f88fd6522e03585feeeb48f81345d7cbb",
+      "pdf_page_count": 12,
+      "medication": "LIPOFUNDIN",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "A-B014-Q09",
+      "sections": "Pred FORT precautions p3 and adverse effects p6; separate Pred MILD leaflet later in the same PDF",
+      "passages": [
+        {
+          "page": 3,
+          "quote": "O uso prolongado de corticosteroides tópicos pode provocar o aumento da pressão intraocular em certos pacientes, o que pode ocasionar dano ao nervo óptico e falhas no campo visual."
+        },
+        {
+          "page": 3,
+          "quote": "É aconselhável a monitorização frequente da pressão intraocular."
+        }
+      ],
+      "analysis": "The source reports elevated intraocular pressure and monitoring, but no expected increment in mmHg. Do not transfer strength-specific statements from Pred MILD to Pred FORT.",
+      "doubt": "Related risk information can be explained without inventing a numeric increment.",
+      "question_id": "A-B014-Q09",
+      "draft_revision": 1,
+      "record_sha256": "1f87e1457ad06fca31659f23c3e961d37f5b7eddd8ffac7c74fcfb500c9b1302",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "question_scoped": "Quanto a pressão do olho pode subir com Pred Fort, em mmHg?",
+      "question_cross_bula": "Quanto a pressão do olho pode subir com o colírio Pred Fort da Allergan, em mmHg?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B014/bula_1791246832147.pdf",
+      "pdf_sha256": "073b06975ba201c153fd9d58a9ed09f1f638875165c2e776246809bf44c47d81",
+      "pdf_page_count": 26,
+      "medication": "Pred Fort / Pred Mild",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "A-B016-Q10",
+      "sections": "Contraindications p2; administration/treatment course p3",
+      "passages": [
+        {
+          "page": 2,
+          "quote": "Este medicamento é contra-indicado na gravidez, categoria de risco B."
+        }
+      ],
+      "analysis": "Pregnancy contraindication and treatment duration do not establish a post-treatment interval before attempting pregnancy. Do not turn the treatment course into a conception waiting period.",
+      "doubt": "No documentary washout interval identified.",
+      "question_id": "A-B016-Q10",
+      "draft_revision": 1,
+      "record_sha256": "6e8a4e58c38e20bbc736984fd46909e0b183fc968217c42cacb7d5b1638d5268",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "question_scoped": "Depois de terminar o tratamento, quanto tempo preciso esperar para tentar engravidar?",
+      "question_cross_bula": "Depois de terminar Imuno BCG da Fundação Ataulpho de Paiva, quanto tempo preciso esperar para tentar engravidar?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B016/bula_1791246837814.pdf",
+      "pdf_sha256": "53eac092c91276dd34b899a286f2b20b3b31eec972f10492e0080b13abf33fe4",
+      "pdf_page_count": 4,
+      "medication": "IMUNO  BCG",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "A-B021-Q10",
+      "sections": "Composition/interactions p2; administration p3; overdose p4",
+      "passages": [
+        {
+          "page": 2,
+          "quote": "Colecalciferol (vitamina D3)...................150 U.I"
+        },
+        {
+          "page": 2,
+          "quote": "Não há relato de interações com alimentos ou medicamentos até o momento."
+        },
+        {
+          "page": 4,
+          "quote": "A superdosagem leva à hipercalciúria e hipercalcemia"
+        }
+      ],
+      "analysis": "Vitamin D content and the absence of reported interactions do not establish how to adjust a separate vitamin D supplement. Overdose information is not a supplementation algorithm; do not calculate or authorize a combined dose.",
+      "doubt": "A human individual decision is missing from the saved events. This assisted finding does not supply that decision.",
+      "question_id": "A-B021-Q10",
+      "draft_revision": 1,
+      "record_sha256": "29ad106fc7ffdc8caad70b0b58a29d71431966381b808231ebedf194a0a3c0d3",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "question_scoped": "Meu bebê já toma vitamina D em gotas. Preciso mudar a quantidade das gotas quando uso esse produto?",
+      "question_cross_bula": "Meu bebê já toma vitamina D em gotas. Preciso mudar a quantidade das gotas quando uso Camomilina C?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B021/bula_1791246895251.pdf",
+      "pdf_sha256": "db4c16b6b044a1234f66dc5c06468bd49ebac99189c249d35bced4f32f282d64",
+      "pdf_page_count": 7,
+      "medication": "CAMOMILINA C",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "A-B026-Q09",
+      "sections": "Indications p2; administration p3-4",
+      "passages": [
+        {
+          "page": 2,
+          "quote": "Este medicamento é utilizado como auxiliar no pré-parto, pré-operatório e na lavagem intestinal."
+        },
+        {
+          "page": 3,
+          "quote": "O modo correto de aplicação e administração do medicamento é pela via retal."
+        }
+      ],
+      "analysis": "Rectal lavage, including preparation for procedures, does not establish a fasting requirement. No oral food/fasting rule for this use was identified in the complete PDF.",
+      "doubt": "Do not import generic preoperative fasting instructions.",
+      "question_id": "A-B026-Q09",
+      "draft_revision": 1,
+      "record_sha256": "f93dfb6ebe9e509619bdb137f0272308a52afdf4d733c3417197c374b1c433c6",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "question_scoped": "Preciso ficar em jejum antes dessa lavagem intestinal?",
+      "question_cross_bula": "Preciso ficar em jejum antes da lavagem intestinal com Glicerina 12% da Halex Istar?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B026/bula_1791246964608.pdf",
+      "pdf_sha256": "b16d579b142fb69d6435ad5d90b2b699e036ffd1d4a6109736350f9f8e250bf5",
+      "pdf_page_count": 7,
+      "medication": "GLICERINA 12%",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "A-B030-Q09",
+      "sections": "Hirudoid GEL precautions/administration p3; additional gel and ointment presentations in the same PDF",
+      "passages": [
+        {
+          "page": 3,
+          "quote": "Até o momento não foram relatadas interações entre HIRUDOID® GEL e outras substâncias."
+        }
+      ],
+      "analysis": "No reported interactions and application instructions do not establish sunscreen/gel layering order, timing or compatibility. Keep GEL distinct from ointment instructions.",
+      "doubt": "Absence of interaction reports is not permission to layer products in a specified order.",
+      "question_id": "A-B030-Q09",
+      "draft_revision": 1,
+      "record_sha256": "f47a2d9d3de32d72efea48130caf8949d24d4795a8b819c9e058e9e39aa98be9",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "question_scoped": "Uso protetor solar na perna. Qual passo primeiro: o protetor ou o gel?",
+      "question_cross_bula": "Uso protetor solar na perna. Qual passo primeiro: o protetor ou Hirudoid gel da Daiichi Sankyo?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B030/bula_1791247046273.pdf",
+      "pdf_sha256": "955bbd5eef54efdac8c98e55974b1b399539aff78f812c7a38d114069f312aed",
+      "pdf_page_count": 19,
+      "medication": "HIRUDOID",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "A-B038-Q10",
+      "sections": "Single Bag monitoring p4; dialysis losses p5; salt warning p7; overdose p9; UltraBag leaflet later",
+      "passages": [
+        {
+          "page": 5,
+          "quote": "Durante a Diálise Peritoneal poderão ocorrer perdas significativas de proteínas, aminoácidos, vitaminas hidrossolúveis e outros medicamentos."
+        },
+        {
+          "page": 5,
+          "quote": "Quando se fizer necessário poderá ser estabelecida uma terapia de reposição."
+        }
+      ],
+      "analysis": "Losses and a possible replacement therapy do not specify which foods to prioritize. Salt/electrolyte warnings and overdose measures do not supply a patient meal plan. Keep Single Bag/UltraBag instructions separate.",
+      "doubt": "A bounded answer may mention losses; no source-based list of recommended foods was found.",
+      "question_id": "A-B038-Q10",
+      "draft_revision": 1,
+      "record_sha256": "8a3906a6945c2abc87d6586bd6c22482183476ffafd4777d876a9766f1a569e4",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "question_scoped": "Que alimentos devo priorizar nas refeições enquanto faço diálise com Single Bag?",
+      "question_cross_bula": "Que alimentos devo priorizar nas refeições enquanto faço diálise com Dianeal PD-2 Single Bag da Baxter?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B038/bula_1791247291427.pdf",
+      "pdf_sha256": "6af0132b12d269b8997c6085e335fbe0a183d8f0acd32d8d6076806db4001456",
+      "pdf_page_count": 28,
+      "medication": "DIANEAL PD-2",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "A-B040-Q10",
+      "sections": "Dodoy food interactions p5; oral/drop administration p5-6",
+      "passages": [
+        {
+          "page": 5,
+          "quote": "Não há dados disponíveis até o momento sobre a interação entre alimentos e dipirona."
+        }
+      ],
+      "analysis": "The absence of food-interaction data does not demonstrate stability, delivery of the full dose or compatibility when mixing drops in yogurt. Drop instructions do not establish mixing permission.",
+      "doubt": "Do not turn no data into safe mixing.",
+      "question_id": "A-B040-Q10",
+      "draft_revision": 1,
+      "record_sha256": "2c495aa90864a2e1a079d5512fabf70eea13931ba7d481daf0466d3dc66e65df",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "question_scoped": "Posso misturar as gotas no iogurte para ficar mais fácil de tomar?",
+      "question_cross_bula": "Posso misturar Dodoy gotas da Jarrell no iogurte para ficar mais fácil de tomar?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B040/bula_1791247250853.pdf",
+      "pdf_sha256": "8d18fe70ec6b52c6c47293c04fe0b96a0d1103cb42d359d2be667ff83a7fc7a0",
+      "pdf_page_count": 9,
+      "medication": "DODOY",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "A-B045-Q09",
+      "sections": "Salonsip storage and administration p13; distinct spray/gel leaflets p1-10",
+      "passages": [
+        {
+          "page": 13,
+          "quote": "Após aberto, mantenha o emplastro restante no envelope fechado, longe de fontes de calor e umidade."
+        }
+      ],
+      "analysis": "The heat warning concerns storage of remaining patches, not use of a hot-water bag over an applied patch. Bandage/adhesion instructions do not establish heat safety. Do not transfer aerosol restrictions to the patch.",
+      "doubt": "No sufficient heat-use instruction found; no conclusion of safety or absolute clinical prohibition.",
+      "question_id": "A-B045-Q09",
+      "draft_revision": 1,
+      "record_sha256": "d322c1b8400c51bbc1b18e4343579e1ae8867c4c67fcb1398cbdb5d2926ca160",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "question_scoped": "Posso usar uma bolsa de água quente por cima do emplastro para aliviar mais?",
+      "question_cross_bula": "Posso usar uma bolsa de água quente por cima do emplastro Salonsip para aliviar mais?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B045/bula_1791247383810.pdf",
+      "pdf_sha256": "1a18cf5583b059f5ec7164ad44ef8d98b574e132e3c0b96d5570daf9f39fb266",
+      "pdf_page_count": 15,
+      "medication": "Air Salonpas / Salonpas Gel / Salonsip",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "B-CB013-Q09",
+      "sections": "Diet/regular meals p3; breakfast administration p6; hypoglycemia/overdose p8",
+      "passages": [
+        {
+          "page": 6,
+          "quote": "A administração do seu(s) comprimido(s) deve ser sempre seguida por uma refeição."
+        },
+        {
+          "page": 8,
+          "quote": "uma dose excessiva resulta em hipoglicemia que deve ser tratada imediatamente com a administração de açúcar (4 a 6 torrões de açúcar) ou uma bebida adocicada e seguida de um lanche ou refeição substancial."
+        }
+      ],
+      "analysis": "Taking tablets with a meal and emergency sugar instructions do not specify grams of carbohydrate for routine breakfast. Keep overdose/hypoglycemia measures outside a routine meal prescription.",
+      "doubt": "No breakfast carbohydrate target identified.",
+      "question_id": "B-CB013-Q09",
+      "draft_revision": 1,
+      "record_sha256": "f23f83711e895720cc5d5d5f74413d75f73cb8fb4191deb21a5299f839864bef",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "question_scoped": "No café da manhã, quantos gramas de carboidrato preciso comer junto com o remédio?",
+      "question_cross_bula": "No café da manhã, quantos gramas de carboidrato preciso comer junto com gliclazida de liberação prolongada de 30 mg da Torrent?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB013/bula_1791329516988.pdf",
+      "pdf_sha256": "a6e22a82de8a2a9a5f03f0a8f16907d50a5bc0169a9e5fb50b6a5a0c2edbe826",
+      "pdf_page_count": 11,
+      "medication": "gliclazida",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "B-CB026-Q09",
+      "sections": "Precautions on infections/viral symptoms p2-3; interactions",
+      "passages": [
+        {
+          "page": 3,
+          "quote": "Adolescentes não devem ser tratados com medicamentos que contenham nimesulida caso estejam presentes sintomas de infecção viral (por vírus), pois a nimesulida pode estar associada com a Síndrome de Reye em alguns pacientes."
+        }
+      ],
+      "analysis": "A warning about adolescents with viral-infection symptoms does not establish influenza vaccination timing while using nimesulide. Viral illness and vaccination are different propositions.",
+      "doubt": "No documentary vaccine interval or instruction to delay vaccination found.",
+      "question_id": "B-CB026-Q09",
+      "draft_revision": 1,
+      "record_sha256": "500009ff30d98d32af58b51b87f83d9a277ce886b515b07709c49a03d8bfacef",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "question_scoped": "Preciso adiar a vacina contra gripe enquanto estiver tomando?",
+      "question_cross_bula": "Preciso adiar a vacina contra gripe enquanto estiver tomando nimesulida da Vitamedic?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB026/bula_1791329621948.pdf",
+      "pdf_sha256": "06a05ae6e200e3d9e31aef6fc44a467ea7cf96c49b1f92069c4971977d7026b9",
+      "pdf_page_count": 10,
+      "medication": "NIMESULIDA",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "B-CB027-Q09",
+      "sections": "Oral presentation p2; tablet administration p5",
+      "passages": [
+        {
+          "page": 2,
+          "quote": "Comprimidos 15 mg: embalagem contendo 10 comprimidos de 15 mg. USO ORAL"
+        }
+      ],
+      "analysis": "The PDF describes oral tablets, not an oral-to-injectable switch. Oral doses and food instructions do not establish route conversion, overlap or injection administration.",
+      "doubt": "No switch protocol; do not manufacture equivalent injected doses.",
+      "question_id": "B-CB027-Q09",
+      "draft_revision": 1,
+      "record_sha256": "5a391e1eff4c961e190cba662392c9847edfc75df7a09f393bfb080d3ea2bcee",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "question_scoped": "Vou trocar o comprimido pela injeção de meloxicam. Como faço essa mudança?",
+      "question_cross_bula": "Vou trocar o comprimido de meloxicam da Cellera pela injeção de meloxicam. Como faço essa mudança?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB027/bula_1791329625718.pdf",
+      "pdf_sha256": "95982b216523fe6b8ae72fc2551877dfe119527e8c660b621d70a8ade34b4a85",
+      "pdf_page_count": 10,
+      "medication": "meloxicam",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "B-CB029-Q10",
+      "sections": "Indications p2; interaction list p5; maximum treatment duration p5-6",
+      "passages": [
+        {
+          "page": 5,
+          "quote": "o uso concomitante com outros anti-inflamatórios não esteroides (Ex: dipirona, piroxican, diclofenaco, nimesulida, ibuprofeno, paracetamol)"
+        }
+      ],
+      "analysis": "Other analgesics appear in an interaction context, not a substitution recommendation after stopping ketorolac. Short-course duration does not select the next treatment.",
+      "doubt": "Do not repurpose an interaction list as replacement options.",
+      "question_id": "B-CB029-Q10",
+      "draft_revision": 1,
+      "record_sha256": "163c9d7224ab63a2fa182c1415a1723430a755da6124206ffdbcb5a54c7e02e2",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "question_scoped": "Acabei o tratamento e a dor continua. Qual remédio posso usar no lugar dele?",
+      "question_cross_bula": "Acabei o tratamento com trometamol cetorolaco sublingual da União Química e a dor continua. Qual remédio posso usar no lugar dele?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB029/bula_1791329632161.pdf",
+      "pdf_sha256": "25b4fe58fccff61a2a522845767bb78b6bd6e8744f4345ca290a17b6f36f54be",
+      "pdf_page_count": 10,
+      "medication": "trometamol cetorolaco",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "B-CB030-Q10",
+      "sections": "Surgical suspension p3-4; missed-dose instructions p6",
+      "passages": [
+        {
+          "page": 3,
+          "quote": "A terapia com o ácido acetilsalicílico deverá ser suspensa, no mínimo, 2 semanas antes de cirurgias."
+        }
+      ],
+      "analysis": "The preoperative suspension period does not establish postoperative restart timing. Routine missed-dose resumption is not a postoperative instruction.",
+      "doubt": "Do not reverse the two-week preoperative rule.",
+      "question_id": "B-CB030-Q10",
+      "draft_revision": 1,
+      "record_sha256": "c22cc5a195da042259e656eb5ac58fa96ff5f900dd8b551bd7f8a8151f6373c6",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "question_scoped": "Já fiz a cirurgia e o remédio foi suspenso antes. Quando posso voltar a tomar?",
+      "question_cross_bula": "Já fiz a cirurgia e Calmador do Laboratório Saúde foi suspenso antes. Quando posso voltar a tomar?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB030/bula_1791246726579.pdf",
+      "pdf_sha256": "61d8fb8db6763fd3ebea0ed76baba62c052f2587b68838f6514cfc845c6bb9c2",
+      "pdf_page_count": 10,
+      "medication": "CALMADOR",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "B-CB031-Q09",
+      "sections": "20 mg fluoxetine food interactions p11; weight/appetite adverse effects p12; stopping/overdose p13; 10 mg leaflet p1-7",
+      "passages": [
+        {
+          "page": 11,
+          "quote": "O cloridrato de fluoxetina pode ser administrado com alimentos sem que interações ocorram."
+        },
+        {
+          "page": 12,
+          "quote": "diminuição de peso"
+        },
+        {
+          "page": 12,
+          "quote": "diminuição do apetite [incluindo anorexia (falta de apetite)]"
+        }
+      ],
+      "analysis": "Food compatibility and weight/appetite effects do not supply a diet for regaining weight while continuing treatment. Do not import a nutrition plan or confuse the two capsule strengths.",
+      "doubt": "No dietary weight-recovery plan identified.",
+      "question_id": "B-CB031-Q09",
+      "draft_revision": 1,
+      "record_sha256": "98bdaa3e8f9ad99a6777962284dc0f0b17311ab0978b13778e3513e5dfac7036",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "question_scoped": "Emagreci depois de começar. Que dieta devo seguir para recuperar o peso sem parar o remédio?",
+      "question_cross_bula": "Emagreci depois de começar fluoxetina 20 mg da Eurofarma. Que dieta devo seguir para recuperar o peso sem parar o remédio?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB031/bula_1791329635147.pdf",
+      "pdf_sha256": "51b7bec49c8aa2ae935fb9e3cda8d280c5bcff9f02423b5bef8745732310895e",
+      "pdf_page_count": 16,
+      "medication": "cloridrato de fluoxetina",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "B-CB041-Q09",
+      "sections": "Cholesterol/LDL indication p2; administration and LDL-goal reference p4",
+      "passages": [
+        {
+          "page": 4,
+          "quote": "Se você não conseguir atingir a sua meta de colesterol LDL utilizando sinvastatina 40 mg, seu médico deve mudar para outro medicamento para reduzir o colesterol."
+        }
+      ],
+      "analysis": "The PDF mentions a patient's LDL goal but does not specify the individual's target value. A 40 mg medicine dose is not an LDL concentration goal.",
+      "doubt": "No individualized numeric LDL target provided.",
+      "question_id": "B-CB041-Q09",
+      "draft_revision": 1,
+      "record_sha256": "380633099b83e613a7c8b706281283293343f26fb026c375972d680de7d59be2",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "question_scoped": "Qual valor de colesterol LDL eu preciso alcançar no meu caso?",
+      "question_cross_bula": "Qual valor de colesterol LDL eu preciso alcançar usando sinvastatina da Sandoz?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB041/bula_1791329706258.pdf",
+      "pdf_sha256": "a035d824170c0971803bbc1b48899f5f662f6aed326c009dfde483de99a7e482",
+      "pdf_page_count": 6,
+      "medication": "SINVASTATINA",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "B-CB042-Q09",
+      "sections": "Oral contraceptives and pregnancy warning p3; adolescent counseling p4",
+      "passages": [
+        {
+          "page": 3,
+          "quote": "São conhecidas outras interações medicamentosas, avise seu médico se você fizer uso de: antiácidos, colestipol, digoxina, azitromicina, contraceptivos orais (pílulas), varfarina e ácido fusídico."
+        }
+      ],
+      "analysis": "A reference to oral contraceptives does not establish effects on an arm implant. Pregnancy-prevention warnings do not prove contraceptive interaction direction or implant efficacy.",
+      "doubt": "Do not extrapolate oral contraceptives to implants or infer reduced/unchanged efficacy.",
+      "question_id": "B-CB042-Q09",
+      "draft_revision": 1,
+      "record_sha256": "e4e1525c0d9ef053b890d1caf47112ba71c66fcb42d73f23da7c113bdc6bacc5",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "question_scoped": "Esse remédio diminui o efeito do implante anticoncepcional no braço?",
+      "question_cross_bula": "Atorvastatina cálcica da Eurofarma diminui o efeito do implante anticoncepcional no braço?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB042/bula_1791329709865.pdf",
+      "pdf_sha256": "f424f5a25f2fe5e76e80a72b3e67982e8714ae76d8d9af3c7cf0f57ed0a3427b",
+      "pdf_page_count": 7,
+      "medication": "ATORVASTATINA CÁLCICA",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "B-CB043-Q09",
+      "sections": "Interactions p3; administration with/without food p5",
+      "passages": [
+        {
+          "page": 5,
+          "quote": "com água, a qualquer hora do dia, com ou sem alimentos."
+        }
+      ],
+      "analysis": "General food timing and taking tablets with water do not answer specific grapefruit-juice compatibility. No toranja-specific support was found in the full PDF.",
+      "doubt": "Do not import grapefruit warnings from other statin PDFs.",
+      "question_id": "B-CB043-Q09",
+      "draft_revision": 1,
+      "record_sha256": "285e8be74a04ec256ff589b9a9382951f5e0f653ee22be0763fb0765137e6ac2",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "question_scoped": "Posso tomar suco de toranja enquanto uso esse remédio?",
+      "question_cross_bula": "Posso tomar suco de toranja enquanto uso rosuvastatina cálcica da Novartis?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB043/bula_1791329713235.pdf",
+      "pdf_sha256": "1f88a64dc5819933e252dae6c347f24fc32c89a4f5d818feb70dce6045eee30c",
+      "pdf_page_count": 9,
+      "medication": "rosuvastatina cálcica",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    },
+    {
+      "id": "B-CB045-Q09",
+      "sections": "Pregnancy contraindication p3; pregnancy/interaction precautions p4",
+      "passages": [
+        {
+          "page": 3,
+          "quote": "Este medicamento é contraindicado para uso por mulheres grávidas ou amamentando."
+        }
+      ],
+      "analysis": "Pregnancy restrictions and other drug interactions do not establish whether the combination reduces contraceptive-pill efficacy. Pregnancy risk is not evidence of a contraceptive failure interaction.",
+      "doubt": "No sufficient pill-efficacy support found.",
+      "question_id": "B-CB045-Q09",
+      "draft_revision": 1,
+      "record_sha256": "24a598de3295672e6b15fab68dcb37ebb942162420b2ef1e2990629fd95d3e8f",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "question_scoped": "Esse comprimido corta o efeito da pílula anticoncepcional?",
+      "question_cross_bula": "Ezetimiba com sinvastatina da EMS corta o efeito da pílula anticoncepcional?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB045/bula_1791329715920.pdf",
+      "pdf_sha256": "1cfb6036ee5dc4dd8b3937839fd0d08b13a103ac226a6259550998c84a57c66d",
+      "pdf_page_count": 12,
+      "medication": "ezetimiba + sinvastatina",
+      "required_qualifiers": [],
+      "physical_pages_examined": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "assisted_conclusion": "insufficient_for_requested_conclusion",
+      "human_full_document_check_not_asserted": true
+    }
+  ],
+  "p0_cases": [
+    {
+      "id": "A-B017-Q05",
+      "passages": [
+        {
+          "page": 2,
+          "quote": "Não use este medicamento caso tenha problemas no estômago."
+        },
+        {
+          "page": 6,
+          "quote": "Na ocorrência de distúrbios gastrintestinais, administrar CAPSFEN® com as refeições ou leite."
+        }
+      ],
+      "finding": "Source-level tension between a broad stomach warning and a food/milk instruction for gastrointestinal disturbances. The current expected information already retains both conditions.",
+      "proposal": "Preserve the record. Explain both instructions without treating food/milk as permission for a contraindicated user. No demonstrated material defect requires a fresh individual review.",
+      "question_id": "A-B017-Q05",
+      "draft_revision": 1,
+      "record_sha256": "cae21d97fa6a6c308b56348b77fd4f0822883800ca1da631e3990d0bfb9de7bb",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "question_scoped": "Se der desconforto no estômago, preciso tomar em jejum?",
+      "question_cross_bula": "Se CAPSFEN der desconforto no estômago, preciso tomar em jejum?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B017/bula_1791246840451.pdf",
+      "pdf_sha256": "7e3b8525ce01e98b77ab7c5f8d1da2dbc1e7388d6227bbd2118655489bbcf4f4",
+      "pdf_page_count": 9,
+      "medication": "CAPSFEN",
+      "required_qualifiers": [
+        "Pergunta sobre forma de tomada em distúrbio gastrintestinal; não autorizar manutenção diante de problema gástrico ou sangramento."
+      ]
+    },
+    {
+      "id": "A-B026-Q08",
+      "passages": [
+        {
+          "page": 2,
+          "quote": "não provoca cólicas ou irritações sensíveis"
+        },
+        {
+          "page": 4,
+          "quote": "cólicas intestinais e diarreia"
+        }
+      ],
+      "finding": "Real source tension, visually confirmed: section 2 claims no sensitive colic/irritation; section 8 lists colic and diarrhea. The expected information already acknowledges the tension.",
+      "proposal": "Preserve the record; describe the adverse-effect statement and the conflicting wording without promising absence of colic or clinically reconciling the source.",
+      "question_id": "A-B026-Q08",
+      "draft_revision": 1,
+      "record_sha256": "3c2d0ebc73f7d88833e0b7dc084b1641a5ae52c05f2777fa471270096df53da3",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "question_scoped": "Pode dar cólica ou diarreia depois da aplicação?",
+      "question_cross_bula": "Pode dar cólica ou diarreia depois da aplicação de Glicerina 12% da Halex Istar?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B026/bula_1791246964608.pdf",
+      "pdf_sha256": "b16d579b142fb69d6435ad5d90b2b699e036ffd1d4a6109736350f9f8e250bf5",
+      "pdf_page_count": 7,
+      "medication": "GLICERINA 12%",
+      "required_qualifiers": [
+        "Reações locais descritas; não garantir ausência de cólica."
+      ]
+    },
+    {
+      "id": "A-B035-Q03",
+      "passages": [
+        {
+          "page": 4,
+          "quote": "IMUSSUPREX® deve ser administrado pelo menos 1 hora antes ou 3 horas após refeição ou ingestão de leite."
+        },
+        {
+          "page": 6,
+          "quote": "Com a administração oral, a náusea parece aliviada pela administração dos comprimidos após as refeições. Contudo, a administração de comprimidos de azatioprina após as refeições pode reduzir a absorção oral, pelo que a monitorização da eficácia terapêutica deve ser considerada após a administração deste modo."
+        }
+      ],
+      "finding": "Administration timing coexists with a paragraph on nausea after meals and reduced absorption. The current expected information and qualifiers already preserve timing, absorption caveat and professional monitoring.",
+      "proposal": "Preserve the record. Do not independently replace the timing instruction or infer a clinical exception.",
+      "question_id": "A-B035-Q03",
+      "draft_revision": 2,
+      "record_sha256": "c7d6b78cfd5e6ad95b4dee52fcb86bab7cc3cf3e497fea1b75516c533e33b623",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "question_scoped": "Posso tomar junto com o café da manhã e leite?",
+      "question_cross_bula": "Posso tomar Imussuprex da Germed junto com o café da manhã e leite?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B035/bula_1791247139052.pdf",
+      "pdf_sha256": "6a3255668e798ff56f9bb41027ae282152b7b1129a3945aa8bb8168b87c85f81",
+      "pdf_page_count": 11,
+      "medication": "IMUSSUPREX",
+      "required_qualifiers": [
+        "Pelo menos 1 hora antes OU 3 horas depois; preservar refeição e leite. Não sugerir mudança independente por náusea."
+      ]
+    },
+    {
+      "id": "B-CB021-Q01",
+      "passages": [
+        {
+          "page": 1,
+          "quote": "Santisa Laboratório Farmacêutico S/A."
+        },
+        {
+          "page": 2,
+          "quote": "Solução injetável 500 mg/mL: embalagem com 100 ampolas de 2 mL."
+        }
+      ],
+      "finding": "Direct examination of both frozen 50-row manifests identifies one dipyrone/Santisa target: CB021, registered product 101860036. The other Santisa target is gentamicin/Gentamisan (B019); other dipyrone-related targets have different responsible entities/products.",
+      "proposal": "Preserve the question and expected information. The name plus Santisa identifies this target within the frozen 100-PDF collection without revealing injection as the answer. This is not a claim of uniqueness across the market.",
+      "question_id": "B-CB021-Q01",
+      "draft_revision": 1,
+      "record_sha256": "6e0748e360bf159db851a535e5dede81521d39ce4fc5c0104cb13b7c48773575",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "question_scoped": "Essa apresentação é de gotas ou de injeção?",
+      "question_cross_bula": "A dipirona monoidratada da Santisa é de gotas ou de injeção?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB021/bula_1791329599897.pdf",
+      "pdf_sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db",
+      "pdf_page_count": 11,
+      "medication": "dipirona",
+      "required_qualifiers": [
+        "Documento injetável; não aplicar tabela de gotas ou dar por via oral."
+      ]
+    },
+    {
+      "id": "B-CB025-Q05",
+      "passages": [
+        {
+          "page": 2,
+          "quote": "sofre de insuficiência hepática ou renal;"
+        },
+        {
+          "page": 3,
+          "quote": "doença grave no fígado ou nos rins"
+        },
+        {
+          "page": 4,
+          "quote": "Se você apresenta qualquer problema hepático, renal ou sanguíneo, você deverá realizar exames de sangue durante o tratamento"
+        }
+      ],
+      "finding": "Monitoring language coexists with contraindications. The expected information already preserves hepatic insufficiency, but registered quotes cite page 3's severe-disease wording and page 4 monitoring, not page 2's broader hepatic/renal-insufficiency bullet.",
+      "proposal": "Propose adding the page 2 contraindication introduction/bullet as documentary context only. Preserve question, classification and expected information; do not infer that tests permit use or narrow page 2 to severe disease. Await authorization; no reference changed.",
+      "question_id": "B-CB025-Q05",
+      "draft_revision": 1,
+      "record_sha256": "374687ef07f8738ac04360ba6ac1e55eb0d8fc0052263cb7c1b3c880a28fbb5b",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "question_scoped": "Quem tem problema no fígado precisa fazer exames durante o tratamento?",
+      "question_cross_bula": "Quem tem problema no fígado precisa fazer exames durante o tratamento com diclofenaco sódico injetável da Halex Istar?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB025/bula_1791329617813.pdf",
+      "pdf_sha256": "7d7cdf890bd46c0375c3d99bf47e5ac77a4142555811f5795b96fab2d9f59df8",
+      "pdf_page_count": 9,
+      "medication": "DICLOFENACO SÓDICO",
+      "required_qualifiers": [
+        "Exames não equivalem a liberação em doença contraindindicada; não inventar frequência."
+      ]
+    },
+    {
+      "id": "B-CB038-Q04",
+      "passages": [
+        {
+          "page": 6,
+          "quote": "Este medicamento não deve ser partido, aberto ou mastigado."
+        },
+        {
+          "page": 7,
+          "quote": "de no mínimo, 2 semanas"
+        }
+      ],
+      "finding": "Dose reduction wording does not authorize splitting/opening a capsule. The current expected information and qualifiers already require individualized professional tapering and prohibit a self-generated schedule/manipulation.",
+      "proposal": "Preserve the record. Do not interpret a dose fraction as permission to cut the capsule; no new formulation or dosage scheme is needed.",
+      "question_id": "B-CB038-Q04",
+      "draft_revision": 1,
+      "record_sha256": "421b9169f018feafc3b30db02f2348877522f2345a88501a79f52c9ef18248d3",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "question_scoped": "Estou pensando em parar. Pode tirar esse remédio de uma vez?",
+      "question_cross_bula": "Estou pensando em parar cloridrato de duloxetina da União Química, produzido pela Anovis. Pode tirar de uma vez?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB038/bula_1791329694894.pdf",
+      "pdf_sha256": "f54cac847bdfccdc10420329c24fa626cc1c6ff78c3fb86cb9784d620abc3490",
+      "pdf_page_count": 13,
+      "medication": "cloridrato de duloxetina",
+      "required_qualifiers": [
+        "Não fornecer esquema pessoal, partir/abrir a cápsula ou indicar suspensão por conta própria; o prazo mínimo não é igual para todos."
+      ]
+    }
+  ],
+  "individual_proposals": [
+    {
+      "id": "A-B013-Q05",
+      "passages": [
+        {
+          "page": 6,
+          "quote": "Crianças: Molhar uma haste flexível com ponta de algodão no produto e passar nas áreas afetadas da boca. Para uma melhor ação do produto, é aconselhável não comer ou beber durante 30 minutos após o uso."
+        }
+      ],
+      "finding": "Visual layout puts the 30-minute sentence immediately below the children's instructions; the adult paragraph is separate. This demonstrates an underspecified population in the current question/qualifier, not that adults must not wait or that the instruction cannot ever apply to adults.",
+      "proposed_scoped": "Depois de usar essa solução na boca de uma criança, é preciso esperar para comer ou beber?",
+      "proposed_cross_bula": "Depois de usar Malvatricin solução para diluição da Megalabs na boca de uma criança, é preciso esperar para comer ou beber?",
+      "proposal": "Semantic scope correction, not just wording: bind the answer to the children's block on physical page 6. Retain the advisable 30-minute interval, not a mandatory absolute rule. Preserve formulation, do not import instructions for PPU or describe a new pediatric dosing regimen. Confirm authorization before revising.",
+      "question_id": "A-B013-Q05",
+      "draft_revision": 1,
+      "record_sha256": "b91fad2b30064808ba4d928159a8b7d4dfbdc07706e7b197bdcc01b5b9c4ab3e",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "question_scoped": "Depois de usar a solução para diluir, preciso esperar para comer ou beber?",
+      "question_cross_bula": "Depois de usar Malvatricin solução para diluição da Megalabs, preciso esperar para comer ou beber?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B013/bula_1791246828833.pdf",
+      "pdf_sha256": "48b7e398c494c5f78745ac163f1fa0ea848c8b8efb2b3d2ed0e4fe3f77e6da38",
+      "pdf_page_count": 15,
+      "medication": "MALVATRICIN",
+      "required_qualifiers": [
+        "Pós-uso; não inventar interação alimentar específica."
+      ]
+    },
+    {
+      "id": "B-CB011-Q02",
+      "passages": [
+        {
+          "page": 3,
+          "quote": "se estiver com problema de funcionamento grave dos rins (depuração de creatinina abaixo de 30 mL/min ou taxa de filtração glomerular estimada (TFGe) abaixo de 30 mL/min/1,73m2);"
+        }
+      ],
+      "finding": "The existing precise numeric user condition is documentarily supported but unnecessarily technical as a patient question. A renal-contraindication question can put the indispensable threshold in the answer without broadening to treatment decisions for every level of renal impairment.",
+      "proposed_scoped": "Tem algum problema nos rins que impeça o uso desse remédio?",
+      "proposed_cross_bula": "Tem algum problema nos rins que impeça o uso da metformina de liberação prolongada da Merck?",
+      "proposal": "Acknowledge semantic reframing from a person already below a numerical threshold to the documented renal restriction. Keep the threshold and the OR between clearance/TFGe mandatory in the expected information. Do not imply values above 30 authorize use, prescribe a dose or require unrelated moderate-impairment dosing details. Await approval before revising.",
+      "question_id": "B-CB011-Q02",
+      "draft_revision": 1,
+      "record_sha256": "3c14f76d61dcb361b4c6c2c987f32c5ca9358cd5f4bd246d5c30dfe269af243d",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "question_scoped": "Minha taxa de filtração dos rins está abaixo de 30 mL/min/1,73 m². Posso usar esse remédio?",
+      "question_cross_bula": "Minha taxa de filtração dos rins está abaixo de 30 mL/min/1,73 m². Posso usar metformina de liberação prolongada da Merck?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB011/bula_1791329509872.pdf",
+      "pdf_sha256": "e56c40afc2b62c3130f4a615b1696c28b732436c57265a2797f3fac44f8e04cc",
+      "pdf_page_count": 15,
+      "medication": "CLORIDRATO DE METFORMINA",
+      "required_qualifiers": [
+        "TFGe abaixo de 30 com sua unidade, sem exigir também depuração de creatinina baixa; limite não significa segurança acima dele."
+      ]
+    },
+    {
+      "id": "A-B021-Q10",
+      "passages": [
+        {
+          "page": 2,
+          "quote": "Colecalciferol (vitamina D3)...................150 U.I"
+        },
+        {
+          "page": 2,
+          "quote": "Não há relato de interações com alimentos ou medicamentos até o momento."
+        },
+        {
+          "page": 4,
+          "quote": "A superdosagem leva à hipercalciúria e hipercalcemia"
+        }
+      ],
+      "finding": "No individual event was saved for this record in the reviewed legacy decisions. The current negative question is preserved; the full-PDF assisted conference supports insufficiency for adjusting a separate supplement.",
+      "proposal": "Prepare the current-version question, evidence/absence rationale and empty human decision fields for an explicit individual decision. Do not save a decision, infer full-document human checking or overwrite prior events.",
+      "question_id": "A-B021-Q10",
+      "draft_revision": 1,
+      "record_sha256": "29ad106fc7ffdc8caad70b0b58a29d71431966381b808231ebedf194a0a3c0d3",
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "question_scoped": "Meu bebê já toma vitamina D em gotas. Preciso mudar a quantidade das gotas quando uso esse produto?",
+      "question_cross_bula": "Meu bebê já toma vitamina D em gotas. Preciso mudar a quantidade das gotas quando uso Camomilina C?",
+      "pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B021/bula_1791246895251.pdf",
+      "pdf_sha256": "db4c16b6b044a1234f66dc5c06468bd49ebac99189c249d35bced4f32f282d64",
+      "pdf_page_count": 7,
+      "medication": "CAMOMILINA C",
+      "required_qualifiers": []
+    }
+  ],
+  "visual_checks": [
+    {
+      "id": "A-B013-Q05",
+      "page": 6,
+      "purpose": "Placement of children's instruction and 30-minute sentence."
+    },
+    {
+      "id": "A-B026-Q08",
+      "page": 2,
+      "purpose": "Section 2 colic wording."
+    },
+    {
+      "id": "A-B026-Q08",
+      "page": 4,
+      "purpose": "Section 8 colic/diarrhea wording."
+    },
+    {
+      "id": "B-CB025-Q05",
+      "page": 2,
+      "purpose": "Unqualified hepatic/renal insufficiency contraindication bullet."
+    }
+  ],
+  "limitations": [
+    "No clinical reconciliation of contradictory source wording.",
+    "Assisted absence assessment is not exhaustive human visual inspection of every page.",
+    "No human approval or risk-priority closure is implied.",
+    "No external medical evidence or RAG outputs were used."
+  ]
+}
+

@@ -1,7 +1,11 @@
 # TCC evaluation preparation
 
-Preparation artifacts only: the pilot and main evaluation have not been run.
-The evidence-selector benchmark remains an auxiliary development check.
+The [Golden Set v1.0.0 publication](golden_set/release/README.md) documents
+the completed methodological freeze: 1,000 questions linked to 100 PDFs.
+[Offline infrastructure](experiment_preparation/README.md) separates retrieval
+and response evaluation. The main experiments and principal metrics have not
+been executed. Earlier pilots/selector checks are development diagnostics,
+not the principal evaluation.
 
 - [Corpus A](corpus/corpus_final.csv): 50 documents selected for documentary
   diversity; [selection rationale](corpus/corpus_selection_report.md).
@@ -18,6 +22,8 @@ and source annotations are preserved; the CSVs are unchanged by this editorial u
 PDFs, personal absolute paths and intermediate experiment outputs are excluded.
 Archive PDFs outside temporary directories before cleanup.
 
-Next: review ten pilot references, implement natural grounded generation and
-instrument the evaluation runner. Verify cross-document access and corpus
-isolation before the main evaluation.
+Next: approve operational snapshots and isolated ingestion, map documentary
+golds independently of rankings, then separately authorize retrieval and
+response evaluation. Natural grounded generation remains a response-stage
+prerequisite. Full documentary reproduction requires the external custodial
+archive described in the release notes; a clone alone is not that archive.

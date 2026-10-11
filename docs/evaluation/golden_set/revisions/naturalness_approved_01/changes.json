@@ -1,0 +1,276 @@
+{
+  "created_on": "2026-10-10",
+  "revision_id": "naturalness_approved_01",
+  "actor": "AI_assistant_applying_author_authorized_revision_not_human_documentary_approval",
+  "authorization_scope": "Six linguistic revisions and one conditional BCG semantic revision; no other record changes. Author authorization is not an individual audit approval.",
+  "record_hash_serialization": "UTF-8 JSON, ensure_ascii=False, sort_keys=True, separators=(comma, colon)",
+  "override_records_path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/questions.overrides.draft.jsonl",
+  "override_records_sha256": "cac68b5f2cd2a9c9524d1b9f27870264e2674cee29d80a15d77d18f4a76f4e99",
+  "changes": [
+    {
+      "question_id": "B-CB002-Q02",
+      "revision_kind": "linguistic",
+      "reason": "Author-authorized linguistic reformulation; same documentary need, presentation and conditions in both variants. Expected information, references, classification and indispensable qualifiers preserved.",
+      "original_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "original_questions_sha256": "91c195c65e3fa997727b5442bee0a62ba573d2a6afc67fe935b25ce386449e4c",
+      "before_record_sha256": "ce135d9d6bfbedfb65053a130b49c28224d72c6046aed99349aa4999c4d423ea",
+      "after_record_sha256": "163fa58c5745cf7cab4a993f51cc0c9b613ee8f6c42c260cff95b640c6fb3c3d",
+      "changed_fields": {
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        },
+        "question_cross_bula": {
+          "before": "Quem tem comprometimento grave dos rins pode tomar hidroclorotiazida da EMS? Qual é o limite citado?",
+          "after": "Quem tem problema grave nos rins tem restrição para tomar hidroclorotiazida da EMS? Qual resultado do exame dos rins está ligado a essa restrição?"
+        },
+        "question_scoped": {
+          "before": "Quem tem comprometimento grave dos rins pode tomar esse remédio? Qual é o limite citado?",
+          "after": "Quem tem problema grave nos rins tem restrição para tomar esse remédio? Qual resultado do exame dos rins está ligado a essa restrição?"
+        }
+      },
+      "scoped_cross_equivalence": {
+        "status": "assistant_checked_not_human_approval",
+        "assessment": "Same proposition, population/condition, form/route and requested range or professional guidance; cross variant identifies the product without adding answer content."
+      },
+      "source_pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB002/bula_1791329439872.pdf",
+      "source_pdf_sha256": "688791db3755ee3c12a59081f885bd9fd2544960600de19b18e565647c205986",
+      "human_decisions_inherited": false
+    },
+    {
+      "question_id": "B-CB017-Q02",
+      "revision_kind": "linguistic",
+      "reason": "Author-authorized linguistic reformulation; same documentary need, presentation and conditions in both variants. Expected information, references, classification and indispensable qualifiers preserved.",
+      "original_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "original_questions_sha256": "eff2d8d11cd7dd1424e5f207043abd8a8db93940ab744ecf1b5cc529c0eac9f7",
+      "before_record_sha256": "bbea522a3fa8d472a8b1f2a3bde9732c2464206ec22268471e68c6a027390fb1",
+      "after_record_sha256": "957968fad09b4201eb91d9cb3b736c4ffa0ce6d5c5f43264f603fab6661ded32",
+      "changed_fields": {
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        },
+        "question_cross_bula": {
+          "before": "Uma criança de onze anos com diabetes tipo 2 está no público indicado para empagliflozina da Germed?",
+          "after": "A empagliflozina da Germed é indicada para tratar diabetes tipo 2 em uma criança de onze anos?"
+        },
+        "question_scoped": {
+          "before": "Uma criança de onze anos com diabetes tipo 2 está no público indicado?",
+          "after": "Esse remédio é indicado para tratar diabetes tipo 2 em uma criança de onze anos?"
+        }
+      },
+      "scoped_cross_equivalence": {
+        "status": "assistant_checked_not_human_approval",
+        "assessment": "Same proposition, population/condition, form/route and requested range or professional guidance; cross variant identifies the product without adding answer content."
+      },
+      "source_pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB017/bula_1791329528383.pdf",
+      "source_pdf_sha256": "0ad60b91f5223877d5459c70e4e533ada52a62d659e6e55530185dbdcd195f3f",
+      "human_decisions_inherited": false
+    },
+    {
+      "question_id": "B-CB021-Q04",
+      "revision_kind": "linguistic",
+      "reason": "Author-authorized linguistic reformulation; same documentary need, presentation and conditions in both variants. Expected information, references, classification and indispensable qualifiers preserved.",
+      "original_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "original_questions_sha256": "eff2d8d11cd7dd1424e5f207043abd8a8db93940ab744ecf1b5cc529c0eac9f7",
+      "before_record_sha256": "d841f1854c9865bcd1c5d850a75c85fd9e6d0fecf5f6511e44d6dff740487cdf",
+      "after_record_sha256": "9dddf66a538e064b62eb4d2fe871e0677416a2ff3c7b20a1b3515e8bbd52da3f",
+      "changed_fields": {
+        "draft_revision": {
+          "before": 2,
+          "after": 3
+        },
+        "question_cross_bula": {
+          "before": "Para uma criança de quatro anos e vinte quilos, que faixa de volume aparece para dipirona injetável da Santisa no músculo?",
+          "after": "Para uma criança de quatro anos e vinte quilos, qual é a faixa de volume da dipirona injetável da Santisa no músculo?"
+        },
+        "question_scoped": {
+          "before": "Para uma criança de quatro anos e vinte quilos, que faixa de volume aparece para aplicação no músculo?",
+          "after": "Para uma criança de quatro anos e vinte quilos, qual é a faixa de volume dessa injeção no músculo?"
+        }
+      },
+      "scoped_cross_equivalence": {
+        "status": "assistant_checked_not_human_approval",
+        "assessment": "Same proposition, population/condition, form/route and requested range or professional guidance; cross variant identifies the product without adding answer content."
+      },
+      "source_pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB021/bula_1791329599897.pdf",
+      "source_pdf_sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db",
+      "human_decisions_inherited": false
+    },
+    {
+      "question_id": "A-B040-Q08",
+      "revision_kind": "linguistic",
+      "reason": "Author-authorized linguistic reformulation; same documentary need, presentation and conditions in both variants. Expected information, references, classification and indispensable qualifiers preserved.",
+      "original_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "original_questions_sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b",
+      "before_record_sha256": "2788b887c846bcb9fb972fe8ce3b3a5e15bd2f358b57499883380de1097d716a",
+      "after_record_sha256": "117e1402af4b6f5170d80a365caa6dab2187a4bc1b410b23b35ec307a504e652",
+      "changed_fields": {
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        },
+        "question_cross_bula": {
+          "before": "Para um bebê de 6 meses e 7 kg, o que a tabela do Dodoy gotas da Jarrell indica como dose única?",
+          "after": "Para um bebê de 6 meses e 7 kg, qual é a faixa de gotas de Dodoy da Jarrell para uma dose só?"
+        },
+        "question_scoped": {
+          "before": "Para um bebê de 6 meses e 7 kg, o que a tabela indica como dose única dessas gotas?",
+          "after": "Para um bebê de 6 meses e 7 kg, qual é a faixa de gotas para uma dose só?"
+        }
+      },
+      "scoped_cross_equivalence": {
+        "status": "assistant_checked_not_human_approval",
+        "assessment": "Same proposition, population/condition, form/route and requested range or professional guidance; cross variant identifies the product without adding answer content."
+      },
+      "source_pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B040/bula_1791247250853.pdf",
+      "source_pdf_sha256": "8d18fe70ec6b52c6c47293c04fe0b96a0d1103cb42d359d2be667ff83a7fc7a0",
+      "human_decisions_inherited": false
+    },
+    {
+      "question_id": "A-B041-Q04",
+      "revision_kind": "linguistic",
+      "reason": "Author-authorized linguistic reformulation; same documentary need, presentation and conditions in both variants. Expected information, references, classification and indispensable qualifiers preserved.",
+      "original_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "original_questions_sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b",
+      "before_record_sha256": "6a76c66b385b2a07c27957b3f92502db4c58f1ab30b052c699b96d771dbeb4e1",
+      "after_record_sha256": "4e26eb2f572b09f6937cf0ad22d07972be8f971855b423e55daa6e0d57b211c1",
+      "changed_fields": {
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        },
+        "question_cross_bula": {
+          "before": "Estou amamentando. Posso usar Vomistop gotas da Medquímica? O profissional precisa orientar alguma alternativa?",
+          "after": "Estou amamentando. Posso usar Vomistop gotas da Medquímica? Preciso receber orientação sobre outras opções?"
+        },
+        "question_scoped": {
+          "before": "Estou amamentando. Posso usar essas gotas? O profissional precisa orientar alguma alternativa?",
+          "after": "Estou amamentando. Posso usar essas gotas? Preciso receber orientação sobre outras opções?"
+        }
+      },
+      "scoped_cross_equivalence": {
+        "status": "assistant_checked_not_human_approval",
+        "assessment": "Same proposition, population/condition, form/route and requested range or professional guidance; cross variant identifies the product without adding answer content."
+      },
+      "source_pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B041/bula_1791247250064.pdf",
+      "source_pdf_sha256": "bf49fef0fa31f56f58f5e118276120e7329f558df7d5da1ebf90f87597d75b40",
+      "human_decisions_inherited": false
+    },
+    {
+      "question_id": "B-CB040-Q04",
+      "revision_kind": "linguistic",
+      "reason": "Author-authorized linguistic reformulation; same documentary need, presentation and conditions in both variants. Expected information, references, classification and indispensable qualifiers preserved.",
+      "original_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "original_questions_sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b",
+      "before_record_sha256": "2b396918d97709be9954f53303f2eb0a97f9a19d9403ef4241a1ffca38dd7649",
+      "after_record_sha256": "8e3418ca63bd8cafd1f86c03fd64e2b73303cc0ecf7bf68149b6b6ec999ad5ea",
+      "changed_fields": {
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        },
+        "question_cross_bula": {
+          "before": "Quem amamenta pode usar cloridrato de trazodona da Globo, produzido pela Zydus? O profissional deve oferecer alternativas?",
+          "after": "Quem está amamentando pode tomar cloridrato de trazodona da Globo, produzido pela Zydus? Precisa receber orientação sobre outras opções?"
+        },
+        "question_scoped": {
+          "before": "Quem amamenta pode usar? O profissional deve oferecer alternativas?",
+          "after": "Quem está amamentando pode tomar esse remédio? Precisa receber orientação sobre outras opções?"
+        }
+      },
+      "scoped_cross_equivalence": {
+        "status": "assistant_checked_not_human_approval",
+        "assessment": "Same proposition, population/condition, form/route and requested range or professional guidance; cross variant identifies the product without adding answer content."
+      },
+      "source_pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB040/bula_1791329702857.pdf",
+      "source_pdf_sha256": "6ccabdc700eaa30fcbc8307b73481125f7276ae799394af28ad1989ae47aa54c",
+      "human_decisions_inherited": false
+    },
+    {
+      "question_id": "A-B016-Q08",
+      "revision_kind": "semantic_conditional_safety",
+      "reason": "Author-authorized semantic revision: conversational scenario no longer supplies the complete warning criteria. Conditional expected answer and qualifiers preserve source conditions and professional conduct; immediate medical contact is explicitly distinguished as safety guidance, not a verbatim fever instruction. Added literal adverse-reaction reporting reference on physical page 3.",
+      "original_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "original_questions_sha256": "3df4b6e62bf6f3deb98d1bc6ea39ec65e658498b708dc461b92d363f6aa92a38",
+      "before_record_sha256": "98adb0f599f9c89ab81722d4204566343b097c1eaf3b6a559e8ba3fd4fa14620",
+      "after_record_sha256": "9c37bcdc1fec082087b915f4c1327d403aa0bf0174d3779a0b648dafb0ad8c21",
+      "changed_fields": {
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        },
+        "expected_information": {
+          "before": "Pode indicar infecção sistêmica, com risco de vida; imunoterapia deve ser descontinuada até excluir infecção sistêmica.",
+          "after": "A febre alta persistente após BCG intravesical pode exigir atenção por gravidade potencial. A bula alerta que febre acima de 39 °C que não desaparece em 24–48 horas após receber líquidos e antipiréticos, e/ou mal-estar e febre com piora dos sintomas, podem indicar infecção sistêmica por BCG, uma complicação com risco de vida. Como a pergunta não informa temperatura medida, duração nem líquidos recebidos, não afirmar que esses critérios estão preenchidos nem diagnosticar infecção. Orientar contato imediato com o médico responsável como orientação de segurança diante desse risco potencial, sem exigir esclarecimento prévio ou recomendar aguardar 24–48 horas. A bula determina comunicar reações indesejáveis ao médico, cirurgião-dentista ou farmacêutico; a urgência do contato nesta resposta é orientação de segurança, não uma citação literal dessa frase. Preservar a conduta profissional de descontinuar a imunoterapia até excluir infecção sistêmica, sem orientar decisão autônoma de tratamento pelo paciente."
+        },
+        "question_cross_bula": {
+          "before": "Depois de Imuno BCG da Fundação Ataulpho de Paiva, uma febre acima de 39 graus que não baixa em 24 a 48 horas, mesmo com líquidos e antitérmico, exige atenção especial?",
+          "after": "Fiz uma aplicação de Imuno BCG da Fundação Ataulpho de Paiva na bexiga e estou com febre alta que não melhora, mesmo tomando antitérmico. Isso pode ser perigoso? O que devo fazer?"
+        },
+        "question_scoped": {
+          "before": "Depois da aplicação, uma febre acima de 39 graus que não baixa em 24 a 48 horas, mesmo com líquidos e antitérmico, exige atenção especial?",
+          "after": "Fiz uma aplicação de BCG na bexiga e estou com febre alta que não melhora, mesmo tomando antitérmico. Isso pode ser perigoso? O que devo fazer?"
+        },
+        "reference_evidence": {
+          "before": [
+            {
+              "pdf_page": 3,
+              "section": "QUAIS OS MALES QUE ESTE MEDICAMENTO PODE CAUSAR? / Efeitos raros e incomuns",
+              "quote": "Febre acima de 39ºC, que não desaparece 24-48 horas após o paciente receber líquidos e antipiréticos, e/ou um período com mal estar e febre, durante o qual os sintomas aumentam, podem indicar uma infecção sistêmica. Uma infecção sistêmica por BCG pode ser uma complicação com risco de vida. Imunoterapia com BCG deve ser descontinuada até uma infecção sistêmica ter sido excluída.",
+              "source_region": null
+            }
+          ],
+          "after": [
+            {
+              "pdf_page": 3,
+              "section": "QUAIS OS MALES QUE ESTE MEDICAMENTO PODE CAUSAR? / Efeitos raros e incomuns",
+              "quote": "Febre acima de 39ºC, que não desaparece 24-48 horas após o paciente receber líquidos e antipiréticos, e/ou um período com mal estar e febre, durante o qual os sintomas aumentam, podem indicar uma infecção sistêmica. Uma infecção sistêmica por BCG pode ser uma complicação com risco de vida. Imunoterapia com BCG deve ser descontinuada até uma infecção sistêmica ter sido excluída.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 3,
+              "section": "QUAIS OS MALES QUE ESTE MEDICAMENTO PODE CAUSAR? / Comunicação de reações indesejáveis",
+              "quote": "Informe a seu médico, cirurgião-dentista ou farmacêutico o aparecimento de reações indesejáveis pelo uso do medicamento.",
+              "source_region": null
+            }
+          ]
+        },
+        "required_qualifiers": {
+          "before": [
+            "Persistência apesar de líquidos/antipiréticos; possibilidade, não diagnóstico; conduta profissional e risco de vida preservados."
+          ],
+          "after": [
+            "BCG aplicado na bexiga, por via intravesical; não confundir com vacinação.",
+            "Temperatura acima de 39 °C, persistência de 24–48 horas após receber líquidos e antipiréticos, e/ou mal-estar e febre com piora dos sintomas são condições documentais; temperatura medida, duração e líquidos recebidos permanecem desconhecidos no cenário perguntado.",
+            "Possível infecção sistêmica e risco de vida, sem diagnóstico, presunção de critérios preenchidos ou tranquilização por ausência de dados.",
+            "Orientar contato médico imediato como orientação de segurança; a bula documenta a comunicação de reações e a gravidade potencial. Não apresentar a palavra imediato como citação literal do aviso de febre.",
+            "Não transformar 24–48 horas em recomendação para aguardar; esclarecimentos podem complementar, mas não condicionar o alerta e o contato médico.",
+            "Descontinuação da imunoterapia até excluir infecção sistêmica é conduta profissional; não prescrever tratamento, antibiótico ou interrupção autônoma, nem transferir a conduta específica de hepatite/pneumonia a um relato genérico de febre."
+          ]
+        },
+        "review_flags": {
+          "before": [
+            "Revisão específica de segurança: não resumir como febre comum nem acrescentar instruções de emergência como se estivessem literalmente neste trecho."
+          ],
+          "after": [
+            "Revisão específica de segurança: não resumir como febre comum nem acrescentar instruções de emergência como se estivessem literalmente neste trecho.",
+            "Revisão semântica autorizada: cenário com critérios ainda desconhecidos; preservar alerta condicional e contato médico imediato como orientação de segurança, distinguindo-o da redação literal da fonte. Auditoria humana permanece pendente."
+          ]
+        }
+      },
+      "scoped_cross_equivalence": {
+        "status": "assistant_checked_not_human_approval",
+        "assessment": "Same clinical conditions and requested need; cross variant only identifies the reference product. BCG conditions are unknown in both variants; both ask potential danger and action."
+      },
+      "source_pdf_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B016/bula_1791246837814.pdf",
+      "source_pdf_sha256": "53eac092c91276dd34b899a286f2b20b3b31eec972f10492e0080b13abf33fe4",
+      "human_decisions_inherited": false
+    }
+  ],
+  "revised_record_count": 7,
+  "unchanged_record_count": 993,
+  "human_decisions_created": 0,
+  "human_decisions_inherited": false,
+  "collection_frozen": false
+}

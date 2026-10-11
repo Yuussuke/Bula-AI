@@ -1,0 +1,76 @@
+{
+  "created_on": "2026-10-10",
+  "revision": 2,
+  "actor": "AI_assistant_documentary_correction_not_human_approval",
+  "record_hash_serialization": "UTF-8 JSON, ensure_ascii=False, sort_keys=True, separators=(',', ':')",
+  "original_questions_sha256": "eabccfba4d6f26b4067d0cbc7a503563e14945c02c330479cadd9153b41e877d",
+  "revised_questions_sha256": "95023498278b61695af98be1b38b79c2d0ed0a868fc252db64d552b3d21c3fb6",
+  "sources_sha256": "9b8eca8a25330ebea4c3b3aef7d4b916baae68fb17dfa4886dcacb518dafa950",
+  "changes": [
+    {
+      "question_id": "A-B030-Q06",
+      "reason": "Semantic scope correction, not stylistic rewriting: painful varicose veins do not imply ulcers or extremely painful inflammation. Preserve ointment, gauze and local source condition on physical page 16; references and expected information unchanged.",
+      "before_record_sha256": "455740cb420215642fe01981b0bd0773f14b4c88bcd916ea9584ec28d3cdba23",
+      "after_record_sha256": "c17e8b8223633d68203aaa5cabd19526d24c315a1d0a9c71d6e7382449db9f29",
+      "changed_fields": {
+        "question_scoped": {
+          "before": "Nas varizes muito doloridas, dá para usar gaze com a pomada?",
+          "after": "Em caso de úlceras ou inflamações extremamente dolorosas nas pernas e coxas, dá para usar gaze com a pomada?"
+        },
+        "question_cross_bula": {
+          "before": "Nas varizes muito doloridas, dá para usar gaze com Hirudoid pomada da Daiichi Sankyo?",
+          "after": "Em caso de úlceras ou inflamações extremamente dolorosas nas pernas e coxas, dá para usar gaze com Hirudoid pomada da Daiichi Sankyo?"
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        }
+      }
+    },
+    {
+      "question_id": "B-CB029-Q04",
+      "reason": "Semantic grouping correction: replace an overlapping binary comparison with an open question about all three source factors. Preserve the explicit renal condition in prose, source maxima, references and existing renal-contraindication alert. Do not construct a new personal regimen.",
+      "before_record_sha256": "98a1ad52c03d15fcd8cbbf3a98984c4317b37da72b31c5fc5ad6bdca07f87dd9",
+      "after_record_sha256": "15d73669914a0e0fec677f194d3858abd7aaca13c61db93b56dd543d1d4a3534",
+      "changed_fields": {
+        "question_scoped": {
+          "before": "O limite diário é igual para adultos de até 65 anos e para quem passou dessa idade ou pesa menos de 50 quilos?",
+          "after": "Como os limites diários desse remédio mudam conforme a idade, o peso e o funcionamento dos rins?"
+        },
+        "question_cross_bula": {
+          "before": "O limite diário do trometamol cetorolaco sublingual da União Química é igual para adultos de até 65 anos e para quem passou dessa idade ou pesa menos de 50 quilos?",
+          "after": "Como os limites diários do trometamol cetorolaco sublingual da União Química mudam conforme a idade, o peso e o funcionamento dos rins?"
+        },
+        "required_qualifiers": {
+          "before": [
+            "Limites documentais, não calcular número de tomadas individual; manter idade, peso e grupos. Contexto renal adicional condicionado às contraindicações."
+          ],
+          "after": [
+            "Preservar os grupos da fonte: mais de 65 anos, menos de 50 kg ou insuficiência renal aparecem no grupo do limite menor. Idade de até 65 anos, sozinha, não autoriza atribuir o limite maior quando há uma dessas condições.",
+            "Relatar limites documentais, sem escolher uma dose, número de tomadas ou tratamento individual.",
+            "Não transformar a menção à insuficiência renal em autorização geral: manter as contraindicações renais descritas na fonte."
+          ]
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        }
+      }
+    }
+  ],
+  "unchanged_records": 98,
+  "unchanged_check": {
+    "question_id": "A-B032-Q07",
+    "record_sha256": "79cd9184155309a2a5ea17e4e70d83d1bd5e2c06e6fc07768df9062e0e3495c9",
+    "decision": "Retain unchanged: the infection instruction is conditional on bacterial or fungal infection. Do not generalize to every infection or infer individual antimicrobial treatment. All previous safety/documentary alerts remain pending."
+  },
+  "human_decisions_inherited": false,
+  "immutable_original_artifacts": {
+    "questions.draft.jsonl": "eabccfba4d6f26b4067d0cbc7a503563e14945c02c330479cadd9153b41e877d",
+    "sources.json": "9b8eca8a25330ebea4c3b3aef7d4b916baae68fb17dfa4886dcacb518dafa950",
+    "review.md": "3d1cdb98f88f9aac3e23b596846d4d711fe152cba4b840dd1a9e89e8cab3014a",
+    "manifest.json": "25c3c6c4c5d66a4a03149ff0ffa5880024c28f6832838ccffe548e142e99df99",
+    "qc_summary.json": "95c9fed91c143852f6f0c9e1917105dbd11ac186b7f62021866a2899cd38ec80",
+    "validation_report.md": "f3031fc5cd9c58798f78d0dbbff4743b3a7479bd3abfb22e6140602fce183aaf"
+  }
+}

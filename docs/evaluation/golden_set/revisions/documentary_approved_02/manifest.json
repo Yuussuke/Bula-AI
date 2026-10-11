@@ -1,0 +1,154 @@
+{
+  "status": "current_drafts_documentary_revision_not_frozen",
+  "previous_collection_manifest_path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/manifest.json",
+  "previous_collection_manifest_sha256": "60cb61895101bf9c08865d82ccd677ce99b84db9f0f6acf0429242e548809721",
+  "previous_input_fingerprint_sha256": "8fa88e09b50201b174d5a1a033b1ae9b739415164b6ecd1d9d4533874a8d600e",
+  "base_question_paths": [
+    "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+    "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+    "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+    "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+    "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+    "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+    "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+    "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+    "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+    "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+    "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl"
+  ],
+  "override_records_path": "docs/evaluation/golden_set/revisions/documentary_approved_02/questions.overrides.draft.jsonl",
+  "override_records_sha256": "b39bd270957005069c9f65a31c9e434162b2bd48ef9598709664112cc9732b6d",
+  "change_ledger_path": "docs/evaluation/golden_set/revisions/documentary_approved_02/changes.json",
+  "change_ledger_sha256": "174f84c61c99e07a48b3d881f4f5f70cbcb5956f0b5c641e21f2dc814bd264a8",
+  "authorized_record_ids": [
+    "A-B013-Q05",
+    "B-CB011-Q02",
+    "B-CB025-Q05"
+  ],
+  "input_files": [
+    {
+      "path": "docs/evaluation/corpus/corpus_final.csv",
+      "sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7"
+    },
+    {
+      "path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+      "sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "sha256": "91c195c65e3fa997727b5442bee0a62ba573d2a6afc67fe935b25ce386449e4c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/sources.json",
+      "sha256": "76fe048da8da176ab1269f96c01844342a9cfe2b2e5f94923b4ca534ed0d91a2"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "sha256": "da02a31983e4dd2dec894ebb457bc4134c3229058ebabb0b01c0fd0d23d1e275"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/sources.json",
+      "sha256": "2f84a31a5f49e14ea1a8d5734949e43b01cf36462a0f70862dc37103f799013c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "sha256": "3df4b6e62bf6f3deb98d1bc6ea39ec65e658498b708dc461b92d363f6aa92a38"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/sources.json",
+      "sha256": "d8d168a1ee95946d7bb3cbf89e92ab732f924c4fd630fc64551a2c42effb9537"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "sha256": "eff2d8d11cd7dd1424e5f207043abd8a8db93940ab744ecf1b5cc529c0eac9f7"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/sources.json",
+      "sha256": "f59d4cb2ce463e2f85d70cd96daf5dc6162bb0f90774d77ac09cc129e55c718e"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "sha256": "367ae9c8a9062a363244f6688e767cd36f6f4f98be77cb03e813dca233b706e0"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/sources.json",
+      "sha256": "bf8e4e69874cd5f8ed945e4afb85501dfcce6a62a509394c89063b75ba65005c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "sha256": "95023498278b61695af98be1b38b79c2d0ed0a868fc252db64d552b3d21c3fb6"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/sources.json",
+      "sha256": "9b8eca8a25330ebea4c3b3aef7d4b916baae68fb17dfa4886dcacb518dafa950"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "sha256": "1eb729c8cc48d12f27debf1c20d42f128a8e39563fb5645d9c71f53ddb066be2"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/sources.json",
+      "sha256": "4cf3762ca1b1fd0468719554d4e329dfbc14b1a4de62132feeb8dd9de60b5439"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/sources.json",
+      "sha256": "ad18d1abb3dbe811d445f300e6c7bad6252ac49b0d312de59454705d4c6f2dbe"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "sha256": "242520fe25f686d2fae3fadde0f1ab750c1068ba2226bd0ac412e3d4ff3c572b"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/sources.json",
+      "sha256": "5847e3f500fdb97908b02758d7bad3c19597d8ce8dde49b3b99cd960af75568f"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "sha256": "bbab89435b127bb78c7440a30ab906140656063464187a76ec00fafd516348f6"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/sources.json",
+      "sha256": "367f61796152522032ae76ae02f53f3fb1d316ff7cebe800b5abb86ae75fbe51"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "sha256": "241481392c794d6427c948e2f0c8a25b6462280f1573af97cc16aa02b1a2d8b5"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/sources.json",
+      "sha256": "b255118271a469aa105a93ab4e1e360d9426203e2d141d0a4215323c0f48aba5"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/changes.json",
+      "sha256": "ee90e525da1490402ec0e6553191d90d37e2375c2d642bc7ddbb3a16d320d257"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/questions.overrides.draft.jsonl",
+      "sha256": "cac68b5f2cd2a9c9524d1b9f27870264e2674cee29d80a15d77d18f4a76f4e99"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/manifest.json",
+      "sha256": "60cb61895101bf9c08865d82ccd677ce99b84db9f0f6acf0429242e548809721"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/questions.overrides.draft.jsonl",
+      "sha256": "b39bd270957005069c9f65a31c9e434162b2bd48ef9598709664112cc9732b6d"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/changes.json",
+      "sha256": "174f84c61c99e07a48b3d881f4f5f70cbcb5956f0b5c641e21f2dc814bd264a8"
+    }
+  ],
+  "input_fingerprint_sha256": "820d12bc4545f2cddc0a62a1aaca8e753388e3ccc184f204fa1e07b0356d3e88",
+  "effective_resolution": "Resolve the immutable naturalness_approved_01 collection (11 bases + seven overrides) first, then apply exactly these three new overrides. No historical files count as extra records.",
+  "audit_sample_path": "docs/evaluation/golden_set/audit_sample/sample.json",
+  "audit_sample_sha256": "dbe1c45ba42bd763de58eac6dfc80a88ce38c5c300c84b25e2d11c669bfb3b33",
+  "sampling_policy": "Preserve existing core and additional IDs exactly; no drawing, replacement, reshuffling or inherited human decisions.",
+  "human_review_status": "pending",
+  "collection_frozen": false
+}
+

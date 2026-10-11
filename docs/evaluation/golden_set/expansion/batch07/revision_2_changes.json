@@ -1,0 +1,109 @@
+{
+  "created_on": "2026-10-10",
+  "revision": 2,
+  "actor": "AI_assistant_documentary_correction_not_human_approval",
+  "record_hash_serialization": "UTF-8 JSON, ensure_ascii=False, sort_keys=True, separators=(',', ':')",
+  "original_questions_sha256": "5d4f54932d39f85c382b8db1aa5124eed0e2237b9d031e4077ffb2bb065445af",
+  "revised_questions_sha256": "1ecc048b5f00030902839607428748cb44c8f7630fc4396c139283e51de48b52",
+  "sources_sha256": "4cf3762ca1b1fd0468719554d4e329dfbc14b1a4de62132feeb8dd9de60b5439",
+  "changes": [
+    {
+      "question_id": "A-B034-Q01",
+      "reason": "Complete literal support for already recorded complementary age-boundary context: identification says above 12, posology says greater than or equal to 12. No question, qualifier, classification or source interpretation changes.",
+      "before_record_sha256": "19f2c8e6d28145180d323406d3ec700a3da4d59840b6092e1cf91548f8fb1c09",
+      "after_record_sha256": "48f4e98a9b00c56cce5976f92308e8429a2658f739b33ad11e8aaf80f4b31a9f",
+      "changed_fields": {
+        "reference_evidence": {
+          "before": [
+            {
+              "pdf_page": 2,
+              "section": "Identificação — comprimidos",
+              "quote": "USO ORAL USO ADULTO E PEDIÁTRICO ACIMA DE 12 ANOS DE IDADE",
+              "source_region": null
+            },
+            {
+              "pdf_page": 7,
+              "section": "Identificação — xarope",
+              "quote": "USO ORAL USO ADULTO E PEDIÁTRICO ACIMA DE 6 MESES DE IDADE",
+              "source_region": null
+            }
+          ],
+          "after": [
+            {
+              "pdf_page": 2,
+              "section": "Identificação — comprimidos",
+              "quote": "USO ORAL USO ADULTO E PEDIÁTRICO ACIMA DE 12 ANOS DE IDADE",
+              "source_region": null
+            },
+            {
+              "pdf_page": 7,
+              "section": "Identificação — xarope",
+              "quote": "USO ORAL USO ADULTO E PEDIÁTRICO ACIMA DE 6 MESES DE IDADE",
+              "source_region": null
+            },
+            {
+              "pdf_page": 3,
+              "section": "6. Dosagem — comprimidos",
+              "quote": "Adultos e adolescentes (maior ou igual a 12 anos de idade): um comprimido revestido de 5 mg de Lur uma vez ao dia, independentemente da alimentação, para alívio dos sintomas associados com a rinite alérgica (incluindo rinite alérgica intermitente e persistente) e urticária.",
+              "source_region": null
+            }
+          ]
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        }
+      }
+    },
+    {
+      "question_id": "A-B035-Q03",
+      "reason": "Complete literal support for already recorded complementary meal/nausea/absorption tension. Keep the primary one-hour-before/three-hours-after instruction; no question or classification change and no clinical reconciliation.",
+      "before_record_sha256": "806f86016088fcbbef2d333cd787547224ddfce886712005ddfeaad46f2fe9fd",
+      "after_record_sha256": "c7d6b78cfd5e6ad95b4dee52fcb86bab7cc3cf3e497fea1b75516c533e33b623",
+      "changed_fields": {
+        "reference_evidence": {
+          "before": [
+            {
+              "pdf_page": 4,
+              "section": "6. Modo de usar",
+              "quote": "IMUSSUPREX® deve ser administrado pelo menos 1 hora antes ou 3 horas após refeição ou ingestão de leite.",
+              "source_region": null
+            }
+          ],
+          "after": [
+            {
+              "pdf_page": 4,
+              "section": "6. Modo de usar",
+              "quote": "IMUSSUPREX® deve ser administrado pelo menos 1 hora antes ou 3 horas após refeição ou ingestão de leite.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 6,
+              "section": "8. Distúrbios gastrointestinais",
+              "quote": "Alguns pacientes sentem náusea quando recebem pela primeira vez azatioprina. Com a administração oral, a náusea parece aliviada pela administração dos comprimidos após as refeições. Contudo, a administração de comprimidos de azatioprina após as refeições pode reduzir a absorção oral, pelo que a monitorização da eficácia terapêutica deve ser considerada após a administração deste modo.",
+              "source_region": null
+            }
+          ]
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        }
+      }
+    }
+  ],
+  "unchanged_records": 98,
+  "unchanged_check": {
+    "question_id": "B-CB037-Q07",
+    "record_sha256": "1b24d949db5ca9faa6ddcd6298a48d5812501b9c114489c9c81186022cbd7642",
+    "decision": "Retain unchanged: tongue swelling and breathing difficulty preserve the explicit physician/emergency-hospital action. Assistant safety priority, not human approval."
+  },
+  "human_decisions_inherited": false,
+  "immutable_original_artifacts": {
+    "questions.draft.jsonl": "5d4f54932d39f85c382b8db1aa5124eed0e2237b9d031e4077ffb2bb065445af",
+    "sources.json": "4cf3762ca1b1fd0468719554d4e329dfbc14b1a4de62132feeb8dd9de60b5439",
+    "review.md": "b36c083fed7308ecf01a4859c2b2aa5e803c480ef923284a668e26da149f838d",
+    "manifest.json": "2dcdfc4470e6d4c77c149da5112184ef2206369cbb6282a6940a4f80142e82ad",
+    "qc_summary.json": "c7c76b9492676978498b0a2ff741f339589f5d9375deb6689ece9010a5329417"
+  }
+}

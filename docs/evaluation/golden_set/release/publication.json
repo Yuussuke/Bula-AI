@@ -1,0 +1,2143 @@
+{
+  "artifact_type": "Portable publication inventory, not a replacement for the immutable freeze manifest",
+  "release_id": "golden-set-v1.0.0",
+  "status": "methodologically_accepted_frozen",
+  "authoritative_manifest": {
+    "path": "docs/evaluation/golden_set/frozen/v1/manifest.json",
+    "sha256": "0b59a882ab360efbf7fcb51bb4c6ba1794f0d6c9d72fc2a88f88fcadb53b4fd7",
+    "external": true,
+    "manifest_fingerprint_sha256": "33ecd26d18b82925ec4c4e83b0eebf8e8edd39b432039926fd0c51f746ed7de0"
+  },
+  "counts": {
+    "records": 1000,
+    "positive": 800,
+    "negative": 200,
+    "pdfs": 100,
+    "corpus_A_pdfs": 50,
+    "corpus_B_pdfs": 50,
+    "per_pdf": {
+      "positive": 8,
+      "negative": 2
+    }
+  },
+  "effective_inputs": [
+    {
+      "path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "sha256": "241481392c794d6427c948e2f0c8a25b6462280f1573af97cc16aa02b1a2d8b5",
+      "record_count": 50
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "sha256": "91c195c65e3fa997727b5442bee0a62ba573d2a6afc67fe935b25ce386449e4c",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "sha256": "da02a31983e4dd2dec894ebb457bc4134c3229058ebabb0b01c0fd0d23d1e275",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "sha256": "3df4b6e62bf6f3deb98d1bc6ea39ec65e658498b708dc461b92d363f6aa92a38",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "sha256": "eff2d8d11cd7dd1424e5f207043abd8a8db93940ab744ecf1b5cc529c0eac9f7",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "sha256": "367ae9c8a9062a363244f6688e767cd36f6f4f98be77cb03e813dca233b706e0",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "sha256": "95023498278b61695af98be1b38b79c2d0ed0a868fc252db64d552b3d21c3fb6",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "sha256": "1eb729c8cc48d12f27debf1c20d42f128a8e39563fb5645d9c71f53ddb066be2",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "sha256": "242520fe25f686d2fae3fadde0f1ab750c1068ba2226bd0ac412e3d4ff3c572b",
+      "record_count": 100
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "sha256": "bbab89435b127bb78c7440a30ab906140656063464187a76ec00fafd516348f6",
+      "record_count": 50
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/questions.overrides.draft.jsonl",
+      "sha256": "cac68b5f2cd2a9c9524d1b9f27870264e2674cee29d80a15d77d18f4a76f4e99",
+      "record_count": 7
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/questions.overrides.draft.jsonl",
+      "sha256": "b39bd270957005069c9f65a31c9e434162b2bd48ef9598709664112cc9732b6d",
+      "record_count": 3
+    }
+  ],
+  "record_bindings_path": "docs/evaluation/golden_set/frozen/v1/record_bindings.jsonl",
+  "effective_records_fingerprint_sha256": "df430fdecc08b4ba10f9e0226190784dcfbb683bcf213fbac62563fb00655158",
+  "effective_input_fingerprint_sha256": "820d12bc4545f2cddc0a62a1aaca8e753388e3ccc184f204fa1e07b0356d3e88",
+  "audit": {
+    "seed": 20261009,
+    "core_ids": [
+      "A-B001-Q10",
+      "A-B002-Q06",
+      "A-B003-Q01",
+      "A-B004-Q08",
+      "A-B005-Q05",
+      "A-B006-Q03",
+      "A-B007-Q04",
+      "A-B008-Q01",
+      "A-B009-Q09",
+      "A-B010-Q08",
+      "A-B011-Q04",
+      "A-B012-Q01",
+      "A-B013-Q05",
+      "A-B014-Q09",
+      "A-B015-Q03",
+      "A-B016-Q10",
+      "A-B017-Q04",
+      "A-B018-Q04",
+      "A-B019-Q05",
+      "A-B020-Q02",
+      "A-B021-Q10",
+      "A-B022-Q06",
+      "A-B023-Q07",
+      "A-B024-Q06",
+      "A-B025-Q04",
+      "A-B026-Q09",
+      "A-B027-Q03",
+      "A-B028-Q03",
+      "A-B029-Q03",
+      "A-B030-Q09",
+      "A-B031-Q03",
+      "A-B032-Q01",
+      "A-B033-Q01",
+      "A-B034-Q01",
+      "A-B035-Q03",
+      "A-B036-Q05",
+      "A-B037-Q03",
+      "A-B038-Q10",
+      "A-B039-Q04",
+      "A-B040-Q10",
+      "A-B041-Q08",
+      "A-B042-Q06",
+      "A-B043-Q01",
+      "A-B044-Q07",
+      "A-B045-Q09",
+      "A-B046-Q06",
+      "A-B047-Q01",
+      "A-B048-Q05",
+      "A-B049-Q06",
+      "A-B050-Q08",
+      "B-CB001-Q01",
+      "B-CB002-Q06",
+      "B-CB003-Q06",
+      "B-CB004-Q06",
+      "B-CB005-Q01",
+      "B-CB006-Q03",
+      "B-CB007-Q04",
+      "B-CB008-Q01",
+      "B-CB009-Q01",
+      "B-CB010-Q01",
+      "B-CB011-Q02",
+      "B-CB012-Q03",
+      "B-CB013-Q09",
+      "B-CB014-Q08",
+      "B-CB015-Q04",
+      "B-CB016-Q03",
+      "B-CB017-Q03",
+      "B-CB018-Q06",
+      "B-CB019-Q07",
+      "B-CB020-Q08",
+      "B-CB021-Q08",
+      "B-CB022-Q02",
+      "B-CB023-Q06",
+      "B-CB024-Q08",
+      "B-CB025-Q06",
+      "B-CB026-Q09",
+      "B-CB027-Q09",
+      "B-CB028-Q07",
+      "B-CB029-Q10",
+      "B-CB030-Q10",
+      "B-CB031-Q09",
+      "B-CB032-Q08",
+      "B-CB033-Q03",
+      "B-CB034-Q06",
+      "B-CB035-Q02",
+      "B-CB036-Q04",
+      "B-CB037-Q04",
+      "B-CB038-Q01",
+      "B-CB039-Q07",
+      "B-CB040-Q06",
+      "B-CB041-Q09",
+      "B-CB042-Q09",
+      "B-CB043-Q09",
+      "B-CB044-Q02",
+      "B-CB045-Q09",
+      "B-CB046-Q03",
+      "B-CB047-Q08",
+      "B-CB048-Q07",
+      "B-CB049-Q04",
+      "B-CB050-Q01"
+    ],
+    "additional_risk_ids": [
+      "B-CB025-Q05",
+      "B-CB021-Q01",
+      "A-B017-Q05",
+      "B-CB038-Q04",
+      "A-B026-Q08",
+      "A-B025-Q01",
+      "A-B025-Q03",
+      "A-B025-Q05",
+      "A-B025-Q07",
+      "A-B025-Q08",
+      "A-B025-Q02",
+      "A-B025-Q06",
+      "A-B016-Q08",
+      "A-B016-Q07",
+      "B-CB013-Q08",
+      "B-CB003-Q03",
+      "A-B042-Q02",
+      "B-CB050-Q04",
+      "B-CB023-Q05",
+      "B-CB021-Q04"
+    ]
+  },
+  "protocol": {
+    "reference_policy": "docs/evaluation/golden_set/phase1/reference_policy.md",
+    "fidelity_policy": "docs/evaluation/golden_set/answer_fidelity_policy.md",
+    "linguistic_policy": "docs/evaluation/golden_set/phase1/linguistic_policy.md",
+    "retrieval_relevance": "Relevant chunks of the specific reference PDF only, in both scoped and cross-leaflet retrieval. Equivalent other-PDF evidence is not target retrieval success.",
+    "cross_leaflet_search": "Corresponding frozen corpus, without hidden target-document filtering; retain non-target positions in the ranking.",
+    "recall": "Recall@10 = retrieved annotated target-PDF gold chunks / all annotated target-PDF gold chunks; positives only.",
+    "mrr": "First relevant target-PDF chunk reciprocal rank, retaining the existing evaluation ranking/cutoff convention. This release does not redefine its cutoff; record the inherited convention in the later experiment manifest.",
+    "negative_abstention": "Evaluate the 200 negatives per reference leaflet only. Cross-leaflet variants do not establish unsupported queries over the whole corpus.",
+    "multi_fragment_limits": "Recall@10 and MRR do not guarantee complete evidentiary coverage, interpretation or a faithful answer. Assess response fidelity separately.",
+    "answer_fidelity": "Required requested information and indispensable qualifiers differ from optional complementary context. Correct answers are not penalized for omitting unrequested complementary details; included factual claims still require documentary support.",
+    "main_evaluation": "Preserve dense/BM25/hybrid comparisons, target retrieval Recall@10/MRR, separate documentary fidelity, readability and operational indicators. No new metric or judge implementation.",
+    "pipeline_parameters": "Unchanged; this is a documentary collection freeze, not a new pipeline/configuration freeze."
+  },
+  "limitations": [
+    "No independent clinical validation.",
+    "No individual human approval of all 1,000 records.",
+    "No exhaustive full-corpus documentary-absence proof.",
+    "Human inspection was sampled and excerpt-based; AI-assisted full-PDF checks remain separately attributed.",
+    "Automated citation/hash checks establish mechanical traceability, not independent semantic validation or table interpretation.",
+    "Existing authored draft/pending metadata and historical not-frozen notices remain immutable; this release supplies separate collection-level acceptance.",
+    "No chunk IDs are mapped by this release; expected_chunk_ids remain unchanged."
+  ],
+  "published_files": [
+    {
+      "path": "docs/evaluation/golden_set/answer_fidelity_policy.md",
+      "sha256": "ec5879ebfac5c0209ed1e17dbc9704720fa3c2c221abffd51f9e0a7556e265b6"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/author_confirmation_20261010/report.md",
+      "sha256": "546f5b75cdfdd95a2338dc23752ab5083720edb1ffdea55a8f942da92b61a0b0"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/documentary_conference_20261010/conference.json",
+      "sha256": "4806c294a362fcdcf095114a6898be4f03636e16eac8ce1f4a3fd4edf8b3d164"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/review_scope_excerpt_only/report.md",
+      "sha256": "b116b28f2990674dc4da4877fee2079f0855d1040ebe9f30bae67562298dab0c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/review_scope_excerpt_only/scope_correction.json",
+      "sha256": "7224e2dfc48b6b8c3623841e76ceffb09204dd99ee3fed5fe43523f95bd017ae"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/round_closure/closure.json",
+      "sha256": "ce20ba33ef8beedfc9e4ba02a556ea345a03801ad8a591b57d9bc36f8e8266aa"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/round_closure/report.md",
+      "sha256": "ab5c2e366de471d213129de074d33c3a3c4b13928c3bdb6fe51ee452b78043f2"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_plan/approved_adjustments.md",
+      "sha256": "43f906c7063bca3226771ba44f5f7879937b67baf67179e69407fb355bcc88aa"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_plan/plan.md",
+      "sha256": "c4bfda17b117b1b37e42e015ba51e929ae85ecdb393f55b86c53da4efbd640bf"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_plan/priority_queue.json",
+      "sha256": "2f674ce487cb28fc7143b40f919272eb5476266bbed9c35bc3414b29d1a1882e"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/report.md",
+      "sha256": "6efeb4d7882d1a97b148bb1e075f2d931612493fc2efd27def2ddeedc4bc5c0d"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/sample.json",
+      "sha256": "dbe1c45ba42bd763de58eac6dfc80a88ce38c5c300c84b25e2d11c669bfb3b33"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/manifest.json",
+      "sha256": "a5844b7b649b5db97522fb1e7b388c7431bccdbbb358edb3503616f95f02e7b8"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "sha256": "91c195c65e3fa997727b5442bee0a62ba573d2a6afc67fe935b25ce386449e4c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/sources.json",
+      "sha256": "76fe048da8da176ab1269f96c01844342a9cfe2b2e5f94923b4ca534ed0d91a2"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/manifest.json",
+      "sha256": "cfcaa89b1fed9678a4147e8c0a4c93dc874dd2428d0805aeafd531e1762fbe38"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/questions.draft.jsonl",
+      "sha256": "6f18c953aa8c3850f289cf5fe8550ffda6e414a0bcc8a1b7d5c24102e174cf5f"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "sha256": "da02a31983e4dd2dec894ebb457bc4134c3229058ebabb0b01c0fd0d23d1e275"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/revision_2_changes.json",
+      "sha256": "1c571b2d49916e8d0cb34d741ae12d3c4a73575b4c214cacaa9006c4a456fd3d"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/sources.json",
+      "sha256": "2f84a31a5f49e14ea1a8d5734949e43b01cf36462a0f70862dc37103f799013c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/manifest.json",
+      "sha256": "ed33152cebbabf449ced9b07acebe15d98b93e0d7138ead73b671c0b6fa7bb7e"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "sha256": "3df4b6e62bf6f3deb98d1bc6ea39ec65e658498b708dc461b92d363f6aa92a38"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/sources.json",
+      "sha256": "d8d168a1ee95946d7bb3cbf89e92ab732f924c4fd630fc64551a2c42effb9537"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/manifest.json",
+      "sha256": "d3868990871e20daa2a40ca4a90d3089b8f6765aeb94804d885239d7c64da5c3"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/questions.draft.jsonl",
+      "sha256": "54f521008bf9b6f8a6e5bcc0453c32ea2d936af859980a26b58f1a940e7f7c26"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "sha256": "eff2d8d11cd7dd1424e5f207043abd8a8db93940ab744ecf1b5cc529c0eac9f7"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/revision_2_changes.json",
+      "sha256": "e896d40cdf9e27bc2fd2e2988b7a0cbdde171461b08b4a1f6968806b39610706"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/sources.json",
+      "sha256": "f59d4cb2ce463e2f85d70cd96daf5dc6162bb0f90774d77ac09cc129e55c718e"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/manifest.json",
+      "sha256": "d76155ee3610746373507606d5cbd3be523a1df9044e3531b145675af5a209ae"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "sha256": "367ae9c8a9062a363244f6688e767cd36f6f4f98be77cb03e813dca233b706e0"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/sources.json",
+      "sha256": "bf8e4e69874cd5f8ed945e4afb85501dfcce6a62a509394c89063b75ba65005c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/manifest.json",
+      "sha256": "25c3c6c4c5d66a4a03149ff0ffa5880024c28f6832838ccffe548e142e99df99"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/questions.draft.jsonl",
+      "sha256": "eabccfba4d6f26b4067d0cbc7a503563e14945c02c330479cadd9153b41e877d"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "sha256": "95023498278b61695af98be1b38b79c2d0ed0a868fc252db64d552b3d21c3fb6"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/revision_2_changes.json",
+      "sha256": "0a7e60a8e0143d80d1fd6c5e8fbe2134333e581a6103c9b19ff9335e62f74d12"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/sources.json",
+      "sha256": "9b8eca8a25330ebea4c3b3aef7d4b916baae68fb17dfa4886dcacb518dafa950"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/manifest.json",
+      "sha256": "2dcdfc4470e6d4c77c149da5112184ef2206369cbb6282a6940a4f80142e82ad"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/questions.draft.jsonl",
+      "sha256": "5d4f54932d39f85c382b8db1aa5124eed0e2237b9d031e4077ffb2bb065445af"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/questions.revision2.draft.jsonl",
+      "sha256": "1ecc048b5f00030902839607428748cb44c8f7630fc4396c139283e51de48b52"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "sha256": "1eb729c8cc48d12f27debf1c20d42f128a8e39563fb5645d9c71f53ddb066be2"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/revision_2_changes.json",
+      "sha256": "39ae9a86539ba198696cfa9111f426b4bd292df93c51052d4977584adeba95e3"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/revision_3_changes.json",
+      "sha256": "75b2ef4eaa5243dfe636cb927761c20b5740dcb1b4fc9d9fda7369a3fbb300cb"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/sources.json",
+      "sha256": "4cf3762ca1b1fd0468719554d4e329dfbc14b1a4de62132feeb8dd9de60b5439"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/manifest.json",
+      "sha256": "968fff6cc1d6b7ea469c194f34a317547906b170115490013b7f0ace2de653cd"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/questions.draft.jsonl",
+      "sha256": "20aa403930320e2117080d55931140487bd9888ff1afe9426101957f0632ec9d"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/revision_2_changes.json",
+      "sha256": "da75fbc31edcdbd8ecfc61d797633e12109c58f5248bf1b0344bb4c0603c5f86"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/sources.json",
+      "sha256": "ad18d1abb3dbe811d445f300e6c7bad6252ac49b0d312de59454705d4c6f2dbe"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/manifest.json",
+      "sha256": "c0fb6a644d1ba6d790de10b05e1a773e938dc5a729c25683c69513fd3147ba62"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "sha256": "242520fe25f686d2fae3fadde0f1ab750c1068ba2226bd0ac412e3d4ff3c572b"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/sources.json",
+      "sha256": "5847e3f500fdb97908b02758d7bad3c19597d8ce8dde49b3b99cd960af75568f"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/manifest.json",
+      "sha256": "13725fdb95992d51de396a13f4a87cc20d07eb24701049c659ef9bfc008af9af"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "sha256": "bbab89435b127bb78c7440a30ab906140656063464187a76ec00fafd516348f6"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/sources.json",
+      "sha256": "367f61796152522032ae76ae02f53f3fb1d316ff7cebe800b5abb86ae75fbe51"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/continuation_policy.md",
+      "sha256": "b75a2cb11eb830e11c888e64eca2d1223f8757c97f3e765777076acb0782625a"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/human_audit_acceptance_clarification.md",
+      "sha256": "f9340386db1fe7a32f4ad961913765165d868a430be329b7e6b071ba7cb495e5"
+    },
+    {
+      "path": "docs/evaluation/golden_set/frozen/v1/record_bindings.jsonl",
+      "sha256": "798c347cd04f26f4a95299c410c5aa090ae5aade4b71280cd106ff1a1b769514"
+    },
+    {
+      "path": "docs/evaluation/golden_set/frozen/v1/report.md",
+      "sha256": "9c54ab64e75b4e41075115bbc621ed7bf9b2bdf8b99be4f777ed3d5c5c721dd9"
+    },
+    {
+      "path": "docs/evaluation/golden_set/frozen/v1/seal_validation.json",
+      "sha256": "29f78272055e68e70957c67bf6a7aa998bdebe6ca2b280e7eafa73bc86c165fb"
+    },
+    {
+      "path": "docs/evaluation/golden_set/frozen/v1/validation.json",
+      "sha256": "6f1f35ab415f8282d025d9cd814ee9443f2cfb2bb1e9146d6dcbd77123292f5b"
+    },
+    {
+      "path": "docs/evaluation/golden_set/naturalness_audit/report.md",
+      "sha256": "8a246ce09febb355c6d7e91d30216988de95918057389794fb1cf891fc888715"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/linguistic_policy.md",
+      "sha256": "e9ac0f3e35a8f6b49758667cb09a892e033f1bab64fd4f9166f743f6dcfc3508"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/questions.draft.jsonl",
+      "sha256": "caeaf46523577605aee6f879b728345a293329856a91860db79138b50627051a"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "sha256": "241481392c794d6427c948e2f0c8a25b6462280f1573af97cc16aa02b1a2d8b5"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/reference_policy.md",
+      "sha256": "af057bb40b727226f2cba7a8af7ccf20298fea2b710545801cd46a3aa55d2773"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/revision_2_changes.json",
+      "sha256": "3197eb1824d53a278b6641298fc0c108fcacf1a95f76a017be165389f1bb7c5f"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/revision_3_changes.json",
+      "sha256": "c138bd2c080c581037f0f511efaf4da0731350147121025e43978f65172ed50a"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/revision_4_changes.json",
+      "sha256": "f3204585ecc4635aff6eec6209c41b0a2fb15d24d34ed1c22de061f2b218ab86"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/revision_history.md",
+      "sha256": "8bdd17db3d3351fde4609dde4878f6f3429ad578d9f08a6451114b18d7e20185"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/sources.json",
+      "sha256": "b255118271a469aa105a93ab4e1e360d9426203e2d141d0a4215323c0f48aba5"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/audit_version_binding.json",
+      "sha256": "ce5b9ee91b8b03e352a3d765944fcafeac11e5431014514f546b462c6fdcc0c7"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/changes.json",
+      "sha256": "174f84c61c99e07a48b3d881f4f5f70cbcb5956f0b5c641e21f2dc814bd264a8"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/manifest.json",
+      "sha256": "4ee4536ddda6b2715efd19b7455fff860587d7e88e20e33c4156500852e0ef82"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/p0_documentary_summary.json",
+      "sha256": "06f8c6ace8a5e0e22c09ccb05de2686ed08e28342d0bbd2c7450601ba1fd06e9"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/questions.overrides.draft.jsonl",
+      "sha256": "b39bd270957005069c9f65a31c9e434162b2bd48ef9598709664112cc9732b6d"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/report.md",
+      "sha256": "b9ccf3a4abcc04ad13a39a9d27a575ff5822862a7117c217ea6e4b8c90bff510"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/audit_version_binding.json",
+      "sha256": "0c462e34d8fc833b2d33b54638994a008f99ad6b710d762abfe242fe794750ae"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/changes.json",
+      "sha256": "ee90e525da1490402ec0e6553191d90d37e2375c2d642bc7ddbb3a16d320d257"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/manifest.json",
+      "sha256": "60cb61895101bf9c08865d82ccd677ce99b84db9f0f6acf0429242e548809721"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/questions.overrides.draft.jsonl",
+      "sha256": "cac68b5f2cd2a9c9524d1b9f27870264e2674cee29d80a15d77d18f4a76f4e99"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/report.md",
+      "sha256": "704f50767f377aa93e0ea73a1296d6b6c2e4c6a8382515cd230c60c3d5254be7"
+    }
+  ],
+  "external_history": [
+    {
+      "path": "docs/evaluation/corpus/corpus_final.csv",
+      "sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+      "sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/author_confirmation_20261010/author_confirmation.json",
+      "sha256": "3b6df872b8d814598a16f782c2afb4d7ada1d0f8ef44dc177d89812a5404e027",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/author_confirmation_20261010/integrity.json",
+      "sha256": "182b01ba77e4036008214089c90cfe3f426fdf55442a44adef4bca4e66a79a57",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/author_confirmation_20261010/legacy_decisions.original.json",
+      "sha256": "e0208c7c7071e1a8b34a6b6c0efc9e612deb3716bf447d41450c161741e2edff",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/documentary_conference_20261010/integrity.json",
+      "sha256": "34305c400a65a907cc623277b084fcfe04e0bd80735c4b88ec5dee8e712e1d64",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/documentary_conference_20261010/negative_conference.md",
+      "sha256": "938d2e245c47a52f8c2031778869beb31e1fbe699e3560a2fb9696ba196bdd99",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/documentary_conference_20261010/report.md",
+      "sha256": "a0bf1d7b62523197ceb08b4b63c8fdca628f2504f6f408fa69a368500ff63ec4",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/review_scope_excerpt_only/previous_AUDIT_INSTRUMENT.md",
+      "sha256": "5a87bcddec2a0a5b854aa34b0123776240c97ef139a502754bf7d4953108efee",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/review_scope_excerpt_only/previous_CURRENT.md",
+      "sha256": "302c4a98312187c769d8be79086d7c13f24c3fde4997a9c95d42eab15110457d",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/review_scope_excerpt_only/submitted_events.original.json",
+      "sha256": "9f84d2f49ad46158aa767e7f8c8c414f24372476f4cf40f05951f54e1f47b84e",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/round_closure/previous_AUDIT_INSTRUMENT.md",
+      "sha256": "89ea125867462bab83ee14429138e703053501a9267a5483cb37a9f616b0214b",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/round_closure/previous_CURRENT.md",
+      "sha256": "1cc78e263cbd88f83ffb307265b67f9af1574dc4b81955ba8318d5d03a7f68dc",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_followup/round_closure/validation.json",
+      "sha256": "91e4f1db9075c6f8cd8a2a8462e5b54fc68f7cc77c2dd804c957c16c3c91aae9",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/frozen/v1/previous_AUDIT_INSTRUMENT.md",
+      "sha256": "31d7cb9ebbe0f4b52d5673ff513bb89ebc91660f2f5da09e8f4b06e1a0c51c4e",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_plan/priority_queue.md",
+      "sha256": "142c671cae7c6254a17c1c32dcecdb071983b9eb9b6426f849a43d5b4f9e913c",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_plan/sporanox_q02_author_note.md",
+      "sha256": "5a639f1bb60b1b24cf182be67dd9ec77e1e978cfb279fc72368a1b0904a6000e",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_plan/verification.md",
+      "sha256": "0995a02139f1e961982e7cd5fbca59e108ccf2c6cd6d700ba2c3dba6af45f4ba",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/artifact_hashes.json",
+      "sha256": "2a084f30000a37340ab7a126fc7e8f26b5b9af1b41d311da8de96783801470ce",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/automatic_checks.json",
+      "sha256": "6e50fcd0bda10a923d0fabf9b8e4743dcb4d3d3336f4c4d7f81ae62e93f97acc",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/build_sample.py",
+      "sha256": "5e8f043b22ca1e6c764451447fe4186c59f2a1220413c5f0b784334cdb55f396",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/CURRENT_VERSION.md",
+      "sha256": "9c1f4fc91cd0dd599b48d72bfa7a1e9ad3e66d8d9bc0fd9e4c6e09b4377df05a",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/instructions.md",
+      "sha256": "67d14548cc1246ef9afb733d7812f0d76cf131de58f05af6488177e114f70427",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/review.html",
+      "sha256": "d3acee83cf5a4be1004c9d6ab6885976e7a62b792a46c827ae2566aefc385e74",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/review_decisions.template.json",
+      "sha256": "92a030843f8fe5a38059c43d1594fac114b559f03eda75f3295c5dee73c65f5f",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/target_identity_inventory.json",
+      "sha256": "54be5e2f2903b982e582afaa5ecb802170b8cb44aaf02ff2cd8001f5d38c6c18",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/test_build_sample.py",
+      "sha256": "7e79e41e0d7e2a1c2e15d3794b9a68d478ec8da5b71904097834fffbc1dd6026",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample/verification.md",
+      "sha256": "ab783b1c03fd213950b5d462a9ec7c866606153d9b6e7c8b267e77ef649efbd8",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/artifact_hashes.json",
+      "sha256": "6d1021e37d8b9c13c452d73c36940ab21cc2cffaeb3310956867b634c6db027f",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/automatic_checks.json",
+      "sha256": "fe172d43a70c87514891747a011bcfac7c23ff7f315f1d53ed31432f43020de8",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/instructions.md",
+      "sha256": "2b1c4acb51412d54a69f534629a700a6e634051f9ceb17f3f0114d6197dbaa5a",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/package_manifest.json",
+      "sha256": "d77511f1849255c4cd851c076870fc12cf58a55d887c9d36a7f2fce2bad43aa2",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/prepare.py",
+      "sha256": "da1091aa66d4b31397c5b9d8c991706a9f971e2cf05c2526ad248f96b67d17f2",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/review.html",
+      "sha256": "f3f8a8370688daf3f4641d8b5293445da62c234a31d5c274f84b86b7d17e036a",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/review.js",
+      "sha256": "701a2d98a7bd80a5fb8a1f476ed47268352a41c1e7e46ecc1f565cc31923be36",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/review_annotations.json",
+      "sha256": "867f2f9987046ebc21b52d4839ef24f6aad59e8bf1b0f6aafd71bb385560c3b7",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/review_decisions.template.json",
+      "sha256": "6e50dd109aea0da433dc3f6c5f705d5b1983798159a7afee6102698017ca0c16",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/review_template.html",
+      "sha256": "6e9fe71d5ab34c0252477f5d1e1102a0641d430504662546fe99c76543cc4a07",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/test_interface.cjs",
+      "sha256": "fd80443b19ae644f96f0ad5036f437ed605dd1f45d2f0640f1a3daf6e11accfe",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/test_prepare.py",
+      "sha256": "c6ddb0945356cc81bd99d5a1c3db1e5e1956bcead93ca698bfd049b21fd483c1",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/test_review.js",
+      "sha256": "871dfcdb78ec8519db7a220678145dbe56534d238fa63e29ad1b45f3a09cea6e",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v2/validation_report.md",
+      "sha256": "61659d676ad33fb472a22fb00cbc91d258823d972cf0df299507dcd47dc8fafa",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/automatic_checks.json",
+      "sha256": "4489321ae4c69c7a54878c77328b42079eebf41e6da4ba7026244b1519136666",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/instructions.md",
+      "sha256": "5c307a351e4ddd1f596c7dcc97b9fa0a5d43a612f43ab33f1dbfe493e01a240c",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/mechanical_integrity.json",
+      "sha256": "9c106e80a30e2e6f58434919f5001fcf538ccdbf278a0da5695ddb3aed7b0a5b",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/package_manifest.json",
+      "sha256": "f4fe4994e9cf3940b47fbb8002009bca2a16a543ab1b998eaeb2a84a8477ed80",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/prepare.py",
+      "sha256": "987bf41c22ba4a1594fab777b506bcce643b31797e9e3372d3bbc3b43a9f3ba6",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/review.html",
+      "sha256": "f898af8b715ccc4e037c45cd845542aafae3ed148b33e1d04f0c04d6034bc0b6",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/review.js",
+      "sha256": "b598e7616c69cc998443ff6be8ff3f9c5fa98e329d6b94db3ddf4b939b68bee5",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/review_annotations.json",
+      "sha256": "ab06e0e9418c406d48e16bec00114b33ca3d603324632760a12ab52fc0593933",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/review_decisions.template.json",
+      "sha256": "fbf9f17e61b4981f4153af2d54a1983712ee30c376094d81b46bd156193223aa",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/review_template.html",
+      "sha256": "b7c9c7ea4b8c43e10bcf45d1c17e95e61e257e3989f8daab64a0f27695f80061",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/test_current_instrument.py",
+      "sha256": "7ca8add21990da637ffad7cf8f4fe5235eab148df95c49268753e7647687d5e3",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/test_interface.cjs",
+      "sha256": "cd785fe517f1a67794a54ae4b61642a70c60b39cd5f1c1439a81b6f03bbbcbea",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/test_review.js",
+      "sha256": "6a2b2445ba51f895153c29212cc59252d77cc64cbee28074d316de99d30f3a5d",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v3/validation_report.md",
+      "sha256": "86a0ce889974173dc34461d02e98f83926c4e5686cac172b04142cfe2db55362",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/instructions.md",
+      "sha256": "1022dce3e1b152fce1fa858ff151c2fb4114e112670e13b359ef25c17eb0df75",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/mechanical_integrity.json",
+      "sha256": "523f3002e4f478b2a90233a5489b2c3d165885d5a74c39908e93a5e551a372f0",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/package_manifest.json",
+      "sha256": "a1f8095233fc119d973fd10c6a456e81847e4c1a5152b6f5aa74956735dec283",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/prepare.py",
+      "sha256": "b6720999d052dda5a7c0ec381705834651422796f2c9f558734ce679628d4747",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/review.html",
+      "sha256": "72a99c41a78331611412497b169e3e8f19830ed0fec555005afda44819f6dfaf",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/review.js",
+      "sha256": "b88a85bb8213c442790e43cc614bc1d5503600375a101b55a61e676cdd7a6055",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/review_annotations.json",
+      "sha256": "867f2f9987046ebc21b52d4839ef24f6aad59e8bf1b0f6aafd71bb385560c3b7",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/review_decisions.template.json",
+      "sha256": "b4274e13ad072cb63490cf16d47c3f8627aad85680014e3185ab6054918d4f0e",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/review_template.html",
+      "sha256": "d4bb5b790d49f849feb4df0ba60cff1e704e9ac130fb307ab326f4d912038ed7",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/test_excerpt_audit.py",
+      "sha256": "c6511b8b7eafd9b8cdb4036244b9f846c25d72fad9ed56b8a9f6c8fc51b91fda",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/test_interface.cjs",
+      "sha256": "11b4ebabe183e9b677418ee111494ab1394b5d6fd27cb1b5b43ff00b03b4fec9",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/test_review.js",
+      "sha256": "a7bdc4e764f5929ae323e43828c257a1d7e7b4b70f0ecaa1493f183354abdcbb",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/audit_sample_v4/validation_report.md",
+      "sha256": "b41028057c7fe0783c2a03a16496765109684ddbe0cf853e3dd5f782775a5082",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/frozen/v1/previous_CURRENT.md",
+      "sha256": "c7901de20065f729297990f285ce06176a78a41fe1b4c47d1e941082e7fdb3c4",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/qc_summary.json",
+      "sha256": "b5ca3c7c94b642458b060618cc5ae6725811c38a91beb8efa634ae3ca4e0c820",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/review.md",
+      "sha256": "9a90db6be6641257e98a9f311c5da264c6762aa039c310a7f329c76edab86d2b",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/sources.preparation.json",
+      "sha256": "b51b59c2f10297041617bd15327e1103a7f4c14b9e0ce9bf95427e748fc49ba9",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/validation_report.md",
+      "sha256": "df3a90f443b4dc79daec7421c70a575d5c00c55d53e535fa7186e97e23150552",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/documentary_review_revision2.md",
+      "sha256": "d45d73683d967eb1644afca75f1eb8943eda8589575b31a9acca37fe642a3eaa",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/qc_revision2.json",
+      "sha256": "6bdefae1d158c1cc379593b3d427e3b2fab8325045395e239f6fa7150cefd757",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/qc_summary.json",
+      "sha256": "5078d3f1d37da4f2b119998ab2dfc54d1a366949bb35af9c1094b62b53d12ba8",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/review.md",
+      "sha256": "c00e20afc6c51f85c3a55d89c9ba14793efe53822cc6324fb55fdf7218a35a0a",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/validation_report.md",
+      "sha256": "4c9abe72556d8bc0852d0c967e6a14f21dd9e49a2476da1ec72eb4f20e227185",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/continuation_review.md",
+      "sha256": "e8dc9d242f4e8d57fa74f8a399ad48647bf0d00183125ef5ef4acefb58734ceb",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/qc_summary.json",
+      "sha256": "ee02a17f6d59bebfa536e4bcb58994fd509d0cc9b86bac1119ed886c39def574",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/review.md",
+      "sha256": "057e29ac9ef25b9d782a121eed37292a47e509cdc8c493c341bfb539b3f23c7e",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/validation_report.md",
+      "sha256": "7bf6a8404acd8a1c8f4db213d98907e87b3a29abab0348ad884e3fd78ae0692c",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/documentary_review_revision2.md",
+      "sha256": "53f80504d72738488870412d55f8019928169c552eb5bb275069487db9e18b7c",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/qc_revision2.json",
+      "sha256": "41a2c54833c6ed30edfdd33d9dd6471d75f7c42368ac85d5e465972a9ffa75a1",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/qc_summary.json",
+      "sha256": "8000b6ab530455d897135e5985204826793e735099698be83bb2db412cbe9f6f",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/review.md",
+      "sha256": "a7e1d531a113dbaf2236fef76cf2189dada900bbd2204e0c8a5885826ae0775b",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/validation_report.md",
+      "sha256": "249aa87edd46ec4747895b7a4db3863c35fb94b76db312108b69f9dc662a2585",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/continuation_review.md",
+      "sha256": "9d35f4a3ba73822a690edd5a23d39125c5212ffdee7c98a46df455243efe6416",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/qc_summary.json",
+      "sha256": "447afe636ef8fb464dbfbb77e8554b8d76218e77925ccec764a4cc7980e4ce6c",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/review.md",
+      "sha256": "b4d86ff92710277e843a8a47d2d84e5bd3d514b87f2f1fd19e70c6b7c9df9b36",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/validation_report.md",
+      "sha256": "241db0735a5d41ae8ec9772c99ec786e5bc68dda9d3234583c8115eeb9c5bcda",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/documentary_review_revision2.md",
+      "sha256": "f1c0c4de11d9c3fd89a3274998eb02a4f2c34bed67ed12c95e66e33aebfe145e",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/qc_revision2.json",
+      "sha256": "d07f94caca5897d5ad191f35fa3b7b3abd5dfcc920e12f36caa154dfcbdcad4d",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/qc_summary.json",
+      "sha256": "95c9fed91c143852f6f0c9e1917105dbd11ac186b7f62021866a2899cd38ec80",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/review.md",
+      "sha256": "3d1cdb98f88f9aac3e23b596846d4d711fe152cba4b840dd1a9e89e8cab3014a",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/validation_report.md",
+      "sha256": "f3031fc5cd9c58798f78d0dbbff4743b3a7479bd3abfb22e6140602fce183aaf",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/documentary_followup_checks.md",
+      "sha256": "85da2dbd2c71ff65f4d95e9c3f77bd27295807f0ff709bc45c96fcd4c63133ed",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/documentary_review_revision3.md",
+      "sha256": "0541da58aa296595126148f0bfc20882ba4e7de54a7fc1463379e65374bc391e",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/qc_revision2.json",
+      "sha256": "a9dd8df7fa0760ed295c44cee1e2a8dc5d0ca528f84c373641612a0cfef66403",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/qc_revision3.json",
+      "sha256": "2283c32fdcc745d0d5f50e798f08d90eb0b1c3987615a4041ae5e20f1b4a3ca1",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/qc_summary.json",
+      "sha256": "c7c76b9492676978498b0a2ff741f339589f5d9375deb6689ece9010a5329417",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/review.md",
+      "sha256": "b36c083fed7308ecf01a4859c2b2aa5e803c480ef923284a668e26da149f838d",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/validation_report.md",
+      "sha256": "d1ffd4a54f920a80c6dd923ee6f56ff5428942c0e86be1fbaf7d8129727833e2",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/documentary_review_revision2.md",
+      "sha256": "db8ff2429ef3ce9a7e9c9ceb75d9ec8b4b7a2995b82b290c590643108aa11db6",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/qc_revision2.json",
+      "sha256": "1f8b055c1294385b3213414fe988b0d4c768aec8a11bf309ad34106281d169bd",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/qc_summary.json",
+      "sha256": "5929b37bc1a07911cc313fe5926952581e73a5954402949e7d2a3233f1b6dc97",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/review.md",
+      "sha256": "1fb07a5bb028c252c7c6f526ea5f1ff060ba46f9e0a9c996ca7866083743b620",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/validation_report.md",
+      "sha256": "75caaf5a25d2f22977856f38c83406e041142d9dfc3b0d38d751a916fea38f99",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/negative_interpretation_author_note.md",
+      "sha256": "5d4a5dfea1a45819fd3c4e7502b3fab7e884458d528b51390e68e90a658bef8d",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/qc_summary.json",
+      "sha256": "1894eb2fc5cf22ac6e74b937bdc8e28d9d620eece5516da1d0bd6599afd80536",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/review.md",
+      "sha256": "508e21f1063924255509915c33153240d5ffcc2ba1540b5621ed7acd4f2ef83c",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/validation_report.md",
+      "sha256": "ecb896a3a7c32c48ace49bcc1af84b73fbe75c4fe1e22be65de4fba5ca676a20",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/collection_qc.draft.json",
+      "sha256": "6c0d67898a6b82ac55d56aec1e70e6606742b3cef1a939536ba199ece9328347",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/collection_review.md",
+      "sha256": "14050677b64db02f631f57d3f07896d64db653c901059a66918d753521ba021e",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/conference_artifact_hashes.json",
+      "sha256": "12267e3edbfb202f12ff28fe6d9a9bcab74c0c17e06cc0defe7c5b60a50edf5d",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/qc_summary.json",
+      "sha256": "72c426da726bcbffdb164a97801bfb71269d2aa796697d776431ff7d7ed92995",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/review.md",
+      "sha256": "83339c2a96afb463b643cdcc21b428457b421383b82518e146ec4297a3d51066",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/validation_report.md",
+      "sha256": "d74c07e8fc7c9bc93b0591dd022f779c172c59375ff463e185756315dccc0191",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/check_batch.py",
+      "sha256": "628595f822675bf00d26a18bbc0e03dd24209a759db435d2d087199b27d00107",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/check_collection.py",
+      "sha256": "cdab8bf15acf735309aba1440ba48e8bc760c99dbca95379a424773f1d40d199",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/negative_pattern_review_batches01_03.md",
+      "sha256": "1334e6c0837d12843b375190ec2417f594345ff7fde134f8fee1a5a4bdc3644b",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/test_check_batch.py",
+      "sha256": "2a63551dfdd2f3a2b75be9680ad895d845dcc5d0b8c2b5fa4378db0560529670",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/naturalness_audit/annotations.json",
+      "sha256": "e8ad5056f040b7dba02bbd10ad73914c50ad4ef57979b7f05d1064cf2b48a428",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/naturalness_audit/build_report.py",
+      "sha256": "20d074b5b21745816e07fde75daab0f40b9d3fb288311d266d728e501451b950",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/naturalness_audit/findings.json",
+      "sha256": "646dfec37b977050e73bb1e9995b71f0f91ba754b2acf005a62f97ac2871abee",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/naturalness_audit/followup.md",
+      "sha256": "59436b0f1c07bfb709ab8a5f5ff4dc7e1c493ca654b8c919b3e00edcc60df0c4",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/naturalness_audit/followup_integrity.json",
+      "sha256": "9697fa8947722e4799c1cc180bdf40aa7a3b37e0f40560dd433979404b65bf29",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/naturalness_audit/introduction.md",
+      "sha256": "5020caf09d38e097799daffe7c00cb069d5d7686e0ffac9dc9d5df7289d36f59",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/check_draft.py",
+      "sha256": "d1477c3a655849810d32bb10cc846dad55936d6f1a70709680a97c73a1a2d867",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/documentary_review_revision3.md",
+      "sha256": "f5e69038e107196a8ba653421d775ca95a40da5b41c8878d4fc661451a14033c",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/linguistic_review_revision4.md",
+      "sha256": "cc531ee45bacf6acf2b322da73ddae95c60fc4a2f100a11b75631e2b17f258c0",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/qc_revision4.json",
+      "sha256": "188fe933da6ba0d24474faa2de87fd94b13a775be16a481fcd1f91d642098ba8",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/qc_summary.json",
+      "sha256": "b8987fc7276090ad3ed588c69e3062e7c50bd4b421c86588a146badaafb702ba",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/review.md",
+      "sha256": "f18450e16a5c457bb28f6c26ea993986d66a694eaabfaa191760c064d5d2378e",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/test_check_draft.py",
+      "sha256": "d9f9eb601f96557d75e386a6a1c0d089d501a7ae8fe9f92cc3399ddee55819fd",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/automatic_checks.json",
+      "sha256": "63e4e6c1f17d2b86a734bea198598abc1d85ed96038676b1ad459dad1ba7e266",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/automatic_report.md",
+      "sha256": "7e43b9d90c80d72112e7e468b4cedeeed391aec044b819eb9e125e2fb57c8f22",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/build_demo.py",
+      "sha256": "55822cc0816839792149b419934456e8ee899f819923593da44da0029ac5cb3a",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/instructions.md",
+      "sha256": "cf39a68a19424153f582115743c862acd7d58f993e8c45ee1fe3ddbd6478b14a",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/protocol.md",
+      "sha256": "3689f686811edbb8dc8ee9e5560300befd5c19bf4065d237af95bb29472a8c71",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/review.html",
+      "sha256": "acf379228bdc7563efc017ea061e86258c31b9780b2ea8c9e64c53986f1be386",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/review.js",
+      "sha256": "e98f7b62dba7d1c58b15a5b78ceb54794043d99dfc74bbfda9a6d7de1a1acb29",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/review_decisions.template.json",
+      "sha256": "199b132a9000640fa89ad6447a748c9a83692a40048f019ea6a009ad8d9b1ba2",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/review_summary.json",
+      "sha256": "098660757880e5b4cb6e56b075a8fdbe7a0769e70a295c2b9a3eaf795eb4bed0",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/review_template.html",
+      "sha256": "ca84eb2a2b0aa56f2fbabd1688598f4c5ddbf81637406b32cff50732fa01f569",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/test_build_demo.py",
+      "sha256": "2d5aef264874bc16b5e7fbce009fd86cb1c876cc0897e0b494087eff827e1055",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/review_demo/test_review.js",
+      "sha256": "fb22a626a0c7cc9560fbfdb6399c4a1eb1e8ec29afdfaee59e6fb794b4bdafd6",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/check_current.py",
+      "sha256": "a726e0063ad79208432dda130983172a9e6dba0b22e490cca65f78013abdb13d",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/documentary_approved_02/previous_CURRENT.md",
+      "sha256": "259913089b5931dc2feb1c5cab3f6762dceae1a83dca4bb8f1ca892f9a1a9e98",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/artifact_hashes.json",
+      "sha256": "f2c79ebf7e037320ae53ebf4ab3227554a2c9ae4d974b0c63cdcdaf1a65cd2a8",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/naturalness_approved_01/qc.json",
+      "sha256": "ab181b381349e20bb8e43cba905441609e4661b47a119de181b81d54398d031b",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": "docs/evaluation/golden_set/revisions/test_check_current.py",
+      "sha256": "dc41e6c8b50245b83a7cb182b4ca91ae44df750000c8d0809182b60edc6ab5fa",
+      "role": "preserved_external_history"
+    },
+    {
+      "path": null,
+      "sha256": "c0575a205b176566f10f1735bcd7789e96fce7c593ab0436fb833d04f1cba8df",
+      "role": "private_original_decision_submission"
+    }
+  ],
+  "pdfs": [
+    {
+      "corpus_id": "A",
+      "document_id": "B023",
+      "medication": "TIMEOLATE",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B023/bula_1791246901366.pdf",
+      "sha256": "a80d5fc0eb0553b52d958fb3ef665d21500b835daf814423ca15373b30b595e0",
+      "pages": 7
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B001",
+      "medication": "SINGULAIR",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B001/bula_1791246623844.pdf",
+      "sha256": "105cd1abc112b3fc2ad801d8ac1c3af5d0266e17702dab250e1ec59742b64692",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B024",
+      "medication": "NIMENRIX",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B024/bula_1791246901688.pdf",
+      "sha256": "2fc26b8f082a0bf554b683b2cc55899746fbc9ddded35cacbee6b4efffcda4a8",
+      "pages": 14
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB001",
+      "medication": "losartana pot�ssica",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB001/bula_1791329435703.pdf",
+      "sha256": "edbfe7b9ec409218457402d8ccbbd4ab8a05c00169e322fab2d3eee2854aef87",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB034",
+      "medication": "CIPRAMIL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB034/bula_1791247042757.pdf",
+      "sha256": "7d23769df530f7cbbcf7bde4001fef5a05b500f04568fa078640d606ba3ad427",
+      "pages": 13
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B002",
+      "medication": "SOLU��O GLICOFISIOL�GICA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B002/bula_1791246686506.pdf",
+      "sha256": "c5175435076de7074fd6afc3ba71bab41bc572e14937547a5521b46243a2b65c",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B003",
+      "medication": "CLORIDRATO DE DOXORRUBICINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B003/bula_1791246691948.pdf",
+      "sha256": "bcd9cf05bacf29c54fc269f2feaa89687eb7ba324a9f81f89ee4f8c92b201eb9",
+      "pages": 10
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B004",
+      "medication": "TRILAX",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B004/bula_1791246696116.pdf",
+      "sha256": "84bf559f735387f65f5c19d7d938580baa0e2703360fbc9b3bc11f3be77ba01d",
+      "pages": 12
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B005",
+      "medication": "Fluibron A / Fluibron",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B005/bula_1791246729901.pdf",
+      "sha256": "78d833d4c99b7f9aeec7899a2d5035fec0501fcebb36ac96fea6ae5eca2fc618",
+      "pages": 17
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B006",
+      "medication": "ARNICA WELEDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B006/bula_1791246732987.pdf",
+      "sha256": "d6dd74d4c973b9c406795fab606a167fa68628e65dde414952b4464755850652",
+      "pages": 17
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB002",
+      "medication": "HIDROCLOROTIAZIDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB002/bula_1791329439872.pdf",
+      "sha256": "688791db3755ee3c12a59081f885bd9fd2544960600de19b18e565647c205986",
+      "pages": 15
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB003",
+      "medication": "CAPTOPRIL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB003/bula_1791329442902.pdf",
+      "sha256": "a8ff9d494dc035d2674f16a157888c2634cb9bc54c2743f8479e3ba5db8295f2",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB004",
+      "medication": "maleato de enalapril",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB004/bula_1791329445649.pdf",
+      "sha256": "9dd47df5d651b65e3130c2b916eae6905e63ce31e39d233edd3393ef6ac14db5",
+      "pages": 11
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB005",
+      "medication": "TENOLON",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB005/bula_1791329448696.pdf",
+      "sha256": "5713913d2953a37f5a7b1ef81f6400a21fe539d27958e3b89434a5d2c981162d",
+      "pages": 14
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB006",
+      "medication": "besilato de anlodipino",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB006/bula_1791329451238.pdf",
+      "sha256": "e5fa58695e3c7aa939467bbfca43ce46d02d8552be12369bd9f7d034355fad0f",
+      "pages": 11
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B007",
+      "medication": "AMPLOSPEC",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B007/bula_1791246736061.pdf",
+      "sha256": "b06c6761037ce03395a19d6e686baed64efa4bbce5cdbbb8bf65850072227c2c",
+      "pages": 16
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B008",
+      "medication": "hemitartarato de rivastigmina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B008/bula_1791246774800.pdf",
+      "sha256": "5c1660eab718c12b0d1952b348fbb98bbc327842c4f686d4533d1d797580a7fa",
+      "pages": 10
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B009",
+      "medication": "LIPOFUNDIN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B009/bula_1791246779068.pdf",
+      "sha256": "07d1af1a55961b0b300d66f7ff77d15f88fd6522e03585feeeb48f81345d7cbb",
+      "pages": 12
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B010",
+      "medication": "Prolopa DR / dispers�vel / BD / HBS",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B010/bula_1791246782934.pdf",
+      "sha256": "46b09e4a582ff0bb81783c7894c02b63f2fd9269b3b9e74b90ec935cbaaafa5f",
+      "pages": 50
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B011",
+      "medication": "AMOXIL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B011/bula_1791246785289.pdf",
+      "sha256": "c79815cbdb393617be76a61ff2bf1a9403695829251a466b785e5329af7f8695",
+      "pages": 21
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB007",
+      "medication": "cloridrato de propranolol",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB007/bula_1791329461722.pdf",
+      "sha256": "50b1449946106b5dc460c38dedc3407d0307c718657bc8758001ae57ca2e7bf8",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB008",
+      "medication": "DIURIT",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB008/bula_1791329499197.pdf",
+      "sha256": "b5aaed38f93ac943ebcf1ddb0fb5733fb6842fb653f8784501ecd6220631c0b2",
+      "pages": 11
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB009",
+      "medication": "NIFEDIPRESS",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB009/bula_1791329502750.pdf",
+      "sha256": "3bd30087cbbb48384e7fa7c05a30eb2fecf56c61fed96e50c422daed98699ba9",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB010",
+      "medication": "clortalidona",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB010/bula_1791329506273.pdf",
+      "sha256": "f06fec156057c26ba1b59e99fe4d85b9e8ddf14466ac7c66374157c66d7458a7",
+      "pages": 11
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB011",
+      "medication": "CLORIDRATO DE METFORMINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB011/bula_1791329509872.pdf",
+      "sha256": "e56c40afc2b62c3130f4a615b1696c28b732436c57265a2797f3fac44f8e04cc",
+      "pages": 15
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B012",
+      "medication": "OTO - XILODASE",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B012/bula_1791246786356.pdf",
+      "sha256": "b0f1b9ab783566bb737a7f7b109b70a1d053811f9f0cc3a5d2a8426ab4498677",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B013",
+      "medication": "MALVATRICIN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B013/bula_1791246828833.pdf",
+      "sha256": "48b7e398c494c5f78745ac163f1fa0ea848c8b8efb2b3d2ed0e4fe3f77e6da38",
+      "pages": 15
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B014",
+      "medication": "Pred Fort / Pred Mild",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B014/bula_1791246832147.pdf",
+      "sha256": "073b06975ba201c153fd9d58a9ed09f1f638875165c2e776246809bf44c47d81",
+      "pages": 26
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B015",
+      "medication": "FIBROGAMMIN P",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B015/bula_1791246834028.pdf",
+      "sha256": "2d934a07fd314a493f4e98a1f7dc716c7310fbe499424b4d26fa815e8d4c97d5",
+      "pages": 17
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B016",
+      "medication": "IMUNO  BCG",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B016/bula_1791246837814.pdf",
+      "sha256": "53eac092c91276dd34b899a286f2b20b3b31eec972f10492e0080b13abf33fe4",
+      "pages": 4
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB012",
+      "medication": "Glibenclamida",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB012/bula_1791329513517.pdf",
+      "sha256": "4b356a7fa1c87e0d30b1434b941eb6d8e8fcf1d4e05ced760c2fbf4aa8c1c801",
+      "pages": 12
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB013",
+      "medication": "gliclazida",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB013/bula_1791329516988.pdf",
+      "sha256": "a6e22a82de8a2a9a5f03f0a8f16907d50a5bc0169a9e5fb50b6a5a0c2edbe826",
+      "pages": 11
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB014",
+      "medication": "GLIMEPIRIDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB014/bula_1791329519793.pdf",
+      "sha256": "7151ca50d34f6b5ef9f14e967d89c9f00ab0ac300b22cb2a322bf4d4a5623106",
+      "pages": 11
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB015",
+      "medication": "cloridrato de pioglitazona",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB015/bula_1791329522882.pdf",
+      "sha256": "cb0a1820ea78b74b2e119e116628bf94235cba05460ce249d53406159d0b855a",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB016",
+      "medication": "dapagliflozina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB016/bula_1791329525463.pdf",
+      "sha256": "689c86348c8e9b37117b9bc3e1d6fba58eff17533a1c4564aec982de6bdae027",
+      "pages": 10
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B017",
+      "medication": "CAPSFEN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B017/bula_1791246840451.pdf",
+      "sha256": "7e3b8525ce01e98b77ab7c5f8d1da2dbc1e7388d6227bbd2118655489bbcf4f4",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B018",
+      "medication": "LAFEPE BENZNIDAZOL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B018/bula_1791246890013.pdf",
+      "sha256": "13e524b83eab65964b7852d1e096894d79a8a02d27eadf30d80472c01fbd93d3",
+      "pages": 5
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B019",
+      "medication": "GENTAMISAN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B019/bula_1791246892067.pdf",
+      "sha256": "64d7fda2018a7276f3f0ea3ca76a69957614f0ecc12257a250d064339e328c31",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B020",
+      "medication": "MONOFER",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B020/bula_1791246894188.pdf",
+      "sha256": "262320f02a0080fc67eb54c99d29689a6a0e01d49a31ee82c2533eaf49f0d98f",
+      "pages": 6
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B021",
+      "medication": "CAMOMILINA C",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B021/bula_1791246895251.pdf",
+      "sha256": "db4c16b6b044a1234f66dc5c06468bd49ebac99189c249d35bced4f32f282d64",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB017",
+      "medication": "empagliflozina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB017/bula_1791329528383.pdf",
+      "sha256": "0ad60b91f5223877d5459c70e4e533ada52a62d659e6e55530185dbdcd195f3f",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB018",
+      "medication": "fosfato de sitagliptina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB018/bula_1791329531264.pdf",
+      "sha256": "f4ad75953080c61882a71cad1aad0b36f17420458c6b03f92f3ae2b5597e9e77",
+      "pages": 6
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB019",
+      "medication": "vildagliptina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB019/bula_1791329586213.pdf",
+      "sha256": "3b54b99a53529e8733c1ad66fda701c1bd392e26407a65d4db7e377c858547bb",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB020",
+      "medication": "fosfato de sitagliptina + cloridrato de metformina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB020/bula_1791329589987.pdf",
+      "sha256": "7c1e9f381f0a54cbf98a323be3eb1f087cd338c70401393b46c63207ef1953e9",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB021",
+      "medication": "dipirona",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB021/bula_1791329599897.pdf",
+      "sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db",
+      "pages": 11
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B022",
+      "medication": "piperacilina s�dica + tazobactam s�dico",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B022/bula_1791246897208.pdf",
+      "sha256": "9a1aadc219a75ce611df32ccbec2961a32565e02c92e9aab3280a3e8952e2fa3",
+      "pages": 4
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B025",
+      "medication": "OLINA ESS�NCIA DE VIDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B025/bula_1791246961983.pdf",
+      "sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+      "pages": 2
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B026",
+      "medication": "GLICERINA 12%",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B026/bula_1791246964608.pdf",
+      "sha256": "b16d579b142fb69d6435ad5d90b2b699e036ffd1d4a6109736350f9f8e250bf5",
+      "pages": 7
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B027",
+      "medication": "Atrovent / Atrovent N",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B027/bula_1791246971053.pdf",
+      "sha256": "2419f85d1426f6c8439d28203100025ad036b5c64e2fd5404a71364241d04be2",
+      "pages": 13
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B028",
+      "medication": "COLPATRIN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B028/bula_1791246973219.pdf",
+      "sha256": "86ba065ac51792dcbe2f284081e57026ca457d7201eb5ef38139e2834c9dbf2a",
+      "pages": 14
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB022",
+      "medication": "PARACETAMOL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB022/bula_1791329605125.pdf",
+      "sha256": "880a41737adf4074c1812fbf3d43fd5d2f15cbaf6f3e0b008a71e2b0fae5186b",
+      "pages": 6
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB023",
+      "medication": "ibuprofeno",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB023/bula_1791329608990.pdf",
+      "sha256": "81103836456eabbd08d844f5195499966c55d1096c0e1674c04dcea8f3db3056",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB024",
+      "medication": "naproxeno sodico",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB024/bula_1791329613221.pdf",
+      "sha256": "66c541f306b4737a2839eb56a25943fc44ce5b50fea1b86dd2c0412297742076",
+      "pages": 8
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB025",
+      "medication": "DICLOFENACO S�DICO",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB025/bula_1791329617813.pdf",
+      "sha256": "7d7cdf890bd46c0375c3d99bf47e5ac77a4142555811f5795b96fab2d9f59df8",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB026",
+      "medication": "NIMESULIDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB026/bula_1791329621948.pdf",
+      "sha256": "06a05ae6e200e3d9e31aef6fc44a467ea7cf96c49b1f92069c4971977d7026b9",
+      "pages": 10
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B029",
+      "medication": "BIOVICERIN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B029/bula_1791247053173.pdf",
+      "sha256": "bc1161a2eab60cc5ca87b14593e5a398b8a94078cfcb0442c75ac5cfc3c065ba",
+      "pages": 5
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B030",
+      "medication": "HIRUDOID",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B030/bula_1791247046273.pdf",
+      "sha256": "955bbd5eef54efdac8c98e55974b1b399539aff78f812c7a38d114069f312aed",
+      "pages": 19
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B031",
+      "medication": "ESPINHEIRA SANTA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B031/bula_1791247042640.pdf",
+      "sha256": "fb604e6e84546dced852fb548f7eef98244d07fbb7cb13a37f376b8cc770c874",
+      "pages": 6
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B032",
+      "medication": "DEXAMETRAT",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B032/bula_1791247113528.pdf",
+      "sha256": "86caa59660df3eeb9c7391eef26c3d4ee35024661b8eba01fbebc642ca7ed799",
+      "pages": 7
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B033",
+      "medication": "DRENOGRIP",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B033/bula_1791247129315.pdf",
+      "sha256": "75d56e686e69a986b5cdb50bdc55bf7baa8a9f101a037da919821ae36895b934",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB027",
+      "medication": "meloxicam",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB027/bula_1791329625718.pdf",
+      "sha256": "95982b216523fe6b8ae72fc2551877dfe119527e8c660b621d70a8ade34b4a85",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB028",
+      "medication": "CETOPROFENO",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB028/bula_1791329629038.pdf",
+      "sha256": "99736d18e7b3c154103f110cd1df7458407a4793a117c1cc2593df1f8363c8b5",
+      "pages": 17
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB029",
+      "medication": "trometamol cetorolaco",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB029/bula_1791329632161.pdf",
+      "sha256": "25b4fe58fccff61a2a522845767bb78b6bd6e8744f4345ca290a17b6f36f54be",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB030",
+      "medication": "CALMADOR",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB030/bula_1791246726579.pdf",
+      "sha256": "61d8fb8db6763fd3ebea0ed76baba62c052f2587b68838f6514cfc845c6bb9c2",
+      "pages": 10
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB031",
+      "medication": "cloridrato de fluoxetina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB031/bula_1791329635147.pdf",
+      "sha256": "51b7bec49c8aa2ae935fb9e3cda8d280c5bcff9f02423b5bef8745732310895e",
+      "pages": 16
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B034",
+      "medication": "LUR",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B034/bula_1791247133192.pdf",
+      "sha256": "4d1c470fbfbec475bf4dd73aa6c3c53177b7e3a401e7f39764befb117c867d6f",
+      "pages": 11
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B035",
+      "medication": "IMUSSUPREX",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B035/bula_1791247139052.pdf",
+      "sha256": "6a3255668e798ff56f9bb41027ae282152b7b1129a3945aa8bb8168b87c85f81",
+      "pages": 11
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B036",
+      "medication": "PROCTYL",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B036/bula_1791247144089.pdf",
+      "sha256": "7b4ec98a6e4d911df1be8d2cf528c31247ba2b324ecdeabc5dcc2a556f93b1ed",
+      "pages": 18
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B037",
+      "medication": "SOLUPREN",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B037/bula_1791247296210.pdf",
+      "sha256": "b2e2e2121098ab3adb22cb61583e2d687b209e00dce9ca29b82458f780c82f76",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B038",
+      "medication": "DIANEAL PD-2",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B038/bula_1791247291427.pdf",
+      "sha256": "6af0132b12d269b8997c6085e335fbe0a183d8f0acd32d8d6076806db4001456",
+      "pages": 28
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB032",
+      "medication": "cloridrato de amitriptilina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB032/bula_1791329638185.pdf",
+      "sha256": "4ef8513bae5afc3b322bbc5f92cb7b69d96753a599642edcdb183c0204b60a1a",
+      "pages": 8
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB033",
+      "medication": "CLORIDRATO DE SERTRALINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB033/bula_1791329641140.pdf",
+      "sha256": "c07d6436bdd2456ecdc914a697a718ab250ba3562c73e11dbde07e6820d0fd9c",
+      "pages": 12
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB035",
+      "medication": "CLORIDRATO DE PAROXETINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB035/bula_1791329644445.pdf",
+      "sha256": "2152cb976ffadf07f9c720735bd23e2b2634c57533decb4416451553e9650323",
+      "pages": 12
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB036",
+      "medication": "cloridrato de venlafaxina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB036/bula_1791329687037.pdf",
+      "sha256": "e91ffc935328cbcfafc693a9debd462f79dc7b834c2140a7e315533a84a68a77",
+      "pages": 13
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB037",
+      "medication": "oxalato de escitalopram",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB037/bula_1791329690930.pdf",
+      "sha256": "51c070166631290367ae086b73a60749e515f3aa0c665762ca7c3ccf45a57f00",
+      "pages": 13
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B039",
+      "medication": "cloridrato de dexmedetomidina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B039/bula_1791247275568.pdf",
+      "sha256": "9a2a902154f079f061ae3d55dca34f07125196b6f748e40011ddfc50db6d6585",
+      "pages": 11
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B040",
+      "medication": "DODOY",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B040/bula_1791247250853.pdf",
+      "sha256": "8d18fe70ec6b52c6c47293c04fe0b96a0d1103cb42d359d2be667ff83a7fc7a0",
+      "pages": 9
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B041",
+      "medication": "VOMISTOP",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B041/bula_1791247250064.pdf",
+      "sha256": "bf49fef0fa31f56f58f5e118276120e7329f558df7d5da1ebf90f87597d75b40",
+      "pages": 10
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B042",
+      "medication": "SOVALDI",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B042/bula_1791247345598.pdf",
+      "sha256": "621636da74328b5eea20fd341a9a6e8307273c79cdb31cd7c969d4d01df74b4d",
+      "pages": 15
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B043",
+      "medication": "CRONOB�",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B043/bula_1791247358820.pdf",
+      "sha256": "36cbc73e5f397832a9aa1c165bc8727571c6353af6d181c4c918b726cf937f6c",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB038",
+      "medication": "cloridrato de duloxetina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB038/bula_1791329694894.pdf",
+      "sha256": "f54cac847bdfccdc10420329c24fa626cc1c6ff78c3fb86cb9784d620abc3490",
+      "pages": 13
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB039",
+      "medication": "mirtazapina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB039/bula_1791329698726.pdf",
+      "sha256": "8012b7dc3dbd959e1170e122bb77b27dd7a291d0868f7752b996dcda61c1ea04",
+      "pages": 8
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB040",
+      "medication": "cloridrato de trazodona",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB040/bula_1791329702857.pdf",
+      "sha256": "6ccabdc700eaa30fcbc8307b73481125f7276ae799394af28ad1989ae47aa54c",
+      "pages": 13
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB041",
+      "medication": "SINVASTATINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB041/bula_1791329706258.pdf",
+      "sha256": "a035d824170c0971803bbc1b48899f5f662f6aed326c009dfde483de99a7e482",
+      "pages": 6
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB042",
+      "medication": "ATORVASTATINA C�LCICA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB042/bula_1791329709865.pdf",
+      "sha256": "f424f5a25f2fe5e76e80a72b3e67982e8714ae76d8d9af3c7cf0f57ed0a3427b",
+      "pages": 7
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B044",
+      "medication": "CYCLOFEMINA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B044/bula_1791247373784.pdf",
+      "sha256": "9555875042d263b7f706f1ccec809e8467184fbc7497a6ccb8a4f41c478ed712",
+      "pages": 8
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B045",
+      "medication": "Air Salonpas / Salonpas Gel / Salonsip",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B045/bula_1791247383810.pdf",
+      "sha256": "1a18cf5583b059f5ec7164ad44ef8d98b574e132e3c0b96d5570daf9f39fb266",
+      "pages": 15
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B046",
+      "medication": "Fra��o �cida com C�lcio 3,5 mEq/L (Farmace)",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B046/bula_1791247394764.pdf",
+      "sha256": "3d52abbef565ebcf1f9b02429ca6632dbafc8ad4f77d4b7f421e717a915c025e",
+      "pages": 5
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B047",
+      "medication": "FUNED �CIDO F�LICO",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B047/bula_1791247427635.pdf",
+      "sha256": "532adebf87780c2a10fa8d5ed1e72cedbb92c2fe2542c43a412795f28431bfab",
+      "pages": 6
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B048",
+      "medication": "LAQFA-ISONIAZIDA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B048/bula_1791247430452.pdf",
+      "sha256": "aebaef75c30f65cb4dfdabbc0cfe0b4b269a63f9ffa3567a4d28432ced51b271",
+      "pages": 8
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB043",
+      "medication": "rosuvastatina c�lcica",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB043/bula_1791329713235.pdf",
+      "sha256": "1f88a64dc5819933e252dae6c347f24fc32c89a4f5d818feb70dce6045eee30c",
+      "pages": 9
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB044",
+      "medication": "CIPROLIP",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB044/bula_1791247123073.pdf",
+      "sha256": "f24ff5c39fbd4b9ca5952cf056121d2944af67a935b6817884ee1834bba8984d",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB045",
+      "medication": "ezetimiba + sinvastatina",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB045/bula_1791329715920.pdf",
+      "sha256": "1cfb6036ee5dc4dd8b3937839fd0d08b13a103ac226a6259550998c84a57c66d",
+      "pages": 12
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB046",
+      "medication": "fenofibrato",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB046/bula_1791329719056.pdf",
+      "sha256": "8159761d3d09b806e2ba08033fa0e0abb43c8b52fb0ec329758dc49658698225",
+      "pages": 8
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB047",
+      "medication": "EZETIMIBA",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB047/bula_1791329721812.pdf",
+      "sha256": "d9bc4c7d12092e81f0eaec51c69406f08d4df01d524842c426cfc4ca191909a2",
+      "pages": 6
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B049",
+      "medication": "SPORANOX",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B049/bula_1791247433429.pdf",
+      "sha256": "7c120618bebaaebdebb15fb19824ba29463fa6e649d5021b8a7e5d4b0d574131",
+      "pages": 19
+    },
+    {
+      "corpus_id": "A",
+      "document_id": "B050",
+      "medication": "VYVGART",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B050/bula_1791247437912.pdf",
+      "sha256": "f41b0939a34c2468bcb95df916ca5cc305782c6236706c461cccca9d1bcadab3",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB048",
+      "medication": "bezafibrato",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB048/bula_1791329724624.pdf",
+      "sha256": "1d6dffe47e8247daaa1a63665eecd486c199e5517916c0f21ad5f3405a73dca0",
+      "pages": 7
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB049",
+      "medication": "genfibrozila",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB049/bula_1791329727134.pdf",
+      "sha256": "4565961b3883e3f7294ee42d3c499f2911acdad2f852f2c62cdb9f829fe6a712",
+      "pages": 6
+    },
+    {
+      "corpus_id": "B",
+      "document_id": "CB050",
+      "medication": "Pravastatina S�dica",
+      "path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB050/bula_1791329730305.pdf",
+      "sha256": "4019f913b8314d822f86dcb39204c43066c99e5dc17ae8fbd44e32e7717971a8",
+      "pages": 15
+    }
+  ]
+}

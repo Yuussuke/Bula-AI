@@ -1,0 +1,3 @@
+# Frozen documentary artifacts must retain their exact byte-level identities.
+# Historical blank lines at EOF are intentional hash-bound source bytes.
+docs/evaluation/golden_set/** -text whitespace=cr-at-eol,-blank-at-eof

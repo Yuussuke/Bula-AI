@@ -1,0 +1,202 @@
+[
+  {
+    "corpus_id": "A",
+    "document_id": "B049",
+    "document_sha256": "7c120618bebaaebdebb15fb19824ba29463fa6e649d5021b8a7e5d4b0d574131",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B049/bula_1791247433429.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 19,
+    "medication": "SPORANOX",
+    "manufacturer": "Kenvue Ltda.",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=112360028",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 234878,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      6,
+      12,
+      13,
+      18,
+      19
+    ],
+    "documentary_notes": [
+      "Kenvue produces, Janssen-Cilag registers; frozen manufacturer unchanged. Current presentation is 28 oral 100-mg capsules; history has other packs and a placeholder notification number.",
+      "Original pages 12/13 tables inspected: buccal row is one capsule once daily for 15 days. Continuous foot-nail versus cyclic hand/foot therapy and recovery time are distinct, not interchangeable. No personalized regimen generated.",
+      "Liver-warning Q06 preserves immediate contact and stopping as expressly stated. Cardiac failure prohibition and clinician exception coexist; no unrestricted cardiac-use fixture authored.",
+      "Saccharolmyces boulardii appears in a non-recommended co-use list, not post-treatment recurrence prevention. Full history checked without treating historic professional-section names as clinical evidence."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B050",
+    "document_sha256": "f41b0939a34c2468bcb95df916ca5cc305782c6236706c461cccca9d1bcadab3",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B050/bula_1791247437912.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 7,
+    "medication": "VYVGART",
+    "manufacturer": "Patheon Italia S.p.A.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=112610001",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 16081,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      4,
+      5,
+      6
+    ],
+    "documentary_notes": [
+      "Adult hospital IV infusion, not home injection or bolus. Diluted versus undiluted storage and their clock origins differ; preserve professional administration.",
+      "Original page 6 visibly retains editorial markup: an earlier approval date is struck out beside 16/09/2026. Patheon OR Vetter producers are printed; manifest names only Patheon. Retain frozen manifest and record discrepancy, do not infer source revision metadata from native concatenation.",
+      "Vaccination advice is four weeks before starting; some, not all, vaccines are contraindicated. Infection symptoms require immediate reporting; no individual diagnosis.",
+      "First-cycle length is not symptom-free duration. Standard concomitant therapy does not document piridostigmine withdrawal."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB048",
+    "document_sha256": "1d6dffe47e8247daaa1a63665eecd486c199e5517916c0f21ad5f3405a73dca0",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB048/bula_1791329724624.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 7,
+    "medication": "bezafibrato",
+    "manufacturer": "EMS S/A; Novamed Fabricação de Produtos Farmacêuticos Ltda.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=105830883",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 21582,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      4
+    ],
+    "documentary_notes": [
+      "Germed registers, EMS or Novamed produce. Coated adult 200-mg tablets; frozen identity unchanged.",
+      "Original page 3 confirms anomalous source text: combined therapy should be 'continuada' at first myopathy sign; the interaction paragraph names metformin as a sulfonylurea example. Do not silently correct, endorse or clinically reconcile either passage. No fixture asks that disputed instruction or classification.",
+      "Original page 4 says three times daily 'pela manhã ou à noite'; no fixed daily schedule fixture authored. Q04 asks only meal timing and intact tablet restrictions, not personalized dose selection.",
+      "Severe renal dysfunction WITH dialysis is prohibited; other renal impairment needs adjustment. Lactation prohibition differs from the source's general pregnancy-orientation wording. No individualized renal regimen."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB049",
+    "document_sha256": "4565961b3883e3f7294ee42d3c499f2911acdad2f852f2c62cdb9f829fe6a712",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB049/bula_1791329727134.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 6,
+    "medication": "genfibrozila",
+    "manufacturer": "CPM Concessionária Paulista de Medicamentos S/A",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=110390189",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 18242,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      4
+    ],
+    "documentary_notes": [
+      "FURP registers, CPM produces, 600/900-mg oral tablets. Physically scored tablets must not be split/opened/chewed according to body instructions.",
+      "Blood peak at one to two hours differs from observed cholesterol reduction from week eight. Diet continues during treatment; pediatric efficacy/safety not established.",
+      "Rosuvastatin is explicitly contraindicated. Warfarin adjustment concerns anticoagulant dose and protrombin-time monitoring, not a new genfibrozil dose.",
+      "Native adverse-event descriptions include internal terminology/frequency complexities; no reconstructed adverse-event percentage or blood-donation eligibility was inferred."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB050",
+    "document_sha256": "4019f913b8314d822f86dcb39204c43066c99e5dc17ae8fbd44e32e7717971a8",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB050/bula_1791329730305.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 15,
+    "medication": "Pravastatina Sódica",
+    "manufacturer": "Intas Pharmaceuticals Ltd.",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=155370006",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 43895,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      5,
+      7,
+      9
+    ],
+    "documentary_notes": [
+      "Accord imports, Intas produces 10/20/40-mg tablets. Familial heterozygous pediatric group differs from unrestricted pediatric use; source label above eight and posology eight-to-eighteen boundary not tested at exactly eight.",
+      "Original page 9 confirms 8–13 versus 14–18 age-specific ranges. Q04 retains diagnosis, age and prepubertal risk/benefit assessment without assuming pubertal status or selecting individual dose.",
+      "Source contains tension between active liver-disease contraindication and hepatic-insufficiency adjustment; acid-fusidic prohibition versus exceptional supervised co-use; no fixture resolves those contradictions. Page 7 colestipol interval differs from generalized resin paragraph on page 9; Q07 asks colestyramine, whose interval agrees.",
+      "Chronic warfarin co-use 'no alteration' versus RNI changes on initiation/titration have different context. No generalized anticoagulant permission fixture. Muscle symptoms require immediate physician contact; hair loss does not document recovery after stopping."
+    ]
+  }
+]

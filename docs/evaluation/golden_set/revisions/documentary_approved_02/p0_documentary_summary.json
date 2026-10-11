@@ -1,0 +1,61 @@
+{
+  "status": "documentary_resolution_proposals_only",
+  "human_closures_created": 0,
+  "priority_queue_changed": false,
+  "cases": [
+    {
+      "question_id": "A-B017-Q05",
+      "draft_revision": 1,
+      "current_record_sha256": "cae21d97fa6a6c308b56348b77fd4f0822883800ca1da631e3990d0bfb9de7bb",
+      "historical_alert_record_sha256": "cae21d97fa6a6c308b56348b77fd4f0822883800ca1da631e3990d0bfb9de7bb",
+      "human_closure_recorded": false,
+      "source_context": "p2 stomach warning; p6 food/milk for gastrointestinal disturbances.",
+      "documentary_resolution_proposal": "Retain both documentary conditions. Food/milk is not permission to use despite a stomach contraindication; no clinical reconciliation or record correction is needed from the demonstrated passages."
+    },
+    {
+      "question_id": "A-B026-Q08",
+      "draft_revision": 1,
+      "current_record_sha256": "3c2d0ebc73f7d88833e0b7dc084b1641a5ae52c05f2777fa471270096df53da3",
+      "historical_alert_record_sha256": "3c2d0ebc73f7d88833e0b7dc084b1641a5ae52c05f2777fa471270096df53da3",
+      "human_closure_recorded": false,
+      "source_context": "p2 no sensitive colic; p4 colic/diarrhea listed.",
+      "documentary_resolution_proposal": "Preserve the real source tension and communicate section 8 without guaranteeing absence of colic. Current expected information already preserves the tension."
+    },
+    {
+      "question_id": "A-B035-Q03",
+      "draft_revision": 2,
+      "current_record_sha256": "c7d6b78cfd5e6ad95b4dee52fcb86bab7cc3cf3e497fea1b75516c533e33b623",
+      "historical_alert_record_sha256": "c7d6b78cfd5e6ad95b4dee52fcb86bab7cc3cf3e497fea1b75516c533e33b623",
+      "human_closure_recorded": false,
+      "source_context": "p4 timing relative to meals/milk; p6 nausea relief versus lower absorption.",
+      "documentary_resolution_proposal": "Preserve the main administration timing and absorption/monitoring caveat. Do not create an independent food exception."
+    },
+    {
+      "question_id": "B-CB021-Q01",
+      "draft_revision": 1,
+      "current_record_sha256": "6e0748e360bf159db851a535e5dede81521d39ce4fc5c0104cb13b7c48773575",
+      "historical_alert_record_sha256": "6e0748e360bf159db851a535e5dede81521d39ce4fc5c0104cb13b7c48773575",
+      "human_closure_recorded": false,
+      "source_context": "p1-2 identity/presentation; both frozen manifests.",
+      "documentary_resolution_proposal": "The prior conference checked product, active ingredient and responsible entity across the 100 targets: dipyrone/Santisa identifies CB021 within this corpus. Preserve the question without disclosing injection in advance; no market-wide uniqueness claim."
+    },
+    {
+      "question_id": "B-CB025-Q05",
+      "draft_revision": 2,
+      "current_record_sha256": "00517b639db7893e6d2cd79290939a7adbe7ddd8366cc40d445d602e772fbd75",
+      "historical_alert_record_sha256": "374687ef07f8738ac04360ba6ac1e55eb0d8fc0052263cb7c1b3c880a28fbb5b",
+      "human_closure_recorded": false,
+      "source_context": "p2 contraindication list; p3 severe disease; p4 monitoring.",
+      "documentary_resolution_proposal": "The authorized revision now adds the p2 introduction and hepatic/renal-insufficiency bullet. Monitoring does not override either contraindication wording; question, classification, expected information and qualifiers remain unchanged."
+    },
+    {
+      "question_id": "B-CB038-Q04",
+      "draft_revision": 1,
+      "current_record_sha256": "421b9169f018feafc3b30db02f2348877522f2345a88501a79f52c9ef18248d3",
+      "historical_alert_record_sha256": "421b9169f018feafc3b30db02f2348877522f2345a88501a79f52c9ef18248d3",
+      "human_closure_recorded": false,
+      "source_context": "p6 capsule must not be split/opened/chewed; p7 individualized gradual reduction.",
+      "documentary_resolution_proposal": "Dose reduction does not authorize capsule manipulation. Preserve physician-guided individualized tapering; do not add a personal schedule."
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "created_on": "2026-10-10",
+  "revision": 2,
+  "actor": "AI_assistant_documentary_correction_not_human_approval",
+  "record_hash_serialization": "UTF-8 JSON, ensure_ascii=False, sort_keys=True, separators=(',', ':')",
+  "original_questions_sha256": "6f18c953aa8c3850f289cf5fe8550ffda6e414a0bcc8a1b7d5c24102e174cf5f",
+  "revised_questions_sha256": "da02a31983e4dd2dec894ebb457bc4134c3229058ebabb0b01c0fd0d23d1e275",
+  "sources_sha256": "2f84a31a5f49e14ea1a8d5734949e43b01cf36462a0f70862dc37103f799013c",
+  "changes": [
+    {
+      "question_id": "A-B007-Q01",
+      "reason": "Remove the requested amount from the query. Brand, manufacturer and route identify the sole Amplospec PDF in the frozen corpus; no unavoidable target ambiguity found.",
+      "before_record_sha256": "782232a83d205b0131c157ba4eead5c2e3e8273b2773ce33090c65bb6c09241f",
+      "after_record_sha256": "d18a8f06398952e890e594b1475085de1a9b9576b1eb0231415cd39a076ab38d",
+      "changed_fields": {
+        "question_cross_bula": {
+          "before": "Quanto de ceftriaxona tem em cada frasco de Amplospec de 1 g, para uso intravenoso?",
+          "after": "Quanto de ceftriaxona tem em cada frasco de Amplospec do Instituto BioChimico, para uso intravenoso?"
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        }
+      }
+    },
+    {
+      "question_id": "A-B008-Q05",
+      "reason": "Explicit source support for the existing complementary alternatives claim is on the same physical page. Preserve the lactation contraindication, both questions and expected information. Alternatives remain optional context under the fidelity policy.",
+      "before_record_sha256": "13f66ea0be6971e46bcb123a34a0db8aa2667e7baa52360cbff646a93fce8ecd",
+      "after_record_sha256": "e5fad9e37c37940b8bc8e650628b397528c47a5eead69bb812cacfa0ba98abed",
+      "changed_fields": {
+        "reference_evidence": {
+          "before": [
+            {
+              "pdf_page": 4,
+              "section": "4. O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO? / Gravidez e lactação",
+              "quote": "Você não deve amamentar durante o tratamento com o hemitartarato de rivastigmina.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 4,
+              "section": "4. O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO? / Gravidez e lactação",
+              "quote": "Este medicamento é contraindicado durante o aleitamento ou doação de leite, pois pode ser excretado no leite humano e pode causar reações indesejáveis no bebê.",
+              "source_region": null
+            }
+          ],
+          "after": [
+            {
+              "pdf_page": 4,
+              "section": "4. O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO? / Gravidez e lactação",
+              "quote": "Você não deve amamentar durante o tratamento com o hemitartarato de rivastigmina.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 4,
+              "section": "4. O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO? / Gravidez e lactação",
+              "quote": "Este medicamento é contraindicado durante o aleitamento ou doação de leite, pois pode ser excretado no leite humano e pode causar reações indesejáveis no bebê.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 4,
+              "section": "4. O QUE DEVO SABER ANTES DE USAR ESTE MEDICAMENTO? / Gravidez e lactação",
+              "quote": "Seu médico ou cirurgião-dentista deve apresentar alternativas para o seu tratamento ou para a alimentação do bebê.",
+              "source_region": null
+            }
+          ]
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        }
+      }
+    }
+  ],
+  "unchanged_records": 98,
+  "unchanged_check": {
+    "question_id": "A-B010-Q01",
+    "record_sha256": "0732a85a3ab0f864eb722b54c4874f3f4a3eef6fdf80009419d474cc438cc135",
+    "decision": "Retain wording. DR alone distinguishes the local form; 250 mg is a redundant but legitimate presentation identifier, not the requested separate active-ingredient amounts (200 mg levodopa; 57 mg salt equivalent to 50 mg benserazide). No other Prolopa target PDF appears in the frozen manifests. This is not human approval."
+  },
+  "human_decisions_inherited": false,
+  "immutable_original_artifacts": {
+    "questions.draft.jsonl": "6f18c953aa8c3850f289cf5fe8550ffda6e414a0bcc8a1b7d5c24102e174cf5f",
+    "sources.json": "2f84a31a5f49e14ea1a8d5734949e43b01cf36462a0f70862dc37103f799013c",
+    "review.md": "c00e20afc6c51f85c3a55d89c9ba14793efe53822cc6324fb55fdf7218a35a0a",
+    "manifest.json": "cfcaa89b1fed9678a4147e8c0a4c93dc874dd2428d0805aeafd531e1762fbe38",
+    "qc_summary.json": "5078d3f1d37da4f2b119998ab2dfc54d1a366949bb35af9c1094b62b53d12ba8",
+    "validation_report.md": "4c9abe72556d8bc0852d0c967e6a14f21dd9e49a2476da1ec72eb4f20e227185"
+  }
+}

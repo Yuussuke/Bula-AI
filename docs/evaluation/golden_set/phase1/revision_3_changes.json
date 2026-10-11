@@ -1,0 +1,37 @@
+{
+  "revision": 3,
+  "decision_date": "2026-10-09",
+  "authority": "Author confirmed target-document relevance before main experiments",
+  "previous_dataset_sha256": "b4c6a559c1aa7f08583f9ece33ba351cf32a34b22b3e014f005bb0189370ab92",
+  "revised_dataset_sha256": "caeaf46523577605aee6f879b728345a293329856a91860db79138b50627051a",
+  "preserved_revision2_audit_sha256": "3197eb1824d53a278b6641298fc0c108fcacf1a95f76a017be165389f1bb7c5f",
+  "policy": "reference_policy.md",
+  "superseded_policy_archive": "revision_history.md",
+  "conference_report": "documentary_review_revision3.md",
+  "documentary_changes": [],
+  "record_metadata_changes": [
+    {
+      "field": "draft_revision",
+      "condition": "all 50 records",
+      "before": 2,
+      "after": 3
+    },
+    {
+      "field": "cross_bula_validation",
+      "condition": "40 positive records",
+      "before": "pending_reference_equivalence_review",
+      "after": "pending_target_query_review"
+    },
+    {
+      "field": "cross_bula_validation",
+      "condition": "10 negative records",
+      "before": "pending_corpus_review",
+      "after": "not_evaluated_for_abstention"
+    }
+  ],
+  "questions_and_documentary_annotations_unchanged": true,
+  "human_approval": "pending_all_50",
+  "experiments_run": false,
+  "pipeline_or_parameter_changes": false,
+  "remaining_questions_generated": 0
+}

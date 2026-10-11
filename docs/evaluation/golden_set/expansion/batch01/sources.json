@@ -1,0 +1,386 @@
+[
+  {
+    "corpus_id": "A",
+    "document_id": "B002",
+    "document_sha256": "c5175435076de7074fd6afc3ba71bab41bc572e14937547a5521b46243a2b65c",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B002/bula_1791246686506.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 9,
+    "medication": "SOLUÇÃO GLICOFISIOLÓGICA",
+    "manufacturer": "Fresenius Kabi Brasil Ltda.",
+    "length_group": "média",
+    "group": null,
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100410011",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 18107,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "The contraindications and precautions use different formulations for organ-function impairment; the draft quotes the relevant section without clinical reconciliation."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B003",
+    "document_sha256": "bcd9cf05bacf29c54fc269f2feaa89687eb7ba324a9f81f89ee4f8c92b201eb9",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B003/bula_1791246691948.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 10,
+    "medication": "CLORIDRATO DE DOXORRUBICINA",
+    "manufacturer": "Eurofarma Laboratórios S.A.",
+    "length_group": "média",
+    "group": null,
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100430004",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 38738,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Distinguish reconstituted from subsequently diluted solution. The vaccine-description passage is not used as evidence; this is documentary annotation, not clinical source certification."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B004",
+    "document_sha256": "84bf559f735387f65f5c19d7d938580baa0e2703360fbc9b3bc11f3be77ba01d",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B004/bula_1791246696116.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 12,
+    "medication": "TRILAX",
+    "manufacturer": "Sandoz do Brasil Indústria Farmacêutica Ltda.",
+    "length_group": "média",
+    "group": null,
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100470267",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 36826,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      4
+    ],
+    "documentary_notes": [
+      "Page 4 mentions Torsilax inside the Trilax leaflet; this passage is not a reference for the drafted questions.",
+      "Page 4 combines adult use, an under-14 restriction with an exception and lack of established pediatric safety. No pediatric-use question is drafted from this ambiguity."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B005",
+    "document_sha256": "78d833d4c99b7f9aeec7899a2d5035fec0501fcebb36ac96fea6ae5eca2fc618",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B005/bula_1791246729901.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 17,
+    "medication": "Fluibron A / Fluibron",
+    "manufacturer": "Chiesi Farmaceutici S.p.A.; Zambon Laboratórios Farmacêuticos Ltda.",
+    "length_group": "longa",
+    "group": null,
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100580039",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 46315,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      4,
+      9,
+      11,
+      13
+    ],
+    "documentary_notes": [
+      "One PDF contains Fluibron A inhalation flaconetes (pages 1–7) and Fluibron oral/inhalation drops (pages 8–13). Keep route and form qualified.",
+      "Pages 7 and 13 retain XX/XX/XXXX approval-date placeholders. Archived ANVISA provenance is preserved; no fresh or latest-version claim is made.",
+      "Page 13 lists Zambon OR Mariol production for the drops, with Chiesi registration. Manifest manufacturer metadata does not enumerate Mariol; the immutable corpus manifest is not corrected here."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B006",
+    "document_sha256": "d6dd74d4c973b9c406795fab606a167fa68628e65dde414952b4464755850652",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B006/bula_1791246732987.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 17,
+    "medication": "ARNICA WELEDA",
+    "manufacturer": "Weleda do Brasil - Laboratório e Farmácia Ltda.",
+    "length_group": "longa",
+    "group": null,
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100610004",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 36795,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      8,
+      13
+    ],
+    "documentary_notes": [
+      "One PDF contains drops (pages 1–5), globules (6–10) and tablets (11–15). Do not transfer excipients or dosing between forms.",
+      "The source states absence of clinical efficacy studies (pages 2, 7, 12). Documentary answerability does not certify efficacy or endorse treatment."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB002",
+    "document_sha256": "688791db3755ee3c12a59081f885bd9fd2544960600de19b18e565647c205986",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB002/bula_1791329439872.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 15,
+    "medication": "HIDROCLOROTIAZIDA",
+    "manufacturer": "EMS S/A; Novamed Fabricação de Produtos Farmacêuticos Ltda.",
+    "length_group": "longa",
+    "group": "Anti-hipertensivos",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=102350792",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 50848,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": []
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB003",
+    "document_sha256": "a8ff9d494dc035d2674f16a157888c2634cb9bc54c2743f8479e3ba5db8295f2",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB003/bula_1791329442902.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 9,
+    "medication": "CAPTOPRIL",
+    "manufacturer": "Brasterapica Pharmaceutica Ltda.",
+    "length_group": "curta",
+    "group": "Anti-hipertensivos",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100380098",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 21598,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": []
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB004",
+    "document_sha256": "9dd47df5d651b65e3130c2b916eae6905e63ce31e39d233edd3393ef6ac14db5",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB004/bula_1791329445649.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 11,
+    "medication": "maleato de enalapril",
+    "manufacturer": "Laboratório Teuto Brasileiro S/A",
+    "length_group": "média",
+    "group": "Anti-hipertensivos",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=103700442",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 35645,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      10,
+      11
+    ],
+    "documentary_notes": [
+      "History tables on pages 10–11 require visual inspection to resolve extracted reading order; they are not clinical evidence for the selected questions."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB005",
+    "document_sha256": "5713913d2953a37f5a7b1ef81f6400a21fe539d27958e3b89434a5d2c981162d",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB005/bula_1791329448696.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 14,
+    "medication": "TENOLON",
+    "manufacturer": "Vitamedic Ind. Farmacêutica Ltda.",
+    "length_group": "longa",
+    "group": "Anti-hipertensivos",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=103920045",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 48949,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": []
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB006",
+    "document_sha256": "e5fa58695e3c7aa939467bbfca43ce46d02d8552be12369bd9f7d034355fad0f",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB006/bula_1791329451238.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 11,
+    "medication": "besilato de anlodipino",
+    "manufacturer": "Sandoz do Brasil Indústria Farmacêutica Ltda.",
+    "length_group": "média",
+    "group": "Anti-hipertensivos",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100470557",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 33987,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      1,
+      2,
+      10,
+      11
+    ],
+    "documentary_notes": [
+      "Native extraction of the cover is garbled and history pages 10–11 are rotated; all three were inspected visually. Clinical-reference text remains extractable.",
+      "Page 4 discusses a 20-mg daily amount in its simvastatin passage while page 5 describes a 10-mg maximum. Neither passage is a reference for dose questions; no clinical correction or inference is attempted."
+    ]
+  }
+]

@@ -1,0 +1,62 @@
+{
+  "created_on": "2026-10-10",
+  "revision": 2,
+  "actor": "AI_assistant_documentary_correction_not_human_approval",
+  "record_hash_serialization": "UTF-8 JSON, ensure_ascii=False, sort_keys=True, separators=(',', ':')",
+  "original_questions_sha256": "54f521008bf9b6f8a6e5bcc0453c32ea2d936af859980a26b58f1a940e7f7c26",
+  "revised_questions_sha256": "eff2d8d11cd7dd1424e5f207043abd8a8db93940ab744ecf1b5cc529c0eac9f7",
+  "sources_sha256": "f59d4cb2ce463e2f85d70cd96daf5dc6162bb0f90774d77ac09cc129e55c718e",
+  "changes": [
+    {
+      "question_id": "B-CB020-Q01",
+      "reason": "Remove the requested ingredient names. Strength is an identifying presentation, not the requested answer. Frozen corpus B has two Globo documents: CB020 50+1000 mg and CB040 trazodone 50/100 mg; only CB020 matches this description. Cover, form and indication verified on physical pages 1-2.",
+      "before_record_sha256": "5a9482d7cee0bc3a5326983a0f79bb7b83a0607d4b57dac7943fc31cf4855722",
+      "after_record_sha256": "bd3dd15687086ac212e37ad26223e5ef62f36de13c1227caf5d372f58235acda",
+      "changed_fields": {
+        "question_cross_bula": {
+          "before": "Quais são os dois remédios que têm no comprimido de sitagliptina com metformina do Laboratório Globo?",
+          "after": "Quais são os dois remédios que têm no comprimido de 50 mg + 1.000 mg do Laboratório Globo, para diabetes?"
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        }
+      }
+    },
+    {
+      "question_id": "B-CB021-Q04",
+      "reason": "Remove evaluator wording only. Preserve age four, weight twenty kilograms, IM route, table references, medical-dose-selection condition and qualifiers; do not calculate an individual dose.",
+      "before_record_sha256": "83dbafd3bba290fa6d8d74785888f76675efb128588c669acbc904fac84d13f7",
+      "after_record_sha256": "d841f1854c9865bcd1c5d850a75c85fd9e6d0fecf5f6511e44d6dff740487cdf",
+      "changed_fields": {
+        "question_scoped": {
+          "before": "Para uma criança de quatro anos e vinte quilos, que faixa de volume aparece para aplicação no músculo? Não calcule uma dose nova.",
+          "after": "Para uma criança de quatro anos e vinte quilos, que faixa de volume aparece para aplicação no músculo?"
+        },
+        "question_cross_bula": {
+          "before": "Para uma criança de quatro anos e vinte quilos, que faixa de volume aparece para dipirona injetável da Santisa no músculo? Não calcule uma dose nova.",
+          "after": "Para uma criança de quatro anos e vinte quilos, que faixa de volume aparece para dipirona injetável da Santisa no músculo?"
+        },
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        }
+      }
+    }
+  ],
+  "unchanged_records": 98,
+  "unchanged_check": {
+    "question_id": "A-B017-Q05",
+    "record_sha256": "cae21d97fa6a6c308b56348b77fd4f0822883800ca1da631e3990d0bfb9de7bb",
+    "decision": "Retain unchanged and prioritize specific human audit: food for gastrointestinal discomfort does not reconcile the source restriction for stomach problems. No automatic approval."
+  },
+  "human_decisions_inherited": false,
+  "immutable_original_artifacts": {
+    "questions.draft.jsonl": "54f521008bf9b6f8a6e5bcc0453c32ea2d936af859980a26b58f1a940e7f7c26",
+    "sources.json": "f59d4cb2ce463e2f85d70cd96daf5dc6162bb0f90774d77ac09cc129e55c718e",
+    "review.md": "a7e1d531a113dbaf2236fef76cf2189dada900bbd2204e0c8a5885826ae0775b",
+    "manifest.json": "d3868990871e20daa2a40ca4a90d3089b8f6765aeb94804d885239d7c64da5c3",
+    "qc_summary.json": "8000b6ab530455d897135e5985204826793e735099698be83bb2db412cbe9f6f",
+    "validation_report.md": "249aa87edd46ec4747895b7a4db3863c35fb94b76db312108b69f9dc662a2585"
+  }
+}

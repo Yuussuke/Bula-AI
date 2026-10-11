@@ -1,0 +1,395 @@
+[
+  {
+    "corpus_id": "A",
+    "document_id": "B029",
+    "document_sha256": "bc1161a2eab60cc5ca87b14593e5a398b8a94078cfcb0442c75ac5cfc3c065ba",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B029/bula_1791247053173.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 5,
+    "medication": "BIOVICERIN",
+    "manufacturer": "Geyer Medicamentos S.A.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=104430009",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 10844,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Geyer is explicit registrant/producer. Main section lists 2/6/12 flaconetes; histories contain other prior presentations. Do not substitute historical presentation data for current instructions.",
+      "Auxiliary diarrhea treatment does not replace oral rehydration. Diabetes caution is not an absolute contraindication. No known overdose symptoms does not cancel rapid medical help.",
+      "Negative requests concern cold-excursion acceptance and spacing with amoxicillin; conservation and own dose intervals do not answer those decisions."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B030",
+    "document_sha256": "955bbd5eef54efdac8c98e55974b1b399539aff78f812c7a38d114069f312aed",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B030/bula_1791247046273.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 19,
+    "medication": "HIRUDOID",
+    "manufacturer": "Daiichi Sankyo Brasil Farmacêutica Ltda.",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=104540013",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 50632,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      3,
+      15,
+      16
+    ],
+    "documentary_notes": [
+      "Single PDF contains gel 3/5 mg/g 20/40-g tubes (pages 1-7), gel 5 mg/g 90-g tube (8-13), and ointment 3/5 mg/g 40-g tubes (14-19). Daiichi Sankyo is explicit producer/registrant. Histories are not new patient instructions.",
+      "Gel prohibits open wounds; ointment explicitly includes varicose veins with/without open wounds and a local gauze-compress instruction. Preserve distinct local form scope and source conditions.",
+      "Onset around two days and a separate expectation after 14 days continuous treatment are not silently reconciled. Lactation non-recommendation and medically assessed wording coexist. No question declares general safety.",
+      "No reported interactions does not establish topical sunscreen sequencing or when to put on compression stockings."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B031",
+    "document_sha256": "fb604e6e84546dced852fb548f7eef98244d07fbb7cb13a37f376b8cc770c874",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B031/bula_1791247042640.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 6,
+    "medication": "ESPINHEIRA SANTA",
+    "manufacturer": "Vidora Farmacêutica Ltda.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=104730031",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 23044,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      3,
+      5
+    ],
+    "documentary_notes": [
+      "Traditional herbal leaflet: cover tintura 0.9 g/mL, body extrato fluido 0.9 g/mL and histories 1.0 mL/mL. Preserve frozen manifest, local representation and archived PDF; no synonym/concentration reconciliation.",
+      "Vidora is explicit registrant/producer. Pages 5-6 are rotated history tables with scrambled native reading order; page 5 was visually checked. Body pages 2-4 remain native/extractable.",
+      "General no-reported-interactions statement coexists with non-recommended concomitant medicines/alcohol and possible herbal interactions. No compatibility claim is authored. Source says older patients lack specific restrictions but later may require lower doses; no elderly regimen is inferred.",
+      "Six-month after-opening validity is different from 24-month labelled expiry. No assay-interference or tea substitution protocol supplied."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B032",
+    "document_sha256": "86caa59660df3eeb9c7391eef26c3d4ee35024661b8eba01fbebc642ca7ed799",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B032/bula_1791247113528.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 7,
+    "medication": "DEXAMETRAT",
+    "manufacturer": "Laboratório Globo S.A.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=105350084",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 17249,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      3,
+      4
+    ],
+    "documentary_notes": [
+      "Globo is explicitly registrant, producer and marketer. Dermatological cream, not oral/injectable dexamethasone or eye treatment.",
+      "Ocular-treatment prohibition and prolonged periocular glaucoma/cataract warnings are retained separately. Ear applicator wording does not override perforated-eardrum contraindication.",
+      "Occlusive dressings may raise absorption/interactions; allowed psoriasis/resistant-case wording is not a self-directed instruction for all wounds.",
+      "No moisturizer sequencing or phototherapy-day schedule is established; topic overlap with psoriasis does not support the requested coordination."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B033",
+    "document_sha256": "75d56e686e69a986b5cdb50bdc55bf7baa8a9f101a037da919821ae36895b934",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B033/bula_1791247129315.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 7,
+    "medication": "DRENOGRIP",
+    "manufacturer": "Belfar Ltda.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=105710006",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 27146,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      4
+    ],
+    "documentary_notes": [
+      "Belfar explicitly registers and produces. Paired green/yellow coated tablets: different ingredient allocations per color. Cover says 500 mg plus other actives, while each color has 263.50 mg monohydrate equivalent to 250 mg dipyrone; no per-tablet 500-mg inference.",
+      "Preserve simultaneous tablet pair and separate daily maxima, onset after ingestion versus driving prohibition throughout treatment.",
+      "Adult cover and under-12 contraindication coexist; lactation absolute-need wording coexists with contraindicated breastfeeding and 48-hour avoidance. No fixture reconciles these statements.",
+      "Neutropenia-associated persistent fever/chills/throat inflammation/mouth ulcers require immediate medical consultation and interruption; no confirmed diagnosis. Source overdose lavage is not home guidance.",
+      "Vomiting does not supply replacement-dose policy; treatment driving prohibition does not establish when fitness returns after last dose."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB027",
+    "document_sha256": "95982b216523fe6b8ae72fc2551877dfe119527e8c660b621d70a8ade34b4a85",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB027/bula_1791329625718.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 10,
+    "medication": "meloxicam",
+    "manufacturer": "Cellera Farmacêutica S.A.",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=104400213",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 26579,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Cellera is explicit producer/registrant; 15-mg oral tablets. Historical 7.5-mg presentations are not substituted into current presentation.",
+      "Terminal hemodialysis maximum 7.5 mg is distinct from severe non-dialyzed renal contraindication. No tablet-splitting instructions or personal dose are inferred.",
+      "Skin/mucosal injury requires immediate interruption. Source overdose paragraph suggests induced vomiting if conscious; it is flagged for independent safety audit, not authored as a home recommendation.",
+      "General stomach-problem prohibition is broader than early digestive-caution wording; no fixture clinically reconciles that tension. No oral-to-injectable switch or emesis replacement protocol."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB028",
+    "document_sha256": "99736d18e7b3c154103f110cd1df7458407a4793a117c1cc2593df1f8363c8b5",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB028/bula_1791329629038.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 17,
+    "medication": "CETOPROFENO",
+    "manufacturer": "Cristália Produtos Químicos Farmacêuticos Ltda.",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=102980276",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 74389,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Cristália explicitly registers and produces. Adult 50-mg/mL ampoules, exclusively IM and professionally administered, not IV or oral.",
+      "Ongoing anticoagulant therapy is contraindicated locally for IM route despite general combination-monitoring text elsewhere. The preceding word 'Hemostasia' is unclear; no clinical repair.",
+      "Concentration maximum at 20-30 minutes is not declared analgesic onset. Pregnancy text has overlapping 13-week/30-week/trimester restrictions; no fixture selects a simplified permissive rule.",
+      "Preserve acidic/colorimetric assay limitation. Immediate consultation for persistent/worsening infection is not a dose escalation; source 'tomar' wording does not change route.",
+      "Local Nicolau-syndrome warning does not establish compress choice. Histories on pages 14-17 have rotated native order; no history-based patient regimen is inferred."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB029",
+    "document_sha256": "25b4fe58fccff61a2a522845767bb78b6bd6e8744f4345ca290a17b6f36f54be",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB029/bula_1791329632161.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 10,
+    "medication": "trometamol cetorolaco",
+    "manufacturer": "União Química Farmacêutica Nacional S/A",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=104971520",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 34896,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      6
+    ],
+    "documentary_notes": [
+      "União Química explicitly registers and produces; adult sublingual 10-mg tablets, not swallowed tablets or injection.",
+      "Page 6 age/weight maximum-dose table was visually checked with headings and separate maximum rows. The prose additionally includes renal patients; severe/moderate renal contraindications remain in force, no general permission.",
+      "Different source passages contain contraindication versus caution for cardiovascular/renal risk; no clinical reconciliation. Interaction examples classify some agents inconsistently; no external correction.",
+      "Preserve acute-versus-chronic scope and five-day limit. Sublingual dissolution does not determine fasting; persistent pain after course does not supply a replacement analgesic."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB030",
+    "document_sha256": "61d8fb8db6763fd3ebea0ed76baba62c052f2587b68838f6514cfc845c6bb9c2",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB030/bula_1791246726579.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 10,
+    "medication": "CALMADOR",
+    "manufacturer": "Laboratório Saúde Ltda.",
+    "length_group": "média",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100490106",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 22629,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2
+    ],
+    "documentary_notes": [
+      "Laboratório Saúde explicitly registers and produces. Adult oral AAS+caffeine tablets; no pediatric regimen.",
+      "Preoperative two-week interruption is not a postoperative restart rule. Seven-day duration has explicit medical exception.",
+      "AAS increases lithium concentration while caffeine increases renal lithium excretion; retain both documentary statements without cancellation/net-effect inference.",
+      "Source varicella vaccine six-month interval and adverse-event frequency wording require human audit; no fixture relies on or clinically repairs them.",
+      "Stimulation/high-dose insomnia does not specify shift-worker sleep timing. Overdose requires rapid medical help."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB031",
+    "document_sha256": "51b7bec49c8aa2ae935fb9e3cda8d280c5bcff9f02423b5bef8745732310895e",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB031/bula_1791329635147.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 16,
+    "medication": "cloridrato de fluoxetina",
+    "manufacturer": "Eurofarma Laboratórios S.A.",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100431159",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 58047,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      9,
+      11,
+      12
+    ],
+    "documentary_notes": [
+      "Eurofarma explicitly registers and produces. PDF includes capsules 10 mg pages 1-7 and 20 mg pages 8-16, with different compositions and some different patient wording. Queries and references explicitly distinguish 20 mg.",
+      "Therapeutic response after weeks is distinct from peak plasma at 6-8 hours. Preserve fluoxetine-to-MAOI five-week interval, which is not the reverse 14-day switch.",
+      "Missed-dose wording differs between 10-mg skip-near-next and 20-mg resume-as-soon-as-possible/24-hour maximum. Do not transfer the former silently.",
+      "Under-18 contraindication coexists with under-7 supervision wording; lactation caution coexists with explicit contraindication; driving conditional wording coexists with broad prohibition. No fixture reconciles these differences.",
+      "Preserve existing suicide/immediate-medical-consultation warnings as safety audit priorities, but no new personal crisis recommendation or causal certainty is authored.",
+      "Weight/appetite effects do not establish diet treatment; flu-like adverse-event wording does not establish influenza-vaccine compatibility."
+    ]
+  }
+]

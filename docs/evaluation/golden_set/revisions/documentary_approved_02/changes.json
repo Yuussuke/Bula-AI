@@ -1,0 +1,167 @@
+{
+  "status": "authorized_documentary_revisions_not_individual_human_approval",
+  "human_decisions_created": 0,
+  "human_decisions_inherited": false,
+  "collection_frozen": false,
+  "changes": [
+    {
+      "question_id": "A-B013-Q05",
+      "before_record_sha256": "b91fad2b30064808ba4d928159a8b7d4dfbdc07706e7b197bdcc01b5b9c4ab3e",
+      "after_record_sha256": "8288537e3f7b967ee7e1eb3c0ad0e955417418774324a217d928b42ea7fff49e",
+      "before_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "after_questions_path": "docs/evaluation/golden_set/revisions/documentary_approved_02/questions.overrides.draft.jsonl",
+      "revision_kind": "semantic",
+      "justification": "Authorized semantic scope correction: pediatric placement of advisory 30-minute instruction; source context added without making the recommendation mandatory.",
+      "changed_fields": {
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        },
+        "expected_information": {
+          "before": "Aconselhável não comer/beber por 30 minutos para melhor ação.",
+          "after": "No contexto das instruções para crianças dessa solução, a bula aconselha não comer ou beber durante 30 minutos após o uso, para melhor ação. Preservar o caráter recomendatório da orientação, sem apresentá-la como obrigação ou extrapolá-la para as instruções de adultos ou outra apresentação."
+        },
+        "question_cross_bula": {
+          "before": "Depois de usar Malvatricin solução para diluição da Megalabs, preciso esperar para comer ou beber?",
+          "after": "Depois de usar Malvatricin solução para diluição da Megalabs na boca de uma criança, é preciso esperar para comer ou beber?"
+        },
+        "question_scoped": {
+          "before": "Depois de usar a solução para diluir, preciso esperar para comer ou beber?",
+          "after": "Depois de usar essa solução na boca de uma criança, é preciso esperar para comer ou beber?"
+        },
+        "reference_evidence": {
+          "before": [
+            {
+              "pdf_page": 6,
+              "section": "Malvatricin solução para diluição / 6. COMO DEVO USAR ESTE MEDICAMENTO?",
+              "quote": "Para uma melhor ação do produto, é aconselhável não comer ou beber durante 30 minutos após o uso.",
+              "source_region": null
+            }
+          ],
+          "after": [
+            {
+              "pdf_page": 6,
+              "section": "Malvatricin solução para diluição / 6. COMO DEVO USAR ESTE MEDICAMENTO?",
+              "quote": "Crianças: Molhar uma haste flexível com ponta de algodão no produto e passar nas áreas afetadas da boca. Para uma melhor ação do produto, é aconselhável não comer ou beber durante 30 minutos após o uso.",
+              "source_region": null
+            }
+          ]
+        },
+        "required_qualifiers": {
+          "before": [
+            "Pós-uso; não inventar interação alimentar específica."
+          ],
+          "after": [
+            "Contexto pediátrico do bloco Crianças na seção 6 da solução para diluição; orientação após o uso.",
+            "Aconselhável não comer ou beber por 30 minutos, para melhor ação; não transformar a recomendação em exigência obrigatória.",
+            "Não extrapolar para adultos ou Malvatricin PPU; não inventar interação alimentar, dose ou novo modo de aplicação."
+          ]
+        }
+      },
+      "scoped_cross_equivalence": "AI_checked_documentary_need_and_target_identification_not_human_approval",
+      "human_decisions_inherited": false,
+      "human_review_status": "pending"
+    },
+    {
+      "question_id": "B-CB011-Q02",
+      "before_record_sha256": "3c14f76d61dcb361b4c6c2c987f32c5ca9358cd5f4bd246d5c30dfe269af243d",
+      "after_record_sha256": "f9d6b02b3a9b3be565cefac779a7a7b3d0c715a50a31cdd62fea76a67efcee12",
+      "before_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "after_questions_path": "docs/evaluation/golden_set/revisions/documentary_approved_02/questions.overrides.draft.jsonl",
+      "revision_kind": "semantic",
+      "justification": "Authorized semantic reframing to the general documentary renal contraindication; both alternative thresholds remain in the expected answer. Historical rejection is preserved, not converted to approval.",
+      "changed_fields": {
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        },
+        "expected_information": {
+          "before": "Não, problema grave dos rins com TFGe abaixo de 30 mL/min/1,73 m² é contraindicação.",
+          "after": "A bula contraindica o cloridrato de metformina de liberação prolongada em problema de funcionamento grave dos rins: depuração de creatinina abaixo de 30 mL/min OU taxa de filtração glomerular estimada (TFGe) abaixo de 30 mL/min/1,73 m². Os critérios são alternativos; valores acima desses limites não constituem autorização automática de uso."
+        },
+        "question_cross_bula": {
+          "before": "Minha taxa de filtração dos rins está abaixo de 30 mL/min/1,73 m². Posso usar metformina de liberação prolongada da Merck?",
+          "after": "Tem algum problema nos rins que impeça o uso da metformina de liberação prolongada da Merck?"
+        },
+        "question_scoped": {
+          "before": "Minha taxa de filtração dos rins está abaixo de 30 mL/min/1,73 m². Posso usar esse remédio?",
+          "after": "Tem algum problema nos rins que impeça o uso desse remédio?"
+        },
+        "required_qualifiers": {
+          "before": [
+            "TFGe abaixo de 30 com sua unidade, sem exigir também depuração de creatinina baixa; limite não significa segurança acima dele."
+          ],
+          "after": [
+            "Preservar depuração de creatinina abaixo de 30 mL/min OU TFGe abaixo de 30 mL/min/1,73 m²; não exigir ambos simultaneamente.",
+            "Responder sobre a restrição renal documental, sem presumir uma TFGe individual ou indicar dose ou tratamento.",
+            "Não converter ausência dessa contraindicação numérica em liberação automática: demais condições documentais e avaliação profissional continuam aplicáveis."
+          ]
+        }
+      },
+      "scoped_cross_equivalence": "AI_checked_documentary_need_and_target_identification_not_human_approval",
+      "human_decisions_inherited": false,
+      "human_review_status": "pending"
+    },
+    {
+      "question_id": "B-CB025-Q05",
+      "before_record_sha256": "374687ef07f8738ac04360ba6ac1e55eb0d8fc0052263cb7c1b3c880a28fbb5b",
+      "after_record_sha256": "00517b639db7893e6d2cd79290939a7adbe7ddd8366cc40d445d602e772fbd75",
+      "before_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "after_questions_path": "docs/evaluation/golden_set/revisions/documentary_approved_02/questions.overrides.draft.jsonl",
+      "revision_kind": "reference_completion",
+      "justification": "Authorized reference-only completion: page 2 list introduction plus hepatic/renal-insufficiency bullet; question/classification/expected information remain unchanged.",
+      "changed_fields": {
+        "draft_revision": {
+          "before": 1,
+          "after": 2
+        },
+        "reference_evidence": {
+          "before": [
+            {
+              "pdf_page": 4,
+              "section": "4. Monitoramento",
+              "quote": "Se você apresenta qualquer problema hepático, renal ou sanguíneo, você deverá realizar exames de sangue durante o tratamento que irão monitorar a sua função hepática (nível de transaminases), sua função renal (nível de creatinina) ou a sua contagem sanguínea (nível de glóbulos brancos, vermelhos e plaquetas). O seu médico levará em consideração estes exames para decidir se diclofenaco sódico precisa ser interrompido ou se a dose deve ser alterada.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 3,
+              "section": "3. Contraindicações",
+              "quote": "Este medicamento é contraindicado para uso por pacientes com doença grave no fígado ou nos rins.",
+              "source_region": null
+            }
+          ],
+          "after": [
+            {
+              "pdf_page": 4,
+              "section": "4. Monitoramento",
+              "quote": "Se você apresenta qualquer problema hepático, renal ou sanguíneo, você deverá realizar exames de sangue durante o tratamento que irão monitorar a sua função hepática (nível de transaminases), sua função renal (nível de creatinina) ou a sua contagem sanguínea (nível de glóbulos brancos, vermelhos e plaquetas). O seu médico levará em consideração estes exames para decidir se diclofenaco sódico precisa ser interrompido ou se a dose deve ser alterada.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 3,
+              "section": "3. Contraindicações",
+              "quote": "Este medicamento é contraindicado para uso por pacientes com doença grave no fígado ou nos rins.",
+              "source_region": null
+            },
+            {
+              "pdf_page": 2,
+              "section": "3. QUANDO NÃO DEVO USAR ESTE MEDICAMENTO? / introdução da lista de contraindicações",
+              "quote": "Você não pode tomar este medicamento se:",
+              "source_region": null
+            },
+            {
+              "pdf_page": 2,
+              "section": "3. QUANDO NÃO DEVO USAR ESTE MEDICAMENTO? / condição da lista introduzida por Você não pode tomar este medicamento se",
+              "quote": "- sofre de insuficiência hepática ou renal;",
+              "source_region": null
+            }
+          ]
+        }
+      },
+      "scoped_cross_equivalence": "AI_checked_documentary_need_and_target_identification_not_human_approval",
+      "human_decisions_inherited": false,
+      "human_review_status": "pending"
+    }
+  ]
+}
+

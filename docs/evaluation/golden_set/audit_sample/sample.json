@@ -1,0 +1,3308 @@
+{
+  "status": "core_drawn_risk_proposed_awaiting_author_conference",
+  "seed": 20261009,
+  "sampler_version": 1,
+  "sampler_sha256": "5e8f043b22ca1e6c764451447fe4186c59f2a1220413c5f0b784334cdb55f396",
+  "ordering_contract": "SHA256 UTF8 JSON [seed,purpose,corpus_id,document_id,question_id], no spaces; lexicographic ID tie-break",
+  "input_files": [
+    {
+      "path": "docs/evaluation/corpus/corpus_final.csv",
+      "sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7"
+    },
+    {
+      "path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+      "sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "sha256": "91c195c65e3fa997727b5442bee0a62ba573d2a6afc67fe935b25ce386449e4c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch01/sources.json",
+      "sha256": "76fe048da8da176ab1269f96c01844342a9cfe2b2e5f94923b4ca534ed0d91a2"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "sha256": "da02a31983e4dd2dec894ebb457bc4134c3229058ebabb0b01c0fd0d23d1e275"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch02/sources.json",
+      "sha256": "2f84a31a5f49e14ea1a8d5734949e43b01cf36462a0f70862dc37103f799013c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "sha256": "3df4b6e62bf6f3deb98d1bc6ea39ec65e658498b708dc461b92d363f6aa92a38"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch03/sources.json",
+      "sha256": "d8d168a1ee95946d7bb3cbf89e92ab732f924c4fd630fc64551a2c42effb9537"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "sha256": "eff2d8d11cd7dd1424e5f207043abd8a8db93940ab744ecf1b5cc529c0eac9f7"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch04/sources.json",
+      "sha256": "f59d4cb2ce463e2f85d70cd96daf5dc6162bb0f90774d77ac09cc129e55c718e"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "sha256": "367ae9c8a9062a363244f6688e767cd36f6f4f98be77cb03e813dca233b706e0"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch05/sources.json",
+      "sha256": "bf8e4e69874cd5f8ed945e4afb85501dfcce6a62a509394c89063b75ba65005c"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "sha256": "95023498278b61695af98be1b38b79c2d0ed0a868fc252db64d552b3d21c3fb6"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch06/sources.json",
+      "sha256": "9b8eca8a25330ebea4c3b3aef7d4b916baae68fb17dfa4886dcacb518dafa950"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "sha256": "1eb729c8cc48d12f27debf1c20d42f128a8e39563fb5645d9c71f53ddb066be2"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch07/sources.json",
+      "sha256": "4cf3762ca1b1fd0468719554d4e329dfbc14b1a4de62132feeb8dd9de60b5439"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "sha256": "bce8d6eef724409b68c76c655bb2ace922feba4fdc23b16659aa9b877681fc2b"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch08/sources.json",
+      "sha256": "ad18d1abb3dbe811d445f300e6c7bad6252ac49b0d312de59454705d4c6f2dbe"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "sha256": "242520fe25f686d2fae3fadde0f1ab750c1068ba2226bd0ac412e3d4ff3c572b"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch09/sources.json",
+      "sha256": "5847e3f500fdb97908b02758d7bad3c19597d8ce8dde49b3b99cd960af75568f"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "sha256": "bbab89435b127bb78c7440a30ab906140656063464187a76ec00fafd516348f6"
+    },
+    {
+      "path": "docs/evaluation/golden_set/expansion/batch10/sources.json",
+      "sha256": "367f61796152522032ae76ae02f53f3fb1d316ff7cebe800b5abb86ae75fbe51"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "sha256": "241481392c794d6427c948e2f0c8a25b6462280f1573af97cc16aa02b1a2d8b5"
+    },
+    {
+      "path": "docs/evaluation/golden_set/phase1/sources.json",
+      "sha256": "b255118271a469aa105a93ab4e1e360d9426203e2d141d0a4215323c0f48aba5"
+    }
+  ],
+  "input_fingerprint_sha256": "96382e4c11643f0e99b7713f0cd17bb61811e35a599df03802a45e8b96520949",
+  "triage_sha256": "2f674ce487cb28fc7143b40f919272eb5476266bbed9c35bc3414b29d1a1882e",
+  "approval_adjustments_sha256": "43f906c7063bca3226771ba44f5f7879937b67baf67179e69407fb355bcc88aa",
+  "core_ids": [
+    "A-B001-Q10",
+    "A-B002-Q06",
+    "A-B003-Q01",
+    "A-B004-Q08",
+    "A-B005-Q05",
+    "A-B006-Q03",
+    "A-B007-Q04",
+    "A-B008-Q01",
+    "A-B009-Q09",
+    "A-B010-Q08",
+    "A-B011-Q04",
+    "A-B012-Q01",
+    "A-B013-Q05",
+    "A-B014-Q09",
+    "A-B015-Q03",
+    "A-B016-Q10",
+    "A-B017-Q04",
+    "A-B018-Q04",
+    "A-B019-Q05",
+    "A-B020-Q02",
+    "A-B021-Q10",
+    "A-B022-Q06",
+    "A-B023-Q07",
+    "A-B024-Q06",
+    "A-B025-Q04",
+    "A-B026-Q09",
+    "A-B027-Q03",
+    "A-B028-Q03",
+    "A-B029-Q03",
+    "A-B030-Q09",
+    "A-B031-Q03",
+    "A-B032-Q01",
+    "A-B033-Q01",
+    "A-B034-Q01",
+    "A-B035-Q03",
+    "A-B036-Q05",
+    "A-B037-Q03",
+    "A-B038-Q10",
+    "A-B039-Q04",
+    "A-B040-Q10",
+    "A-B041-Q08",
+    "A-B042-Q06",
+    "A-B043-Q01",
+    "A-B044-Q07",
+    "A-B045-Q09",
+    "A-B046-Q06",
+    "A-B047-Q01",
+    "A-B048-Q05",
+    "A-B049-Q06",
+    "A-B050-Q08",
+    "B-CB001-Q01",
+    "B-CB002-Q06",
+    "B-CB003-Q06",
+    "B-CB004-Q06",
+    "B-CB005-Q01",
+    "B-CB006-Q03",
+    "B-CB007-Q04",
+    "B-CB008-Q01",
+    "B-CB009-Q01",
+    "B-CB010-Q01",
+    "B-CB011-Q02",
+    "B-CB012-Q03",
+    "B-CB013-Q09",
+    "B-CB014-Q08",
+    "B-CB015-Q04",
+    "B-CB016-Q03",
+    "B-CB017-Q03",
+    "B-CB018-Q06",
+    "B-CB019-Q07",
+    "B-CB020-Q08",
+    "B-CB021-Q08",
+    "B-CB022-Q02",
+    "B-CB023-Q06",
+    "B-CB024-Q08",
+    "B-CB025-Q06",
+    "B-CB026-Q09",
+    "B-CB027-Q09",
+    "B-CB028-Q07",
+    "B-CB029-Q10",
+    "B-CB030-Q10",
+    "B-CB031-Q09",
+    "B-CB032-Q08",
+    "B-CB033-Q03",
+    "B-CB034-Q06",
+    "B-CB035-Q02",
+    "B-CB036-Q04",
+    "B-CB037-Q04",
+    "B-CB038-Q01",
+    "B-CB039-Q07",
+    "B-CB040-Q06",
+    "B-CB041-Q09",
+    "B-CB042-Q09",
+    "B-CB043-Q09",
+    "B-CB044-Q02",
+    "B-CB045-Q09",
+    "B-CB046-Q03",
+    "B-CB047-Q08",
+    "B-CB048-Q07",
+    "B-CB049-Q04",
+    "B-CB050-Q01"
+  ],
+  "core_distribution": {
+    "A": {
+      "total": 50,
+      "positive": 40,
+      "negative": 10
+    },
+    "B": {
+      "total": 50,
+      "positive": 40,
+      "negative": 10
+    }
+  },
+  "additional_risk_proposed_ids": [
+    "B-CB025-Q05",
+    "B-CB021-Q01",
+    "A-B017-Q05",
+    "B-CB038-Q04",
+    "A-B026-Q08",
+    "A-B025-Q01",
+    "A-B025-Q03",
+    "A-B025-Q05",
+    "A-B025-Q07",
+    "A-B025-Q08",
+    "A-B025-Q02",
+    "A-B025-Q06",
+    "A-B016-Q08",
+    "A-B016-Q07",
+    "B-CB013-Q08",
+    "B-CB003-Q03",
+    "A-B042-Q02",
+    "B-CB050-Q04",
+    "B-CB023-Q05",
+    "B-CB021-Q04"
+  ],
+  "risk_priority_contract": "P0; eight Olina positives; explicit author safety priorities; named tables/stability; other P1; remaining alerts; SHA256 risk-choice for ties",
+  "risk_candidate_queue": [
+    {
+      "question_id": "B-CB025-Q05",
+      "tier": 0,
+      "reasons": [
+        "potential_blocker_requires_documentary_resolution_not_confirmed_error",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB021-Q01",
+      "tier": 0,
+      "reasons": [
+        "potential_blocker_requires_documentary_resolution_not_confirmed_error",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B035-Q03",
+      "tier": 0,
+      "reasons": [
+        "potential_blocker_requires_documentary_resolution_not_confirmed_error",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B017-Q05",
+      "tier": 0,
+      "reasons": [
+        "potential_blocker_requires_documentary_resolution_not_confirmed_error",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB038-Q04",
+      "tier": 0,
+      "reasons": [
+        "potential_blocker_requires_documentary_resolution_not_confirmed_error",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B026-Q08",
+      "tier": 0,
+      "reasons": [
+        "potential_blocker_requires_documentary_resolution_not_confirmed_error",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B025-Q01",
+      "tier": 1,
+      "reasons": [
+        "required_Olina_positive_support_and_within_document_redundancy_check"
+      ]
+    },
+    {
+      "question_id": "A-B025-Q03",
+      "tier": 1,
+      "reasons": [
+        "required_Olina_positive_support_and_within_document_redundancy_check"
+      ]
+    },
+    {
+      "question_id": "A-B025-Q05",
+      "tier": 1,
+      "reasons": [
+        "required_Olina_positive_support_and_within_document_redundancy_check"
+      ]
+    },
+    {
+      "question_id": "A-B025-Q07",
+      "tier": 1,
+      "reasons": [
+        "required_Olina_positive_support_and_within_document_redundancy_check"
+      ]
+    },
+    {
+      "question_id": "A-B025-Q08",
+      "tier": 1,
+      "reasons": [
+        "required_Olina_positive_support_and_within_document_redundancy_check"
+      ]
+    },
+    {
+      "question_id": "A-B025-Q04",
+      "tier": 1,
+      "reasons": [
+        "required_Olina_positive_support_and_within_document_redundancy_check"
+      ]
+    },
+    {
+      "question_id": "A-B025-Q02",
+      "tier": 1,
+      "reasons": [
+        "required_Olina_positive_support_and_within_document_redundancy_check"
+      ]
+    },
+    {
+      "question_id": "A-B025-Q06",
+      "tier": 1,
+      "reasons": [
+        "required_Olina_positive_support_and_within_document_redundancy_check"
+      ]
+    },
+    {
+      "question_id": "A-B016-Q08",
+      "tier": 2,
+      "reasons": [
+        "explicit_author_safety_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B016-Q07",
+      "tier": 2,
+      "reasons": [
+        "explicit_author_safety_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB013-Q08",
+      "tier": 2,
+      "reasons": [
+        "explicit_author_safety_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB003-Q03",
+      "tier": 2,
+      "reasons": [
+        "explicit_author_safety_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B042-Q02",
+      "tier": 3,
+      "reasons": [
+        "previously_identified_table_or_stability_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB050-Q04",
+      "tier": 3,
+      "reasons": [
+        "previously_identified_table_or_stability_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB023-Q05",
+      "tier": 3,
+      "reasons": [
+        "previously_identified_table_or_stability_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB021-Q04",
+      "tier": 3,
+      "reasons": [
+        "previously_identified_table_or_stability_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B035-Q08",
+      "tier": 3,
+      "reasons": [
+        "previously_identified_table_or_stability_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B015-Q06",
+      "tier": 3,
+      "reasons": [
+        "previously_identified_table_or_stability_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B015-Q07",
+      "tier": 3,
+      "reasons": [
+        "previously_identified_table_or_stability_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B024-Q07",
+      "tier": 3,
+      "reasons": [
+        "previously_identified_table_or_stability_priority",
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B007-Q03",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B034-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B044-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B038-Q06",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB029-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB015-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB038-Q03",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB017-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB046-Q04",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB043-Q06",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B020-Q06",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB023-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB026-Q02",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB019-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B045-Q06",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB036-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB020-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB028-Q06",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB049-Q02",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB022-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B037-Q02",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B042-Q04",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B040-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B005-Q02",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B020-Q10",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B019-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB025-Q03",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B032-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B044-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB033-Q01",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B050-Q04",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB038-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB008-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB010-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB027-Q06",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB028-Q04",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB031-Q04",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB030-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B032-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B038-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB026-Q04",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB037-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B036-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB042-Q06",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB044-Q02",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB044-Q06",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B002-Q02",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB041-Q03",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB041-Q04",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB045-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB021-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB042-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B021-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B017-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB045-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB041-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B039-Q06",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B028-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB032-Q03",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB046-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB042-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B027-Q04",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B015-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB025-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB046-Q03",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB024-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB047-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B007-Q02",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB027-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB050-Q05",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B011-Q02",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB007-Q02",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B027-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB024-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B033-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B049-Q06",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B048-Q03",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB036-Q03",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B029-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB018-Q07",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB029-Q04",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB049-Q03",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B040-Q08",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB040-Q03",
+      "tier": 4,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B049-Q02",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB021-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B024-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B011-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B002-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B005-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B009-Q01",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB005-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB009-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B044-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B049-Q05",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB008-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB007-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B004-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B050-Q07",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB004-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B021-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB028-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B007-Q08",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB011-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB030-Q05",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B009-Q03",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB002-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B008-Q08",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B046-Q03",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B005-Q01",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB005-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B003-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B023-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B010-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB002-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B045-Q02",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B001-Q01",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB007-Q07",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB019-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB024-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B029-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B030-Q02",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB023-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB001-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B003-Q06",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B024-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB003-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B003-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B011-Q01",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B050-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B030-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB034-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB011-Q02",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B039-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB013-Q04",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB034-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB004-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B049-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B047-Q08",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B023-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B041-Q07",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B040-Q03",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB001-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B048-Q05",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB035-Q02",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B004-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B005-Q06",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B009-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B006-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB010-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B045-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B034-Q01",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B043-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B002-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B007-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B033-Q02",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB040-Q07",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB050-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB031-Q08",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B018-Q03",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B001-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB003-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B038-Q07",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB025-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B005-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB011-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB014-Q05",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B022-Q06",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B010-Q07",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB010-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB006-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B001-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B008-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB023-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB048-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B046-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "B-CB006-Q10",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    },
+    {
+      "question_id": "A-B006-Q09",
+      "tier": 5,
+      "reasons": [
+        "remaining_authorship_triage_priority"
+      ]
+    }
+  ],
+  "overlap": {
+    "P0": {
+      "all_ids": [
+        "A-B017-Q05",
+        "A-B026-Q08",
+        "A-B035-Q03",
+        "B-CB021-Q01",
+        "B-CB025-Q05",
+        "B-CB038-Q04"
+      ],
+      "core_ids": [
+        "A-B035-Q03"
+      ],
+      "additional_ids": [
+        "A-B017-Q05",
+        "A-B026-Q08",
+        "B-CB021-Q01",
+        "B-CB025-Q05",
+        "B-CB038-Q04"
+      ],
+      "not_in_initial_union": []
+    },
+    "safety_tags": {
+      "all_ids": [
+        "A-B002-Q02",
+        "A-B005-Q02",
+        "A-B007-Q02",
+        "A-B007-Q03",
+        "A-B011-Q02",
+        "A-B015-Q06",
+        "A-B015-Q08",
+        "A-B016-Q07",
+        "A-B016-Q08",
+        "A-B017-Q05",
+        "A-B017-Q07",
+        "A-B019-Q05",
+        "A-B020-Q06",
+        "A-B020-Q10",
+        "A-B021-Q05",
+        "A-B026-Q08",
+        "A-B027-Q04",
+        "A-B027-Q08",
+        "A-B028-Q08",
+        "A-B029-Q08",
+        "A-B032-Q07",
+        "A-B032-Q08",
+        "A-B033-Q07",
+        "A-B034-Q05",
+        "A-B035-Q03",
+        "A-B036-Q08",
+        "A-B037-Q02",
+        "A-B038-Q05",
+        "A-B038-Q06",
+        "A-B039-Q06",
+        "A-B040-Q05",
+        "A-B040-Q08",
+        "A-B042-Q04",
+        "A-B044-Q05",
+        "A-B044-Q08",
+        "A-B045-Q06",
+        "A-B047-Q08",
+        "A-B048-Q03",
+        "A-B049-Q06",
+        "A-B050-Q04",
+        "B-CB003-Q03",
+        "B-CB007-Q02",
+        "B-CB008-Q05",
+        "B-CB010-Q08",
+        "B-CB010-Q09",
+        "B-CB013-Q04",
+        "B-CB013-Q08",
+        "B-CB014-Q05",
+        "B-CB015-Q07",
+        "B-CB017-Q08",
+        "B-CB018-Q07",
+        "B-CB019-Q08",
+        "B-CB020-Q07",
+        "B-CB021-Q04",
+        "B-CB021-Q08",
+        "B-CB022-Q08",
+        "B-CB023-Q05",
+        "B-CB023-Q07",
+        "B-CB023-Q09",
+        "B-CB023-Q10",
+        "B-CB024-Q05",
+        "B-CB024-Q07",
+        "B-CB025-Q03",
+        "B-CB025-Q05",
+        "B-CB025-Q08",
+        "B-CB025-Q10",
+        "B-CB026-Q02",
+        "B-CB026-Q04",
+        "B-CB027-Q06",
+        "B-CB027-Q07",
+        "B-CB028-Q04",
+        "B-CB028-Q06",
+        "B-CB028-Q09",
+        "B-CB029-Q04",
+        "B-CB029-Q08",
+        "B-CB030-Q08",
+        "B-CB031-Q04",
+        "B-CB032-Q03",
+        "B-CB033-Q01",
+        "B-CB036-Q03",
+        "B-CB036-Q05",
+        "B-CB037-Q07",
+        "B-CB038-Q03",
+        "B-CB038-Q04",
+        "B-CB038-Q08",
+        "B-CB040-Q03",
+        "B-CB040-Q07",
+        "B-CB041-Q03",
+        "B-CB041-Q04",
+        "B-CB041-Q07",
+        "B-CB042-Q05",
+        "B-CB042-Q06",
+        "B-CB042-Q08",
+        "B-CB043-Q06",
+        "B-CB044-Q02",
+        "B-CB044-Q06",
+        "B-CB045-Q05",
+        "B-CB045-Q08",
+        "B-CB046-Q03",
+        "B-CB046-Q04",
+        "B-CB046-Q08",
+        "B-CB047-Q07",
+        "B-CB049-Q02",
+        "B-CB049-Q03",
+        "B-CB050-Q04",
+        "B-CB050-Q05"
+      ],
+      "core_ids": [
+        "A-B019-Q05",
+        "A-B035-Q03",
+        "A-B049-Q06",
+        "B-CB021-Q08",
+        "B-CB044-Q02",
+        "B-CB046-Q03"
+      ],
+      "additional_ids": [
+        "A-B016-Q07",
+        "A-B016-Q08",
+        "A-B017-Q05",
+        "A-B026-Q08",
+        "B-CB003-Q03",
+        "B-CB013-Q08",
+        "B-CB021-Q04",
+        "B-CB023-Q05",
+        "B-CB025-Q05",
+        "B-CB038-Q04",
+        "B-CB050-Q04"
+      ],
+      "not_in_initial_union": [
+        "A-B002-Q02",
+        "A-B005-Q02",
+        "A-B007-Q02",
+        "A-B007-Q03",
+        "A-B011-Q02",
+        "A-B015-Q06",
+        "A-B015-Q08",
+        "A-B017-Q07",
+        "A-B020-Q06",
+        "A-B020-Q10",
+        "A-B021-Q05",
+        "A-B027-Q04",
+        "A-B027-Q08",
+        "A-B028-Q08",
+        "A-B029-Q08",
+        "A-B032-Q07",
+        "A-B032-Q08",
+        "A-B033-Q07",
+        "A-B034-Q05",
+        "A-B036-Q08",
+        "A-B037-Q02",
+        "A-B038-Q05",
+        "A-B038-Q06",
+        "A-B039-Q06",
+        "A-B040-Q05",
+        "A-B040-Q08",
+        "A-B042-Q04",
+        "A-B044-Q05",
+        "A-B044-Q08",
+        "A-B045-Q06",
+        "A-B047-Q08",
+        "A-B048-Q03",
+        "A-B050-Q04",
+        "B-CB007-Q02",
+        "B-CB008-Q05",
+        "B-CB010-Q08",
+        "B-CB010-Q09",
+        "B-CB013-Q04",
+        "B-CB014-Q05",
+        "B-CB015-Q07",
+        "B-CB017-Q08",
+        "B-CB018-Q07",
+        "B-CB019-Q08",
+        "B-CB020-Q07",
+        "B-CB022-Q08",
+        "B-CB023-Q07",
+        "B-CB023-Q09",
+        "B-CB023-Q10",
+        "B-CB024-Q05",
+        "B-CB024-Q07",
+        "B-CB025-Q03",
+        "B-CB025-Q08",
+        "B-CB025-Q10",
+        "B-CB026-Q02",
+        "B-CB026-Q04",
+        "B-CB027-Q06",
+        "B-CB027-Q07",
+        "B-CB028-Q04",
+        "B-CB028-Q06",
+        "B-CB028-Q09",
+        "B-CB029-Q04",
+        "B-CB029-Q08",
+        "B-CB030-Q08",
+        "B-CB031-Q04",
+        "B-CB032-Q03",
+        "B-CB033-Q01",
+        "B-CB036-Q03",
+        "B-CB036-Q05",
+        "B-CB037-Q07",
+        "B-CB038-Q03",
+        "B-CB038-Q08",
+        "B-CB040-Q03",
+        "B-CB040-Q07",
+        "B-CB041-Q03",
+        "B-CB041-Q04",
+        "B-CB041-Q07",
+        "B-CB042-Q05",
+        "B-CB042-Q06",
+        "B-CB042-Q08",
+        "B-CB043-Q06",
+        "B-CB044-Q06",
+        "B-CB045-Q05",
+        "B-CB045-Q08",
+        "B-CB046-Q04",
+        "B-CB046-Q08",
+        "B-CB047-Q07",
+        "B-CB049-Q02",
+        "B-CB049-Q03",
+        "B-CB050-Q05"
+      ]
+    },
+    "explicit_safety": {
+      "all_ids": [
+        "A-B016-Q07",
+        "A-B016-Q08",
+        "B-CB003-Q03",
+        "B-CB013-Q08"
+      ],
+      "core_ids": [],
+      "additional_ids": [
+        "A-B016-Q07",
+        "A-B016-Q08",
+        "B-CB003-Q03",
+        "B-CB013-Q08"
+      ],
+      "not_in_initial_union": []
+    },
+    "Olina_positives": {
+      "all_ids": [
+        "A-B025-Q01",
+        "A-B025-Q02",
+        "A-B025-Q03",
+        "A-B025-Q04",
+        "A-B025-Q05",
+        "A-B025-Q06",
+        "A-B025-Q07",
+        "A-B025-Q08"
+      ],
+      "core_ids": [
+        "A-B025-Q04"
+      ],
+      "additional_ids": [
+        "A-B025-Q01",
+        "A-B025-Q02",
+        "A-B025-Q03",
+        "A-B025-Q05",
+        "A-B025-Q06",
+        "A-B025-Q07",
+        "A-B025-Q08"
+      ],
+      "not_in_initial_union": []
+    }
+  },
+  "membership": {
+    "A-B001-Q10": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "b9b9edcb6a37696b9a5c1d20eff961cf47a7b9095a4c4dd1582ec9b1547e6263",
+      "pdf_sha256": "105cd1abc112b3fc2ad801d8ac1c3af5d0266e17702dab250e1ec59742b64692",
+      "original_revision": 4
+    },
+    "A-B002-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "702056a5752910dad0cc1c626402506126fc01338434124ba057117c4f662fab",
+      "pdf_sha256": "c5175435076de7074fd6afc3ba71bab41bc572e14937547a5521b46243a2b65c",
+      "original_revision": 1
+    },
+    "A-B003-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "f099853cf8dced76cdc9f91efc4600154e14dec9d7d04e94c690c1a6479d7f3b",
+      "pdf_sha256": "bcd9cf05bacf29c54fc269f2feaa89687eb7ba324a9f81f89ee4f8c92b201eb9",
+      "original_revision": 1
+    },
+    "A-B004-Q08": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "39b116a7ed6f7090fbbfed3030575483efdcfcb352caba082845b86931f19461",
+      "pdf_sha256": "84bf559f735387f65f5c19d7d938580baa0e2703360fbc9b3bc11f3be77ba01d",
+      "original_revision": 1
+    },
+    "A-B005-Q05": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "dbe46153f50be979343cece4ee14fa34c8242af18b98c780e447dac2fbf1932f",
+      "pdf_sha256": "78d833d4c99b7f9aeec7899a2d5035fec0501fcebb36ac96fea6ae5eca2fc618",
+      "original_revision": 1
+    },
+    "A-B006-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "dd8a6187e4b2faa3fc2da7514117273c662ea2ae1f229e77f5e81e898196642b",
+      "pdf_sha256": "d6dd74d4c973b9c406795fab606a167fa68628e65dde414952b4464755850652",
+      "original_revision": 1
+    },
+    "A-B007-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "3afcde2f415e003dc9846c0eb6ff5aa8510d9d048184b56379cdc4361e62eff3",
+      "pdf_sha256": "b06c6761037ce03395a19d6e686baed64efa4bbce5cdbbb8bf65850072227c2c",
+      "original_revision": 1
+    },
+    "A-B008-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "a5da77d251cfc98576d3db97c4c97f8bfb6b50c77528a40a1b1660ed0b78d19e",
+      "pdf_sha256": "5c1660eab718c12b0d1952b348fbb98bbc327842c4f686d4533d1d797580a7fa",
+      "original_revision": 1
+    },
+    "A-B009-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "88b957dcf62441d08f1466f563d2bdde69cd09be44ab49dd84d96e5f5b1e51cd",
+      "pdf_sha256": "07d1af1a55961b0b300d66f7ff77d15f88fd6522e03585feeeb48f81345d7cbb",
+      "original_revision": 1
+    },
+    "A-B010-Q08": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "4afc33d7a172e9c3fc9bca62db803119b229d595a97545f19af264a20e36b461",
+      "pdf_sha256": "46b09e4a582ff0bb81783c7894c02b63f2fd9269b3b9e74b90ec935cbaaafa5f",
+      "original_revision": 1
+    },
+    "A-B011-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "0a4df1743cd59ffbc2eafb34e0d1e58542d23cea86288b96df63444d5d5fdcd1",
+      "pdf_sha256": "c79815cbdb393617be76a61ff2bf1a9403695829251a466b785e5329af7f8695",
+      "original_revision": 1
+    },
+    "A-B012-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "d737374758229bc6825d53cfa215944cafad7e9f582e4bd4f3510f6c162e1b8a",
+      "pdf_sha256": "b0f1b9ab783566bb737a7f7b109b70a1d053811f9f0cc3a5d2a8426ab4498677",
+      "original_revision": 1
+    },
+    "A-B013-Q05": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "b91fad2b30064808ba4d928159a8b7d4dfbdc07706e7b197bdcc01b5b9c4ab3e",
+      "pdf_sha256": "48b7e398c494c5f78745ac163f1fa0ea848c8b8efb2b3d2ed0e4fe3f77e6da38",
+      "original_revision": 1
+    },
+    "A-B014-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "1f87e1457ad06fca31659f23c3e961d37f5b7eddd8ffac7c74fcfb500c9b1302",
+      "pdf_sha256": "073b06975ba201c153fd9d58a9ed09f1f638875165c2e776246809bf44c47d81",
+      "original_revision": 1
+    },
+    "A-B015-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "0c9cd4c916e83251a884c2d12215130339faa55b2cdc8d2ca143f7c64cc7f50a",
+      "pdf_sha256": "2d934a07fd314a493f4e98a1f7dc716c7310fbe499424b4d26fa815e8d4c97d5",
+      "original_revision": 1
+    },
+    "A-B016-Q07": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "7997760fca62eb93a084a1c6264fb225775455a260c49ed2f0860f5c17e684b3",
+      "pdf_sha256": "53eac092c91276dd34b899a286f2b20b3b31eec972f10492e0080b13abf33fe4",
+      "original_revision": 1
+    },
+    "A-B016-Q08": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "98adb0f599f9c89ab81722d4204566343b097c1eaf3b6a559e8ba3fd4fa14620",
+      "pdf_sha256": "53eac092c91276dd34b899a286f2b20b3b31eec972f10492e0080b13abf33fe4",
+      "original_revision": 1
+    },
+    "A-B016-Q10": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "6e8a4e58c38e20bbc736984fd46909e0b183fc968217c42cacb7d5b1638d5268",
+      "pdf_sha256": "53eac092c91276dd34b899a286f2b20b3b31eec972f10492e0080b13abf33fe4",
+      "original_revision": 1
+    },
+    "A-B017-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "07bce8ac0645594294d2a1de2de85c05f01fc41180bd837ecf36918d85764bea",
+      "pdf_sha256": "7e3b8525ce01e98b77ab7c5f8d1da2dbc1e7388d6227bbd2118655489bbcf4f4",
+      "original_revision": 1
+    },
+    "A-B017-Q05": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": true,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "cae21d97fa6a6c308b56348b77fd4f0822883800ca1da631e3990d0bfb9de7bb",
+      "pdf_sha256": "7e3b8525ce01e98b77ab7c5f8d1da2dbc1e7388d6227bbd2118655489bbcf4f4",
+      "original_revision": 1
+    },
+    "A-B018-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "64f0b80ab4c5505270ae76c091813d1e15c400f643448141abbc29ea5ac3500f",
+      "pdf_sha256": "13e524b83eab65964b7852d1e096894d79a8a02d27eadf30d80472c01fbd93d3",
+      "original_revision": 1
+    },
+    "A-B019-Q05": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "12b4c1de0707c6d14975848271b9a2a2f68e9a6416ffd033f754d2164752f539",
+      "pdf_sha256": "64d7fda2018a7276f3f0ea3ca76a69957614f0ecc12257a250d064339e328c31",
+      "original_revision": 1
+    },
+    "A-B020-Q02": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "3932a0a8b5b7dca3924655f3a38703b467ac1e3ab5e0182ead8f981771cc8132",
+      "pdf_sha256": "262320f02a0080fc67eb54c99d29689a6a0e01d49a31ee82c2533eaf49f0d98f",
+      "original_revision": 1
+    },
+    "A-B021-Q10": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "29ad106fc7ffdc8caad70b0b58a29d71431966381b808231ebedf194a0a3c0d3",
+      "pdf_sha256": "db4c16b6b044a1234f66dc5c06468bd49ebac99189c249d35bced4f32f282d64",
+      "original_revision": 1
+    },
+    "A-B022-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "4e35d647bf731719ca31438ac66a0f1c71d558043b55fa7478ebe59ba8a98259",
+      "pdf_sha256": "9a1aadc219a75ce611df32ccbec2961a32565e02c92e9aab3280a3e8952e2fa3",
+      "original_revision": 1
+    },
+    "A-B023-Q07": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "380575add31cbc42b61b434b018c1a52c729a00a9df0717ac41fdd93388cfbe0",
+      "pdf_sha256": "a80d5fc0eb0553b52d958fb3ef665d21500b835daf814423ca15373b30b595e0",
+      "original_revision": 4
+    },
+    "A-B024-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "5d658deb969acdf0346c2202548216c5f8fd3ca78d3a799a791a2c6525833663",
+      "pdf_sha256": "2fc26b8f082a0bf554b683b2cc55899746fbc9ddded35cacbee6b4efffcda4a8",
+      "original_revision": 4
+    },
+    "A-B025-Q01": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": true,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "2a95e906cc2d68ccf72c8d8b0275852b31704667b51734bddc31f043070be9ac",
+      "pdf_sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+      "original_revision": 1
+    },
+    "A-B025-Q02": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": true,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "f151fe55ca48f3354f89697451fabb80467e343205088c95ee3e4cca5a8858f0",
+      "pdf_sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+      "original_revision": 1
+    },
+    "A-B025-Q03": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": true,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "e5ba3bc01520d9ba1b3de553dfc14e260045954d6eb6292f1e214ba6782d5596",
+      "pdf_sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+      "original_revision": 1
+    },
+    "A-B025-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": true,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "ec9760d50dc2a7993b6dbf2a11d35c91ef8624bbcdc61254060b03315afe3c3b",
+      "pdf_sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+      "original_revision": 1
+    },
+    "A-B025-Q05": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": true,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "93de206f3cd16cfd5b017b0f49b807018c2a2232d5f50f8cd3749f71f0638361",
+      "pdf_sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+      "original_revision": 1
+    },
+    "A-B025-Q06": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": true,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "bebc4a340b531208b9ed87dd16628ae13d2eeba5a70c0bd3699d0f8b3e1f69bb",
+      "pdf_sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+      "original_revision": 1
+    },
+    "A-B025-Q07": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": true,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "e0685b8342d26e3c72cf79184f5cf264b243507311fd846613fa1a5f32fd2a67",
+      "pdf_sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+      "original_revision": 1
+    },
+    "A-B025-Q08": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": true,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "46732d50ac0455be9251aabe69ef698bdb07c290886cf6f13014ff7f41a98e76",
+      "pdf_sha256": "97bad7b2154efbf28aec64e64e23fc50dde45594abe0b7dea5be54922fae64f7",
+      "original_revision": 1
+    },
+    "A-B026-Q08": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": true,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "3c2d0ebc73f7d88833e0b7dc084b1641a5ae52c05f2777fa471270096df53da3",
+      "pdf_sha256": "b16d579b142fb69d6435ad5d90b2b699e036ffd1d4a6109736350f9f8e250bf5",
+      "original_revision": 1
+    },
+    "A-B026-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "f93dfb6ebe9e509619bdb137f0272308a52afdf4d733c3417197c374b1c433c6",
+      "pdf_sha256": "b16d579b142fb69d6435ad5d90b2b699e036ffd1d4a6109736350f9f8e250bf5",
+      "original_revision": 1
+    },
+    "A-B027-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "7b3c03fa31944dd47ec85763d45a736793f8d9a0664f1e0920c490c6209a53c2",
+      "pdf_sha256": "2419f85d1426f6c8439d28203100025ad036b5c64e2fd5404a71364241d04be2",
+      "original_revision": 1
+    },
+    "A-B028-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "1a54bf829cd42e356d2eaf41711084dc6271c11fedade08bfd99b5b6c1769e31",
+      "pdf_sha256": "86ba065ac51792dcbe2f284081e57026ca457d7201eb5ef38139e2834c9dbf2a",
+      "original_revision": 1
+    },
+    "A-B029-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "376915211ae809dc762f498d2f9187180bb14280834a3076cb0a5b1f709796d3",
+      "pdf_sha256": "bc1161a2eab60cc5ca87b14593e5a398b8a94078cfcb0442c75ac5cfc3c065ba",
+      "original_revision": 1
+    },
+    "A-B030-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "f47a2d9d3de32d72efea48130caf8949d24d4795a8b819c9e058e9e39aa98be9",
+      "pdf_sha256": "955bbd5eef54efdac8c98e55974b1b399539aff78f812c7a38d114069f312aed",
+      "original_revision": 1
+    },
+    "A-B031-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "8dfbd024db9228f73e2f31573c531593d8c29c1a71e83ab7f09c1a6474434d5e",
+      "pdf_sha256": "fb604e6e84546dced852fb548f7eef98244d07fbb7cb13a37f376b8cc770c874",
+      "original_revision": 1
+    },
+    "A-B032-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "fb3564557d176f2bf284c06a83db7cc7871958570e795177248ea7ba7ebb3937",
+      "pdf_sha256": "86caa59660df3eeb9c7391eef26c3d4ee35024661b8eba01fbebc642ca7ed799",
+      "original_revision": 1
+    },
+    "A-B033-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "b742940091b3256a2a45b7a4b745008d0dc3148d24fbca817792faf8bde26ef0",
+      "pdf_sha256": "75d56e686e69a986b5cdb50bdc55bf7baa8a9f101a037da919821ae36895b934",
+      "original_revision": 1
+    },
+    "A-B034-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "48f4e98a9b00c56cce5976f92308e8429a2658f739b33ad11e8aaf80f4b31a9f",
+      "pdf_sha256": "4d1c470fbfbec475bf4dd73aa6c3c53177b7e3a401e7f39764befb117c867d6f",
+      "original_revision": 2
+    },
+    "A-B035-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": true,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "c7d6b78cfd5e6ad95b4dee52fcb86bab7cc3cf3e497fea1b75516c533e33b623",
+      "pdf_sha256": "6a3255668e798ff56f9bb41027ae282152b7b1129a3945aa8bb8168b87c85f81",
+      "original_revision": 2
+    },
+    "A-B036-Q05": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "b669e6995e474ad365f5832e0f91596a165da0a79952b8551f9e3b911981a502",
+      "pdf_sha256": "7b4ec98a6e4d911df1be8d2cf528c31247ba2b324ecdeabc5dcc2a556f93b1ed",
+      "original_revision": 1
+    },
+    "A-B037-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "5625e698708c330dbb3a1d6887c468cc125c7ad19088d3d069aca71953267709",
+      "pdf_sha256": "b2e2e2121098ab3adb22cb61583e2d687b209e00dce9ca29b82458f780c82f76",
+      "original_revision": 1
+    },
+    "A-B038-Q10": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "8a3906a6945c2abc87d6586bd6c22482183476ffafd4777d876a9766f1a569e4",
+      "pdf_sha256": "6af0132b12d269b8997c6085e335fbe0a183d8f0acd32d8d6076806db4001456",
+      "original_revision": 1
+    },
+    "A-B039-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "8035e3c2d9a3848545174a4cc680406202e92e37533149adfcbae594bb56ad14",
+      "pdf_sha256": "9a2a902154f079f061ae3d55dca34f07125196b6f748e40011ddfc50db6d6585",
+      "original_revision": 1
+    },
+    "A-B040-Q10": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "2c495aa90864a2e1a079d5512fabf70eea13931ba7d481daf0466d3dc66e65df",
+      "pdf_sha256": "8d18fe70ec6b52c6c47293c04fe0b96a0d1103cb42d359d2be667ff83a7fc7a0",
+      "original_revision": 1
+    },
+    "A-B041-Q08": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "491554b1fecc37226a226b8f6dfae8ce91fe6d5f7f19e79e07ce7861d9b51dd7",
+      "pdf_sha256": "bf49fef0fa31f56f58f5e118276120e7329f558df7d5da1ebf90f87597d75b40",
+      "original_revision": 1
+    },
+    "A-B042-Q02": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "1e7dcb30557b9bfe26b16bc87d28b7a77ffe018613315cb2a4876600cfcad1a6",
+      "pdf_sha256": "621636da74328b5eea20fd341a9a6e8307273c79cdb31cd7c969d4d01df74b4d",
+      "original_revision": 2
+    },
+    "A-B042-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "4c04245cb2b0ebaef119665fbdb185501ebb577dc3679f4fc3c601040e49f7cf",
+      "pdf_sha256": "621636da74328b5eea20fd341a9a6e8307273c79cdb31cd7c969d4d01df74b4d",
+      "original_revision": 1
+    },
+    "A-B043-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "7ec56a6c5a1e1528422b2b802119fb0733311336c3a1e060ea9bc17253dc0756",
+      "pdf_sha256": "36cbc73e5f397832a9aa1c165bc8727571c6353af6d181c4c918b726cf937f6c",
+      "original_revision": 1
+    },
+    "A-B044-Q07": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "b49741ef9fd5b8fc9d6339857601f0ad571b12b5dd08b479a5653951175e7c19",
+      "pdf_sha256": "9555875042d263b7f706f1ccec809e8467184fbc7497a6ccb8a4f41c478ed712",
+      "original_revision": 1
+    },
+    "A-B045-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "d322c1b8400c51bbc1b18e4343579e1ae8867c4c67fcb1398cbdb5d2926ca160",
+      "pdf_sha256": "1a18cf5583b059f5ec7164ad44ef8d98b574e132e3c0b96d5570daf9f39fb266",
+      "original_revision": 1
+    },
+    "A-B046-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "8394d16ebb0f35c58cf23b39633a76d9b9bac0f0e2bc9abdfbc60d36602a9a49",
+      "pdf_sha256": "3d52abbef565ebcf1f9b02429ca6632dbafc8ad4f77d4b7f421e717a915c025e",
+      "original_revision": 1
+    },
+    "A-B047-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "e71f6576e8312ea5bb2992f49bcca88e38d2fe7f489003ce7120e999cf0e7166",
+      "pdf_sha256": "532adebf87780c2a10fa8d5ed1e72cedbb92c2fe2542c43a412795f28431bfab",
+      "original_revision": 1
+    },
+    "A-B048-Q05": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "be7d3aa4e4dcfabd7b3337f45e0f584f051ac89f2773802472399e084fd6296b",
+      "pdf_sha256": "aebaef75c30f65cb4dfdabbc0cfe0b4b269a63f9ffa3567a4d28432ced51b271",
+      "original_revision": 1
+    },
+    "A-B049-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "a9cb9d976d822248803c96b7c1447ca5c10438326e3fd59ef909f070f3b3077c",
+      "pdf_sha256": "7c120618bebaaebdebb15fb19824ba29463fa6e649d5021b8a7e5d4b0d574131",
+      "original_revision": 1
+    },
+    "A-B050-Q08": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "2b751eea302d497e6d590fce0b975d2a1173d8a79818a8ed1924302a36b8d486",
+      "pdf_sha256": "f41b0939a34c2468bcb95df916ca5cc305782c6236706c461cccca9d1bcadab3",
+      "original_revision": 1
+    },
+    "B-CB001-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "3d9897456af93ddc84ddecc5cbcf070e0639e1cae9f681583e736e3b9b3be40b",
+      "pdf_sha256": "edbfe7b9ec409218457402d8ccbbd4ab8a05c00169e322fab2d3eee2854aef87",
+      "original_revision": 4
+    },
+    "B-CB002-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "e4eeff62d61fe4f544a91271d8f1f69bdd34332c8eb7c168bf64fa70c776dbe8",
+      "pdf_sha256": "688791db3755ee3c12a59081f885bd9fd2544960600de19b18e565647c205986",
+      "original_revision": 1
+    },
+    "B-CB003-Q03": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "2a8006c34da03d16d24f9fa4993be41ccab344ddea380838cae6f8dbef9917af",
+      "pdf_sha256": "a8ff9d494dc035d2674f16a157888c2634cb9bc54c2743f8479e3ba5db8295f2",
+      "original_revision": 1
+    },
+    "B-CB003-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "edbe30f6c2626f5e0a3ce2c6e4c6daeace995fe458fb6ddc0da067932015456d",
+      "pdf_sha256": "a8ff9d494dc035d2674f16a157888c2634cb9bc54c2743f8479e3ba5db8295f2",
+      "original_revision": 1
+    },
+    "B-CB004-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "35f2213186a8c91ee6b1cc13477cfb51fc1ed2a6c4f378c087a5250e58c17aff",
+      "pdf_sha256": "9dd47df5d651b65e3130c2b916eae6905e63ce31e39d233edd3393ef6ac14db5",
+      "original_revision": 1
+    },
+    "B-CB005-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "5452b9a3807d49835f9399a648a5bcf2839d7c4c15f38fb15d5843b6e403bcf6",
+      "pdf_sha256": "5713913d2953a37f5a7b1ef81f6400a21fe539d27958e3b89434a5d2c981162d",
+      "original_revision": 1
+    },
+    "B-CB006-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch01/questions.draft.jsonl",
+      "record_sha256": "3c2904f8f5a2cc6316b8f6ba4fdfceca70699a7ff466313e72c5e0057c23f71a",
+      "pdf_sha256": "e5fa58695e3c7aa939467bbfca43ce46d02d8552be12369bd9f7d034355fad0f",
+      "original_revision": 1
+    },
+    "B-CB007-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "214d84739945eeaeb434b2430851dd113fea90bd050bc608c6cbca17c54b2dca",
+      "pdf_sha256": "50b1449946106b5dc460c38dedc3407d0307c718657bc8758001ae57ca2e7bf8",
+      "original_revision": 1
+    },
+    "B-CB008-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "98eb2893a7c601021fc5fe36e6292efb7b4d07825422f80765766911c83051c9",
+      "pdf_sha256": "b5aaed38f93ac943ebcf1ddb0fb5733fb6842fb653f8784501ecd6220631c0b2",
+      "original_revision": 1
+    },
+    "B-CB009-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "115ecc94c601042bacc6d7fc86277dccd8ebcead54f94e123005f632703617c2",
+      "pdf_sha256": "3bd30087cbbb48384e7fa7c05a30eb2fecf56c61fed96e50c422daed98699ba9",
+      "original_revision": 1
+    },
+    "B-CB010-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "1436b8c397f1bd741fdd4d9a3ba4e43b4a8683311ed68e8f2f3d3eff1bfd0e13",
+      "pdf_sha256": "f06fec156057c26ba1b59e99fe4d85b9e8ddf14466ac7c66374157c66d7458a7",
+      "original_revision": 1
+    },
+    "B-CB011-Q02": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch02/questions.revision2.draft.jsonl",
+      "record_sha256": "3c14f76d61dcb361b4c6c2c987f32c5ca9358cd5f4bd246d5c30dfe269af243d",
+      "pdf_sha256": "e56c40afc2b62c3130f4a615b1696c28b732436c57265a2797f3fac44f8e04cc",
+      "original_revision": 1
+    },
+    "B-CB012-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "121c84bdf22cc39cb54191a3b46411c200269a67025e58e9c5cbf3fba8db396f",
+      "pdf_sha256": "4b356a7fa1c87e0d30b1434b941eb6d8e8fcf1d4e05ced760c2fbf4aa8c1c801",
+      "original_revision": 1
+    },
+    "B-CB013-Q08": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "9d17c81cd8907bd0c83cb7bf3313b5a5cca93a7744dda8388cd39d134fc862ea",
+      "pdf_sha256": "a6e22a82de8a2a9a5f03f0a8f16907d50a5bc0169a9e5fb50b6a5a0c2edbe826",
+      "original_revision": 1
+    },
+    "B-CB013-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "f23f83711e895720cc5d5d5f74413d75f73cb8fb4191deb21a5299f839864bef",
+      "pdf_sha256": "a6e22a82de8a2a9a5f03f0a8f16907d50a5bc0169a9e5fb50b6a5a0c2edbe826",
+      "original_revision": 1
+    },
+    "B-CB014-Q08": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "8518013af63e6a7fff057bd2b15ecba146be25a26c88c84b83f3331672585011",
+      "pdf_sha256": "7151ca50d34f6b5ef9f14e967d89c9f00ab0ac300b22cb2a322bf4d4a5623106",
+      "original_revision": 1
+    },
+    "B-CB015-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "94f35742088ae4743ac01b2c41020baccbba13487dbbb4cc1ea68a6464a5a309",
+      "pdf_sha256": "cb0a1820ea78b74b2e119e116628bf94235cba05460ce249d53406159d0b855a",
+      "original_revision": 1
+    },
+    "B-CB016-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch03/questions.draft.jsonl",
+      "record_sha256": "1d9abc2da06a1dc74822b20dc91c3b5231dfcc320cfd21c9fd533e1239a199e5",
+      "pdf_sha256": "689c86348c8e9b37117b9bc3e1d6fba58eff17533a1c4564aec982de6bdae027",
+      "original_revision": 1
+    },
+    "B-CB017-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "ec3fb3f0eb6cd89a4c15ed28732a060ae9dd23447d5d814f8cce3832d06c3f30",
+      "pdf_sha256": "0ad60b91f5223877d5459c70e4e533ada52a62d659e6e55530185dbdcd195f3f",
+      "original_revision": 1
+    },
+    "B-CB018-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "675477329c84d58a38bffb38cbf6ac457e3c82f2298770bf01bf5290ad724373",
+      "pdf_sha256": "f4ad75953080c61882a71cad1aad0b36f17420458c6b03f92f3ae2b5597e9e77",
+      "original_revision": 1
+    },
+    "B-CB019-Q07": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "d62b747f3f19d78020692be0fb210f532d5d640900210486010bbf56f1d19975",
+      "pdf_sha256": "3b54b99a53529e8733c1ad66fda701c1bd392e26407a65d4db7e377c858547bb",
+      "original_revision": 1
+    },
+    "B-CB020-Q08": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "39a43eec9b5de7c3b93a2a1b5301b796193a63f40cc315b8f97bf935d035c1ca",
+      "pdf_sha256": "7c1e9f381f0a54cbf98a323be3eb1f087cd338c70401393b46c63207ef1953e9",
+      "original_revision": 1
+    },
+    "B-CB021-Q01": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": true,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "6e0748e360bf159db851a535e5dede81521d39ce4fc5c0104cb13b7c48773575",
+      "pdf_sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db",
+      "original_revision": 1
+    },
+    "B-CB021-Q04": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "d841f1854c9865bcd1c5d850a75c85fd9e6d0fecf5f6511e44d6dff740487cdf",
+      "pdf_sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db",
+      "original_revision": 2
+    },
+    "B-CB021-Q08": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch04/questions.revision2.draft.jsonl",
+      "record_sha256": "ae7873782507d55cd4a03273097a96b14729b7921b065b2bdb0fc9cc1fa4ca96",
+      "pdf_sha256": "f4e26e9636a20c95db3e2e4ff8c2217c0cb84f8f3c178d72fd29ee8673d150db",
+      "original_revision": 1
+    },
+    "B-CB022-Q02": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "ee8220d1a60eb40b99ec8ecad3b85318cb4f490a4795a9f32a8e71ed20a74928",
+      "pdf_sha256": "880a41737adf4074c1812fbf3d43fd5d2f15cbaf6f3e0b008a71e2b0fae5186b",
+      "original_revision": 1
+    },
+    "B-CB023-Q05": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "21aea4fc9bb74caa2749d4a6570243d2c11fef13530b9f66644f69f077951c99",
+      "pdf_sha256": "81103836456eabbd08d844f5195499966c55d1096c0e1674c04dcea8f3db3056",
+      "original_revision": 1
+    },
+    "B-CB023-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "32fb7eff85d15af8434975593f4d208fc2438fd7f9d4baaa573f02de7740b2aa",
+      "pdf_sha256": "81103836456eabbd08d844f5195499966c55d1096c0e1674c04dcea8f3db3056",
+      "original_revision": 1
+    },
+    "B-CB024-Q08": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "c189607f4091fef9f8a10b66f4be0f37c48c4819a77c8b0ae575d156b7c91545",
+      "pdf_sha256": "66c541f306b4737a2839eb56a25943fc44ce5b50fea1b86dd2c0412297742076",
+      "original_revision": 1
+    },
+    "B-CB025-Q05": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": true,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "374687ef07f8738ac04360ba6ac1e55eb0d8fc0052263cb7c1b3c880a28fbb5b",
+      "pdf_sha256": "7d7cdf890bd46c0375c3d99bf47e5ac77a4142555811f5795b96fab2d9f59df8",
+      "original_revision": 1
+    },
+    "B-CB025-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "26354f19579af84019f20cc148c5fe794d6982df0dc3674493db886757cea0dd",
+      "pdf_sha256": "7d7cdf890bd46c0375c3d99bf47e5ac77a4142555811f5795b96fab2d9f59df8",
+      "original_revision": 1
+    },
+    "B-CB026-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch05/questions.draft.jsonl",
+      "record_sha256": "500009ff30d98d32af58b51b87f83d9a277ce886b515b07709c49a03d8bfacef",
+      "pdf_sha256": "06a05ae6e200e3d9e31aef6fc44a467ea7cf96c49b1f92069c4971977d7026b9",
+      "original_revision": 1
+    },
+    "B-CB027-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "5a391e1eff4c961e190cba662392c9847edfc75df7a09f393bfb080d3ea2bcee",
+      "pdf_sha256": "95982b216523fe6b8ae72fc2551877dfe119527e8c660b621d70a8ade34b4a85",
+      "original_revision": 1
+    },
+    "B-CB028-Q07": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "f9e176e72eb9b8262c6b28a0b803eb7ca9082ec16cdf42412ad89f76b2cd271a",
+      "pdf_sha256": "99736d18e7b3c154103f110cd1df7458407a4793a117c1cc2593df1f8363c8b5",
+      "original_revision": 1
+    },
+    "B-CB029-Q10": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "163c9d7224ab63a2fa182c1415a1723430a755da6124206ffdbcb5a54c7e02e2",
+      "pdf_sha256": "25b4fe58fccff61a2a522845767bb78b6bd6e8744f4345ca290a17b6f36f54be",
+      "original_revision": 1
+    },
+    "B-CB030-Q10": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "c22cc5a195da042259e656eb5ac58fa96ff5f900dd8b551bd7f8a8151f6373c6",
+      "pdf_sha256": "61d8fb8db6763fd3ebea0ed76baba62c052f2587b68838f6514cfc845c6bb9c2",
+      "original_revision": 1
+    },
+    "B-CB031-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch06/questions.revision2.draft.jsonl",
+      "record_sha256": "98bdaa3e8f9ad99a6777962284dc0f0b17311ab0978b13778e3513e5dfac7036",
+      "pdf_sha256": "51b7bec49c8aa2ae935fb9e3cda8d280c5bcff9f02423b5bef8745732310895e",
+      "original_revision": 1
+    },
+    "B-CB032-Q08": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "958641688ae92a36df77497a5c49131dab22c003dba2bcdbbb8442cdcf7f1ad5",
+      "pdf_sha256": "4ef8513bae5afc3b322bbc5f92cb7b69d96753a599642edcdb183c0204b60a1a",
+      "original_revision": 1
+    },
+    "B-CB033-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "f7325b907483b422e73a99e1479975d3004efccd3a261f2318c7ab38263da272",
+      "pdf_sha256": "c07d6436bdd2456ecdc914a697a718ab250ba3562c73e11dbde07e6820d0fd9c",
+      "original_revision": 1
+    },
+    "B-CB034-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/phase1/questions.revision4.draft.jsonl",
+      "record_sha256": "53a53b80feb9ce8706fed984e1bbe56af6cff7d3f4eaaed2795c7c0acf156fa8",
+      "pdf_sha256": "7d23769df530f7cbbcf7bde4001fef5a05b500f04568fa078640d606ba3ad427",
+      "original_revision": 4
+    },
+    "B-CB035-Q02": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "013a8a1dd8c6cc27eac97f68fd8d71168d1c32bd990bf23da158a7cdd816f660",
+      "pdf_sha256": "2152cb976ffadf07f9c720735bd23e2b2634c57533decb4416451553e9650323",
+      "original_revision": 1
+    },
+    "B-CB036-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "f56410ad6d09bf4cfbae8f939b82b97bb805595fdbb59268196222592ad3e2ea",
+      "pdf_sha256": "e91ffc935328cbcfafc693a9debd462f79dc7b834c2140a7e315533a84a68a77",
+      "original_revision": 1
+    },
+    "B-CB037-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch07/questions.revision3.draft.jsonl",
+      "record_sha256": "4cc79fe90ee7595099cc9ce66022b1ad1d81751869ac13170bf8658fcbe62059",
+      "pdf_sha256": "51c070166631290367ae086b73a60749e515f3aa0c665762ca7c3ccf45a57f00",
+      "original_revision": 1
+    },
+    "B-CB038-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "f7860f14180f562feedfbfadcae041172611b989cb1e276595bd359028c4a77f",
+      "pdf_sha256": "f54cac847bdfccdc10420329c24fa626cc1c6ff78c3fb86cb9784d620abc3490",
+      "original_revision": 1
+    },
+    "B-CB038-Q04": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": true,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "421b9169f018feafc3b30db02f2348877522f2345a88501a79f52c9ef18248d3",
+      "pdf_sha256": "f54cac847bdfccdc10420329c24fa626cc1c6ff78c3fb86cb9784d620abc3490",
+      "original_revision": 1
+    },
+    "B-CB039-Q07": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "250eda3fe2845cbdf738b8237ee2058e2386ad48524aa084d77a3d35cb25c152",
+      "pdf_sha256": "8012b7dc3dbd959e1170e122bb77b27dd7a291d0868f7752b996dcda61c1ea04",
+      "original_revision": 1
+    },
+    "B-CB040-Q06": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "f210e20247fdd1323463b0380f25b9e216a8bc3f8ebc24c63e56d7e777bebeda",
+      "pdf_sha256": "6ccabdc700eaa30fcbc8307b73481125f7276ae799394af28ad1989ae47aa54c",
+      "original_revision": 1
+    },
+    "B-CB041-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "380633099b83e613a7c8b706281283293343f26fb026c375972d680de7d59be2",
+      "pdf_sha256": "a035d824170c0971803bbc1b48899f5f662f6aed326c009dfde483de99a7e482",
+      "original_revision": 1
+    },
+    "B-CB042-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch08/questions.revision2.draft.jsonl",
+      "record_sha256": "e4e1525c0d9ef053b890d1caf47112ba71c66fcb42d73f23da7c113bdc6bacc5",
+      "pdf_sha256": "f424f5a25f2fe5e76e80a72b3e67982e8714ae76d8d9af3c7cf0f57ed0a3427b",
+      "original_revision": 1
+    },
+    "B-CB043-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "285e8be74a04ec256ff589b9a9382951f5e0f653ee22be0763fb0765137e6ac2",
+      "pdf_sha256": "1f88a64dc5819933e252dae6c347f24fc32c89a4f5d818feb70dce6045eee30c",
+      "original_revision": 1
+    },
+    "B-CB044-Q02": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "db1669f93b9d941baada4f233482b32aaf9898e366111e260f0b8872948f9b53",
+      "pdf_sha256": "f24ff5c39fbd4b9ca5952cf056121d2944af67a935b6817884ee1834bba8984d",
+      "original_revision": 1
+    },
+    "B-CB045-Q09": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "24a598de3295672e6b15fab68dcb37ebb942162420b2ef1e2990629fd95d3e8f",
+      "pdf_sha256": "1cfb6036ee5dc4dd8b3937839fd0d08b13a103ac226a6259550998c84a57c66d",
+      "original_revision": 1
+    },
+    "B-CB046-Q03": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "6d083c9d5159d244a755bb0aee767effaa15bd4cad1993f1edf579ea8a315b32",
+      "pdf_sha256": "8159761d3d09b806e2ba08033fa0e0abb43c8b52fb0ec329758dc49658698225",
+      "original_revision": 1
+    },
+    "B-CB047-Q08": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch09/questions.draft.jsonl",
+      "record_sha256": "415cee427d1667c668c0509a9e998a0c7633e9e5f0b32f329db0131e7017019a",
+      "pdf_sha256": "d9bc4c7d12092e81f0eaec51c69406f08d4df01d524842c426cfc4ca191909a2",
+      "original_revision": 1
+    },
+    "B-CB048-Q07": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "fee3498abf7ffe31cf130cb74b75b9eb18709b52e17db345e8b229fc72384ac6",
+      "pdf_sha256": "1d6dffe47e8247daaa1a63665eecd486c199e5517916c0f21ad5f3405a73dca0",
+      "original_revision": 1
+    },
+    "B-CB049-Q04": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "71af30479c4d2086443b2d227ebfb5124c783a82e87344b6c64f1e864e035e4d",
+      "pdf_sha256": "4565961b3883e3f7294ee42d3c499f2911acdad2f852f2c62cdb9f829fe6a712",
+      "original_revision": 1
+    },
+    "B-CB050-Q01": {
+      "core_stratified": true,
+      "additional_risk_proposed": false,
+      "P0": false,
+      "safety_priority": false,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "3451c4ab23d1719938698ddfeaf671e71891f4b738663cc4b7c98d6aa21319c2",
+      "pdf_sha256": "4019f913b8314d822f86dcb39204c43066c99e5dc17ae8fbd44e32e7717971a8",
+      "original_revision": 1
+    },
+    "B-CB050-Q04": {
+      "core_stratified": false,
+      "additional_risk_proposed": true,
+      "P0": false,
+      "safety_priority": true,
+      "Olina_group": false,
+      "effective_questions_path": "docs/evaluation/golden_set/expansion/batch10/questions.draft.jsonl",
+      "record_sha256": "644d4a99840d925c594006dd20ee5c78a7c80d32b0beb9d9d23ad562a728525c",
+      "pdf_sha256": "4019f913b8314d822f86dcb39204c43066c99e5dc17ae8fbd44e32e7717971a8",
+      "original_revision": 1
+    }
+  },
+  "unique_initial_review_budget": 120,
+  "additional_count": 20,
+  "human_decisions_created": 0,
+  "collection_frozen": false,
+  "rag_calls": 0,
+  "provider_calls": 0,
+  "automated_scope": "100_percent_structure_integrity_provenance_literal_quotes_not_semantic_approval"
+}

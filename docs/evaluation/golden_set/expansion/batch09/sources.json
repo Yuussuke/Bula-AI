@@ -1,0 +1,367 @@
+[
+  {
+    "corpus_id": "A",
+    "document_id": "B044",
+    "document_sha256": "9555875042d263b7f706f1ccec809e8467184fbc7497a6ccb8a4f41c478ed712",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B044/bula_1791247373784.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 8,
+    "medication": "CYCLOFEMINA",
+    "manufacturer": "Productos Científicos S.A. de C.V. (Carnot Laboratórios)",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=110360266",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 27760,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      4
+    ],
+    "documentary_notes": [
+      "Monthly adult intramuscular contraception; first use, pill switch, injectable switch and postpartum guidance are distinct. Lactation is not recommended and professional alternatives are explicit.",
+      "Depressive mood may be serious; preserve prompt medical contact. Rifampicin appears in an extensive efficacy/bleeding interaction list; this is a frozen-document reference, not a universal rule for every antibiotic.",
+      "The source notes relatively few androgenic effects but still lists acne and weight changes. No acne-treatment benefit or ovulation-recovery interval is established."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B045",
+    "document_sha256": "1a18cf5583b059f5ec7164ad44ef8d98b574e132e3c0b96d5570daf9f39fb266",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B045/bula_1791247383810.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 15,
+    "medication": "Air Salonpas / Salonpas Gel / Salonsip",
+    "manufacturer": "Hisamitsu Farmacêutica do Brasil Ltda.; Hisamitsu Pharmaceutical Co., Inc.",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=110520001",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 27602,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      8,
+      13
+    ],
+    "documentary_notes": [
+      "One frozen PDF contains Air aerosol (pages 1–5), Salonpas Gel (6–10) and Salonsip patch (11–15). Preserve product, route and local instructions; not a single merged regimen.",
+      "Original pages 3/8/13 confirm coverage differences: no occlusive bandage over Air/Gel, but bandage/adhesive recommended to fix Salonsip. Gel must not be massaged. Air distance/seconds do not transfer to gel or patch.",
+      "Storage heat precautions are not a tested hot-water-bag co-use protocol. Two-year age prohibition appears for Air/Salonsip, not expressly for gel; all state adult use/physician consultation for children. No general pediatric fixture or new age rule authored.",
+      "Approval-date placeholders XX/XX/XXXX are present; frozen confirmation/manifests remain unchanged. Do not infer an approval date from that placeholder."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B046",
+    "document_sha256": "3d52abbef565ebcf1f9b02429ca6632dbafc8ad4f77d4b7f421e717a915c025e",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B046/bula_1791247394764.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 5,
+    "medication": "Fração Ácida com Cálcio 3,5 mEq/L (Farmace)",
+    "manufacturer": "Farmace Indústria Químico-Farmacêutica Cearense Ltda.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=110850007",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 12067,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      4
+    ],
+    "documentary_notes": [
+      "Extracorporeal concentrate for hospital dialysis preparation, not direct administration, oral hydration or IV saline. Technical needs are justified by this PDF, not claimed to be common patient questions.",
+      "Original preparation paragraph gives 1 L acid + 1.225 L basic + 32.775 L purified water = 35 L, with qualified-team and medical-individualization constraints. No individualized dialysate formula calculated.",
+      "Forty-eight hours after seal break differs from 24-month unopened validity. Slight yellow coloration may be normal; turbidity/deposit or violated seal is not.",
+      "Contraindications concern access/cardiovascular/capillary conditions and the dialysis procedure. Do not infer that every renal failure contraindicates this renal-treatment preparation."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B047",
+    "document_sha256": "532adebf87780c2a10fa8d5ed1e72cedbb92c2fe2542c43a412795f28431bfab",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B047/bula_1791247427635.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 6,
+    "medication": "FUNED ÁCIDO FÓLICO",
+    "manufacturer": "",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=112090018",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 12514,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      1,
+      2
+    ],
+    "documentary_notes": [
+      "Frozen manufacturer field is empty; FUNED registers the product. Preserve manifest without inferring an explicitly identified manufacturing role.",
+      "Original page 1 table distinguishes daily posology from IDR and percentage IDR; no new calculated dose or percentage. Questions cover distinct prevention, timing, excipient, interaction, older-age caution, missed dose, diet and urinary-color needs.",
+      "Source tension on page 2: pernicious anemia contraindication versus use only with adequate B12. Adult label versus no age contraindication also coexist. No blanket pernicious-anemia or pediatric permission fixture authored.",
+      "Urinary yellow coloration is described as drug elimination, not a clinical diagnosis for every urine change. High-dose tolerance language must not override overdose medical-attention instructions."
+    ]
+  },
+  {
+    "corpus_id": "A",
+    "document_id": "B048",
+    "document_sha256": "aebaef75c30f65cb4dfdabbc0cfe0b4b269a63f9ffa3567a4d28432ced51b271",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/final/B048/bula_1791247430452.pdf",
+    "manifest_path": "docs/evaluation/corpus/corpus_final.csv",
+    "manifest_sha256": "a472f4aae94658ffbb2b76b1ad8c83dcbdae0812f88c369f26b9a41e91b9b3a7",
+    "page_count": 8,
+    "medication": "LAQFA-ISONIAZIDA",
+    "manufacturer": "Laboratório Químico-Farmacêutico da Aeronáutica",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=112330036",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 26309,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      2,
+      3,
+      5
+    ],
+    "documentary_notes": [
+      "Active TB combination treatment differs from ILTB monotherapy; pregnancy deferral concerns ILTB with a specific HIV exception, not all TB care.",
+      "Original pages 2/3 tables and child-contact paragraph visually inspected. Contact with bacilliferous cases has PT >=5 mm or positive IGRA independent of BCG; general pediatric table differentiates BCG timing. Q05 uses the explicit contact paragraph, not a synthesized criterion.",
+      "270 versus 180 ILTB doses require adherence/prescriber conditions; calendar duration alone is insufficient. Fasting preference has a digestive-intolerance meal exception.",
+      "Liver disease prohibition coexists with monitoring of pre-existing liver disease. Page 7 native extraction duplicates letters; no page-7 quote authored and no silent repair of literal citations. Adverse-event frequencies are internally complex; no synthesized rate.",
+      "B6 dose from pregnancy must not transfer to diabetes; urine-glucose false positivity cannot establish other lab interferences."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB043",
+    "document_sha256": "1f88a64dc5819933e252dae6c347f24fc32c89a4f5d818feb70dce6045eee30c",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB043/bula_1791329713235.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 9,
+    "medication": "rosuvastatina cálcica",
+    "manufacturer": "Novartis Pharmaceutical Manufacturing LLC; Lek S.A.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=100681144",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 53114,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      5
+    ],
+    "documentary_notes": [
+      "Novartis identifies/registers, Sandoz imports/markets; the frozen two producers remain unchanged. 10/20-mg tablets; pediatric indication specifically familial heterozygous hypercholesterolemia.",
+      "Source tensions: sections 3/6 differ on renal/hepatic insufficiency; section 4 first says avoid cyclosporine then discusses adjusted concomitant doses. No renal/cyclosporine permission or dosing fixture authored; risk audit remains pending.",
+      "Family-hypercholesterolemia blood-donation prohibition must not generalize to all users. Muscular symptoms with fever require immediate reporting. No grapefruit guidance is imported from another statin."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB044",
+    "document_sha256": "f24ff5c39fbd4b9ca5952cf056121d2944af67a935b6817884ee1834bba8984d",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB044/bula_1791247123073.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 7,
+    "medication": "CIPROLIP",
+    "manufacturer": "UCI-Farma Indústria Farmacêutica Ltda.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=105500172",
+    "provenance_date": "2026-10-05",
+    "native_text_characters": 21286,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      4
+    ],
+    "documentary_notes": [
+      "Adult ciprofibrate, not fenofibrate. Mixed-lipid indication depends on intolerance/contraindication of other effective therapy; diet is retained.",
+      "The scored tablet must not be split, opened or chewed. Moderate renal guidance is alternate-day while severe is prohibited. No personal renal staging or adjustment.",
+      "Warfarin effect is potentiated: adjusted/reduced anticoagulant, not an invented Ciprolip reduction. Muscular symptoms need prompt disclosure and immediate CPK evaluation; suspension is conditional.",
+      "Muscular toxicity reversibility does not support hair-recovery prognosis. Meal timing is not supplied by with-liquid administration or diet advice."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB045",
+    "document_sha256": "1cfb6036ee5dc4dd8b3937839fd0d08b13a103ac226a6259550998c84a57c66d",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB045/bula_1791329715920.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 12,
+    "medication": "ezetimiba + sinvastatina",
+    "manufacturer": "EMS S/A; Novamed Fabricação de Produtos Farmacêuticos Ltda.",
+    "length_group": "longa",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=102351139",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 59379,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      4,
+      5
+    ],
+    "documentary_notes": [
+      "Fixed combination has digestive-absorption plus endogenous-production mechanisms, unlike isolated ezetimibe. Current body includes 10+10, 10+20, 10+40; older history includes canceled 10+80, not a current recommendation.",
+      "Lactose differs by presentation; do not substitute the lower quantity from other strengths. Body limits splitting/chewing and specifies nighttime dosing.",
+      "Clarithromycin is in the do-not-use list, not merely caution. Pregnancy discovery explicitly requires interruption and immediate medical contact; liver signs also require immediate contact.",
+      "Colestyramine interval differs from fenofibrate coadministration. Thyroid disease as muscle-risk factor does not establish levothyroxine interaction. Older/history manufacturer and pack statements do not replace current body."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB046",
+    "document_sha256": "8159761d3d09b806e2ba08033fa0e0abb43c8b52fb0ec329758dc49658698225",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB046/bula_1791329719056.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 8,
+    "medication": "fenofibrato",
+    "manufacturer": "Torrent Pharmaceuticals Ltd.",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=105250112",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 23816,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      4
+    ],
+    "documentary_notes": [
+      "Torrent 160-mg tablets, not unrestricted generic interchange across formulations. Tablets whole with lunch/dinner; the source separately permits 200-mg capsule substitution without posology adjustment.",
+      "Original pages 3/4 confirm acute-pancreatitis triglyceride exception and a lactation tension: do-not-use statement followed by criterious-use/medical-assessment statement. No clinical reconciliation or lactation fixture.",
+      "Statin combination conditions are cumulative and require monitoring; immediate muscle-symptom contact is preserved, clinician decides interruption. Elderly adult regimen assumes no renal insufficiency.",
+      "Second-week onset is not achievement of an individual lipid goal. Creatinine monitoring is not evidence about creatine supplements. Erectile dysfunction is listed without recovery prognosis."
+    ]
+  },
+  {
+    "corpus_id": "B",
+    "document_id": "CB047",
+    "document_sha256": "d9bc4c7d12092e81f0eaec51c69406f08d4df01d524842c426cfc4ca191909a2",
+    "source_path": "backend/tmp/anvisa-bulas-v2/corpus-20261005/pdfs/corpus-b/CB047/bula_1791329721812.pdf",
+    "manifest_path": "docs/evaluation/corpus_b/corpus_b_final.csv",
+    "manifest_sha256": "f99be5547f9c4e95dc38baf51f38e37ad5c0e27f7e667c4c1c536ab2c99b0365",
+    "page_count": 6,
+    "medication": "EZETIMIBA",
+    "manufacturer": "Watson Pharma Private Limited",
+    "length_group": "curta",
+    "anvisa_consultation": "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=109740297",
+    "provenance_date": "2026-10-06",
+    "native_text_characters": 14150,
+    "full_document_read_pages": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "reading_actor": "AI_assistant_not_human_reviewer",
+    "visual_checked_pages": [
+      3,
+      4
+    ],
+    "documentary_notes": [
+      "Biolab imports/registers, Watson produces isolated 10-mg ezetimibe. Do not transfer combination-with-statin age, night dosing, splitting or contraindications to isolated product.",
+      "Any daily time and with/without food; prescribed fenofibrate can share time, colestyramine needs separation. Above-six wording versus under-six non-recommendation leaves exact-six boundary untested.",
+      "Liver monitoring paragraph concerns prescribed statin combination and is conditional. Muscle symptoms require immediate physician contact; no independent diagnosis or treatment.",
+      "No tablet-splitting or perioperative protocol is supplied; tablet shape alone cannot authorize manipulation. Clinical concerns must not be inferred from absence."
+    ]
+  }
+]
