@@ -1,0 +1,33 @@
+# Dependency topology only. Do not start before separate ingestion authorization.
+name: bula-ai-evaluation
+
+x-postgres: &postgres
+  image: ${EVAL_POSTGRES_IMAGE:?Provide the approved PostgreSQL image@sha256 digest}
+  environment:
+    POSTGRES_USER: evaluation
+    POSTGRES_PASSWORD: ${EVAL_POSTGRES_PASSWORD:?Provide an evaluation-only password}
+    POSTGRES_DB: evaluation
+
+services:
+  postgres-a:
+    <<: *postgres
+    volumes:
+      - postgres-a:/var/lib/postgresql
+  postgres-b:
+    <<: *postgres
+    volumes:
+      - postgres-b:/var/lib/postgresql
+  qdrant-a:
+    image: ${EVAL_QDRANT_IMAGE:?Provide the approved Qdrant image@sha256 digest}
+    volumes:
+      - qdrant-a:/qdrant/storage
+  qdrant-b:
+    image: ${EVAL_QDRANT_IMAGE:?Provide the approved Qdrant image@sha256 digest}
+    volumes:
+      - qdrant-b:/qdrant/storage
+
+volumes:
+  postgres-a:
+  postgres-b:
+  qdrant-a:
+  qdrant-b:
