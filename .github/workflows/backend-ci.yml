@@ -50,6 +50,25 @@ jobs:
           GITLEAKS_CONFIG: .gitleaks.toml
           GITLEAKS_NOTIFY_USER_LIST: "@pedro-stanaka,@YUUSSUKE"
 
+  evaluation-offline:
+    name: Offline Evaluation Infrastructure
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Install locked dependencies
+        run: uv sync --frozen
+      - name: Test offline infrastructure without application services
+        run: uv run --offline --no-sync python -m pytest --confcutdir=tests/unit/evaluation tests/unit/evaluation -q
+      - name: Type-check evaluation infrastructure
+        run: uv run --offline --no-sync mypy evaluation --follow-imports=silent --disallow-untyped-defs
+
   lint:
     name: Lint
     runs-on: ubuntu-latest

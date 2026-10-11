@@ -17,6 +17,11 @@ build/
 
 # Logs
 *.log
+# Machine-local evaluation artifacts
+/tmp/evaluation-*/
+/backend/tmp/evaluation-*/
+/backend/evaluation/artifacts/
+/docs/evaluation/experiment_preparation/manifest.prepared*.json
 tmp/rag-ingestion-debug/
 backend/tmp/rag-ingestion-debug/
 backend/tmp/pytest-temp/
