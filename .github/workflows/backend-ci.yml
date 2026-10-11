@@ -50,6 +50,29 @@ jobs:
           GITLEAKS_CONFIG: .gitleaks.toml
           GITLEAKS_NOTIFY_USER_LIST: "@pedro-stanaka,@YUUSSUKE"
 
+  evaluation-offline:
+    name: Offline Evaluation Integrity
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.14"
+      - name: Install locked dependencies
+        run: uv sync --frozen
+      - name: Verify the published Golden Set
+        run: uv run --offline --no-sync python ../docs/evaluation/golden_set/release/verify.py
+      - name: Test publication integrity
+        run: uv run --offline --no-sync python -m unittest discover -s ../docs/evaluation/golden_set/release -p test_verify.py
+      - name: Test offline infrastructure without application services
+        run: uv run --offline --no-sync pytest --confcutdir=tests/unit/evaluation tests/unit/evaluation -q
+      - name: Type-check evaluation infrastructure
+        run: uv run --offline --no-sync mypy evaluation ../docs/evaluation/golden_set/release/verify.py --follow-imports=silent --disallow-untyped-defs
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
