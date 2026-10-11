@@ -15,6 +15,10 @@ build/
 # Environment variable files
 .env
 
+# Private immutable provenance is restored from the custodial archive
+/docs/evaluation/golden_set/frozen/v1/manifest.json
+/docs/evaluation/golden_set/**/*.original.json
+
 # Logs
 *.log
 tmp/rag-ingestion-debug/
