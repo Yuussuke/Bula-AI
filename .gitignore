@@ -15,6 +15,9 @@ build/
 # Environment variable files
 .env
 
+# Custodial evaluation outputs, provider telemetry and private review histories
+backend/evaluation/artifacts/
+
 # Private immutable provenance is restored from the custodial archive
 /docs/evaluation/golden_set/frozen/v1/manifest.json
 /docs/evaluation/golden_set/**/*.original.json
