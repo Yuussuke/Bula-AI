@@ -119,3 +119,21 @@ guarantee all layouts are repaired. Chunking and retrieval are unchanged.
 
 Validate parsing before freezing ingestion. Existing indexed text and chunk IDs
 are not updated by this code change; reprocess explicitly when adopting it.
+
+## Source-backed layout regions
+
+`native_markdown_layout_regions_v5` associates physical ruled grids with connected
+native regions, including `picture` classifications and split table fragments.
+Thin filled borders supplement strict line detection; broad shaded backgrounds
+do not. Rotation is normalized in memory, and cardinal text direction determines
+cell reading order. Empty offsets do not consume text; invalid, overlapping or
+unmapped nonempty intervals remain errors.
+
+Illustrated instruction grids retain captions and data rows without inventing
+column names. Ambiguous cell ownership, mixed cell directions and unproven
+headerless continuations fail closed. Explicit repeated grouped headers remain
+on their own page. There is no OCR, model call, or index migration in this change.
+
+See [the offline corpus report](../../../../../docs/decisions/2026-10-11-source-backed-table-layout.md)
+before authorizing another ingestion. v5 is not a guarantee that all tables,
+borderless layouts or image-only content are semantically complete.

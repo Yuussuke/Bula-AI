@@ -348,6 +348,11 @@ class PyMuPDF4LLMHandler(ParserHandler):
             )
 
         try:
+            # Normalize only the in-memory copy. Native offsets, words and rules
+            # must use the same coordinate space; original PDF bytes are untouched.
+            for page in document:
+                if page.rotation:
+                    page.remove_rotation()
             page_chunks = pymupdf4llm_module.to_markdown(
                 document,
                 page_chunks=True,
