@@ -26,7 +26,7 @@ DEFAULT_FAILURE_ERROR = (
     "No text-based extraction tier produced enough content. "
     "OCR is not enabled in this parsing phase."
 )
-PARSER_VERSION = "native_markdown_layout_regions_v5"
+PARSER_VERSION = "native_markdown_table_continuation_v6"
 
 
 @dataclass
