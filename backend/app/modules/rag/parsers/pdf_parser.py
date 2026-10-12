@@ -13,7 +13,7 @@ from app.modules.rag.parsers.handlers import (
     PyMuPDF4LLMHandler,
     PyMuPDFHandler,
 )
-from app.modules.rag.parsers.markdown_hygiene import trim_markdown_from_legal_section
+from app.modules.rag.parsers.markdown_hygiene import trim_lines_from_last_legal_section
 from app.modules.rag.parsers.markdown_renderer import (
     MarkdownBuildResult,
     MarkdownRenderer,
@@ -26,7 +26,7 @@ DEFAULT_FAILURE_ERROR = (
     "No text-based extraction tier produced enough content. "
     "OCR is not enabled in this parsing phase."
 )
-PARSER_VERSION = "native_markdown_table_continuation_v6"
+PARSER_VERSION = "native_markdown_last_legal_section_v8"
 
 
 @dataclass
@@ -98,6 +98,9 @@ class BulaParser:
         if not extracted_lines:
             extracted_lines = self._collect_lines(extraction_result=extraction_result)
         detected_sections = self.section_detector.detect(extracted_lines)
+        extracted_lines, detected_sections = trim_lines_from_last_legal_section(
+            extracted_lines, detected_sections
+        )
         markdown_result = self.markdown_renderer.render(
             lines=extracted_lines,
             detected_sections=detected_sections,
@@ -106,7 +109,6 @@ class BulaParser:
             markdown_result=markdown_result,
             front_matter=cleanup_result.front_matter,
         )
-        markdown_result = trim_markdown_from_legal_section(markdown_result)
         metadata = self.metadata_extractor.extract(
             lines=extracted_lines,
             filename=filename,
