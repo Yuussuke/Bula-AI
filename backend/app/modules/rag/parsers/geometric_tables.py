@@ -9,6 +9,7 @@ from typing import Any
 import unicodedata
 
 from pymupdf import TEXTFLAGS_WORDS
+from app.modules.rag.parsers.table_continuation import TableContinuationMatcher
 
 
 Bounds = tuple[float, float, float, float]
@@ -33,6 +34,7 @@ class TableCell:
     row_end: int
     column_start: int
     column_end: int
+    text_direction: tuple[int, int] = (1, 0)
 
 
 @dataclass(frozen=True)
@@ -141,6 +143,15 @@ class GeometricTableExtractor:
                         row_end=self._edge_index(y_edges, projected[3]),
                         column_start=self._edge_index(x_edges, projected[0]),
                         column_end=self._edge_index(x_edges, projected[2]),
+                        text_direction=next(
+                            iter(
+                                {
+                                    line_directions.get((word[5], word[6]), (1, 0))
+                                    for word in cell_words
+                                }
+                            ),
+                            direction,
+                        ),
                     )
                 )
             occupancy: Counter[tuple[int, int]] = Counter()
@@ -329,6 +340,7 @@ class GeometricTableIntegrator:
 
     def __init__(self) -> None:
         self.extractor = GeometricTableExtractor()
+        self.continuations = TableContinuationMatcher()
 
     def repair(self, document: Any, page_chunks: Any) -> dict[str, object]:
         try:
@@ -344,11 +356,17 @@ class GeometricTableIntegrator:
         repaired_count = 0
         native_only_count = 0
         previous_page_table: GeometricTable | None = None
+        previous_header_table: GeometricTable | None = None
+        previous_header_id: str | None = None
         previous_page_height = 0.0
+        previous_top_context: list[tuple[str, float, float]] = []
         for chunk in page_chunks:
             page_number = chunk["metadata"]["page_number"]
             page = document[page_number - 1]
             tables = self.extractor.extract(page)
+            top_context = self._top_context(
+                chunk, float(page.rect.width), float(page.rect.height)
+            )
             continuation_table: GeometricTable | None = None
             if (
                 previous_page_table is not None
@@ -358,6 +376,17 @@ class GeometricTableIntegrator:
                     current=tables[0],
                     previous_page_height=previous_page_height,
                     current_page_height=float(page.rect.height),
+                    header_source=previous_header_table,
+                    has_context_break=any(
+                        not any(
+                            text == old_text
+                            and abs(x - old_x) <= 0.02
+                            and abs(y - old_y) <= 0.02
+                            for old_text, old_x, old_y in previous_top_context
+                        )
+                        for text, x, y in top_context
+                        if y * float(page.rect.height) <= tables[0].bounds[1]
+                    ),
                 )
             ):
                 continuation_table = tables[0]
@@ -418,20 +447,83 @@ class GeometricTableIntegrator:
                 )
                 replacements.append((start, end, replacement + "\n\n"))
                 for table in selected:
+                    table_id = f"p{page_number}:t{tables.index(table)}"
+                    if table is continuation_table:
+                        if previous_header_table is None or previous_header_id is None:
+                            raise TableStructureError(
+                                "missing_continuation_header_source", page_number
+                            )
+                        header_source = previous_header_table
+                        header_id = previous_header_id
+                    else:
+                        header_source = table
+                        header_id = table_id
+                    header_end = self.continuations.body_start(header_source)
+                    continuation_method = None
+                    if table is continuation_table and previous_page_table:
+                        if self.continuations.is_absolutely_aligned(
+                            previous_page_table, table
+                        ):
+                            continuation_method = "absolute_columns"
+                        elif self.continuations.can_match_frame_change(
+                            previous_page_table, table, header_source
+                        ):
+                            continuation_method = "anchored_internal_columns_and_types"
+                        else:
+                            continuation_method = "relative_schema_and_anchors"
+                    header_cells = [
+                        {
+                            "source_cell_id": f"{header_id}:c{index}",
+                            "page": header_source.page_number,
+                            "bounds": list(cell.bounds),
+                            "text": cell.text,
+                            "row_start": cell.row_start,
+                            "row_end": cell.row_end,
+                            "column_start": cell.column_start,
+                            "column_end": cell.column_end,
+                        }
+                        for index, cell in enumerate(header_source.cells)
+                        if cell.row_start
+                        < (header_end if header_end is not None else 1)
+                    ]
                     diagnostics.append(
                         {
+                            "table_id": table_id,
                             "page": page_number,
                             "bounds": list(table.bounds),
                             "rows": table.row_count,
                             "columns": table.column_count,
                             "method": "geometric_lines_strict",
                             "reading_direction": list(table.reading_direction),
-                            "has_header": table.has_header,
+                            "has_header": table.has_header
+                            and table is not continuation_table,
                             "merged_cells": sum(
                                 cell.row_end - cell.row_start > 1
                                 or cell.column_end - cell.column_start > 1
                                 for cell in table.cells
                             ),
+                            "continuation_of": header_id
+                            if table is continuation_table
+                            else None,
+                            "previous_fragment_page": previous_page_table.page_number
+                            if table is continuation_table and previous_page_table
+                            else None,
+                            "continuation_method": continuation_method,
+                            "header_source_cells": header_cells,
+                            "cells": [
+                                {
+                                    "source_cell_id": f"{table_id}:c{index}",
+                                    "page": page_number,
+                                    "bounds": list(cell.bounds),
+                                    "text": cell.text,
+                                    "row_start": cell.row_start,
+                                    "row_end": cell.row_end,
+                                    "column_start": cell.column_start,
+                                    "column_end": cell.column_end,
+                                    "text_direction": list(cell.text_direction),
+                                }
+                                for index, cell in enumerate(table.cells)
+                            ],
                         }
                     )
                     repaired_count += 1
@@ -444,13 +536,21 @@ class GeometricTableIntegrator:
                 chunk["text"] = (
                     chunk["text"][:start] + replacement + chunk["text"][end:]
                 )
-            previous_page_table = tables[-1] if tables else None
+            if tables:
+                if tables[-1] is not continuation_table:
+                    previous_header_table = tables[-1]
+                    previous_header_id = f"p{page_number}:t{len(tables) - 1}"
+                previous_page_table = tables[-1]
+            else:
+                previous_page_table = previous_header_table = None
+                previous_header_id = None
             previous_page_height = float(page.rect.height)
+            previous_top_context = top_context
         return {
             "geometric_table_count": repaired_count,
             "native_only_table_count": native_only_count,
-            "tables": diagnostics[:100],
-            "diagnostics_truncated": len(diagnostics) > 100,
+            "tables": diagnostics,
+            "diagnostics_truncated": False,
         }
 
     def _regions(
@@ -476,6 +576,31 @@ class GeometricTableIntegrator:
             regions.append((sorted(selected, key=lambda item: item.bounds[1]), indices))
         return regions
 
+    def _top_context(
+        self, chunk: Any, page_width: float, page_height: float
+    ) -> list[tuple[str, float, float]]:
+        """Recognize repeated marginal source text, never a manufacturer name."""
+        result = []
+        for box in chunk.get("page_boxes", []):
+            if (
+                box["class"] in {"header", "footer"}
+                or box["bbox"][3] > page_height * 0.15
+            ):
+                continue
+            start, end = box["pos"]
+            if not 0 <= start <= end <= len(chunk["text"]):
+                raise TableStructureError(
+                    "invalid_native_offsets", chunk["metadata"]["page_number"]
+                )
+            text = self.continuations.normalize(chunk["text"][start:end])
+            # These are converter formatting markers, not physical PDF words.
+            text = re.sub(r"^#{1,6}\s+", "", text).replace("**", "").replace("__", "")
+            if text:
+                result.append(
+                    (text, box["bbox"][0] / page_width, box["bbox"][3] / page_height)
+                )
+        return result
+
     def _covers(self, outer: Any, inner: Bounds) -> bool:
         # Layout boxes follow text, while ruled grids include cell padding.
         width = max(0, min(outer[2], inner[2]) - max(outer[0], inner[0]))
@@ -493,6 +618,8 @@ class GeometricTableIntegrator:
         current: GeometricTable,
         previous_page_height: float,
         current_page_height: float,
+        header_source: GeometricTable | None = None,
+        has_context_break: bool = False,
     ) -> bool:
         if not previous.has_header or not current.has_header:
             return False
@@ -506,29 +633,28 @@ class GeometricTableIntegrator:
             return False
         if current.bounds[1] > current_page_height * 0.15:
             return False
+        if has_context_break:
+            if self.continuations.body_start(current) == 0:
+                raise TableStructureError(
+                    "ambiguous_continuation_context", current.page_number
+                )
+            return False
         if self._has_repeated_grouped_header(previous, current):
             # An explicit repeated two-tier header anchors this page's columns;
             # retain it rather than inheriting labels across changed geometry.
             return False
-        previous_edges = sorted(
-            {
-                edge
-                for cell in previous.cells
-                for edge in (cell.bounds[0], cell.bounds[2])
-            }
+        is_aligned = self.continuations.is_absolutely_aligned(previous, current)
+        is_source_backed_reflow = self.continuations.can_match_reflow(
+            previous, current, header_source or previous
         )
-        current_edges = sorted(
-            {
-                edge
-                for cell in current.cells
-                for edge in (cell.bounds[0], cell.bounds[2])
-            }
+        is_anchored_frame_change = self.continuations.can_match_frame_change(
+            previous, current, header_source or previous
         )
-        is_aligned = len(previous_edges) == len(current_edges) and all(
-            abs(before - after) <= 2
-            for before, after in zip(previous_edges, current_edges, strict=True)
-        )
-        if not is_aligned:
+        if (
+            not is_aligned
+            and not is_source_backed_reflow
+            and not is_anchored_frame_change
+        ):
             # A likely continuation without a proven column correspondence must
             # not promote a data row to a new header or inherit guessed labels.
             raise TableStructureError(

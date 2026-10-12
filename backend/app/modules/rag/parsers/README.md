@@ -22,12 +22,12 @@ The bula parser keeps extraction concerns separate from Markdown hygiene:
 5. `SectionDetector` also merges adjacent wrapped heading fragments when their
    typography and text shape indicate one visual title.
 6. `MarkdownRenderer` emits headings and body text from the merged section model.
-7. `markdown_hygiene.trim_markdown_from_legal_section` applies final Markdown
-   cleanup, including truncation before legal-tail markers such as
-   `DIZERES LEGAIS`, `III - DIZERES LEGAIS`, `III- DIZERES LEGAIS`, and
-   `3 - DIZERES LEGAIS`.
-
-When the legal marker is absent, Markdown hygiene leaves the document unchanged.
+7. `trim_lines_from_last_legal_section` removes only the final legal tail,
+   before repeated titles are deduplicated by the renderer. A PDF may contain
+   multiple leaflets or presentations after intermediate legal blocks. Exact
+   standalone legal titles are protected from furniture removal and prose joins;
+   prose/table mentions are not boundaries. Without a legal title, all lines
+   remain. This is a document-end heuristic, not a universal guarantee about PDFs.
 
 The converter API and page-chunk contract are documented in the
 [official PyMuPDF4LLM API](https://pymupdf.readthedocs.io/en/latest/pymupdf4llm/api.html).
@@ -137,3 +137,31 @@ on their own page. There is no OCR, model call, or index migration in this chang
 See [the offline corpus report](../../../../../docs/decisions/2026-10-11-source-backed-table-layout.md)
 before authorizing another ingestion. v5 is not a guarantee that all tables,
 borderless layouts or image-only content are semantically complete.
+
+## Multipage table correspondence
+
+`native_markdown_table_continuation_v6` retains the existing absolute-column
+match and adds conservative correspondence for reflowed columns or a changed
+outer frame. Relative geometry alone is insufficient: ordered lexical types,
+source headers and independent anchors must agree. Unproven matches still fail.
+Cell diagnostics retain page, bounds, spans, text direction and original header
+provenance. No unit conversion, clinical inference, OCR or ingestion is involved.
+
+See [the validation report](../../../../../docs/decisions/2026-10-12-multipage-table-continuation.md)
+before rollout. DIANEAL is repaired offline, but differences inherited from v5
+against the currently indexed corpus prevent claiming full rollout readiness.
+
+## Last legal-section cutoff
+
+The v7 offline diagnostic temporarily removed legal truncation altogether.
+`native_markdown_last_legal_section_v8` adopts the subsequently authorized
+last-occurrence rule while retaining intermediate legal blocks and clinical
+content. Roman/numeric numbering and native Markdown heading/emphasis wrappers
+are supported; the title must otherwise match exactly. No medication-specific
+rules or inferred boundaries are used. Legal text preceding another presentation
+remains, potentially adding retrieval noise.
+
+The existing renderer still deduplicates repeated headings across presentations;
+cover metadata aggregation is also unchanged. This fix does not guarantee
+downstream presentation scoping. Reprocessing and mapping updates require explicit
+authorization; old snapshots and original PDFs must remain unchanged.

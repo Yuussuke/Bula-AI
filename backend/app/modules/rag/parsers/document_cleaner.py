@@ -16,6 +16,7 @@ from app.modules.rag.parsers.handlers import (
     normalize_for_matching,
 )
 from app.modules.rag.parsers.markdown_renderer import normalize_spaces
+from app.modules.rag.parsers.markdown_hygiene import is_legal_section_marker
 
 
 PAGE_NUMBER_PATTERN = re.compile(r"^\s*(?:P[ÁA]GINA\s+)?\d{1,3}\s*$", re.IGNORECASE)
@@ -277,6 +278,9 @@ class BulaDocumentCleaner:
     def _can_be_page_furniture(self, value: str) -> bool:
         clean_value = normalize_spaces(value)
         if not clean_value or len(clean_value) > 120:
+            return False
+
+        if is_legal_section_marker(clean_value):
             return False
 
         normalized_value = normalize_for_matching(clean_value)
@@ -895,6 +899,7 @@ class BulaDocumentCleaner:
         clean_text = line.text.lstrip()
         return (
             line.markdown_heading_level is not None
+            or is_legal_section_marker(clean_text)
             or self._is_markdown_table_line(clean_text)
             or re.match(r"^(?:[-*+]\s+|\d+[.)]\s+)", clean_text) is not None
         )

@@ -119,15 +119,102 @@ async def test_local_leaflet_preserves_repaired_relationships(
     assert hashlib.sha256(source).hexdigest() == checksum
     parsed = await BulaParser().parse(source, pdf_path.name)
     if identity == "A-B038":
-        # The original picture-association failure is removed. An earlier,
-        # headerless continuation now fails safely because its columns shift.
-        assert not parsed.success
-        assert parsed.extraction_decision == "table_structure_rejected"
+        assert parsed.success, parsed.error
+        assert parsed.cleanup_summary is not None
+        tables = parsed.cleanup_summary["table_extraction"]["tables"]
+        continued = next(table for table in tables if table["page"] == 3)
+        assert continued["columns"] == 14
+        assert continued["continuation_of"] == "p2:t0"
+        assert continued["continuation_method"] == "relative_schema_and_anchors"
+        assert all(cell["page"] == 3 for cell in continued["cells"])
+        assert all(cell["page"] == 2 for cell in continued["header_source_cells"])
+        composition = parsed.markdown.split("## COMPOSIÇÃO", maxsplit=1)[1].split(
+            "INFORMAÇÕES AO PACIENTE", maxsplit=1
+        )[0]
+        table_rows = [line for line in composition.splitlines() if line.startswith("|")]
         assert (
-            parsed.metadata["quality_signals"]["table_failure_reason"]
-            == "ambiguous_table_continuation"
+            len(table_rows) == 17
+        )  # Two header tiers, one separator, 14 physical data rows.
+        assert sum("---" in line for line in table_rows) == 1
+        assert all(len(line.split("|")) == 16 for line in table_rows)
+        first_continued = [
+            value.strip() for value in table_rows[6].strip("|").split("|")
+        ]
+        assert first_continued[1:] == [
+            "1,5",
+            "538",
+            "448",
+            "18,3",
+            "5,08",
+            "344",
+            "5,2",
+            "132",
+            "2,5",
+            "0,5",
+            "95",
+            "40",
+            "2000",
+        ]
+        # Independently transcribed from the physical composition table, not
+        # from retrieval outputs. These six formulations cover all 14 data rows.
+        formulations = [
+            ("1,5", "25,7", "346", "3,5", "96", ["2500", "5000", "6000"]),
+            ("1,5", "18,3", "344", "2,5", "95", ["2000", "6000"]),
+            ("2,5", "25,7", "396", "3,5", "96", ["2500", "6000"]),
+            ("2,5", "18,3", "395", "2,5", "95", ["2000", "6000"]),
+            ("4,25", "25,7", "485", "3,5", "96", ["2500", "5000", "6000"]),
+            ("4,25", "18,3", "483", "2,5", "95", ["2000", "6000"]),
+        ]
+        expected_numbers = [
+            [
+                glucose,
+                "538",
+                "448",
+                calcium_mass,
+                "5,08",
+                osmolarity,
+                "5,2",
+                "132",
+                ionic_calcium,
+                "0,5",
+                chloride,
+                "40",
+                volume,
+            ]
+            for glucose, calcium_mass, osmolarity, ionic_calcium, chloride, volumes in formulations
+            for volume in volumes
+        ]
+        actual_numbers = [
+            [value.strip() for value in line.strip("|").split("|")][1:]
+            for line in table_rows[3:]
+        ]
+        assert actual_numbers == expected_numbers
+        header_cells = continued["header_source_cells"]
+        assert any(
+            cell["column_start"] == 1 and cell["text"] == "glicose monoidratada (g)"
+            for cell in header_cells
         )
-        assert parsed.metadata["quality_signals"]["table_failure_page"] == 3
+        assert any(
+            cell["column_start"] == 9 and cell["text"] == "cálcio"
+            for cell in header_cells
+        )
+        assert any(
+            cell["column_start"] == 8
+            and cell["column_end"] == 13
+            and "mEq/L" in cell["text"]
+            for cell in header_cells
+        )
+        assert any(
+            cell["column_start"] == 13 and "(mL)" in cell["text"]
+            for cell in header_cells
+        )
+        origin = next(table for table in tables if table["page"] == 2)
+        assert any(
+            cell["column_start"] == 4
+            and "(mg)" in cell["text"]
+            and cell["text_direction"] == [0, -1]
+            for cell in origin["cells"]
+        )
         with pymupdf.open(stream=source, filetype="pdf") as document:
             for page in document:
                 if page.rotation:

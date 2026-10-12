@@ -728,7 +728,7 @@ def test_markdown_renderer_keeps_distinct_titles_with_same_canonical_section() -
         "3 - DIZERES LEGAIS",
     ],
 )
-async def test_parser_omits_lines_from_dizeres_legais_onward(
+async def test_parser_removes_tail_at_only_legal_section(
     legal_marker: str,
 ) -> None:
     extraction_result = build_extraction_result(
@@ -751,8 +751,70 @@ async def test_parser_omits_lines_from_dizeres_legais_onward(
     assert result.success is True
     assert "## COMPOSICAO" in result.markdown
     assert "## INDICACOES" in result.markdown
-    assert "DIZERES LEGAIS" not in result.markdown
-    assert "Registro MS" not in result.markdown
+    assert legal_marker not in result.markdown
+    assert "Registro MS 1.2345.6789" not in result.markdown
+    assert "Farmaceutico responsavel: Exemplo." not in result.markdown
+
+
+@pytest.mark.anyio
+async def test_parser_preserves_each_presentation_after_intermediate_legal_sections() -> (
+    None
+):
+    source_pages = [
+        "COMPOSICAO\nSolucao oral com 1 mg/mL.\n"
+        "3. QUANDO NAO DEVO USAR ESTE MEDICAMENTO?\n"
+        "Nao use em caso de alergia.\nDIZERES LEGAIS\nRegistro MS 1.1111.1111",
+        "SPRAY\nCOMPOSICAO\nSpray com 2 mg/mL.\n"
+        "3. QUANDO NAO DEVO USAR ESTE MEDICAMENTO?\n"
+        "O spray e contraindicado para menores de 2 anos.\n"
+        "III - DIZERES LEGAIS\nRegistro MS 1.2222.2222",
+        "COMPRIMIDOS\nCOMPOSICAO\nCada comprimido contem 5 mg.\n"
+        "6. COMO DEVO USAR ESTE MEDICAMENTO?\n"
+        "Uso exclusivo em adultos.\nDIZERES LEGAIS\nRegistro MS 1.3333.3333",
+    ]
+    extraction_result = build_extraction_result(
+        text="\n".join(source_pages), extraction_tier="native", is_sparse=False
+    )
+    extraction_result.pages = [
+        ExtractedPage(
+            page_number=page_number,
+            text=text,
+            lines=[
+                ExtractedLine(text=line, page_number=page_number)
+                for line in text.splitlines()
+            ],
+        )
+        for page_number, text in enumerate(source_pages, start=1)
+    ]
+    parser = BulaParser(first_handler=StaticHandler(extraction_result))
+
+    result = await parser.parse(pdf_bytes=b"%PDF-1.4", filename="presentations.pdf")
+
+    assert result.success is True
+    for expected_text in (
+        "Solucao oral com 1 mg/mL.",
+        "Spray com 2 mg/mL.",
+        "O spray e contraindicado para menores de 2 anos.",
+        "Cada comprimido contem 5 mg.",
+        "Uso exclusivo em adultos.",
+    ):
+        assert expected_text in result.markdown
+    later_sections = [
+        section
+        for section in result.metadata["section_metadata"]
+        if section["page_number"] == 3 and "COMO DEVO USAR" in section["title"]
+    ]
+    assert later_sections
+    assert "Registro MS 1.1111.1111" in result.markdown
+    assert "Registro MS 1.2222.2222" in result.markdown
+    assert "Registro MS 1.3333.3333" not in result.markdown
+    assert (
+        result.markdown.index("Solucao oral com 1 mg/mL.")
+        < result.markdown.index("Spray com 2 mg/mL.")
+        < result.markdown.index("Cada comprimido contem 5 mg.")
+    )
+    for section in result.metadata["section_metadata"]:
+        assert 0 <= section["char_start"] < section["char_end"] <= len(result.markdown)
 
 
 @pytest.mark.anyio
