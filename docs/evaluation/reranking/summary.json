@@ -45,6 +45,26 @@
     "per_case_scores_inferred": false,
     "clinical_validation_claimed": false
   },
+  "concurrency": {
+    "archive_manifest": "tmp/bge-concurrency/artifacts/v3/manifest.json",
+    "manifest_sha256": "a801b3fc4aa56506e99f18463a58b9ac3042d563c1e0fddb7ccce3c75048ac00",
+    "fingerprint": "514769b2cc4944f92a74942c24203e1bad266d41bd532acc5fb31858df8edcad",
+    "effective_presentation": "presentation-v2",
+    "trials": 188,
+    "requests": 1785,
+    "paid_calls": 0,
+    "new_embeddings": 0,
+    "confirmed_scoped_requests_per_second": 1.0,
+    "confirmed_cross_requests_per_second": 0.5,
+    "confirmation_windows_seconds": [60, 90],
+    "bge_request_failures": {
+      "overload_rejected": 38,
+      "execution_timeout": 27,
+      "queue_timeout": 9
+    },
+    "oom_or_cuda_errors": 0,
+    "p99_estimated": false
+  },
   "decision": "RRF-B + BGE selected for the thesis artifact; integration remains separate",
   "production_changed": false,
   "original_artifacts_modified": false

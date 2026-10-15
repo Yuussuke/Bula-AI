@@ -66,3 +66,5 @@ file's SHA-256 and its listed files/code against the bundle, then inspect the
 recorded plans/environment. Re-execution requires the original PDFs, snapshot,
 corrected runtime, pinned BGE assets and separately authorized API credentials.
 This public summary alone is not a self-contained executable reproduction.
+
+See [concurrency and operating limits](concurrency.md) for the separate load test.
