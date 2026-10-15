@@ -1,0 +1,71 @@
+{
+  "version": "rrfb-bge-milestone-v1",
+  "recorded_on": "2026-10-15",
+  "scope": "auxiliary_evaluation_not_main_experiment",
+  "snapshot_fingerprint": "25352cc246531d3e86ebf51b80fa2451b212fa95039e5f6f820e4127bea78471",
+  "pdfs": 100,
+  "chunks": 2974,
+  "candidate_depth_per_strategy": 20,
+  "dense_raw_limit": 60,
+  "rrf_constant": 60,
+  "final_k": 10,
+  "reranker": "BAAI/bge-reranker-v2-m3",
+  "reranker_revision": "953dc6f6f85a1b2dbfca4c34a2796e7dde08d41e",
+  "llm": "sabia-4",
+  "temperature": 0.2,
+  "paired_runs": {
+    "development": {
+      "questions": 36,
+      "positive": 24,
+      "negative": 12,
+      "executions": 72,
+      "technical_failures": 0,
+      "negative_full_abstentions_rrfb_bge": [10, 8],
+      "archive_manifest": "tmp/rrfb-bge-generation/artifacts/v1/manifest.json",
+      "manifest_sha256": "ac1057a60f443413f5c8d280cc5107903d68f492a9a421b3e853a170182e4f2a",
+      "fingerprint": "5874419d956105de3b97f1adda11051b8ccacbb7b76ff1e9b0d1947b70468842"
+    },
+    "final": {
+      "questions": 24,
+      "positive": 16,
+      "negative": 8,
+      "executions": 48,
+      "technical_failures": 0,
+      "negative_full_abstentions_rrfb_bge": [6, 6],
+      "archive_manifest": "tmp/rrfb-bge-final24/artifacts/v1/manifest.json",
+      "manifest_sha256": "e6c9d5918d3ae3e3b5d1bafdec2512ce42d7f7d1d23a714e9550952803ce5afd",
+      "fingerprint": "03b8fd89a929c3e0d3bd967be2c6bcf69855fa5573afd26956fceef7de88ff3c"
+    }
+  },
+  "human_assessment": {
+    "provenance": "explicit_author_messages_not_per_case_rubric_export",
+    "development": "both_arms_reported_adequate",
+    "final_confirmed_on": "2026-10-15",
+    "final": "author_reports_review_completed_and_better_answer_quality_with_bge",
+    "per_case_scores_inferred": false,
+    "clinical_validation_claimed": false
+  },
+  "concurrency": {
+    "archive_manifest": "tmp/bge-concurrency/artifacts/v3/manifest.json",
+    "manifest_sha256": "a801b3fc4aa56506e99f18463a58b9ac3042d563c1e0fddb7ccce3c75048ac00",
+    "fingerprint": "514769b2cc4944f92a74942c24203e1bad266d41bd532acc5fb31858df8edcad",
+    "effective_presentation": "presentation-v2",
+    "trials": 188,
+    "requests": 1785,
+    "paid_calls": 0,
+    "new_embeddings": 0,
+    "confirmed_scoped_requests_per_second": 1.0,
+    "confirmed_cross_requests_per_second": 0.5,
+    "confirmation_windows_seconds": [60, 90],
+    "bge_request_failures": {
+      "overload_rejected": 38,
+      "execution_timeout": 27,
+      "queue_timeout": 9
+    },
+    "oom_or_cuda_errors": 0,
+    "p99_estimated": false
+  },
+  "decision": "RRF-B + BGE selected for the thesis artifact; integration remains separate",
+  "production_changed": false,
+  "original_artifacts_modified": false
+}

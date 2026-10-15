@@ -1,5 +1,8 @@
 # TCC evaluation preparation
 
+Latest auxiliary milestone: [RRF-B and BGE evaluation](reranking/README.md).
+The historical preparation status below does not describe those later runs.
+
 [Golden Set v1.0.0](golden_set/release/README.md) is methodologically frozen:
 1,000 questions linked to 100 PDFs. The main evaluation has not been run;
 earlier pilot/selector checks are development diagnostics, not its results.
