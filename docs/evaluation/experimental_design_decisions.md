@@ -1,5 +1,9 @@
 # Experimental design decisions
 
+Historical plan: see the [executed final protocol](final/README.md) and
+[results](final/results.md) for later decisions, @10 metrics and completed review.
+The dated planning text below is preserved, not a current execution specification.
+
 Recorded on 2026-10-06. Pre-experimental plan, not completed evaluation results
 or a replacement for the thesis methodology.
 

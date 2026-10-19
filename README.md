@@ -86,6 +86,12 @@ flowchart LR
 
 ## Academic and Professional Quality Criteria
 
+The [evaluation index](docs/evaluation/README.md) links the completed
+[120-need / 240-output evaluation](docs/evaluation/final/README.md), results,
+methodological limitations and reproduction requirements. The evaluated
+RRF-B + BGE runtime is documented separately from production integration;
+technical acceptance and documentary assessment are not clinical certification.
+
 The project is developed with criteria that support both thesis evaluation and engineering quality:
 
 - Clear problem definition and technical scope.
