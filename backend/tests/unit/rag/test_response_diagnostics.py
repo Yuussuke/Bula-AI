@@ -4,6 +4,7 @@ import pytest
 from langchain_core.runnables import RunnableLambda
 
 from app.modules.rag import response_diagnostics
+from app.modules.rag.grounded_generation import GroundedGenerationError
 from app.modules.rag.response_diagnostics import ResponseStageObserver
 
 
@@ -50,3 +51,30 @@ def test_sync_observation_preserves_result(monkeypatch: pytest.MonkeyPatch) -> N
     logged_fields = captured_logger.info.call_args.kwargs
     assert logged_fields["status"] == "success"
     assert logged_fields["failure_reason"] is None
+
+
+@pytest.mark.parametrize(
+    "reason",
+    ["missing_source_citation", "unknown_source_citation", "malformed_source_citation"],
+)
+def test_generation_contract_failure_keeps_reason_without_logging_content(
+    reason: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    captured_logger = Mock()
+    monkeypatch.setattr(response_diagnostics, "logger", captured_logger)
+    failure = GroundedGenerationError(reason)
+
+    def fail(inputs: dict[str, object]) -> str:
+        raise failure
+
+    observed = ResponseStageObserver().wrap(
+        stage="generation", runnable=RunnableLambda(fail)
+    )
+    with pytest.raises(GroundedGenerationError) as raised:
+        observed.invoke({"diagnostic_id": "test-run", "question": "private question"})
+
+    assert raised.value is failure
+    logged_fields = captured_logger.info.call_args.kwargs
+    assert logged_fields["stage"] == "generation"
+    assert logged_fields["failure_reason"] == reason
+    assert "private question" not in str(logged_fields)

@@ -71,6 +71,8 @@ def source(text: str, score: float = 1) -> Document:
     "answer",
     [
         "Guarde entre 15 e 30 °C [2] e proteja da umidade [1].",
+        "Guarde entre 15 e 30 °C e proteja da umidade [1,2].",
+        "Guarde entre 15 e 30 °C e proteja da umidade [1, 2].",
     ],
 )
 async def test_natural_answer_uses_only_validated_units_and_keeps_citation_mapping(
@@ -135,6 +137,8 @@ async def test_invalid_selection_is_technical_failure_not_documentary_insufficie
         ("", "empty_generated_answer"),
         ("Guarde na embalagem.", "missing_source_citation"),
         ("Proteja da luz [2].", "unknown_source_citation"),
+        ("Proteja da luz [1,2].", "unknown_source_citation"),
+        ("Proteja da luz [1] [1,].", "malformed_source_citation"),
     ],
 )
 async def test_invalid_generation_is_not_a_successful_abstention(

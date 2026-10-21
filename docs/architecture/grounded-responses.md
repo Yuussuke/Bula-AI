@@ -16,6 +16,9 @@ The archived `grounded_patient_answer_v1` prompt and 1,024-token generation cap
 are reused without tuning. Responses must be nonempty, complete and reference
 existing numbered sources. Citation checks validate syntax/identity, **not
 semantic entailment**. No verifier, revision, new retrieval or model is added.
+`numeric_source_citations_v2` accepts `[1]`, `[1][2]` and `[1,2]` without
+rewriting answers. Unknown IDs and malformed numeric markers remain failures,
+even when another citation is valid; bracketed prose is not a source marker.
 Provider calls, cost and latency can increase by one generation call after a
 supported selection; tests use synthetic providers, not paid API calls.
 

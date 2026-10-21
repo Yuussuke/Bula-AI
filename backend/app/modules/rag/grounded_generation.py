@@ -14,7 +14,10 @@ from langchain_core.runnables import Runnable, RunnableLambda, RunnablePassthrou
 
 GENERATION_PROMPT_VERSION = "grounded_patient_answer_v1"
 GENERATION_MAX_TOKENS = 1024
-CITATION_PATTERN = re.compile(r"\[(\d+)\]")
+CITATION_VALIDATOR_VERSION = "numeric_source_citations_v2"
+CITATION_PATTERN = re.compile(r"\[([0-9]+(?:[ \t]*,[ \t]*[0-9]+)*)\]")
+BRACKET_PATTERN = re.compile(r"\[[^\]]*\]")
+NUMERIC_REFERENCE_PATTERN = re.compile(r"(?:^\[|,)[ \t]*[+-]?[0-9]")
 GENERATION_PROMPT = ChatPromptTemplate.from_messages(
     [
         (
@@ -83,6 +86,29 @@ class GroundedAnswerGenerator:
             raise GroundedGenerationError("incomplete_generated_answer")
         return message
 
+    @staticmethod
+    def validate_source_citations(answer: str, source_count: int) -> None:
+        """Check numeric reference syntax/identity, not factual entailment.
+
+        Individual and comma-separated markers are equivalent. Do not ignore
+        a malformed numeric marker just because another reference is valid.
+        Bracketed prose without numeric-reference syntax is not a citation.
+        """
+        citation_ids: set[int] = set()
+        for marker in BRACKET_PATTERN.findall(answer):
+            match = CITATION_PATTERN.fullmatch(marker)
+            if match is None:
+                if NUMERIC_REFERENCE_PATTERN.search(marker):
+                    raise GroundedGenerationError("malformed_source_citation")
+                continue
+            citation_ids.update(
+                int(value.strip()) for value in match.group(1).split(",")
+            )
+        if not citation_ids:
+            raise GroundedGenerationError("missing_source_citation")
+        if not citation_ids <= set(range(1, source_count + 1)):
+            raise GroundedGenerationError("unknown_source_citation")
+
     def build(self) -> Runnable[dict[str, object], dict[str, object]]:
         def prepare(inputs: dict[str, object]) -> dict[str, object]:
             return cast(dict[str, object], inputs["generation_context"])
@@ -92,11 +118,7 @@ class GroundedAnswerGenerator:
             source_chunks = cast(list[dict[str, object]], inputs["source_chunks"])
             if not answer:
                 raise GroundedGenerationError("empty_generated_answer")
-            citation_ids = {int(match) for match in CITATION_PATTERN.findall(answer)}
-            if not citation_ids:
-                raise GroundedGenerationError("missing_source_citation")
-            if not citation_ids <= set(range(1, len(source_chunks) + 1)):
-                raise GroundedGenerationError("unknown_source_citation")
+            self.validate_source_citations(answer, len(source_chunks))
             # Do not claim entailment: actual fidelity is evaluated separately.
             diagnostics = dict(cast(dict[str, object], inputs["response_diagnostics"]))
             diagnostics.update(
