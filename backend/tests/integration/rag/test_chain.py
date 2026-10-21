@@ -52,7 +52,14 @@ async def test_swapping_llm_keeps_selected_retriever_and_sources(
     factory = RetrieverStrategyFactory(builders=builders)
     results = []
     for _ in range(2):
-        llm = FakeChatModel(response=safety_selection("E1"))
+        from langchain_core.language_models.fake_chat_models import FakeListChatModel
+
+        llm = FakeListChatModel(
+            responses=[
+                safety_selection("E1"),
+                "Dose usual: 1 comprimido apos as refeicoes. [1]",
+            ]
+        )
         chain_factory = RAGChainFactory(
             retriever_factory=factory, llm_builder=lambda: llm
         )
