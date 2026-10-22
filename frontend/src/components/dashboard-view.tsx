@@ -3,7 +3,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { BookOpenText, LogOut, Menu, Pill } from "lucide-react";
 import { type ReactElement, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { SystemBulaCatalog } from "@/components/bulas/system-bula-catalog";
 import { SystemBulaNavigation } from "@/components/bulas/system-bula-navigation";
@@ -53,6 +53,11 @@ export function DashboardView(): ReactElement {
       </div>
 
       <nav className="min-h-0 flex-1 overflow-y-auto p-4" aria-label="Navegação principal">
+        <Button asChild variant="ghost" className="mb-3 w-full justify-start">
+          <Link to="/chat" onClick={() => setIsMobileMenuOpen(false)}>
+            Chat geral
+          </Link>
+        </Button>
         <div className="bg-sidebar-accent text-sidebar-accent-foreground flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium">
           <BookOpenText aria-hidden="true" className="h-5 w-5" />
           Catálogo de bulas

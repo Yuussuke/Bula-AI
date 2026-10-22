@@ -4,6 +4,7 @@ import { type ReactElement, useState } from "react";
 import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
 
 import { getQueryableBula } from "@/api/bulas";
+import type { ChatContext, ChatScope } from "@/api/chat";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatSessionNavigation } from "@/components/chat/chat-session-navigation";
@@ -102,22 +103,24 @@ function ChatPageUnavailable({ message }: { message: string }): ReactElement {
   );
 }
 
-export function ChatPage(): ReactElement {
+export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElement {
   const { bulaId } = useParams<{ bulaId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const [question, setQuestion] = useState("");
   const [isMobileSessionsOpen, setIsMobileSessionsOpen] = useState(false);
   const sessionId = searchParams.get("session");
   const resolvedBulaId = bulaId ?? "";
+  const context: ChatContext =
+    scope === "cross_bula" ? { scope: "cross_bula" } : { scope: "bula", bulaId: resolvedBulaId };
 
   const bulaQuery = useQuery({
     queryKey: ["queryable-bula", resolvedBulaId],
     queryFn: () => getQueryableBula(resolvedBulaId),
-    enabled: Boolean(bulaId),
+    enabled: scope === "bula" && Boolean(bulaId),
     staleTime: 5 * 60 * 1000,
   });
   const chatSession = useChatSession({
-    bulaId: resolvedBulaId,
+    context,
     sessionId,
     onSessionCreated: (createdSessionId) => {
       setSearchParams({ session: createdSessionId }, { replace: true });
@@ -142,7 +145,7 @@ export function ChatPage(): ReactElement {
     setSearchParams({}, { replace: true });
   };
 
-  if (!bulaId) {
+  if (scope === "bula" && !bulaId) {
     return <Navigate to="/" replace />;
   }
 
@@ -156,32 +159,36 @@ export function ChatPage(): ReactElement {
     );
   }
 
-  if (bulaQuery.error || chatSession.loadError || !bulaQuery.data) {
+  if (chatSession.hasContextMismatch) {
+    return (
+      <ChatPageUnavailable message="Esta conversa pertence a outra bula ou contexto e não pode ser aberta nesta página." />
+    );
+  }
+
+  if (bulaQuery.error || chatSession.loadError || (scope === "bula" && !bulaQuery.data)) {
     return (
       <ChatPageUnavailable message="Não foi possível carregar a conversa. Verifique a conexão e tente novamente." />
     );
   }
 
-  if (sessionId && chatSession.loadedBulaId !== bulaId) {
-    return (
-      <ChatPageUnavailable message="Esta conversa pertence a outra bula e não pode ser aberta nesta página." />
-    );
-  }
-
-  const bulaDisplayName = bulaQuery.data.alias || bulaQuery.data.product_name;
-  const bulaDescription = [
-    bulaQuery.data.alias ? bulaQuery.data.product_name : bulaQuery.data.active_ingredient,
-    bulaQuery.data.strength,
-    bulaQuery.data.manufacturer,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .join(" · ");
+  const bula = bulaQuery.data;
+  const bulaDisplayName = scope === "cross_bula" ? "Chat geral" : bula?.alias || bula?.product_name;
+  const bulaDescription =
+    scope === "cross_bula"
+      ? "Consulta às bulas de sistema publicadas · busca não exaustiva"
+      : [
+          bula?.alias ? bula.product_name : bula?.active_ingredient,
+          bula?.strength,
+          bula?.manufacturer,
+        ]
+          .filter((value): value is string => Boolean(value))
+          .join(" · ");
 
   return (
     <div className="bg-muted/20 flex min-h-screen">
       <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-72 shrink-0 border-r lg:block">
         <ChatSessionNavigation
-          bulaId={bulaId}
+          context={context}
           currentSessionId={sessionId}
           onStartNewSession={handleStartNewSession}
         />
@@ -193,10 +200,12 @@ export function ChatPage(): ReactElement {
           className="bg-sidebar text-sidebar-foreground w-[85%] max-w-80 gap-0 p-0"
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>Conversas desta bula</SheetTitle>
+            <SheetTitle>
+              {scope === "cross_bula" ? "Conversas gerais" : "Conversas desta bula"}
+            </SheetTitle>
           </SheetHeader>
           <ChatSessionNavigation
-            bulaId={bulaId}
+            context={context}
             currentSessionId={sessionId}
             onStartNewSession={handleStartNewSession}
             onNavigate={() => setIsMobileSessionsOpen(false)}
@@ -237,7 +246,12 @@ export function ChatPage(): ReactElement {
                 {bulaDescription || "Bula enviada por você"}
               </p>
             </div>
-            <ModeIndicator />
+            <ModeIndicator
+              mode={
+                chatSession.messages.findLast((message) => message.role === "assistant")
+                  ?.retrievalMode ?? (sessionId ? null : "hybrid")
+              }
+            />
           </div>
         </header>
 

@@ -8,6 +8,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { getQueryableBula, type QueryableBulaResponse } from "@/api/bulas";
 import {
   askBulaQuestion,
+  askCrossBulaQuestion,
   type AskResponse,
   type ChatSessionResponse,
   continueChatSession,
@@ -23,6 +24,7 @@ vi.mock("@/api/bulas", () => ({
 
 vi.mock("@/api/chat", () => ({
   askBulaQuestion: vi.fn(),
+  askCrossBulaQuestion: vi.fn(),
   continueChatSession: vi.fn(),
   getChatSession: vi.fn(),
   listChatSessions: vi.fn(),
@@ -58,6 +60,7 @@ const FIRST_RESPONSE: AskResponse = {
 
 const getQueryableBulaMock = vi.mocked(getQueryableBula);
 const askBulaQuestionMock = vi.mocked(askBulaQuestion);
+const askCrossBulaQuestionMock = vi.mocked(askCrossBulaQuestion);
 const continueChatSessionMock = vi.mocked(continueChatSession);
 const getChatSessionMock = vi.mocked(getChatSession);
 const listChatSessionsMock = vi.mocked(listChatSessions);
@@ -128,6 +131,7 @@ function renderChatPage(initialEntry = `/bulas/${BULA_ID}/chat`): void {
       <MemoryRouter initialEntries={[initialEntry]}>
         <Routes>
           <Route path="/bulas/:bulaId/chat" element={<ChatPage />} />
+          <Route path="/chat" element={<ChatPage scope="cross_bula" />} />
           <Route path="/" element={<p>Dashboard</p>} />
         </Routes>
         <LocationProbe />
@@ -147,6 +151,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   getQueryableBulaMock.mockResolvedValue(QUERYABLE_BULA);
   askBulaQuestionMock.mockResolvedValue(FIRST_RESPONSE);
+  askCrossBulaQuestionMock.mockResolvedValue(FIRST_RESPONSE);
   continueChatSessionMock.mockResolvedValue({
     session_id: SESSION_ID,
     answer: "Resposta contextual para a pergunta seguinte.",
@@ -166,6 +171,59 @@ beforeEach(() => {
 });
 
 describe("ChatPage", () => {
+  it("starts general chat without loading a target leaflet and preserves its session", async () => {
+    const user = userEvent.setup();
+    renderChatPage("/chat");
+    expect(screen.getByRole("heading", { name: "Chat geral" })).toBeInTheDocument();
+    expect(getQueryableBulaMock).not.toHaveBeenCalled();
+    await user.type(
+      screen.getByRole("textbox", { name: "Digite sua pergunta sobre a bula" }),
+      "Quais orientações existem?"
+    );
+    await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+    expect(await screen.findByText(FIRST_RESPONSE.answer)).toBeInTheDocument();
+    expect(askCrossBulaQuestionMock).toHaveBeenCalledWith({
+      question: "Quais orientações existem?",
+    });
+    expect(askBulaQuestionMock).not.toHaveBeenCalled();
+    expect(screen.getByTestId("location")).toHaveTextContent(`/chat?session=${SESSION_ID}`);
+    expect(listChatSessionsMock).toHaveBeenCalledWith(
+      expect.objectContaining({ scope: "cross_bula" })
+    );
+  });
+
+  it("restores general history without treating orphaned individual sessions as general", async () => {
+    getChatSessionMock.mockResolvedValue({ ...buildPersistedSession(), bula_id: null });
+    renderChatPage(`/chat?session=${SESSION_ID}`);
+    expect(await screen.findByRole("heading", { name: "Chat indisponível" })).toBeInTheDocument();
+    expect(screen.getByText(/outra bula ou contexto/)).toBeInTheDocument();
+    expect(continueChatSessionMock).not.toHaveBeenCalled();
+  });
+
+  it("continues only explicitly general sessions and displays the executed mode", async () => {
+    const user = userEvent.setup();
+    getChatSessionMock.mockResolvedValue({
+      ...buildPersistedSession(),
+      scope: "cross_bula",
+      bula_id: null,
+    });
+    renderChatPage(`/chat?session=${SESSION_ID}`);
+    expect(await screen.findByText("Resposta persistida no PostgreSQL.")).toBeInTheDocument();
+    expect(screen.getAllByText("Semântico").length).toBeGreaterThan(0);
+    await user.type(
+      screen.getByRole("textbox", { name: "Digite sua pergunta sobre a bula" }),
+      "E para crianças?"
+    );
+    await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+    expect(
+      await screen.findByText("Resposta contextual para a pergunta seguinte.")
+    ).toBeInTheDocument();
+    expect(continueChatSessionMock).toHaveBeenCalledWith(SESSION_ID, {
+      question: "E para crianças?",
+    });
+    expect(askCrossBulaQuestionMock).not.toHaveBeenCalled();
+  });
+
   it("keeps the final page structure reserved while the conversation loads", async () => {
     const deferredBula = createDeferredPromise<QueryableBulaResponse>();
     getQueryableBulaMock.mockReturnValue(deferredBula.promise);
@@ -191,7 +249,7 @@ describe("ChatPage", () => {
     expect(
       await screen.findByRole("heading", { name: QUERYABLE_BULA.product_name })
     ).toBeInTheDocument();
-    expect(screen.getByText("Dense retrieval (beta)")).toBeInTheDocument();
+    expect(screen.getByText("Híbrido")).toBeInTheDocument();
     expect(screen.getByRole("complementary")).toHaveClass("w-72", "shrink-0");
     expect(getQueryableBulaMock).toHaveBeenCalledWith(BULA_ID);
     expect(getChatSessionMock).not.toHaveBeenCalled();

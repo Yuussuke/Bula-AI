@@ -3,7 +3,7 @@ import { AlertCircle, ArrowLeft, History, MessageSquarePlus, Pill, RefreshCw } f
 import { type ReactElement, useMemo } from "react";
 import { Link } from "react-router-dom";
 
-import { type ChatSessionResponse, listChatSessions } from "@/api/chat";
+import { type ChatContext, type ChatSessionResponse, listChatSessions } from "@/api/chat";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
@@ -16,7 +16,7 @@ const sessionDateFormatter = new Intl.DateTimeFormat("pt-BR", {
 });
 
 interface ChatSessionNavigationProps {
-  bulaId: string;
+  context: ChatContext;
   currentSessionId: string | null;
   onStartNewSession: () => void;
   onNavigate?: () => void;
@@ -39,21 +39,33 @@ function formatSessionDate(updatedAt: string): string {
 }
 
 export function ChatSessionNavigation({
-  bulaId,
+  context,
   currentSessionId,
   onStartNewSession,
   onNavigate,
 }: ChatSessionNavigationProps): ReactElement {
+  const bulaId = context.scope === "bula" ? context.bulaId : undefined;
+  const sessionsLabel =
+    context.scope === "cross_bula" ? "Conversas gerais" : "Conversas desta bula";
   const sessionsQuery = useQuery({
-    queryKey: ["chat-sessions", { limit: CHAT_SESSION_LIST_LIMIT, offset: 0 }],
-    queryFn: () => listChatSessions({ limit: CHAT_SESSION_LIST_LIMIT, offset: 0 }),
+    queryKey: [
+      "chat-sessions",
+      context.scope,
+      bulaId,
+      { limit: CHAT_SESSION_LIST_LIMIT, offset: 0 },
+    ],
+    queryFn: () =>
+      listChatSessions({ limit: CHAT_SESSION_LIST_LIMIT, offset: 0, scope: context.scope, bulaId }),
   });
   const bulaSessions = useMemo(
     () =>
       (sessionsQuery.data ?? [])
-        .filter((session) => session.bula_id === bulaId)
+        .filter(
+          (session) =>
+            (session.scope ?? "bula") === context.scope && session.bula_id === (bulaId ?? null)
+        )
         .sort(compareSessionsByLastUpdate),
-    [bulaId, sessionsQuery.data]
+    [bulaId, context.scope, sessionsQuery.data]
   );
 
   const handleStartNewSession = (): void => {
@@ -93,10 +105,10 @@ export function ChatSessionNavigation({
         </Button>
       </div>
 
-      <nav className="min-h-0 flex-1 overflow-y-auto p-4" aria-label="Conversas desta bula">
+      <nav className="min-h-0 flex-1 overflow-y-auto p-4" aria-label={sessionsLabel}>
         <h2 className="text-sidebar-foreground/60 mb-3 flex items-center gap-2 px-2 text-xs font-semibold tracking-wide uppercase">
           <History aria-hidden="true" className="h-3.5 w-3.5" />
-          Conversas desta bula
+          {sessionsLabel}
         </h2>
 
         {sessionsQuery.isLoading ? (
@@ -128,7 +140,9 @@ export function ChatSessionNavigation({
 
         {sessionsQuery.isSuccess && bulaSessions.length === 0 ? (
           <p className="text-sidebar-foreground/60 px-2 py-3 text-sm">
-            Nenhuma conversa iniciada para esta bula.
+            {context.scope === "cross_bula"
+              ? "Nenhuma conversa geral iniciada."
+              : "Nenhuma conversa iniciada para esta bula."}
           </p>
         ) : null}
 
@@ -140,7 +154,7 @@ export function ChatSessionNavigation({
               return (
                 <li key={session.id}>
                   <Link
-                    to={`/bulas/${bulaId}/chat?session=${session.id}`}
+                    to={`${context.scope === "cross_bula" ? "/chat" : `/bulas/${bulaId}/chat`}?session=${session.id}`}
                     replace
                     aria-current={isCurrentSession ? "page" : undefined}
                     onClick={onNavigate}

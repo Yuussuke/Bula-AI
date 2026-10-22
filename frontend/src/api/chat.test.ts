@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   askBulaQuestion,
+  askCrossBulaQuestion,
   type AskResponse,
   type ChatSessionResponse,
   continueChatSession,
@@ -31,6 +32,23 @@ function expectAuthenticatedRequest(requestInit: RequestInit | undefined): void 
 }
 
 describe("chat API", () => {
+  it("posts general questions without a target ID and filters history server-side", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock.mockImplementation(() =>
+      Promise.resolve(createJsonResponse({ source_chunks: [], source_bulas: [] }))
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    await askCrossBulaQuestion({ question: "Dúvida geral", mode: "hybrid" });
+    expect(fetchMock.mock.calls[0][0]).toBe(`${API_BASE_URL}/api/v1/chat/ask`);
+    expect(fetchMock.mock.calls[0][1]?.body).toBe(
+      JSON.stringify({ question: "Dúvida geral", mode: "hybrid" })
+    );
+    expectAuthenticatedRequest(fetchMock.mock.calls[0][1]);
+    await listChatSessions({ scope: "cross_bula", limit: 10, offset: 2 });
+    expect(fetchMock.mock.calls[1][0]).toBe(
+      `${API_BASE_URL}/api/v1/chat/sessions?limit=10&offset=2&scope=cross_bula`
+    );
+  });
   beforeEach(() => {
     useAuthStore.getState().setAuth({
       accessToken: "access-token",

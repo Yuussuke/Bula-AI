@@ -3,7 +3,9 @@ import { useRef, useState } from "react";
 
 import {
   askBulaQuestion,
+  askCrossBulaQuestion,
   type AskResponse,
+  type ChatContext,
   type ChatSessionResponse,
   continueChatSession,
   getChatSession,
@@ -14,6 +16,8 @@ interface SendQuestionVariables {
   question: string;
   sessionId: string | null;
   optimisticUserMessageId: string;
+  context: ChatContext;
+  contextKey: string;
 }
 
 interface TransientChatMessage extends ChatTimelineMessage {
@@ -21,7 +25,7 @@ interface TransientChatMessage extends ChatTimelineMessage {
 }
 
 interface UseChatSessionOptions {
-  bulaId: string;
+  context: ChatContext;
   sessionId: string | null;
   onSessionCreated: (sessionId: string) => void;
 }
@@ -29,6 +33,7 @@ interface UseChatSessionOptions {
 interface UseChatSessionResult {
   messages: ChatTimelineMessage[];
   loadedBulaId: string | null;
+  hasContextMismatch: boolean;
   isLoading: boolean;
   isSending: boolean;
   loadError: Error | null;
@@ -36,19 +41,26 @@ interface UseChatSessionResult {
   sendQuestion: (question: string) => Promise<boolean>;
 }
 
-function buildSessionQueryKey(sessionId: string): readonly ["chat-session", string] {
-  return ["chat-session", sessionId] as const;
+class ChatContextMismatchError extends Error {}
+
+function buildSessionQueryKey(
+  contextKey: string,
+  sessionId: string
+): readonly ["chat-session", string, string] {
+  return ["chat-session", contextKey, sessionId] as const;
 }
 
 function mapSessionToTimeline(session: ChatSessionResponse): ChatTimeline {
   return {
     sessionId: session.id,
     bulaId: session.bula_id,
+    scope: session.scope ?? "bula",
     messages: session.messages.map((message) => ({
       id: message.id,
       role: message.role,
       content: message.content,
       sourceChunks: message.source_chunks ?? [],
+      retrievalMode: message.retrieval_mode,
     })),
   };
 }
@@ -70,16 +82,17 @@ function buildTurnMessages(
       role: "assistant",
       content: response.answer,
       sourceChunks: response.source_chunks,
+      retrievalMode: response.retrieval_mode,
     },
   ];
 }
 
-function buildConversationKey(bulaId: string, sessionId: string | null): string {
-  return `${bulaId}:${sessionId ?? "new"}`;
+function buildConversationKey(contextKey: string, sessionId: string | null): string {
+  return `${contextKey}:${sessionId ?? "new"}`;
 }
 
 export function useChatSession({
-  bulaId,
+  context,
   sessionId,
   onSessionCreated,
 }: UseChatSessionOptions): UseChatSessionResult {
@@ -88,33 +101,48 @@ export function useChatSession({
   const [transientUserMessage, setTransientUserMessage] = useState<TransientChatMessage | null>(
     null
   );
-  const conversationKey = buildConversationKey(bulaId, sessionId);
+  const bulaId = context.scope === "bula" ? context.bulaId : null;
+  const contextKey = `${context.scope}:${bulaId ?? "general"}`;
+  const conversationKey = buildConversationKey(contextKey, sessionId);
   const sessionQuery = useQuery({
-    queryKey: sessionId ? buildSessionQueryKey(sessionId) : ["chat-session", "new"],
+    queryKey: sessionId
+      ? buildSessionQueryKey(contextKey, sessionId)
+      : ["chat-session", contextKey, "new"],
     queryFn: async (): Promise<ChatTimeline> => {
       if (!sessionId) {
         throw new Error("A session identifier is required to load chat history.");
       }
 
-      return mapSessionToTimeline(await getChatSession(sessionId));
+      const session = mapSessionToTimeline(await getChatSession(sessionId));
+      if (session.scope !== context.scope || session.bulaId !== bulaId) {
+        throw new ChatContextMismatchError("A conversa pertence a outro contexto.");
+      }
+      return session;
     },
     enabled: Boolean(sessionId),
     staleTime: Number.POSITIVE_INFINITY,
   });
 
   const sendMutation = useMutation({
-    mutationFn: async ({ question, sessionId: existingSessionId }: SendQuestionVariables) => {
+    mutationFn: async ({
+      question,
+      sessionId: existingSessionId,
+      context: questionContext,
+    }: SendQuestionVariables) => {
       if (existingSessionId) {
         return continueChatSession(existingSessionId, { question });
       }
 
-      return askBulaQuestion(bulaId, { question });
+      if (questionContext.scope === "cross_bula") return askCrossBulaQuestion({ question });
+      return askBulaQuestion(questionContext.bulaId, { question });
     },
     onSuccess: (response, variables) => {
       const nextSessionId = response.session_id;
-      const nextQueryKey = buildSessionQueryKey(nextSessionId);
+      const nextQueryKey = buildSessionQueryKey(variables.contextKey, nextSessionId);
       const existingTimeline = variables.sessionId
-        ? queryClient.getQueryData<ChatTimeline>(buildSessionQueryKey(variables.sessionId))
+        ? queryClient.getQueryData<ChatTimeline>(
+            buildSessionQueryKey(variables.contextKey, variables.sessionId)
+          )
         : undefined;
       const newMessages = buildTurnMessages(
         variables.question,
@@ -124,12 +152,13 @@ export function useChatSession({
 
       queryClient.setQueryData<ChatTimeline>(nextQueryKey, {
         sessionId: nextSessionId,
-        bulaId,
+        bulaId: variables.context.scope === "bula" ? variables.context.bulaId : null,
+        scope: variables.context.scope,
         messages: [...(existingTimeline?.messages ?? []), ...newMessages],
       });
       void queryClient.invalidateQueries({ queryKey: ["chat-sessions"] });
 
-      if (!variables.sessionId) {
+      if (!variables.sessionId && variables.contextKey === contextKey) {
         onSessionCreated(nextSessionId);
       }
     },
@@ -137,6 +166,7 @@ export function useChatSession({
   });
 
   const sendQuestion = async (question: string): Promise<boolean> => {
+    if (sessionId && (!sessionQuery.data || sessionQuery.error)) return false;
     if (isSendInFlightRef.current) {
       return false;
     }
@@ -157,6 +187,8 @@ export function useChatSession({
         question,
         sessionId,
         optimisticUserMessageId: optimisticUserMessage.id,
+        context,
+        contextKey,
       });
       setTransientUserMessage((currentMessage) =>
         currentMessage?.id === optimisticUserMessage.id ? null : currentMessage
@@ -183,6 +215,7 @@ export function useChatSession({
       ...(visibleTransientMessage ? [visibleTransientMessage] : []),
     ],
     loadedBulaId: sessionQuery.data?.bulaId ?? null,
+    hasContextMismatch: sessionQuery.error instanceof ChatContextMismatchError,
     isLoading: sessionQuery.isLoading,
     isSending: sendMutation.isPending,
     loadError: sessionQuery.error,
