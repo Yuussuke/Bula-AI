@@ -1,5 +1,6 @@
 import asyncio
 import re
+from uuid import UUID
 from typing import Any, Self
 
 from langchain_core.callbacks import (
@@ -44,6 +45,7 @@ class DenseBulaRetriever(BaseRetriever):
 
     bula_id: str | None = None
     corpus: tuple[BulaCorpus, ...] | None = None
+    allowed_bula_ids: tuple[UUID, ...] | None = None
     k: int = DEFAULT_RETRIEVAL_K
     qdrant_store: QdrantVectorStore
     embeddings: EmbeddingAdapter
@@ -80,7 +82,7 @@ class DenseBulaRetriever(BaseRetriever):
         run_manager: AsyncCallbackManagerForRetrieverRun,
     ) -> list[Document]:
         _ = run_manager
-        if self.corpus == ():
+        if self.corpus == () or self.allowed_bula_ids == ():
             return []
         query_vector = await asyncio.to_thread(self.embeddings.embed_query, query)
         search_result = await self.qdrant_store.search_similar(
@@ -121,6 +123,15 @@ class DenseBulaRetriever(BaseRetriever):
 
     def _build_bula_filter(self) -> Filter:
         conditions: list[Condition] = []
+        if self.allowed_bula_ids is not None:
+            conditions.append(
+                FieldCondition(
+                    key="bula_id",
+                    match=MatchAny(
+                        any=[str(bula_id) for bula_id in self.allowed_bula_ids]
+                    ),
+                )
+            )
         if self.bula_id is not None:
             conditions.append(
                 FieldCondition(
