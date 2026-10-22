@@ -49,14 +49,13 @@ function preserveSpacingBeforeEmphasis(markdown: string): string {
 
 function linkNumericCitations(markdown: string, citationCount: number): string {
   const markdownWithCitationLinks = markdown.replace(
-    /\[(\d+)\](?!\()/g,
-    (citation, rawCitationNumber: string) => {
-      const citationNumber = Number(rawCitationNumber);
-      if (citationNumber < 1 || citationNumber > citationCount) {
+    /\[([0-9]+(?:[ \t]*,[ \t]*[0-9]+)*)\](?!\()/g,
+    (citation, rawCitationNumbers: string) => {
+      const citationNumbers = rawCitationNumbers.split(",").map((value) => Number(value.trim()));
+      if (citationNumbers.some((number) => number < 1 || number > citationCount)) {
         return citation;
       }
-
-      return `[${citationNumber}](#bula-source-${citationNumber})`;
+      return citationNumbers.map((number) => `[${number}](#bula-source-${number})`).join(", ");
     }
   );
 

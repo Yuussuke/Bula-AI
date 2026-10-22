@@ -5,6 +5,47 @@ import { describe, expect, it } from "vitest";
 import { SourceChunks } from "@/components/chat/source-chunks";
 
 describe("SourceChunks", () => {
+  it("keeps document attribution and canonical links attached to each numbered source", async () => {
+    const user = userEvent.setup();
+    render(
+      <SourceChunks
+        sourceChunks={[
+          {
+            chunk_id: "a",
+            bula_id: "one",
+            drug_name: "Produto A",
+            manufacturer: "Fabricante A",
+            presentation: "gotas",
+            strength: "50 mg/mL",
+            source_url: "https://consultas.anvisa.gov.br/a.pdf",
+            section_title: "Advertências",
+            chunk_text: "Texto A.",
+            relevance_score: 0.5,
+          },
+          {
+            chunk_id: "b",
+            bula_id: "two",
+            drug_name: "Produto B",
+            manufacturer: "Fabricante B",
+            presentation: "comprimidos",
+            source_url: "javascript:alert(1)",
+            section_title: "Advertências",
+            chunk_text: "Texto B.",
+            relevance_score: 0.4,
+          },
+        ]}
+      />
+    );
+    await user.click(screen.getByRole("button", { name: "Ver 2 fontes na bula" }));
+    expect(screen.getByText("Produto A")).toBeInTheDocument();
+    expect(screen.getByText("Produto B")).toBeInTheDocument();
+    expect(screen.getByText(/Fabricante A · gotas · 50 mg\/mL/)).toBeInTheDocument();
+    expect(screen.getAllByRole("link", { name: "Abrir fonte original" })).toHaveLength(1);
+    expect(screen.getByRole("link", { name: "Abrir fonte original" })).toHaveAttribute(
+      "href",
+      "https://consultas.anvisa.gov.br/a.pdf"
+    );
+  });
   it("presents Markdown as readable headings, lists and tables", async () => {
     const user = userEvent.setup();
     const { container } = render(

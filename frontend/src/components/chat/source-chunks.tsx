@@ -10,6 +10,16 @@ import { cn } from "@/lib/utils";
 
 const MessageMarkdown = lazy(() => import("@/components/chat/message-markdown"));
 
+function getSourceLink(value?: string | null): string | undefined {
+  if (!value) return undefined;
+  try {
+    const url = new URL(value);
+    return ["https:", "http:"].includes(url.protocol) ? url.href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 interface SourceChunksProps {
   sourceChunks: SourceChunkResponse[];
   messageId?: string;
@@ -63,8 +73,29 @@ export function SourceChunks({
               className="bg-muted/40 border-border focus:ring-primary scroll-mt-6 rounded-md border p-3 transition outline-none focus:ring-2"
             >
               <p className="text-foreground text-xs font-semibold">
-                {sourceChunk.section_title || "Seção da bula"}
+                <span>[{index + 1}] </span>
+                <span>{sourceChunk.section_title || "Seção da bula"}</span>
               </p>
+              {sourceChunk.drug_name ? (
+                <div className="my-2 space-y-1 text-xs">
+                  <p className="font-semibold">{sourceChunk.drug_name}</p>
+                  <p>
+                    {[sourceChunk.manufacturer, sourceChunk.presentation, sourceChunk.strength]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </p>
+                  {getSourceLink(sourceChunk.source_url) ? (
+                    <a
+                      href={getSourceLink(sourceChunk.source_url)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-primary underline"
+                    >
+                      Abrir fonte original
+                    </a>
+                  ) : null}
+                </div>
+              ) : null}
               <Suspense
                 fallback={
                   <div
