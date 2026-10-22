@@ -1,9 +1,20 @@
 from datetime import datetime
 from uuid import UUID
+from typing import cast
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
+from pydantic import (
+    AliasChoices,
+    BaseModel,
+    ConfigDict,
+    Field,
+    field_validator,
+    computed_field,
+    HttpUrl,
+    SerializerFunctionWrapHandler,
+    model_serializer,
+)
 
-from app.modules.chat.models import ChatMessage, ChatRole, ChatSession
+from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, ChatScope
 from app.modules.rag.retrieval_mode import RetrievalMode
 
 
@@ -14,11 +25,49 @@ class ChatMessageCreate(BaseModel):
 
 
 class SourceChunkResponse(BaseModel):
+    chunk_id: str | None = None
+    bula_id: UUID | None = None
+    drug_name: str | None = None
+    manufacturer: str | None = None
+    presentation: str | None = None
+    strength: str | None = None
+    source_url: HttpUrl | None = None
     section_title: str
     chunk_text: str
     relevance_score: float = Field(
         validation_alias=AliasChoices("relevance_score", "score")
     )
+
+    @model_serializer(mode="wrap")
+    def serialize_source(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        # Keep legacy sources' wire shape; absent new metadata is not fabricated.
+        values = cast(dict[str, object], handler(self))
+        return {key: value for key, value in values.items() if value is not None}
+
+
+class SourceBulaResponse(BaseModel):
+    bula_id: UUID
+    drug_name: str
+    manufacturer: str | None = None
+    presentation: str | None = None
+    strength: str | None = None
+    source_url: HttpUrl | None = None
+
+
+def source_bulas_from_chunks(
+    chunks: list[SourceChunkResponse],
+) -> list[SourceBulaResponse]:
+    sources: dict[UUID, SourceBulaResponse] = {}
+    for chunk in chunks:
+        if chunk.bula_id is None or chunk.drug_name is None:
+            continue
+        if chunk.bula_id not in sources:
+            sources[chunk.bula_id] = SourceBulaResponse.model_validate(
+                chunk.model_dump()
+            )
+    return list(sources.values())
 
 
 class ChatMessageResponse(ChatMessageCreate):
@@ -30,6 +79,10 @@ class ChatMessageResponse(ChatMessageCreate):
 
     model_config = ConfigDict(from_attributes=True)
 
+    @computed_field
+    def source_bulas(self) -> list[SourceBulaResponse]:
+        return source_bulas_from_chunks(self.source_chunks)
+
 
 class ChatSessionCreate(BaseModel):
     bula_id: UUID | None = None
@@ -39,6 +92,7 @@ class ChatSessionResponse(BaseModel):
     id: UUID
     user_id: int
     bula_id: UUID | None
+    scope: ChatScope = ChatScope.BULA
     title: str
     created_at: datetime
     updated_at: datetime
@@ -58,6 +112,7 @@ class ChatSessionResponse(BaseModel):
             id=session.id,
             user_id=session.user_id,
             bula_id=session.bula_id,
+            scope=ChatScope(session.scope),
             title=session.title,
             created_at=session.created_at,
             updated_at=session.updated_at,
@@ -97,3 +152,7 @@ class AskResponse(BaseModel):
     answer: str
     retrieval_mode: RetrievalMode
     source_chunks: list[SourceChunkResponse] = Field(default_factory=list)
+
+    @computed_field
+    def source_bulas(self) -> list[SourceBulaResponse]:
+        return source_bulas_from_chunks(self.source_chunks)
