@@ -75,7 +75,10 @@ def override_real_chain_factory() -> None:
     chain_factory = RAGChainFactory(
         retriever_factory=strategy_factory,
         llm_builder=lambda: FakeListChatModel(
-            responses=['{"unit_ids":["E1"],"limitation":null}']
+            responses=[
+                '{"unit_ids":["E1"],"limitation":null}',
+                "Informação da fonte selecionada. [1]",
+            ]
         ),
     )
     app.dependency_overrides[get_rag_chain_factory] = lambda: chain_factory

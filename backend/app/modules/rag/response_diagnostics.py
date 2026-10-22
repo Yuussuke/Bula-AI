@@ -6,6 +6,7 @@ from typing import TypeVar
 import structlog
 from langchain_core.runnables import Runnable, RunnableConfig, RunnableLambda
 from openai import APIConnectionError, APIError, APITimeoutError
+from app.modules.rag.grounded_generation import GroundedGenerationError
 
 logger = structlog.get_logger(__name__)
 StageOutput = TypeVar("StageOutput")
@@ -65,6 +66,8 @@ class ResponseStageObserver:
         )
 
     def classify_error(self, error: Exception) -> str:
+        if isinstance(error, GroundedGenerationError):
+            return error.reason
         if isinstance(error, (TimeoutError, APITimeoutError)):
             return "timeout"
         if isinstance(error, APIConnectionError):

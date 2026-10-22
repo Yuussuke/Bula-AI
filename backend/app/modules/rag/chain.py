@@ -34,6 +34,7 @@ from app.modules.rag.section_evidence_retriever import (
     is_direct_contraindication_question,
 )
 from app.modules.rag.section_titles import is_administrative_section
+from app.modules.rag.grounded_generation import GroundedAnswerGenerator
 
 logger = structlog.get_logger(__name__)
 
@@ -122,13 +123,14 @@ class RAGChainFactory:
     ) -> Runnable[dict[str, object], dict[str, object]]:
         retriever = self.retriever_factory.build(bula_id=bula_id, mode=mode)
         llm = self.llm_builder()
-        return build_rag_chain(retriever=retriever, llm=llm)
+        return build_grounded_rag_chain(retriever=retriever, llm=llm)
 
 
 def build_rag_chain(
     *,
     retriever: BaseRetriever,
     llm: BaseChatModel,
+    include_generation_context: bool = False,
 ) -> Runnable[dict[str, object], dict[str, object]]:
     retrieve_documents = RunnableLambda(_build_retrieval_query) | retriever
     selected_evidence = (
@@ -145,7 +147,8 @@ def build_rag_chain(
     )
     observer = ResponseStageObserver()
     chain = RunnablePassthrough.assign(
-        diagnostic_id=RunnableLambda(_build_diagnostic_id)
+        include_generation_context=RunnableLambda(lambda _: include_generation_context),
+        diagnostic_id=RunnableLambda(_build_diagnostic_id),
     ).assign(
         documents=observer.wrap(stage="retrieval", runnable=retrieve_documents)
     ).assign(
@@ -159,6 +162,22 @@ def build_rag_chain(
         stage="answer_validation", runnable=RunnableLambda(_build_chain_output)
     )
     return cast(Runnable[dict[str, object], dict[str, object]], chain)
+
+
+def build_grounded_rag_chain(
+    *, retriever: BaseRetriever, llm: BaseChatModel
+) -> Runnable[dict[str, object], dict[str, object]]:
+    """Production answer path; the base chain remains an extractive diagnostic."""
+    selected = build_rag_chain(
+        retriever=retriever, llm=llm, include_generation_context=True
+    )
+    generator = ResponseStageObserver().wrap(
+        stage="generation", runnable=GroundedAnswerGenerator(llm).build()
+    )
+    return selected | RunnableBranch(
+        (lambda inputs: "generation_context" in inputs, generator),
+        RunnablePassthrough(),
+    )
 
 
 def _build_diagnostic_id(inputs: dict[str, object]) -> str:
@@ -293,6 +312,35 @@ def _select_answer_documents(inputs: dict[str, object]) -> list[Document]:
 def _build_chain_output(inputs: dict[str, object]) -> dict[str, object]:
     documents = cast(list[Document], inputs["documents"])
     answer = str(inputs["answer"]).strip()
+    is_natural_response = bool(inputs.get("include_generation_context"))
+
+    def finish(
+        text: str,
+        chunks: list[dict[str, object]],
+        *,
+        support: str,
+        reason: str | None = None,
+        technical_failure: str | None = None,
+        unit_ids: list[str] | None = None,
+        limitation: str | None = None,
+        validation_error: dict[str, object] | None = None,
+    ) -> dict[str, object]:
+        output: dict[str, object] = {"answer": text, "source_chunks": chunks}
+        if is_natural_response:
+            output["response_diagnostics"] = {
+                "context_sufficiency": support,
+                "abstained": reason is not None,
+                "abstention_reason": reason,
+                "technical_failure": technical_failure,
+                "validation_error": validation_error or {},
+                "selected_unit_ids": unit_ids or [],
+                "limitation": limitation,
+                "generation_status": "pending" if chunks else "skipped",
+                "claim_verification": "not_implemented",
+                "citation_validation": "not_run",
+            }
+        return output
+
     if not documents:
         _log_evidence_decision(
             retrieval="empty",
@@ -300,8 +348,11 @@ def _build_chain_output(inputs: dict[str, object]) -> dict[str, object]:
             verification="not_checked",
             diagnostic_id=inputs.get("diagnostic_id"),
             reason="no_usable_documents",
+            generation_status="skipped" if is_natural_response else "not_implemented",
         )
-        return {"answer": NO_CONTEXT_MESSAGE, "source_chunks": []}
+        return finish(
+            NO_CONTEXT_MESSAGE, [], support="not_assessed", reason="no_usable_documents"
+        )
 
     chat_history = cast(list[BaseMessage], inputs.get("chat_history", []))
     validation_result = validate_extractive_safety_answer(
@@ -321,8 +372,17 @@ def _build_chain_output(inputs: dict[str, object]) -> dict[str, object]:
             if validation_result.rejection_reason
             else "internal_error",
             validation_error=validation_result.error_details(),
+            generation_status="skipped" if is_natural_response else "not_implemented",
         )
-        return {"answer": UNVERIFIED_ANSWER_MESSAGE, "source_chunks": []}
+        return finish(
+            UNVERIFIED_ANSWER_MESSAGE,
+            [],
+            support="not_assessed",
+            technical_failure=validation_result.rejection_reason.value
+            if validation_result.rejection_reason
+            else "internal_error",
+            validation_error=validation_result.error_details(),
+        )
     _log_evidence_decision(
         retrieval="found",
         support=extractive_answer.support,
@@ -335,6 +395,13 @@ def _build_chain_output(inputs: dict[str, object]) -> dict[str, object]:
         reason="insufficient_context"
         if extractive_answer.support is EvidenceSupport.INSUFFICIENT
         else None,
+        generation_status=(
+            "pending"
+            if extractive_answer.support is not EvidenceSupport.INSUFFICIENT
+            else "skipped"
+        )
+        if is_natural_response
+        else "not_implemented",
         selected_unit_count=len(validation_result.assessment.unit_ids)
         if validation_result.assessment is not None
         else None,
@@ -345,14 +412,53 @@ def _build_chain_output(inputs: dict[str, object]) -> dict[str, object]:
         else None,
     )
     if extractive_answer.support is EvidenceSupport.INSUFFICIENT:
-        return {
-            "answer": INSUFFICIENT_SPECIFIC_EVIDENCE_MESSAGE,
-            "source_chunks": [],
+        return finish(
+            INSUFFICIENT_SPECIFIC_EVIDENCE_MESSAGE,
+            [],
+            support=extractive_answer.support.value,
+            reason="insufficient_context",
+        )
+    assessment = validation_result.assessment
+    output = finish(
+        extractive_answer.answer,
+        build_source_chunks(extractive_answer.documents),
+        support=extractive_answer.support.value,
+        unit_ids=assessment.unit_ids if assessment else [],
+        limitation=assessment.limitation.value
+        if assessment and assessment.limitation
+        else None,
+    )
+    if inputs.get("include_generation_context"):
+        diagnostics = cast(dict[str, object], output["response_diagnostics"])
+        diagnostics["selected_chunk_ids"] = [
+            str(document.metadata.get("chunk_id", ""))
+            for document in extractive_answer.documents
+        ]
+        source_numbers = {
+            id(document): number
+            for number, document in enumerate(extractive_answer.documents, 1)
         }
-    return {
-        "answer": extractive_answer.answer,
-        "source_chunks": build_source_chunks(extractive_answer.documents),
-    }
+        if assessment is None:
+            raise RuntimeError("Validated evidence requires its selection")
+        selected_ids = set(assessment.unit_ids)
+        selected_units = [
+            unit
+            for unit in build_evidence_units(documents)
+            if unit.unit_id in selected_ids
+        ]
+        output["diagnostic_id"] = inputs.get("diagnostic_id")
+        output["generation_context"] = {
+            "question": str(inputs["question"]),
+            "chat_history": chat_history,
+            "context": "\n\n".join(
+                f"[{source_numbers[id(unit.document)]}] Seção: {unit.section_title}\n{unit.text}"
+                for unit in selected_units
+            ),
+            "limitation": assessment.limitation.value
+            if assessment.limitation
+            else "nenhuma",
+        }
+    return output
 
 
 def _log_evidence_decision(
@@ -365,6 +471,7 @@ def _log_evidence_decision(
     selected_unit_count: int | None = None,
     limitation: str | None = None,
     validation_error: dict[str, object] | None = None,
+    generation_status: str = "not_implemented",
 ) -> None:
     # Only decision labels are logged: never the question, PDF content, or LLM body.
     logger.info(
@@ -377,7 +484,7 @@ def _log_evidence_decision(
         abstained=reason is not None,
         context_sufficiency=support.value if support is not None else "not_assessed",
         corrective_retrieval_used=False,
-        generation_status="not_implemented",
+        generation_status=generation_status,
         claim_verification="not_implemented",
         selected_unit_count=selected_unit_count,
         limitation=limitation,
