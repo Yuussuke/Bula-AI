@@ -66,6 +66,7 @@ export default function App(): ReactElement {
           element={<ProtectedRoute authResolved={authResolved} isAuthenticated={isAuthenticated} />}
         >
           <Route path="/" element={<DashboardView />} />
+          <Route path="/chat" element={<ChatPage scope="cross_bula" />} />
           <Route path="/bulas/:bulaId/chat" element={<ChatPage />} />
         </Route>
         <Route

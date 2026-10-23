@@ -1,6 +1,7 @@
 import { Bot, User } from "lucide-react";
 import { lazy, type ReactElement, Suspense, useState } from "react";
 
+import { ModeIndicator } from "@/components/chat/mode-indicator";
 import { buildSourceChunkId } from "@/components/chat/source-chunk-navigation";
 import { SourceChunks } from "@/components/chat/source-chunks";
 import type { ChatTimelineMessage } from "@/components/chat/types";
@@ -76,6 +77,7 @@ export function ChatBubble({ message }: ChatBubbleProps): ReactElement {
         {message.deliveryStatus === "failed" ? (
           <p className="text-primary-foreground/85 text-right text-xs">Não foi possível enviar</p>
         ) : null}
+        {!isUserMessage && <ModeIndicator mode={message.retrievalMode ?? null} />}
         {!isUserMessage && (
           <SourceChunks
             sourceChunks={message.sourceChunks}

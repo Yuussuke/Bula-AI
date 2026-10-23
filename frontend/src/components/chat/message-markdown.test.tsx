@@ -5,6 +5,22 @@ import { describe, expect, it, vi } from "vitest";
 import MessageMarkdown from "@/components/chat/message-markdown";
 
 describe("MessageMarkdown", () => {
+  it("links grouped citations without renumbering or linking unknown IDs", async () => {
+    const user = userEvent.setup();
+    const onCitationClick = vi.fn();
+    render(
+      <MessageMarkdown
+        markdown="Fontes [2, 1]. Grupo inválido [1,9]."
+        variant="answer"
+        citationCount={2}
+        onCitationClick={onCitationClick}
+      />
+    );
+    await user.click(screen.getByRole("link", { name: "Ir para a fonte 2" }));
+    expect(onCitationClick).toHaveBeenCalledWith(2);
+    expect(screen.getByRole("link", { name: "Ir para a fonte 1" })).toBeInTheDocument();
+    expect(screen.getByText(/Grupo inválido \[1,9\]/)).toBeInTheDocument();
+  });
   it("preserves visible spacing before bold text", () => {
     const { container } = render(
       <MessageMarkdown
