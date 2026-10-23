@@ -41,6 +41,7 @@ class PostgreSQLBM25Index:
         k: int = 10,
         bula_id: UUID | None = None,
         corpus: Sequence[BulaCorpus] | None = None,
+        allowed_bula_ids: Sequence[UUID] | None = None,
         include_administrative_sections: bool = True,
         include_document_metadata: bool = True,
     ) -> list[BM25SearchResult]:
@@ -53,6 +54,7 @@ class PostgreSQLBM25Index:
             k=k,
             bula_id=bula_id,
             corpus=corpus,
+            allowed_bula_ids=allowed_bula_ids,
             include_administrative_sections=include_administrative_sections,
             include_document_metadata=include_document_metadata,
         )
@@ -68,6 +70,13 @@ class PostgreSQLBM25Index:
             bula_id=bula_id,
             section_titles=section_titles,
             limit=limit,
+        )
+
+    async def get_source_chunks(
+        self, *, chunk_ids: Sequence[str], bula_ids: Sequence[UUID]
+    ) -> list[ChunkMetadataInput]:
+        return await self.repository.get_source_chunks(
+            chunk_ids=chunk_ids, bula_ids=bula_ids
         )
 
     async def update_corpus(self, *, bula_id: UUID, corpus: BulaCorpus) -> None:

@@ -90,6 +90,7 @@ class ChunkMetadataRepository:
         k: int,
         bula_id: UUID | None,
         corpus: Sequence[BulaCorpus] | None,
+        allowed_bula_ids: Sequence[UUID] | None = None,
         include_administrative_sections: bool = True,
         include_document_metadata: bool = True,
     ) -> list[BM25SearchResult]:
@@ -121,6 +122,8 @@ class ChunkMetadataRepository:
             candidates = candidates.where(ChunkMetadata.bula_id == bula_id)
         if corpus is not None:
             candidates = candidates.where(ChunkMetadata.corpus.in_(corpus))
+        if allowed_bula_ids is not None:
+            candidates = candidates.where(ChunkMetadata.bula_id.in_(allowed_bula_ids))
 
         # pg_textsearch 1.1 can post-filter an index top-k scan. Materialize the
         # scope FIRST so unrelated bulas cannot crowd out eligible results.
@@ -167,6 +170,24 @@ class ChunkMetadataRepository:
             (has_prefix, ""),
             else_=ChunkMetadata.chunk_text,
         )
+
+    async def get_source_chunks(
+        self, *, chunk_ids: Sequence[str], bula_ids: Sequence[UUID]
+    ) -> list[ChunkMetadataInput]:
+        if not chunk_ids or not bula_ids:
+            return []
+        statement = select(ChunkMetadata).where(
+            ChunkMetadata.chunk_id.in_(chunk_ids),
+            ChunkMetadata.bula_id.in_(bula_ids),
+            ChunkMetadata.corpus == BulaCorpus.SYSTEM.value,
+        )
+        result = await self.db.execute(
+            statement.execution_options(populate_existing=True)
+        )
+        return [
+            ChunkMetadataInput.model_validate(chunk, from_attributes=True)
+            for chunk in result.scalars()
+        ]
 
     async def find_section_evidence(
         self,

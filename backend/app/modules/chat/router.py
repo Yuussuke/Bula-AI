@@ -5,7 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.modules.auth.dependencies import get_current_user
 from app.modules.auth.models import User
-from app.modules.chat.dependencies import get_chat_service
+from app.modules.chat.models import ChatScope
+from app.modules.chat.dependencies import get_chat_service, require_chat_capacity
 from app.modules.chat.schemas import (
     AskRequest,
     AskResponse,
@@ -18,9 +19,27 @@ from app.modules.chat.service import (
     ChatSessionNotFoundError,
     DirectAskUnavailableError,
     QueryableBulaNotFoundError,
+    PublishedSourcesChangedError,
 )
 
 router = APIRouter(prefix="/chat", tags=["chat"])
+
+
+@router.post("/ask", response_model=AskResponse)
+async def ask_cross_bula(
+    payload: AskRequest,
+    current_user: User = Depends(require_chat_capacity),
+    chat_service: ChatService = Depends(get_chat_service),
+) -> AskResponse:
+    try:
+        return await chat_service.ask_cross_bula_question(
+            payload=payload, user_id=cast(int, current_user.id)
+        )
+    except PublishedSourcesChangedError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="As fontes mudaram durante a consulta. Envie a pergunta novamente.",
+        ) from exc
 
 
 @router.post("/direct-ask", response_model=DirectAskResponse)
@@ -48,7 +67,7 @@ async def direct_ask(
 async def ask_bula(
     bula_id: UUID,
     payload: AskRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_chat_capacity),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> AskResponse:
     try:
@@ -68,6 +87,8 @@ async def ask_bula(
 async def list_sessions(
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
+    scope: ChatScope | None = Query(default=None),
+    bula_id: UUID | None = Query(default=None),
     current_user: User = Depends(get_current_user),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> list[ChatSessionResponse]:
@@ -75,6 +96,8 @@ async def list_sessions(
         user_id=cast(int, current_user.id),
         limit=limit,
         offset=offset,
+        scope=scope,
+        bula_id=bula_id,
     )
     return [ChatSessionResponse.from_session(session) for session in sessions]
 
@@ -102,7 +125,7 @@ async def get_session(
 async def continue_session(
     session_id: UUID,
     payload: AskRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_chat_capacity),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> AskResponse:
     try:
@@ -115,4 +138,9 @@ async def continue_session(
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Chat session not found or no longer queryable.",
+        ) from exc
+    except PublishedSourcesChangedError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="As fontes mudaram durante a consulta. Envie a pergunta novamente.",
         ) from exc

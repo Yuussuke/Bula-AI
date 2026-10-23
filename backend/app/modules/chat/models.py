@@ -20,8 +20,23 @@ class ChatRole(str, enum.Enum):
     ASSISTANT = "assistant"
 
 
+class ChatScope(str, enum.Enum):
+    BULA = "bula"
+    CROSS_BULA = "cross_bula"
+
+
 class ChatSession(Base, UUIDMixin, TimestampMixin):
     __tablename__ = "chat_sessions"
+    __table_args__ = (
+        CheckConstraint("scope IN ('bula', 'cross_bula')", name="valid_chat_scope"),
+        CheckConstraint(
+            "scope != 'cross_bula' OR bula_id IS NULL",
+            name="cross_bula_without_document",
+        ),
+    )
+    scope: Mapped[str] = mapped_column(
+        String(20), default=ChatScope.BULA.value, server_default=ChatScope.BULA.value
+    )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     title: Mapped[str] = mapped_column(String(50), nullable=False)
 

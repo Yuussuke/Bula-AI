@@ -124,6 +124,28 @@ async def test_real_bm25_portuguese_accents_stemming_and_nonmatches(
 
 
 @pytest.mark.anyio
+async def test_allowed_documents_are_filtered_before_lexical_top_k(
+    bm25_context: BM25Context,
+) -> None:
+    index, _, bulas = bm25_context
+    await index.upsert_chunks(
+        [
+            make_chunk(bulas[0], "produtox produtox produtox produtox", "private"),
+            make_chunk(bulas[1], "produtox e informação original", "public"),
+            make_chunk(bulas[2], "produtox produtox produtox", "shared"),
+        ]
+    )
+    results = await index.search(
+        "produtox",
+        k=1,
+        corpus=(BulaCorpus.SYSTEM, BulaCorpus.SHARED, BulaCorpus.PRIVATE),
+        allowed_bula_ids=(bulas[1].id,),
+    )
+    assert [result.bula_id for result in results] == [bulas[1].id]
+    assert await index.search("produtox", allowed_bula_ids=()) == []
+
+
+@pytest.mark.anyio
 async def test_metadata_is_retained_for_discovery_but_cannot_consume_evidence_budget(
     bm25_context: BM25Context,
 ) -> None:

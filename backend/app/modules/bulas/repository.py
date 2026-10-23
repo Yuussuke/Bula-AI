@@ -295,6 +295,14 @@ class BulaRepository:
         result = await self.db.execute(statement)
         return result.unique().scalar_one_or_none()
 
+    async def list_queryable_system_bulas(self) -> list[Bula]:
+        """Complete authorization scope, independent of catalog pagination."""
+        statement = self._published_system_bula_statement().order_by(Bula.id)
+        result = await self.db.execute(
+            statement.execution_options(populate_existing=True)
+        )
+        return list(result.unique().scalars().all())
+
     def _published_system_bula_statement(self) -> Select[tuple[Bula]]:
         return (
             select(Bula)

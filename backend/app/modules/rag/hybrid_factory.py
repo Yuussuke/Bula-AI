@@ -39,6 +39,7 @@ class HybridRetrieverFactory:
         *,
         bula_id: UUID | None,
         corpus: Sequence[BulaCorpus] | None = None,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
         k: int = DEFAULT_RETRIEVAL_K,
         candidate_k: int | None = None,
     ) -> EnrichingRetriever:
@@ -59,6 +60,7 @@ class HybridRetrieverFactory:
         if candidate_k < k or candidate_k > MAX_HYBRID_CANDIDATES:
             raise ValueError("candidate_k must be >= k and <= 100.")
         dense_retriever = DenseBulaRetriever(
+            allowed_bula_ids=allowed_bula_ids,
             bula_id=str(bula_id) if bula_id is not None else None,
             corpus=corpus_scope,
             k=candidate_k,
@@ -67,6 +69,7 @@ class HybridRetrieverFactory:
             embeddings=self.embeddings,
         )
         bm25_retriever = self.bm25_retriever_factory.build(
+            allowed_bula_ids=allowed_bula_ids,
             bula_id=bula_id,
             corpus=corpus_scope,
             k=candidate_k,
