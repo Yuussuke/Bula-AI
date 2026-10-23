@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 
 import {
   askBulaQuestion,
@@ -18,6 +18,7 @@ interface SendQuestionVariables {
   optimisticUserMessageId: string;
   context: ChatContext;
   contextKey: string;
+  conversationRevision: number;
 }
 
 interface TransientChatMessage extends ChatTimelineMessage {
@@ -38,7 +39,8 @@ interface UseChatSessionResult {
   isSending: boolean;
   loadError: Error | null;
   sendError: Error | null;
-  sendQuestion: (question: string) => Promise<boolean>;
+  sendQuestion: (question: string) => Promise<boolean | null>;
+  invalidatePendingConversation: () => void;
 }
 
 class ChatContextMismatchError extends Error {}
@@ -98,12 +100,25 @@ export function useChatSession({
 }: UseChatSessionOptions): UseChatSessionResult {
   const queryClient = useQueryClient();
   const isSendInFlightRef = useRef(false);
+  const conversationRevisionRef = useRef(0);
+  const isMountedRef = useRef(false);
   const [transientUserMessage, setTransientUserMessage] = useState<TransientChatMessage | null>(
     null
   );
   const bulaId = context.scope === "bula" ? context.bulaId : null;
   const contextKey = `${context.scope}:${bulaId ?? "general"}`;
   const conversationKey = buildConversationKey(contextKey, sessionId);
+  useLayoutEffect(() => {
+    isMountedRef.current = true;
+    conversationRevisionRef.current += 1;
+    return () => {
+      isMountedRef.current = false;
+      conversationRevisionRef.current += 1;
+    };
+  }, [conversationKey]);
+
+  const isCurrentRequest = (revision: number): boolean =>
+    isMountedRef.current && conversationRevisionRef.current === revision;
   const sessionQuery = useQuery({
     queryKey: sessionId
       ? buildSessionQueryKey(contextKey, sessionId)
@@ -158,20 +173,21 @@ export function useChatSession({
       });
       void queryClient.invalidateQueries({ queryKey: ["chat-sessions"] });
 
-      if (!variables.sessionId && variables.contextKey === contextKey) {
+      if (!variables.sessionId && isCurrentRequest(variables.conversationRevision)) {
         onSessionCreated(nextSessionId);
       }
     },
     retry: false,
   });
 
-  const sendQuestion = async (question: string): Promise<boolean> => {
+  const sendQuestion = async (question: string): Promise<boolean | null> => {
     if (sessionId && (!sessionQuery.data || sessionQuery.error)) return false;
     if (isSendInFlightRef.current) {
       return false;
     }
 
     isSendInFlightRef.current = true;
+    const conversationRevision = conversationRevisionRef.current;
     const optimisticUserMessage: TransientChatMessage = {
       id: `local-user-${crypto.randomUUID()}`,
       role: "user",
@@ -189,18 +205,21 @@ export function useChatSession({
         optimisticUserMessageId: optimisticUserMessage.id,
         context,
         contextKey,
+        conversationRevision,
       });
       setTransientUserMessage((currentMessage) =>
         currentMessage?.id === optimisticUserMessage.id ? null : currentMessage
       );
-      return true;
+      return isCurrentRequest(conversationRevision) ? true : null;
     } catch {
-      setTransientUserMessage((currentMessage) =>
-        currentMessage?.id === optimisticUserMessage.id
-          ? { ...currentMessage, deliveryStatus: "failed" }
-          : currentMessage
-      );
-      return false;
+      if (isCurrentRequest(conversationRevision)) {
+        setTransientUserMessage((currentMessage) =>
+          currentMessage?.id === optimisticUserMessage.id
+            ? { ...currentMessage, deliveryStatus: "failed" }
+            : currentMessage
+        );
+      }
+      return isCurrentRequest(conversationRevision) ? false : null;
     } finally {
       isSendInFlightRef.current = false;
     }
@@ -219,7 +238,14 @@ export function useChatSession({
     isLoading: sessionQuery.isLoading,
     isSending: sendMutation.isPending,
     loadError: sessionQuery.error,
-    sendError: sendMutation.error,
+    sendError:
+      visibleTransientMessage?.id === sendMutation.variables?.optimisticUserMessageId
+        ? sendMutation.error
+        : null,
     sendQuestion,
+    invalidatePendingConversation: () => {
+      conversationRevisionRef.current += 1;
+      setTransientUserMessage(null);
+    },
   };
 }

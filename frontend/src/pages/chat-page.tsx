@@ -135,13 +135,15 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
 
     setQuestion("");
     void chatSession.sendQuestion(cleanQuestion).then((wasSent) => {
-      if (!wasSent) {
+      if (wasSent === false) {
         setQuestion((currentQuestion) => currentQuestion || cleanQuestion);
       }
     });
   };
 
   const handleStartNewSession = (): void => {
+    chatSession.invalidatePendingConversation();
+    setQuestion("");
     setSearchParams({}, { replace: true });
   };
 

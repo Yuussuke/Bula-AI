@@ -171,6 +171,39 @@ beforeEach(() => {
 });
 
 describe("ChatPage", () => {
+  it.each([false, true])(
+    "ignores an old request after opening another general session (failure=%s)",
+    async (hasFailed) => {
+      const user = userEvent.setup();
+      const deferred = createDeferredPromise<AskResponse>();
+      askCrossBulaQuestionMock.mockImplementation(() =>
+        deferred.promise.then((response) => {
+          if (hasFailed) throw new ApiError(409, "Fontes alteradas");
+          return response;
+        })
+      );
+      const session = { ...buildPersistedSession(), scope: "cross_bula" as const, bula_id: null };
+      listChatSessionsMock.mockResolvedValue([session]);
+      getChatSessionMock.mockResolvedValue(session);
+      renderChatPage("/chat");
+      await user.type(screen.getByRole("textbox"), "Pergunta da conversa anterior");
+      await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+      await user.click(
+        await screen.findByRole("link", { name: /Para que serve este medicamento/ })
+      );
+      expect(
+        await screen.findByText("Resposta persistida no PostgreSQL.", {}, { timeout: 5000 })
+      ).toBeInTheDocument();
+      await act(async () => {
+        deferred.resolve({ ...FIRST_RESPONSE, session_id: "late-session" });
+        await deferred.promise;
+      });
+      await waitFor(() => expect(screen.getByRole("textbox")).not.toBeDisabled());
+      expect(screen.getByTestId("location")).toHaveTextContent(`/chat?session=${SESSION_ID}`);
+      expect(screen.getByRole("textbox")).toHaveValue("");
+      expect(screen.queryByText("Não foi possível enviar")).not.toBeInTheDocument();
+    }
+  );
   it("starts general chat without loading a target leaflet and preserves its session", async () => {
     const user = userEvent.setup();
     renderChatPage("/chat");
