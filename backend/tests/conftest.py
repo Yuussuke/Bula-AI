@@ -20,6 +20,8 @@ from app.core.base import Base
 from app.core.database import get_db
 from app.modules.auth.dependencies import get_password_breach_checker
 from app.modules.bulas.dependencies import get_bula_ingestion_queue
+from app.modules.chat.dependencies import get_chat_usage_guard
+from app.modules.chat.usage_guard import ChatUsageGuard
 
 app.state.limiter.enabled = False
 
@@ -99,6 +101,8 @@ async def client(
     fake_bula_ingestion_queue: FakeBulaIngestionQueue,
     fake_password_breach_checker: FakePasswordBreachChecker,
 ) -> AsyncGenerator[AsyncClient, None]:
+    chat_guard = ChatUsageGuard(requests_per_minute=1000)
+    app.dependency_overrides[get_chat_usage_guard] = lambda: chat_guard
     app.dependency_overrides[get_db] = lambda: db_session
     app.dependency_overrides[get_bula_ingestion_queue] = lambda: (
         fake_bula_ingestion_queue

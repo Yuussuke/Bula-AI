@@ -151,6 +151,8 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
 
     FRONTEND_URL: str = "http://localhost:5173"
     max_bula_upload_size_bytes: int = 10 * 1024 * 1024
+    chat_requests_per_minute: int = Field(default=10, ge=1)
+    chat_max_concurrent_per_user: int = Field(default=1, ge=1)
     backend_cors_origins: list[str] = [
         "http://localhost:3000",
         FRONTEND_URL,

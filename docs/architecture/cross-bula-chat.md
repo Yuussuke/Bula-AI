@@ -33,3 +33,14 @@ runtime. Citation syntax checks do not establish semantic entailment, and Top-K
 retrieval is not an exhaustive survey of all drugs. No frozen datasets, indexes,
 snapshots or ingestion settings change. Tests use synthetic providers; real BM25
 tests require a separately migrated `BM25_TEST_DATABASE_URL` containing `test`.
+
+## Chat admission limits
+
+All three paid chat endpoints share an authenticated-user sliding-window budget
+(`CHAT_REQUESTS_PER_MINUTE`, default 10) and concurrent-request limit
+(`CHAT_MAX_CONCURRENT_PER_USER`, default 1). Rejections return 429 and
+`Retry-After: 60` before calling the chat service. Slots are released on success,
+exception or cancellation. Read-only history is unaffected. State is in memory
+per application process; multiple workers/replicas require a shared admission
+store or gateway before claiming a deployment-wide quota. This is not a monetary
+budget or a substitute for provider-side spending limits.

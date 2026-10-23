@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.modules.auth.dependencies import get_current_user
 from app.modules.auth.models import User
 from app.modules.chat.models import ChatScope
-from app.modules.chat.dependencies import get_chat_service
+from app.modules.chat.dependencies import get_chat_service, require_chat_capacity
 from app.modules.chat.schemas import (
     AskRequest,
     AskResponse,
@@ -28,7 +28,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 @router.post("/ask", response_model=AskResponse)
 async def ask_cross_bula(
     payload: AskRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_chat_capacity),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> AskResponse:
     try:
@@ -67,7 +67,7 @@ async def direct_ask(
 async def ask_bula(
     bula_id: UUID,
     payload: AskRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_chat_capacity),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> AskResponse:
     try:
@@ -125,7 +125,7 @@ async def get_session(
 async def continue_session(
     session_id: UUID,
     payload: AskRequest,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(require_chat_capacity),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> AskResponse:
     try:
