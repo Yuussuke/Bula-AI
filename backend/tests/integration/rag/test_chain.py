@@ -1,4 +1,6 @@
 import json
+from unittest.mock import AsyncMock
+from app.modules.rag.published_evidence import PublishedEvidenceIndex
 from typing import Any
 from uuid import UUID
 
@@ -38,12 +40,20 @@ async def test_swapping_llm_keeps_selected_retriever_and_sources(
     selected_retriever = FakeRetriever(documents=[build_document()])
 
     def build_selected(
-        *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+        *,
+        bula_id: UUID | None,
+        corpus: tuple[BulaCorpus, ...] | None,
+        k: int,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
     ) -> BaseRetriever:
         return selected_retriever
 
     def build_unselected(
-        *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+        *,
+        bula_id: UUID | None,
+        corpus: tuple[BulaCorpus, ...] | None,
+        k: int,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
     ) -> BaseRetriever:
         raise AssertionError("An unrelated retriever was constructed.")
 
@@ -61,7 +71,9 @@ async def test_swapping_llm_keeps_selected_retriever_and_sources(
             ]
         )
         chain_factory = RAGChainFactory(
-            retriever_factory=factory, llm_builder=lambda: llm
+            source_index=AsyncMock(spec=PublishedEvidenceIndex),
+            retriever_factory=factory,
+            llm_builder=lambda: llm,
         )
         chain = chain_factory.build_chain(bula_id=UUID(int=1), mode=mode)
         result = await chain.ainvoke({"question": "Como usar?"})

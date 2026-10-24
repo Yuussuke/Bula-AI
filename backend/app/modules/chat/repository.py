@@ -4,7 +4,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.chat.models import ChatMessage, ChatRole, ChatSession
+from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, ChatScope
 from app.modules.rag.retrieval_mode import RetrievalMode
 
 MAX_CHAT_SESSION_TITLE_LENGTH = 50
@@ -46,15 +46,17 @@ class ChatRepository:
         self,
         *,
         user_id: int,
-        bula_id: UUID,
+        bula_id: UUID | None,
         first_question: str,
         answer: str,
         retrieval_mode: RetrievalMode,
         source_chunks: list[dict[str, str | float]],
+        scope: ChatScope = ChatScope.BULA,
     ) -> tuple[ChatSession, ChatMessage, ChatMessage]:
         chat_session = ChatSession(
             user_id=user_id,
             bula_id=bula_id,
+            scope=scope.value,
             title=self._extract_title(first_question),
         )
         self.db.add(chat_session)
@@ -194,10 +196,17 @@ class ChatRepository:
         user_id: int,
         limit: int = 20,
         offset: int = 0,
+        scope: ChatScope | None = None,
+        bula_id: UUID | None = None,
     ) -> list[ChatSession]:
+        filters = [ChatSession.user_id == user_id]
+        if scope is not None:
+            filters.append(ChatSession.scope == scope.value)
+        if bula_id is not None:
+            filters.append(ChatSession.bula_id == bula_id)
         statement = (
             select(ChatSession)
-            .where(ChatSession.user_id == user_id)
+            .where(*filters)
             .order_by(ChatSession.created_at.desc(), ChatSession.id.desc())
             .limit(limit)
             .offset(offset)

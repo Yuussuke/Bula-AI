@@ -201,9 +201,14 @@ def get_retriever_strategy_factory(
         )
 
     def build_dense(
-        *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+        *,
+        bula_id: UUID | None,
+        corpus: tuple[BulaCorpus, ...] | None,
+        k: int,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
     ) -> BaseRetriever:
         retriever = DenseBulaRetriever(
+            allowed_bula_ids=allowed_bula_ids,
             bula_id=str(bula_id) if bula_id is not None else None,
             corpus=corpus,
             k=k,
@@ -221,9 +226,15 @@ def get_retriever_strategy_factory(
         )
 
     def build_bm25(
-        *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+        *,
+        bula_id: UUID | None,
+        corpus: tuple[BulaCorpus, ...] | None,
+        k: int,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
     ) -> BaseRetriever:
-        retriever = bm25_factory.build(bula_id=bula_id, corpus=corpus, k=k)
+        retriever = bm25_factory.build(
+            bula_id=bula_id, corpus=corpus, k=k, allowed_bula_ids=allowed_bula_ids
+        )
         if bula_id is None:
             return retriever
         return SectionEvidenceRetriever(
@@ -234,14 +245,20 @@ def get_retriever_strategy_factory(
         )
 
     def build_hybrid(
-        *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+        *,
+        bula_id: UUID | None,
+        corpus: tuple[BulaCorpus, ...] | None,
+        k: int,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
     ) -> BaseRetriever:
         factory = HybridRetrieverFactory(
             qdrant_store=build_vector_store(),
             embeddings=get_embeddings(settings=settings),
             bm25_retriever_factory=bm25_factory,
         )
-        retriever = factory.build(bula_id=bula_id, corpus=corpus, k=k)
+        retriever = factory.build(
+            bula_id=bula_id, corpus=corpus, k=k, allowed_bula_ids=allowed_bula_ids
+        )
         if bula_id is None:
             return retriever
         return SectionEvidenceRetriever(
@@ -265,6 +282,7 @@ def get_rag_chain_factory(
         get_retriever_strategy_factory
     ),
     settings: Settings = Depends(get_settings),
+    source_index: PostgreSQLBM25Index = Depends(get_bm25_index),
 ) -> RAGChainFactory:
     def build_chat_llm() -> BaseChatModel:
         return get_llm(settings=settings)
@@ -272,6 +290,7 @@ def get_rag_chain_factory(
     return RAGChainFactory(
         retriever_factory=retriever_factory,
         llm_builder=build_chat_llm,
+        source_index=source_index,
     )
 
 

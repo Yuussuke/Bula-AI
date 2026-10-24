@@ -35,6 +35,12 @@ from app.modules.rag.section_evidence_retriever import (
 )
 from app.modules.rag.section_titles import is_administrative_section
 from app.modules.rag.grounded_generation import GroundedAnswerGenerator
+from app.modules.bulas.models import BulaCorpus
+from app.modules.rag.published_evidence import (
+    PublishedEvidenceIndex,
+    PublishedEvidenceRetriever,
+    document_identity,
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -111,9 +117,29 @@ class RAGChainFactory:
         *,
         retriever_factory: RetrieverStrategyFactory,
         llm_builder: Callable[[], BaseChatModel],
+        source_index: PublishedEvidenceIndex,
     ) -> None:
         self.retriever_factory = retriever_factory
         self.llm_builder = llm_builder
+        self.source_index = source_index
+
+    def build_cross_bula_chain(
+        self, *, mode: RetrievalMode, sources: dict[UUID, dict[str, str]]
+    ) -> Runnable[dict[str, object], dict[str, object]]:
+        retriever = self.retriever_factory.build(
+            mode=mode,
+            bula_id=None,
+            corpus=(BulaCorpus.SYSTEM,),
+            allowed_bula_ids=tuple(sources),
+        )
+        return build_grounded_rag_chain(
+            retriever=PublishedEvidenceRetriever(
+                wrapped_retriever=retriever,
+                source_index=self.source_index,
+                sources=sources,
+            ),
+            llm=self.llm_builder(),
+        )
 
     def build_chain(
         self,
@@ -185,8 +211,9 @@ def _build_diagnostic_id(inputs: dict[str, object]) -> str:
 
 
 def build_source_chunks(documents: list[Document]) -> list[dict[str, object]]:
-    return [
-        {
+    source_chunks: list[dict[str, object]] = []
+    for document in documents:
+        source_chunk: dict[str, object] = {
             "section_title": _get_metadata_text(
                 document=document,
                 key="section_title",
@@ -195,8 +222,20 @@ def build_source_chunks(documents: list[Document]) -> list[dict[str, object]]:
             "chunk_text": document.page_content,
             "relevance_score": _get_relevance_score(document=document),
         }
-        for document in documents
-    ]
+        if document.metadata.get("cross_bula"):
+            for key in (
+                "chunk_id",
+                "bula_id",
+                "drug_name",
+                "manufacturer",
+                "presentation",
+                "strength",
+                "source_url",
+            ):
+                if key in document.metadata:
+                    source_chunk[key] = document.metadata[key]
+        source_chunks.append(source_chunk)
+    return source_chunks
 
 
 def _build_retrieval_query(inputs: dict[str, object]) -> str:
@@ -451,7 +490,7 @@ def _build_chain_output(inputs: dict[str, object]) -> dict[str, object]:
             "question": str(inputs["question"]),
             "chat_history": chat_history,
             "context": "\n\n".join(
-                f"[{source_numbers[id(unit.document)]}] Seção: {unit.section_title}\n{unit.text}"
+                f"[{source_numbers[id(unit.document)]}] {document_identity(unit.document)}Seção: {unit.section_title}\n{unit.text}"
                 for unit in selected_units
             ),
             "limitation": assessment.limitation.value

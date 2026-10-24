@@ -1,4 +1,5 @@
 from datetime import datetime
+from collections.abc import Sequence
 from uuid import UUID
 
 from sqlalchemy import Select, and_, or_, select
@@ -294,6 +295,18 @@ class BulaRepository:
         statement = self._published_system_bula_statement().where(Bula.id == bula_id)
         result = await self.db.execute(statement)
         return result.unique().scalar_one_or_none()
+
+    async def list_queryable_system_bulas(
+        self, *, bula_ids: Sequence[UUID] | None = None
+    ) -> list[Bula]:
+        """Published source scope; optional IDs only narrow eligible documents."""
+        statement = self._published_system_bula_statement().order_by(Bula.id)
+        if bula_ids is not None:
+            statement = statement.where(Bula.id.in_(bula_ids))
+        result = await self.db.execute(
+            statement.execution_options(populate_existing=True)
+        )
+        return list(result.unique().scalars().all())
 
     def _published_system_bula_statement(self) -> Select[tuple[Bula]]:
         return (

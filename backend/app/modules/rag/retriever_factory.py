@@ -13,7 +13,12 @@ from app.modules.rag.retrieval_limits import DEFAULT_RETRIEVAL_K
 
 class RetrieverBuilder(Protocol):
     def __call__(
-        self, *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+        self,
+        *,
+        bula_id: UUID | None,
+        corpus: tuple[BulaCorpus, ...] | None,
+        k: int,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
     ) -> BaseRetriever: ...
 
 
@@ -29,6 +34,7 @@ class RetrieverStrategyFactory:
         mode: RetrievalMode,
         bula_id: UUID | None,
         corpus: Sequence[BulaCorpus] | None = None,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
         k: int = DEFAULT_RETRIEVAL_K,
     ) -> BaseRetriever:
         if bula_id is not None and not isinstance(bula_id, UUID):
@@ -40,4 +46,6 @@ class RetrieverStrategyFactory:
         corpus_scope = (
             tuple(BulaCorpus(value) for value in corpus) if corpus is not None else None
         )
-        return self._builders[mode](bula_id=bula_id, corpus=corpus_scope, k=k)
+        return self._builders[mode](
+            bula_id=bula_id, corpus=corpus_scope, k=k, allowed_bula_ids=allowed_bula_ids
+        )

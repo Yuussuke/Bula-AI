@@ -35,6 +35,7 @@ class FixedEmbeddings(LCEmbeddings):
 
 @pytest.mark.anyio
 @pytest.mark.parametrize("mode", list(RetrievalMode))
+@pytest.mark.parametrize("allowed_bula_ids", [None, (UUID(int=2),), ()])
 @pytest.mark.parametrize(
     ("bula_id", "corpus", "expected_ids"),
     [
@@ -47,6 +48,7 @@ class FixedEmbeddings(LCEmbeddings):
 )
 async def test_factory_results_respect_bula_and_corpus_intersection(
     mode: RetrievalMode,
+    allowed_bula_ids: tuple[UUID, ...] | None,
     bula_id: UUID | None,
     corpus: tuple[BulaCorpus, ...] | None,
     expected_ids: set[str],
@@ -75,6 +77,7 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
         k: int,
         bula_id: UUID | None,
         corpus: tuple[BulaCorpus, ...] | None,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
         include_administrative_sections: bool,
         include_document_metadata: bool,
     ) -> list[BM25SearchResult]:
@@ -83,6 +86,7 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
             for result in source_results
             if (bula_id is None or result.bula_id == bula_id)
             and (corpus is None or result.corpus in corpus)
+            and (allowed_bula_ids is None or result.bula_id in allowed_bula_ids)
         ][:k]
 
     lexical_index = AsyncMock(spec=BM25SearchIndex)
@@ -128,10 +132,20 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
             bm25_factory=BM25RetrieverFactory(index=lexical_index),
             section_index=section_index,
         )
-        retriever = factory.build(mode=mode, bula_id=bula_id, corpus=corpus, k=4)
+        retriever = factory.build(
+            mode=mode,
+            bula_id=bula_id,
+            corpus=corpus,
+            k=4,
+            allowed_bula_ids=allowed_bula_ids,
+        )
         question = "Tenho alergia?" if bula_id is None else "Informações da fonte?"
         documents = await retriever.ainvoke(question)
 
+        if allowed_bula_ids is not None:
+            expected_ids = expected_ids & {
+                f"chunk-{bula_id.int}" for bula_id in allowed_bula_ids
+            }
         assert {document.metadata["chunk_id"] for document in documents} == expected_ids
         for document in documents:
             source = next(
@@ -148,7 +162,7 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
                     f"Fabricante {source.bula_id.int}"
                 )
         section_index.find_section_evidence.assert_not_awaited()
-        if mode == RetrievalMode.DENSE or corpus == ():
+        if mode == RetrievalMode.DENSE or corpus == () or allowed_bula_ids == ():
             lexical_index.search.assert_not_awaited()
         else:
             lexical_index.search.assert_awaited_once_with(
@@ -158,6 +172,7 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
                 corpus=corpus,
                 include_administrative_sections=False,
                 include_document_metadata=False,
+                allowed_bula_ids=allowed_bula_ids,
             )
     finally:
         await client.close()

@@ -10,6 +10,7 @@ from enum import StrEnum
 
 from langchain_core.documents import Document
 from app.modules.rag.source_content import without_front_matter
+from app.modules.rag.published_evidence import document_identity
 
 
 HEADING_PATTERN = re.compile(r"^\s{0,3}#{1,6}\s+")
@@ -56,7 +57,7 @@ def build_evidence_units(documents: list[Document]) -> list[EvidenceUnit]:
 def format_evidence_units(units: list[EvidenceUnit]) -> str:
     return "\n\n".join(
         f"[{unit.unit_id}] Fonte {unit.source_number}; "
-        f"seção: {unit.section_title or 'Não identificada'}; "
+        f"{document_identity(unit.document)}seção: {unit.section_title or 'Não identificada'}; "
         f"tipo: {unit.kind.value}\n{unit.text}"
         for unit in units
     )

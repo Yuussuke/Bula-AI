@@ -28,6 +28,7 @@ class BM25SearchIndex(Protocol):
         k: int = 10,
         bula_id: UUID | None = None,
         corpus: Sequence[BulaCorpus] | None = None,
+        allowed_bula_ids: Sequence[UUID] | None = None,
         include_administrative_sections: bool = True,
         include_document_metadata: bool = True,
     ) -> list[BM25SearchResult]: ...
@@ -49,6 +50,7 @@ class BM25Retriever(BaseRetriever):
     k: int = Field(default=DEFAULT_RETRIEVAL_K, ge=1, le=100)
     bula_id: UUID | None = None
     corpus: tuple[BulaCorpus, ...] | None = None
+    allowed_bula_ids: tuple[UUID, ...] | None = None
     include_administrative_sections: bool = False
     include_document_metadata: bool = False
 
@@ -60,7 +62,7 @@ class BM25Retriever(BaseRetriever):
         *,
         run_manager: AsyncCallbackManagerForRetrieverRun,
     ) -> list[Document]:
-        if not query.strip() or self.corpus == ():
+        if not query.strip() or self.corpus == () or self.allowed_bula_ids == ():
             return []
 
         results = await self.index.search(
@@ -70,6 +72,7 @@ class BM25Retriever(BaseRetriever):
             corpus=self.corpus,
             include_administrative_sections=self.include_administrative_sections,
             include_document_metadata=self.include_document_metadata,
+            allowed_bula_ids=self.allowed_bula_ids,
         )
         # Preserve the index ranking, original source text, and chunk identities.
         return [self._to_document(result) for result in results]
@@ -112,6 +115,7 @@ class BM25RetrieverFactory:
         *,
         bula_id: UUID | None,
         corpus: Sequence[BulaCorpus] | None = None,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
         k: int = DEFAULT_RETRIEVAL_K,
         include_administrative_sections: bool = False,
         include_document_metadata: bool = False,
@@ -120,6 +124,7 @@ class BM25RetrieverFactory:
             index=self.index,
             bula_id=bula_id,
             corpus=tuple(corpus) if corpus is not None else None,
+            allowed_bula_ids=allowed_bula_ids,
             k=k,
             include_administrative_sections=include_administrative_sections,
             include_document_metadata=include_document_metadata,
