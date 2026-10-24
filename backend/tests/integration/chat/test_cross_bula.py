@@ -19,6 +19,7 @@ from app.modules.bulas.models import (
     SystemBulaPublication,
     SystemBulaPublicationState,
 )
+from app.modules.bulas.repository import BulaRepository
 from app.modules.chat.models import ChatMessage, ChatSession, ChatScope
 from app.modules.rag.bm25_index import PostgreSQLBM25Index
 from app.modules.rag.chain import RAGChainFactory
@@ -148,6 +149,12 @@ async def test_cross_bula_keeps_authorized_sources_and_history(
         ),
     ]
     scopes: list[tuple[UUID, ...]] = []
+    repository = BulaRepository(db_session)
+    assert await repository.list_queryable_system_bulas(bula_ids=[]) == []
+    selected_documents = await repository.list_queryable_system_bulas(
+        bula_ids=[first.id, shared.id]
+    )
+    assert [bula.id for bula in selected_documents] == [first.id]
     install_factory(
         db_session,
         documents,
@@ -317,6 +324,13 @@ async def test_general_chat_requires_auth_and_rejects_client_scope(
             headers=build_auth_headers(token),
         )
         assert response.status_code == 422
+
+    response = await client.get(
+        "/api/v1/chat/sessions?scope=cross_bula&bula_id=11111111-1111-4111-8111-111111111111",
+        headers=build_auth_headers(token),
+    )
+    assert response.status_code == 422
+    assert "Conversas gerais" in response.json()["detail"]
 
 
 @pytest.mark.anyio

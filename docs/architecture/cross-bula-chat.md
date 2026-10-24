@@ -15,6 +15,22 @@ Publication metadata is checked again before saving; a change returns HTTP 409
 without saving the answer. This is request-time validation, not a distributed
 transaction across publication, vector retrieval and provider execution.
 
+The chain factory requires its canonical source index at composition time.
+Retriever builders always accept the same `allowed_bula_ids` argument, including
+`None` for an unrestricted internal builder (not a public authorization bypass).
+Nested retrieval callbacks retain their parent trace. Document labels use
+Portuguese; empty identities add no punctuation. Explicit chat route errors use Portuguese,
+and incompatible `cross_bula`/`bula_id` history filters return 422.
+
+Publication revalidation queries only the selected document IDs; the initial
+allowlist still enumerates the published corpus. Larger-corpus authorization
+optimization and citation-history normalization remain deferred. `retrieval_mode`
+reports the requested strategy, not proof it ran: the empty-corpus fast path logs
+`retrieval_status=not_run` and `requested_mode`. Abstention without sources does
+not revalidate publications because it presents no document-backed claims.
+The migration is backward compatible but not a universal zero-downtime promise:
+PostgreSQL constraint validation can acquire locks and should be scheduled.
+
 Responses retain numbered `source_chunks` and add deduplicated `source_bulas`.
 New general-chat sources include chunk/document IDs, drug, manufacturer,
 presentation, strength and canonical source URL. Metadata identifies the source;

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from uuid import UUID
+import structlog
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
 from pydantic import ValidationError, HttpUrl
@@ -23,6 +24,10 @@ class ChatChainOutputError(RuntimeError):
     """Raised when a RAG chain returns an invalid shape."""
 
 
+class PublishedSourceIntegrityError(RuntimeError):
+    """Published-document provenance violates a repository invariant."""
+
+
 class ChatSessionNotFoundError(Exception):
     """Raised when a chat session is unavailable to the current user."""
 
@@ -41,6 +46,7 @@ class PublishedSourcesChangedError(Exception):
 
 MAX_PRIOR_CHAT_TURNS = 10
 MAX_PRIOR_CHAT_MESSAGES = MAX_PRIOR_CHAT_TURNS * 2
+logger = structlog.get_logger(__name__)
 
 
 class ChatService:
@@ -78,7 +84,9 @@ class ChatService:
     def _published_source_metadata(self, bula: Bula) -> dict[str, str]:
         publication = bula.system_publication
         if publication is None:
-            raise ChatChainOutputError("Published source is missing its provenance.")
+            raise PublishedSourceIntegrityError(
+                "Published source is missing its provenance."
+            )
         return {
             "drug_name": bula.drug_name,
             "manufacturer": publication.manufacturer,
@@ -94,6 +102,11 @@ class ChatService:
         bulas = await self.bula_repository.list_queryable_system_bulas()
         sources = {bula.id: self._published_source_metadata(bula) for bula in bulas}
         if not sources:
+            logger.info(
+                "rag_cross_bula_empty_corpus",
+                retrieval_status="not_run",
+                requested_mode=payload.mode.value,
+            )
             return NO_CONTEXT_MESSAGE, []
         chain = self.chain_factory.build_cross_bula_chain(
             mode=payload.mode, sources=sources
@@ -117,7 +130,12 @@ class ChatService:
                     "Cross-bula response contains inconsistent source metadata."
                 )
         if source_chunks:
-            current_bulas = await self.bula_repository.list_queryable_system_bulas()
+            selected_bula_ids = {
+                chunk.bula_id for chunk in source_chunks if chunk.bula_id is not None
+            }
+            current_bulas = await self.bula_repository.list_queryable_system_bulas(
+                bula_ids=sorted(selected_bula_ids)
+            )
             current_sources = {
                 bula.id: self._published_source_metadata(bula) for bula in current_bulas
             }
