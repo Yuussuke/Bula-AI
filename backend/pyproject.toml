@@ -35,6 +35,20 @@ dependencies = [
     "uvicorn[standard]>=0.46.0",
 ]
 
+[project.optional-dependencies]
+reranker = [
+    "torch==2.9.1",
+    "transformers==4.57.1",
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu128" }
+
 [dependency-groups]
 dev = [
     "aiosqlite>=0.22.1",
@@ -62,6 +76,11 @@ warn_return_any = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 pretty = true
+
+[[tool.mypy.overrides]]
+module = ["torch", "torch.*", "transformers", "transformers.*"]
+# These optional CUDA dependencies are absent from lightweight CI environments.
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 norecursedirs = [
