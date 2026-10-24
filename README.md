@@ -89,7 +89,8 @@ flowchart LR
 The [evaluation index](docs/evaluation/README.md) links the completed
 [120-need / 240-output evaluation](docs/evaluation/final/README.md), results,
 methodological limitations and reproduction requirements. The evaluated
-RRF-B + BGE runtime is documented separately from production integration;
+RRF-B + BGE evaluation is preserved independently of the subsequent
+[runtime integration](docs/architecture/rrfb-bge-runtime.md);
 technical acceptance and documentary assessment are not clinical certification.
 
 The project is developed with criteria that support both thesis evaluation and engineering quality:
@@ -460,7 +461,7 @@ chunks without reading the PDF.
 
 For follow-up turns, the retrieval query includes the medication name and the
 previous user question when the new question is context-dependent. The dense
-retriever over-fetches candidates but returns at most four evidence-bearing
+retriever over-fetches candidates but returns at most ten evidence-bearing
 chunks; Markdown headings without body content are not sent to the answer
 model or exposed as sources. No fixed similarity threshold is applied before
 the retrieval evaluation has calibrated one for this corpus.
@@ -626,7 +627,8 @@ uv run pytest -q tests/integration/rag/test_bm25_index.py
 ### Scoped hybrid retriever
 
 `HybridRetrieverFactory` builds a retrieval pipeline for an already authorized
-bula or explicit corpus scope. Both dense and BM25 receive the same filters and fetch
+bula or explicit corpus scope. In its RRF-only `build` mode, dense and BM25
+receive the same filters and fetch
 12 eligible candidates per branch for the default final `k = 10`; dense fetches
 36 raw points before eligibility filtering. Final K and candidate pools are
 independent: an explicit `candidate_k` can change the branch pool (at most 100,
@@ -650,8 +652,9 @@ retrievers can explicitly set `include_administrative_sections=True` for audits.
 The dense candidate window can still be exhausted; this is not an exhaustive
 search or a relevance guarantee.
 
-`EnrichingRetriever` performs one batched Qdrant payload lookup after final
-top-k selection. It fills only allowlisted source metadata such as medication,
+`EnrichingRetriever` performs one batched Qdrant payload lookup on fused results
+(the complete candidate union before BGE in hybrid chat). It fills only
+allowlisted source metadata such as medication,
 manufacturer and section. Existing values are never silently overwritten. A
 missing payload leaves the fused document usable, while identity, source-text or
 metadata disagreements fail explicitly because they indicate index drift.
@@ -684,8 +687,9 @@ returns no documents.
 Dense/hybrid factories reject a call with neither filter. These are internal
 components, not access controls: callers must authorize the scope, and `system`
 does not mean `published`. Corpus-only searches must not be exposed through an
-endpoint without publication/ownership authorization. The current chat still
-requires an authorized individual bula; this change does not add cross-bula chat.
+endpoint without publication/ownership authorization. General chat applies the
+published-document allowlist and canonical validation described in
+[the cross-bula contract](docs/architecture/cross-bula-chat.md).
 
 For bula-scoped chat, every mode retains the existing bounded PostgreSQL
 safety-section supplement (up to two chunks for allergy/contraindication queries).
@@ -694,8 +698,12 @@ final source of chat evidence. Corpus-only factory searches do not apply this
 single-bula supplement. Evaluate raw retrievers separately when comparing dense,
 BM25 and RRF; track the safety supplement separately in end-to-end evaluations.
 
-This component is used by the chat's default hybrid strategy. The retrieval
-component itself requires no migration, backfill, re-embedding or PDF
+The default hybrid chat uses RRF-B (`build_candidates`: 20 candidates per branch,
+60 dense raw points, full union up to 40), canonical validation for cross-bula,
+and BGE reranking to Top-10. Setup, pinned assets, Python/CUDA versions and
+technical failures are documented in
+[the runtime guide](docs/architecture/rrfb-bge-runtime.md).
+This retrieval integration requires no migration, backfill, re-embedding or PDF
 reprocessing. Existing bulas still need the previously documented lexical
 backfill if they predate the PostgreSQL index. Its consistency contracts are in
 [the hybrid retrieval decision](docs/decisions/2026-09-22-hybrid-retrieval-rrf.md).
@@ -731,8 +739,9 @@ construction, citation processing and independently injected LLM. An error in
 retrieval or generation propagates without switching strategies or persisting
 a partial conversation turn.
 
-`relevance_score` uses the selected method's scale (dense similarity, BM25 or
-RRF), not a confidence probability. Scores may order sources within one response
+`relevance_score` uses the selected method's scale (dense similarity, BM25,
+BGE raw logits in hybrid chat, or RRF when BGE is explicitly disabled), not a
+confidence probability. Scores may order sources within one response
 but must not be compared across modes. A section-supplemented source has score
 `0.0` because the section lookup is unranked; this does not mean the source is
 irrelevant. The retrieval query uses the patient's

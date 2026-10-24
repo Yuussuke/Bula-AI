@@ -59,10 +59,50 @@ class HybridRetrieverFactory:
             candidate_k = max(k, DEFAULT_HYBRID_CANDIDATE_K)
         if candidate_k < k or candidate_k > MAX_HYBRID_CANDIDATES:
             raise ValueError("candidate_k must be >= k and <= 100.")
+        return self._build(
+            bula_id=bula_id,
+            corpus=corpus_scope,
+            allowed_bula_ids=allowed_bula_ids,
+            candidate_k=candidate_k,
+            result_k=k,
+        )
+
+    def build_candidates(
+        self,
+        *,
+        bula_id: UUID | None,
+        corpus: Sequence[BulaCorpus] | None = None,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
+    ) -> EnrichingRetriever:
+        """RRF-B: 20 eligible candidates per branch, retaining the full union."""
+        if bula_id is not None and not isinstance(bula_id, UUID):
+            raise ValueError("A bula ID must be a UUID.")
+        if bula_id is None and corpus is None:
+            raise ValueError("A bula UUID or explicit corpus scope is required.")
+        corpus_scope = (
+            tuple(BulaCorpus(value) for value in corpus) if corpus is not None else None
+        )
+        return self._build(
+            bula_id=bula_id,
+            corpus=corpus_scope,
+            allowed_bula_ids=allowed_bula_ids,
+            candidate_k=20,
+            result_k=40,
+        )
+
+    def _build(
+        self,
+        *,
+        bula_id: UUID | None,
+        corpus: tuple[BulaCorpus, ...] | None,
+        allowed_bula_ids: tuple[UUID, ...] | None,
+        candidate_k: int,
+        result_k: int,
+    ) -> EnrichingRetriever:
         dense_retriever = DenseBulaRetriever(
             allowed_bula_ids=allowed_bula_ids,
             bula_id=str(bula_id) if bula_id is not None else None,
-            corpus=corpus_scope,
+            corpus=corpus,
             k=candidate_k,
             candidate_limit=candidate_k * DEFAULT_CANDIDATE_MULTIPLIER,
             qdrant_store=self.qdrant_store,
@@ -71,13 +111,13 @@ class HybridRetrieverFactory:
         bm25_retriever = self.bm25_retriever_factory.build(
             allowed_bula_ids=allowed_bula_ids,
             bula_id=bula_id,
-            corpus=corpus_scope,
+            corpus=corpus,
             k=candidate_k,
         )
         hybrid_retriever = HybridRetriever.from_retrievers(
             dense_retriever=dense_retriever,
             bm25_retriever=bm25_retriever,
-            k=k,
+            k=result_k,
         )
         return EnrichingRetriever(
             wrapped_retriever=hybrid_retriever,

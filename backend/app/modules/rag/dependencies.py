@@ -38,7 +38,7 @@ from app.modules.rag.retrieval_limits import (
 )
 from app.modules.rag.retriever_factory import RetrieverStrategyFactory
 from app.modules.rag.schemas import ChunkingConfig
-from app.modules.rag.section_evidence_retriever import SectionEvidenceRetriever
+from app.modules.rag.reranker import ResidentReranker, RerankerError
 from app.modules.rag.service import RAGIngestionService
 from app.modules.rag.token_estimator import build_token_estimator
 from app.modules.storage.client import ObjectStoreClient
@@ -216,14 +216,7 @@ def get_retriever_strategy_factory(
             qdrant_store=build_vector_store(),
             embeddings=get_embeddings(settings=settings),
         )
-        if bula_id is None:
-            return retriever
-        return SectionEvidenceRetriever(
-            wrapped_retriever=retriever,
-            index=section_index,
-            bula_id=bula_id,
-            corpus=corpus,
-        )
+        return retriever
 
     def build_bm25(
         *,
@@ -235,14 +228,7 @@ def get_retriever_strategy_factory(
         retriever = bm25_factory.build(
             bula_id=bula_id, corpus=corpus, k=k, allowed_bula_ids=allowed_bula_ids
         )
-        if bula_id is None:
-            return retriever
-        return SectionEvidenceRetriever(
-            wrapped_retriever=retriever,
-            index=section_index,
-            bula_id=bula_id,
-            corpus=corpus,
-        )
+        return retriever
 
     def build_hybrid(
         *,
@@ -256,24 +242,30 @@ def get_retriever_strategy_factory(
             embeddings=get_embeddings(settings=settings),
             bm25_retriever_factory=bm25_factory,
         )
-        retriever = factory.build(
+        if settings.reranker.enabled:
+            return factory.build_candidates(
+                bula_id=bula_id, corpus=corpus, allowed_bula_ids=allowed_bula_ids
+            )
+        return factory.build(
             bula_id=bula_id, corpus=corpus, k=k, allowed_bula_ids=allowed_bula_ids
         )
-        if bula_id is None:
-            return retriever
-        return SectionEvidenceRetriever(
-            wrapped_retriever=retriever,
-            index=section_index,
-            bula_id=bula_id,
-            corpus=corpus,
-        )
+
+    def require_reranker() -> ResidentReranker:
+        reranker = getattr(request.app.state, "reranker", None)
+        if not isinstance(reranker, ResidentReranker):
+            raise RerankerError(
+                "Resident reranker was not initialized by the API lifespan."
+            )
+        return reranker
 
     return RetrieverStrategyFactory(
+        hybrid_reranker=require_reranker if settings.reranker.enabled else None,
+        section_index=section_index,
         builders={
             RetrievalMode.DENSE: build_dense,
             RetrievalMode.BM25: build_bm25,
             RetrievalMode.HYBRID: build_hybrid,
-        }
+        },
     )
 
 

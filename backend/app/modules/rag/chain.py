@@ -126,18 +126,22 @@ class RAGChainFactory:
     def build_cross_bula_chain(
         self, *, mode: RetrievalMode, sources: dict[UUID, dict[str, str]]
     ) -> Runnable[dict[str, object], dict[str, object]]:
+        def validate_candidates(retriever: BaseRetriever) -> BaseRetriever:
+            return PublishedEvidenceRetriever(
+                wrapped_retriever=retriever,
+                source_index=self.source_index,
+                sources=sources,
+            )
+
         retriever = self.retriever_factory.build(
             mode=mode,
             bula_id=None,
             corpus=(BulaCorpus.SYSTEM,),
             allowed_bula_ids=tuple(sources),
+            validate_candidates=validate_candidates,
         )
         return build_grounded_rag_chain(
-            retriever=PublishedEvidenceRetriever(
-                wrapped_retriever=retriever,
-                source_index=self.source_index,
-                sources=sources,
-            ),
+            retriever=retriever,
             llm=self.llm_builder(),
         )
 
