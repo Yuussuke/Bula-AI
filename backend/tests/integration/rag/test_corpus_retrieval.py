@@ -172,11 +172,7 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
                 corpus=corpus,
                 include_administrative_sections=False,
                 include_document_metadata=False,
-                **(
-                    {"allowed_bula_ids": allowed_bula_ids}
-                    if allowed_bula_ids is not None
-                    else {}
-                ),
+                allowed_bula_ids=allowed_bula_ids,
             )
     finally:
         await client.close()

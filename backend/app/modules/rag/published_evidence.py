@@ -38,7 +38,9 @@ class PublishedEvidenceRetriever(BaseRetriever):
     ) -> list[Document]:
         if not self.sources:
             return []
-        documents = await self.wrapped_retriever.ainvoke(query)
+        documents = await self.wrapped_retriever.ainvoke(
+            query, config={"callbacks": run_manager.get_child()}
+        )
         chunks = await self.source_index.get_source_chunks(
             chunk_ids=[
                 str(document.metadata.get("chunk_id", "")) for document in documents
@@ -90,12 +92,15 @@ def document_identity(document: Document) -> str:
     """Source labels are identification, never additional medical evidence."""
     if not document.metadata.get("cross_bula"):
         return ""
-    fields = ("drug_name", "manufacturer", "presentation", "strength")
-    return (
-        "; ".join(
-            f"{key}: {document.metadata[key]}"
-            for key in fields
-            if document.metadata.get(key)
-        )
-        + "; "
+    labels = {
+        "drug_name": "medicamento",
+        "manufacturer": "fabricante",
+        "presentation": "apresentação",
+        "strength": "concentração",
+    }
+    identity = "; ".join(
+        f"{label}: {document.metadata[key]}"
+        for key, label in labels.items()
+        if document.metadata.get(key)
     )
+    return f"{identity}; " if identity else ""

@@ -131,6 +131,7 @@ async def test_strategy_composition_uses_only_selected_stores_and_preserves_scop
             corpus=None,
             include_administrative_sections=False,
             include_document_metadata=False,
+            allowed_bula_ids=None,
         )
     if mode == RetrievalMode.BM25:
         client.query_points.assert_not_awaited()

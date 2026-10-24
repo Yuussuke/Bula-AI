@@ -46,11 +46,6 @@ class RetrieverStrategyFactory:
         corpus_scope = (
             tuple(BulaCorpus(value) for value in corpus) if corpus is not None else None
         )
-        if allowed_bula_ids is not None:
-            return self._builders[mode](
-                bula_id=bula_id,
-                corpus=corpus_scope,
-                k=k,
-                allowed_bula_ids=allowed_bula_ids,
-            )
-        return self._builders[mode](bula_id=bula_id, corpus=corpus_scope, k=k)
+        return self._builders[mode](
+            bula_id=bula_id, corpus=corpus_scope, k=k, allowed_bula_ids=allowed_bula_ids
+        )

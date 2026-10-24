@@ -117,7 +117,7 @@ class RAGChainFactory:
         *,
         retriever_factory: RetrieverStrategyFactory,
         llm_builder: Callable[[], BaseChatModel],
-        source_index: PublishedEvidenceIndex | None = None,
+        source_index: PublishedEvidenceIndex,
     ) -> None:
         self.retriever_factory = retriever_factory
         self.llm_builder = llm_builder
@@ -126,8 +126,6 @@ class RAGChainFactory:
     def build_cross_bula_chain(
         self, *, mode: RetrievalMode, sources: dict[UUID, dict[str, str]]
     ) -> Runnable[dict[str, object], dict[str, object]]:
-        if self.source_index is None:
-            raise RuntimeError("Cross-bula source validation is not configured.")
         retriever = self.retriever_factory.build(
             mode=mode,
             bula_id=None,

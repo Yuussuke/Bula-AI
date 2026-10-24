@@ -29,6 +29,7 @@ class StubSearchIndex:
         k: int = 10,
         bula_id: UUID | None = None,
         corpus: Sequence[BulaCorpus] | None = None,
+        allowed_bula_ids: Sequence[UUID] | None = None,
         include_administrative_sections: bool = True,
         include_document_metadata: bool = True,
     ) -> list[BM25SearchResult]:

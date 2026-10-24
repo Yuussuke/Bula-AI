@@ -12,6 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from datetime import UTC, datetime
 from uuid import UUID
 from uuid import uuid4
+from unittest.mock import AsyncMock
+from app.modules.rag.published_evidence import PublishedEvidenceIndex
 
 from app.main import app
 from app.modules.auth.models import User
@@ -59,6 +61,7 @@ def build_mode_evidence_retriever(
     bula_id: UUID | None,
     corpus: tuple[BulaCorpus, ...] | None,
     k: int,
+    allowed_bula_ids: tuple[UUID, ...] | None = None,
 ) -> BaseRetriever:
     assert bula_id is not None
     assert corpus is None
@@ -73,6 +76,7 @@ def override_real_chain_factory() -> None:
         }
     )
     chain_factory = RAGChainFactory(
+        source_index=AsyncMock(spec=PublishedEvidenceIndex),
         retriever_factory=strategy_factory,
         llm_builder=lambda: FakeListChatModel(
             responses=[
@@ -347,8 +351,8 @@ async def test_direct_ask_returns_501_until_rag_is_available(
 
     assert response.status_code == 501
     assert response.json()["detail"] == (
-        "RAG chat is not yet available on this endpoint. "
-        "Use /api/v1/chat/sessions/{bula_id}/ask."
+        "O chat RAG não está disponível neste endpoint. "
+        "Utilize /api/v1/chat/ask ou /api/v1/chat/sessions/{bula_id}/ask."
     )
 
 

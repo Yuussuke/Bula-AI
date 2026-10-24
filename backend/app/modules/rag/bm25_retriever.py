@@ -65,11 +65,6 @@ class BM25Retriever(BaseRetriever):
         if not query.strip() or self.corpus == () or self.allowed_bula_ids == ():
             return []
 
-        scope_options = (
-            {"allowed_bula_ids": self.allowed_bula_ids}
-            if self.allowed_bula_ids is not None
-            else {}
-        )
         results = await self.index.search(
             query,
             k=self.k,
@@ -77,7 +72,7 @@ class BM25Retriever(BaseRetriever):
             corpus=self.corpus,
             include_administrative_sections=self.include_administrative_sections,
             include_document_metadata=self.include_document_metadata,
-            **scope_options,
+            allowed_bula_ids=self.allowed_bula_ids,
         )
         # Preserve the index ranking, original source text, and chunk identities.
         return [self._to_document(result) for result in results]

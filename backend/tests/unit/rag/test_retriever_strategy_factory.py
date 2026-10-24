@@ -33,7 +33,12 @@ class RecordingBuilder:
         self.is_built = False
 
     def __call__(
-        self, *, bula_id: UUID | None, corpus: tuple[BulaCorpus, ...] | None, k: int
+        self,
+        *,
+        bula_id: UUID | None,
+        corpus: tuple[BulaCorpus, ...] | None,
+        k: int,
+        allowed_bula_ids: tuple[UUID, ...] | None = None,
     ) -> BaseRetriever:
         self.is_built = True
         return StrategyRetriever(mode=self.mode, bula_id=bula_id, corpus=corpus, k=k)
