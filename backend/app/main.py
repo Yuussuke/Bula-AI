@@ -2,8 +2,11 @@ from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from typing import cast
 
+import structlog
+
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
 from slowapi.extension import _rate_limit_exceeded_handler
 from slowapi.middleware import SlowAPIMiddleware
@@ -19,30 +22,66 @@ from app.core.request_logging import RequestLoggingMiddleware
 from app.modules.auth.router import router as auth_router
 from app.modules.bulas.router import router as bulas_router
 from app.modules.chat.router import router as chat_router
+from app.modules.rag.bge_engine import BGEEngine
 from app.modules.rag.qdrant_client import (
     QDRANT_CLIENT_STATE_KEY,
     create_qdrant_client,
 )
+from app.modules.rag.reranker import ResidentReranker, RerankerError
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     pgq_pool = None
     qdrant_client = None
+    reranker = (
+        ResidentReranker(
+            load_scorer=lambda: BGEEngine(settings.reranker.model_path),
+            capacity=settings.reranker.capacity,
+            timeout_seconds=settings.reranker.timeout_seconds,
+        )
+        if settings.reranker.enabled
+        else None
+    )
+    app.state.reranker = reranker
 
     try:
         pgq_pool, pgq_queries = await create_pgq_queries(settings.database_url)
         setattr(app.state, PGQ_QUERIES_STATE_KEY, pgq_queries)
         qdrant_client = create_qdrant_client(settings=settings)
         setattr(app.state, QDRANT_CLIENT_STATE_KEY, qdrant_client)
+        if reranker is not None:
+            try:
+                await reranker.warmup()
+            except RerankerError:
+                # Dense/BM25 and health remain available. Hybrid returns 503,
+                # never an unannounced RRF-only answer or documentary abstention.
+                structlog.get_logger(__name__).error(
+                    "rag_reranker_unavailable", exc_info=True
+                )
         yield
     finally:
+        if reranker is not None:
+            await reranker.close()
         # The FastAPI lifespan owns the shared Qdrant client and closes it on shutdown.
         if qdrant_client is not None:
             await qdrant_client.close()
         if pgq_pool is not None:
             await pgq_pool.close()
         await close_engine()
+
+
+async def reranker_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    # Technical failure is never converted into documentary abstention.
+    structlog.get_logger(__name__).error(
+        "rag_reranker_failed", path=request.url.path, error=str(exc), exc_info=True
+    )
+    return JSONResponse(
+        status_code=503,
+        content={
+            "detail": "A busca híbrida está temporariamente indisponível. Tente novamente mais tarde."
+        },
+    )
 
 
 def rate_limit_exceeded_handler(request: Request, exc: Exception) -> Response:
@@ -69,6 +108,7 @@ def create_app() -> FastAPI:
     )
     app.add_exception_handler(RateLimitExceeded, rate_limit_exceeded_handler)
     app.add_exception_handler(Exception, global_exception_handler)
+    app.add_exception_handler(RerankerError, reranker_exception_handler)
     app.add_middleware(RequestLoggingMiddleware)
     app.add_middleware(CorrelationIdMiddleware)
 

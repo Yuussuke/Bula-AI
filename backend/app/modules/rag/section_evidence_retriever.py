@@ -88,7 +88,9 @@ class SectionEvidenceRetriever(BaseRetriever):
         *,
         run_manager: AsyncCallbackManagerForRetrieverRun,
     ) -> list[Document]:
-        documents = await self.wrapped_retriever.ainvoke(query)
+        documents = await self.wrapped_retriever.ainvoke(
+            query, config={"callbacks": run_manager.get_child()}
+        )
         if self.corpus == ():
             return []
         if not is_contraindication_question(query):

@@ -137,3 +137,19 @@ def test_hybrid_factory_rejects_an_unscoped_search() -> None:
 
     with pytest.raises(ValueError, match="explicit corpus scope"):
         factory.build(bula_id=None)
+
+
+def test_rrfb_preserves_full_union_and_authorization_with_20_candidates_per_branch() -> (
+    None
+):
+    factory, _, _ = build_factory()
+    allowed = (UUID(int=1), UUID(int=2))
+    retriever = factory.build_candidates(
+        bula_id=None, corpus=(BulaCorpus.SYSTEM,), allowed_bula_ids=allowed
+    ).wrapped_retriever
+    assert isinstance(retriever, HybridRetriever)
+    assert retriever.k == 40
+    dense, lexical = retriever.retrievers
+    assert dense.k == lexical.k == 20
+    assert dense.candidate_limit == 60
+    assert dense.allowed_bula_ids == lexical.allowed_bula_ids == allowed

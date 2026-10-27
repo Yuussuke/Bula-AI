@@ -1,6 +1,7 @@
 """General-chat contracts with real persistence and synthetic providers only."""
 
 from uuid import UUID
+from typing import Never
 
 import pytest
 from httpx import AsyncClient
@@ -28,6 +29,7 @@ from app.modules.rag.models import ChunkMetadata
 from app.modules.rag.repository import ChunkMetadataRepository
 from app.modules.rag.retrieval_mode import RetrievalMode
 from app.modules.rag.retriever_factory import RetrieverStrategyFactory
+from app.modules.rag.reranker import ResidentReranker, RerankerError
 from tests.integration.chat.test_chat import (
     TEST_USER,
     build_auth_headers,
@@ -52,6 +54,7 @@ def install_factory(
     documents: list[Document],
     responses: list[str],
     observed_scopes: list[tuple[UUID, ...]],
+    reranker: ResidentReranker | None = None,
 ) -> None:
     def build(
         *,
@@ -68,7 +71,8 @@ def install_factory(
 
     factory = RAGChainFactory(
         retriever_factory=RetrieverStrategyFactory(
-            builders={mode: build for mode in RetrievalMode}
+            builders={mode: build for mode in RetrievalMode},
+            hybrid_reranker=(lambda: reranker) if reranker is not None else None,
         ),
         llm_builder=lambda: FakeListChatModel(responses=responses),
         source_index=PostgreSQLBM25Index(ChunkMetadataRepository(db)),
@@ -103,6 +107,87 @@ async def add_chunk(
             "score": 0.5,
         },
     )
+
+
+@pytest.mark.anyio
+async def test_cross_bula_validates_full_candidates_before_local_inference_and_final_cut(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    token = await get_access_token(client)
+    user = await get_user_by_email(db_session, email=TEST_USER["email"])
+    bula = await create_system_bula(
+        db_session, owner_id=user.id, state=SystemBulaPublicationState.PUBLISHED
+    )
+    valid = await add_chunk(db_session, bula.id, "Leia as instruções.")
+    stale = valid.model_copy(deep=True)
+    stale.page_content = "Texto divergente do registro canônico."
+    seen: list[list[str]] = []
+
+    class LocalScorer:
+        def score(
+            self, query: str, passages: list[str], *, deadline: float
+        ) -> list[float]:
+            seen.append(passages)
+            return [1.0] * len(passages)
+
+    reranker = ResidentReranker(load_scorer=LocalScorer)
+    try:
+        install_factory(
+            db_session,
+            [stale, valid],
+            ['{"unit_ids":["E1"],"limitation":null}', "Leia as instruções [1]."],
+            [],
+            reranker,
+        )
+        response = await client.post(
+            "/api/v1/chat/ask",
+            json={"question": "Como proceder?", "mode": "hybrid"},
+            headers=build_auth_headers(token),
+        )
+        assert response.status_code == 200
+        assert seen == [["Seção: Advertências\n\nLeia as instruções."]]
+        assert (
+            response.json()["source_chunks"][0]["chunk_id"]
+            == valid.metadata["chunk_id"]
+        )
+    finally:
+        await reranker.close()
+
+
+@pytest.mark.anyio
+async def test_reranker_failure_returns_503_without_persisting_an_abstention(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    token = await get_access_token(client)
+    user = await get_user_by_email(db_session, email=TEST_USER["email"])
+    bula = await create_system_bula(
+        db_session, owner_id=user.id, state=SystemBulaPublicationState.PUBLISHED
+    )
+    document = await add_chunk(db_session, bula.id, "Leia as instruções.")
+
+    def unavailable_scorer() -> Never:
+        raise RerankerError("CUDA unavailable")
+
+    reranker = ResidentReranker(load_scorer=unavailable_scorer)
+    try:
+        install_factory(db_session, [document], [], [], reranker)
+        response = await client.post(
+            "/api/v1/chat/ask",
+            json={"question": "Como proceder?", "mode": "hybrid"},
+            headers=build_auth_headers(token),
+        )
+        assert response.status_code == 503
+        assert "temporariamente indisponível" in response.json()["detail"]
+        assert (
+            await db_session.scalar(select(func.count()).select_from(ChatSession)) == 0
+        )
+        assert (
+            await db_session.scalar(select(func.count()).select_from(ChatMessage)) == 0
+        )
+    finally:
+        await reranker.close()
 
 
 @pytest.mark.anyio

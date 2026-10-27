@@ -4,6 +4,7 @@ __pycache__/
 
 # Virtual environments
 .venv/
+/backend/models/
 venv/
 env/
 

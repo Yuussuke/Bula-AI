@@ -1,4 +1,5 @@
 from functools import lru_cache
+from pathlib import Path
 from typing import Literal
 
 from pydantic import Field, field_validator
@@ -108,6 +109,17 @@ class RAGIngestionSettings(BaseSettings):
     )
 
 
+class RerankerSettings(BaseSettings):
+    enabled: bool = True
+    model_path: Path = Path("models/bge-reranker-v2-m3")
+    capacity: int = Field(default=16, ge=1)
+    timeout_seconds: float = Field(default=15, gt=0)
+
+    model_config = SettingsConfigDict(
+        env_file=".env", env_prefix="RERANKER_", extra="ignore"
+    )
+
+
 class DatabaseSettings(BaseSettings):
     database_url: str = "postgresql+asyncpg://bulaai:bulaai@postgres:5432/bulaai"
     sql_echo: bool = False
@@ -164,6 +176,7 @@ class Settings(MaritacaSettings, DatabaseSettings, SecuritySettings):
     ollama: OllamaSettings = Field(default_factory=OllamaSettings)
     qdrant: QdrantSettings = Field(default_factory=QdrantSettings)
     rag_ingestion: RAGIngestionSettings = Field(default_factory=RAGIngestionSettings)
+    reranker: RerankerSettings = Field(default_factory=RerankerSettings)
     password_breach: PasswordBreachSettings = Field(
         default_factory=PasswordBreachSettings
     )

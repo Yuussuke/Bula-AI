@@ -1,0 +1,16 @@
+# Explicit local GPU setup; does not change databases, workers or indexes.
+# docker compose -f docker-compose.yml -f docker-compose.bge.yml up -d --build api
+services:
+  api:
+    build:
+      context: ./backend
+      args:
+        INSTALL_RERANKER: "true"
+    gpus: all
+    environment:
+      UV_PROJECT_ENVIRONMENT: /opt/bula-ai-venv
+      RERANKER_ENABLED: "true"
+      RERANKER_MODEL_PATH: /models/bge-reranker-v2-m3
+    command: ["uv", "run", "--no-sync", "python", "run.py"]
+    volumes:
+      - ./backend/models/bge-reranker-v2-m3:/models/bge-reranker-v2-m3:ro

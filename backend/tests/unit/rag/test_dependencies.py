@@ -59,6 +59,8 @@ async def test_strategy_composition_uses_only_selected_stores_and_preserves_scop
     mode: RetrievalMode, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     settings = build_settings(api_key=None)
+    # This regression explicitly exercises the legacy RRF composition without BGE.
+    settings.reranker.enabled = False
     bula_id = UUID(int=1)
     payload = {
         "chunk_id": "shared",

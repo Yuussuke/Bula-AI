@@ -20,6 +20,7 @@ from app.modules.rag.bm25_retriever import BM25RetrieverFactory, BM25SearchIndex
 from app.modules.rag.embeddings import EmbeddingAdapter
 from app.modules.rag.qdrant_client import QDRANT_CLIENT_STATE_KEY
 from app.modules.rag.qdrant_store import QdrantVectorStore, make_point_id
+from app.modules.rag.reranker import ResidentReranker
 from app.modules.rag.retrieval_mode import RetrievalMode
 from app.modules.rag.schemas import BM25SearchResult
 from app.modules.rag.section_evidence_retriever import SectionEvidenceIndex
@@ -33,7 +34,13 @@ class FixedEmbeddings(LCEmbeddings):
         return [1.0, 0.0, 0.0, 0.0]
 
 
+class FixedPairScorer:
+    def score(self, query: str, passages: list[str], *, deadline: float) -> list[float]:
+        return [float(len(passages) - index) for index in range(len(passages))]
+
+
 @pytest.mark.anyio
+@pytest.mark.parametrize("is_reranker_enabled", [False, True])
 @pytest.mark.parametrize("mode", list(RetrievalMode))
 @pytest.mark.parametrize("allowed_bula_ids", [None, (UUID(int=2),), ()])
 @pytest.mark.parametrize(
@@ -48,6 +55,7 @@ class FixedEmbeddings(LCEmbeddings):
 )
 async def test_factory_results_respect_bula_and_corpus_intersection(
     mode: RetrievalMode,
+    is_reranker_enabled: bool,
     allowed_bula_ids: tuple[UUID, ...] | None,
     bula_id: UUID | None,
     corpus: tuple[BulaCorpus, ...] | None,
@@ -100,6 +108,7 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
         monkeypatch.setattr(dependencies, "get_embeddings", build_embeddings)
 
     client = AsyncQdrantClient(location=":memory:")
+    reranker = ResidentReranker(load_scorer=FixedPairScorer)
     try:
         store = QdrantVectorStore(client=client, vector_size=4)
         await store.ensure_collection()
@@ -126,9 +135,14 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
         # BM25 must also work without an app Qdrant client or embedding API key.
         if mode != RetrievalMode.BM25:
             setattr(application.state, QDRANT_CLIENT_STATE_KEY, client)
+        if mode == RetrievalMode.HYBRID and is_reranker_enabled:
+            application.state.reranker = reranker
         factory = dependencies.get_retriever_strategy_factory(
             request=Request({"type": "http", "app": application}),
-            settings=Settings(embedding={"dimension": 4}),
+            settings=Settings(
+                embedding={"dimension": 4},
+                reranker={"enabled": is_reranker_enabled},
+            ),
             bm25_factory=BM25RetrieverFactory(index=lexical_index),
             section_index=section_index,
         )
@@ -167,7 +181,9 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
         else:
             lexical_index.search.assert_awaited_once_with(
                 question,
-                k=12 if mode == RetrievalMode.HYBRID else 4,
+                k=(20 if is_reranker_enabled else 12)
+                if mode == RetrievalMode.HYBRID
+                else 4,
                 bula_id=bula_id,
                 corpus=corpus,
                 include_administrative_sections=False,
@@ -175,4 +191,5 @@ async def test_factory_results_respect_bula_and_corpus_intersection(
                 allowed_bula_ids=allowed_bula_ids,
             )
     finally:
+        await reranker.close()
         await client.close()

@@ -13,7 +13,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN pip install --no-cache-dir uv
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev
+ENV UV_PROJECT_ENVIRONMENT=/opt/bula-ai-venv
+ARG INSTALL_RERANKER=false
+RUN if [ "$INSTALL_RERANKER" = "true" ]; then \
+        uv sync --frozen --no-dev --extra reranker; \
+    else uv sync --frozen --no-dev; fi
 
 # Copy application code and scripts
 COPY app/ ./app/
