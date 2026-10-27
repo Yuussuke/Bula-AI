@@ -87,14 +87,16 @@ class ChatService:
             raise PublishedSourceIntegrityError(
                 "Published source is missing its provenance."
             )
-        return {
+        metadata = {
             "drug_name": bula.drug_name,
-            "manufacturer": publication.manufacturer,
             "presentation": publication.presentation,
             "strength": publication.strength,
             "source_url": str(HttpUrl(publication.canonical_source_url)),
             "content_sha256": publication.sha256_checksum,
         }
+        if publication.manufacturer is not None:
+            metadata["manufacturer"] = publication.manufacturer
+        return metadata
 
     async def _answer_cross_bula(
         self, *, payload: AskRequest, chat_history: list[BaseMessage] | None = None

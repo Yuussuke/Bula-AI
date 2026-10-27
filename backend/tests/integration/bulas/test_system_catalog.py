@@ -270,3 +270,52 @@ async def test_system_catalog_requires_authentication(client: AsyncClient) -> No
     response = await client.get("/api/v1/bulas/system")
 
     assert response.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_verified_publication_preserves_unknown_metadata_and_full_strength(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    access_token = await get_access_token(client, email="import-catalog@example.com")
+    bula = await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Verified Import",
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    publication = await db_session.get(SystemBulaPublication, bula.id)
+    assert publication is not None
+    publication.manufacturer = None
+    publication.expedition_number = None
+    publication.transaction_number = None
+    publication.source_record_id = None
+    publication.source_published_at = None
+    publication.source_updated_at = None
+    publication.search_query = None
+    publication.downloader_version = None
+    publication.downloaded_at = None
+    publication.reviewed_by_name = None
+    publication.reviewed_at = None
+    publication.strength = "; ".join(
+        f"Presentation {index}: {index} mg" for index in range(25)
+    )
+    await db_session.commit()
+
+    response = await client.get(
+        "/api/v1/bulas/system", headers=auth_headers(access_token)
+    )
+
+    assert response.status_code == 200
+    item = response.json()[0]
+    assert item["strength"] == publication.strength
+    for key in (
+        "manufacturer",
+        "expedition_number",
+        "transaction_number",
+        "source_record_id",
+        "source_published_at",
+        "reviewed_by",
+        "reviewed_at",
+    ):
+        assert item[key] is None

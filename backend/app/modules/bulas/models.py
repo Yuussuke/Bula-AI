@@ -115,31 +115,31 @@ class SystemBulaPublication(Base, TimestampMixin):
     target_id: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
     active_ingredient: Mapped[str] = mapped_column(String(500), nullable=False)
     product_name: Mapped[str] = mapped_column(String(500), nullable=False)
-    strength: Mapped[str] = mapped_column(String(255), nullable=False)
+    strength: Mapped[str] = mapped_column(Text, nullable=False)
     pharmaceutical_form: Mapped[str] = mapped_column(String(500), nullable=False)
     presentation: Mapped[str] = mapped_column(Text, nullable=False)
     audience: Mapped[str] = mapped_column(String(20), nullable=False)
-    manufacturer: Mapped[str] = mapped_column(String(500), nullable=False)
+    manufacturer: Mapped[str | None] = mapped_column(String(500), nullable=True)
     company_tax_id: Mapped[str] = mapped_column(String(32), nullable=False)
     anvisa_product_id: Mapped[int] = mapped_column(Integer, nullable=False)
     registration_number: Mapped[str] = mapped_column(String(100), nullable=False)
     process_number: Mapped[str] = mapped_column(String(100), nullable=False)
-    expedition_number: Mapped[str] = mapped_column(String(100), nullable=False)
-    transaction_number: Mapped[str] = mapped_column(String(100), nullable=False)
-    source_record_id: Mapped[str] = mapped_column(
-        String(100), nullable=False, index=True
+    expedition_number: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    transaction_number: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    source_record_id: Mapped[str | None] = mapped_column(
+        String(100), nullable=True, index=True
     )
     canonical_source_url: Mapped[str] = mapped_column(String(2048), nullable=False)
-    source_published_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
+    source_published_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
     )
     source_updated_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
     )
-    search_query: Mapped[str] = mapped_column(String(500), nullable=False)
-    downloader_version: Mapped[str] = mapped_column(String(100), nullable=False)
-    downloaded_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False
+    search_query: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    downloader_version: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    downloaded_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
     )
     filename: Mapped[str] = mapped_column(String(500), nullable=False)
     sha256_checksum: Mapped[str] = mapped_column(String(64), nullable=False, index=True)

@@ -119,16 +119,16 @@ class SystemBulaResponse(BaseModel):
     pharmaceutical_form: str
     presentation: str
     audience: Literal["patient", "professional"]
-    manufacturer: str
+    manufacturer: str | None
     company_tax_id: str
     anvisa_product_id: int
     registration_number: str
     process_number: str
-    expedition_number: str
-    transaction_number: str
-    source_record_id: str
+    expedition_number: str | None
+    transaction_number: str | None
+    source_record_id: str | None
     canonical_source_url: str
-    source_published_at: datetime
+    source_published_at: datetime | None
     source_updated_at: datetime | None
     sha256_checksum: str
     content_size_bytes: int
