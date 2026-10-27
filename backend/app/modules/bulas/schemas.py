@@ -51,6 +51,12 @@ class BulaResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class BulaAliasUpdate(BaseModel):
+    alias: str | None = Field(max_length=100)
+
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+
 class BulaUploadResponse(BaseModel):
     filename: str
     pages: int
@@ -119,16 +125,16 @@ class SystemBulaResponse(BaseModel):
     pharmaceutical_form: str
     presentation: str
     audience: Literal["patient", "professional"]
-    manufacturer: str
+    manufacturer: str | None
     company_tax_id: str
     anvisa_product_id: int
     registration_number: str
     process_number: str
-    expedition_number: str
-    transaction_number: str
-    source_record_id: str
+    expedition_number: str | None
+    transaction_number: str | None
+    source_record_id: str | None
     canonical_source_url: str
-    source_published_at: datetime
+    source_published_at: datetime | None
     source_updated_at: datetime | None
     sha256_checksum: str
     content_size_bytes: int
@@ -172,6 +178,21 @@ class SystemBulaResponse(BaseModel):
             reviewed_at=publication.reviewed_at,
             published_at=publication.published_at,
         )
+
+
+class SystemBulaSearchQuery(BaseModel):
+    query: str = Field(default="", max_length=200)
+    audience: Literal["all", "patient", "professional"] = "all"
+    sort: Literal["name_asc", "name_desc"] = "name_asc"
+    limit: int = Field(default=20, ge=1, le=100)
+    offset: int = Field(default=0, ge=0)
+
+
+class SystemBulaPageResponse(BaseModel):
+    items: list[SystemBulaResponse]
+    total: int
+    limit: int
+    offset: int
 
 
 class SystemBulaManifestEntry(BaseModel):

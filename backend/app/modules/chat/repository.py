@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from uuid import UUID
 
 from sqlalchemy import select
@@ -5,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, ChatScope
+from app.modules.chat.schemas import SessionSortOrder
 from app.modules.rag.retrieval_mode import RetrievalMode
 
 MAX_CHAT_SESSION_TITLE_LENGTH = 50
@@ -141,6 +143,7 @@ class ChatRepository:
             source_chunks=source_chunks,
         )
         self.db.add_all([user_message, assistant_message])
+        session.updated_at = datetime.now(timezone.utc)
 
         try:
             await self.db.commit()
@@ -198,16 +201,20 @@ class ChatRepository:
         offset: int = 0,
         scope: ChatScope | None = None,
         bula_id: UUID | None = None,
+        sort: SessionSortOrder = "created_at",
     ) -> list[ChatSession]:
         filters = [ChatSession.user_id == user_id]
         if scope is not None:
             filters.append(ChatSession.scope == scope.value)
         if bula_id is not None:
             filters.append(ChatSession.bula_id == bula_id)
+        order_column = (
+            ChatSession.updated_at if sort == "updated_at" else ChatSession.created_at
+        )
         statement = (
             select(ChatSession)
             .where(*filters)
-            .order_by(ChatSession.created_at.desc(), ChatSession.id.desc())
+            .order_by(order_column.desc(), ChatSession.id.desc())
             .limit(limit)
             .offset(offset)
         )

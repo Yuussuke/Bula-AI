@@ -13,6 +13,7 @@ from app.modules.chat.schemas import (
     ChatSessionResponse,
     DirectAskRequest,
     DirectAskResponse,
+    SessionSortOrder,
 )
 from app.modules.chat.service import (
     ChatService,
@@ -89,6 +90,7 @@ async def list_sessions(
     offset: int = Query(default=0, ge=0),
     scope: ChatScope | None = Query(default=None),
     bula_id: UUID | None = Query(default=None),
+    sort: SessionSortOrder = Query(default="created_at"),
     current_user: User = Depends(get_current_user),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> list[ChatSessionResponse]:
@@ -103,6 +105,7 @@ async def list_sessions(
         offset=offset,
         scope=scope,
         bula_id=bula_id,
+        sort=sort,
     )
     return [ChatSessionResponse.from_session(session) for session in sessions]
 

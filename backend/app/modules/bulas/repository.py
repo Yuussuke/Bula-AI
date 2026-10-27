@@ -2,7 +2,7 @@ from datetime import datetime
 from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import Select, and_, or_, select
+from sqlalchemy import Select, and_, func, or_, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -14,7 +14,7 @@ from app.modules.bulas.models import (
     SystemBulaPublication,
     SystemBulaPublicationState,
 )
-from app.modules.bulas.schemas import SystemBulaManifestEntry
+from app.modules.bulas.schemas import SystemBulaManifestEntry, SystemBulaSearchQuery
 from app.modules.storage.models import StoredObject
 
 
@@ -75,10 +75,14 @@ class BulaRepository:
         await self.db.refresh(bula)
         return bula
 
-    async def list_by_user(self, *, user_id: int) -> list[Bula]:
+    async def list_by_user(
+        self, *, user_id: int, corpus: BulaCorpus | None = None
+    ) -> list[Bula]:
         statement = (
             select(Bula).where(Bula.user_id == user_id).order_by(Bula.created_at.desc())
         )
+        if corpus is not None:
+            statement = statement.where(Bula.corpus == corpus)
         result = await self.db.execute(statement)
         return list(result.scalars().all())
 
@@ -296,6 +300,54 @@ class BulaRepository:
         result = await self.db.execute(statement)
         return result.unique().scalar_one_or_none()
 
+    async def search_published_system_bulas(
+        self, *, filters: SystemBulaSearchQuery
+    ) -> tuple[list[Bula], int]:
+        statement = self._published_system_bula_statement()
+        if filters.audience != "all":
+            statement = statement.where(
+                SystemBulaPublication.audience == filters.audience
+            )
+        searchable_columns = (
+            SystemBulaPublication.product_name,
+            SystemBulaPublication.active_ingredient,
+            SystemBulaPublication.manufacturer,
+            SystemBulaPublication.strength,
+            SystemBulaPublication.pharmaceutical_form,
+        )
+        # Filter the whole authorized catalog before counting or paginating.
+        # unaccent is provided by the existing PostgreSQL ingestion migrations.
+        for term in filters.query.split():
+            escaped_term = term.replace("/", "//").replace("%", "/%").replace("_", "/_")
+            statement = statement.where(
+                or_(
+                    *(
+                        func.lower(func.unaccent(column)).contains(
+                            func.lower(func.unaccent(escaped_term)), escape="/"
+                        )
+                        for column in searchable_columns
+                    )
+                )
+            )
+        total_statement = select(func.count()).select_from(
+            statement.with_only_columns(Bula.id).order_by(None).subquery()
+        )
+        total = int(await self.db.scalar(total_statement) or 0)
+        product_order = SystemBulaPublication.product_name.asc()
+        if filters.sort == "name_desc":
+            product_order = SystemBulaPublication.product_name.desc()
+        page_statement = (
+            statement.order_by(
+                product_order,
+                SystemBulaPublication.manufacturer.asc(),
+                Bula.id.asc(),
+            )
+            .limit(filters.limit)
+            .offset(filters.offset)
+        )
+        result = await self.db.execute(page_statement)
+        return list(result.unique().scalars().all()), total
+
     async def list_queryable_system_bulas(
         self, *, bula_ids: Sequence[UUID] | None = None
     ) -> list[Bula]:
@@ -344,6 +396,12 @@ class BulaRepository:
         if qdrant_collection is not None:
             bula.qdrant_collection = qdrant_collection
 
+        await self.db.commit()
+        await self.db.refresh(bula)
+        return bula
+
+    async def update_alias(self, *, bula: Bula, alias: str | None) -> Bula:
+        bula.alias = alias
         await self.db.commit()
         await self.db.refresh(bula)
         return bula

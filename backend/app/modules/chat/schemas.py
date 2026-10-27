@@ -1,6 +1,6 @@
 from datetime import datetime
 from uuid import UUID
-from typing import cast
+from typing import Literal, cast
 
 from pydantic import (
     AliasChoices,
@@ -16,6 +16,8 @@ from pydantic import (
 
 from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, ChatScope
 from app.modules.rag.retrieval_mode import RetrievalMode
+
+SessionSortOrder = Literal["created_at", "updated_at"]
 
 
 class ChatMessageCreate(BaseModel):
