@@ -16,6 +16,7 @@ from app.modules.chat.schemas import (
     DirectAskRequest,
     DirectAskResponse,
     SourceChunkResponse,
+    SessionSortOrder,
 )
 from app.modules.rag.chain import RAGChainFactory, NO_CONTEXT_MESSAGE
 
@@ -87,14 +88,16 @@ class ChatService:
             raise PublishedSourceIntegrityError(
                 "Published source is missing its provenance."
             )
-        return {
+        metadata = {
             "drug_name": bula.drug_name,
-            "manufacturer": publication.manufacturer,
             "presentation": publication.presentation,
             "strength": publication.strength,
             "source_url": str(HttpUrl(publication.canonical_source_url)),
             "content_sha256": publication.sha256_checksum,
         }
+        if publication.manufacturer is not None:
+            metadata["manufacturer"] = publication.manufacturer
+        return metadata
 
     async def _answer_cross_bula(
         self, *, payload: AskRequest, chat_history: list[BaseMessage] | None = None
@@ -270,6 +273,7 @@ class ChatService:
         offset: int,
         scope: ChatScope | None = None,
         bula_id: UUID | None = None,
+        sort: SessionSortOrder = "created_at",
     ) -> list[ChatSession]:
         return await self.chat_repository.list_user_sessions(
             user_id=user_id,
@@ -277,6 +281,7 @@ class ChatService:
             offset=offset,
             scope=scope,
             bula_id=bula_id,
+            sort=sort,
         )
 
     async def get_session_with_history(

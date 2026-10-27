@@ -22,6 +22,7 @@ from app.modules.bulas.schemas import (
     SystemBulaSeedCandidate,
     SystemBulaSeedFailure,
     SystemBulaSeedSummary,
+    SystemBulaSearchQuery,
 )
 from app.modules.storage.client import ObjectStoreClient
 
@@ -120,7 +121,15 @@ class BulaService:
         return bula
 
     async def list_bulas_for_user(self, *, user_id: int) -> list[Bula]:
-        return await self.repo.list_by_user(user_id=user_id)
+        return await self.repo.list_by_user(user_id=user_id, corpus=BulaCorpus.PRIVATE)
+
+    async def update_private_alias(
+        self, *, bula_id: UUID, user_id: int, alias: str | None
+    ) -> Bula:
+        bula = await self.repo.get_by_id_for_user(bula_id=bula_id, user_id=user_id)
+        if bula is None or bula.corpus != BulaCorpus.PRIVATE:
+            raise HTTPException(status_code=404, detail="Bula privada não encontrada.")
+        return await self.repo.update_alias(bula=bula, alias=self._clean_alias(alias))
 
     async def list_published_system_bulas(
         self,
@@ -138,6 +147,11 @@ class BulaService:
         if bula is None:
             raise SystemBulaNotFoundError()
         return bula
+
+    async def search_published_system_bulas(
+        self, *, filters: SystemBulaSearchQuery
+    ) -> tuple[list[Bula], int]:
+        return await self.repo.search_published_system_bulas(filters=filters)
 
     async def get_queryable_bula_for_user(
         self,

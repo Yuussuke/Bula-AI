@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Annotated, cast
 from uuid import UUID
 
 from fastapi import (
@@ -17,9 +17,12 @@ from app.modules.auth.dependencies import get_current_user
 from app.modules.bulas.dependencies import get_bula_service
 from app.modules.bulas.schemas import (
     BulaResponse,
+    BulaAliasUpdate,
     BulaStatusResponse,
     QueryableBulaResponse,
     SystemBulaResponse,
+    SystemBulaPageResponse,
+    SystemBulaSearchQuery,
 )
 from app.modules.bulas.service import (
     BulaService,
@@ -75,6 +78,22 @@ async def list_system_bulas(
     return [SystemBulaResponse.from_bula(bula) for bula in bulas]
 
 
+@router.get("/system/search", response_model=SystemBulaPageResponse)
+async def search_system_bulas(
+    filters: Annotated[SystemBulaSearchQuery, Query()],
+    current_user: auth_models.User = Depends(get_current_user),
+    bula_service: BulaService = Depends(get_bula_service),
+) -> SystemBulaPageResponse:
+    _ = current_user
+    bulas, total = await bula_service.search_published_system_bulas(filters=filters)
+    return SystemBulaPageResponse(
+        items=[SystemBulaResponse.from_bula(bula) for bula in bulas],
+        total=total,
+        limit=filters.limit,
+        offset=filters.offset,
+    )
+
+
 @router.get("/system/{bula_id}", response_model=SystemBulaResponse)
 async def get_system_bula(
     bula_id: UUID,
@@ -122,3 +141,16 @@ async def get_bula_status(
         user_id=cast(int, current_user.id),
     )
     return BulaStatusResponse.model_validate(bula)
+
+
+@router.patch("/{bula_id}/alias", response_model=BulaResponse)
+async def update_private_alias(
+    bula_id: UUID,
+    payload: BulaAliasUpdate,
+    current_user: auth_models.User = Depends(get_current_user),
+    bula_service: BulaService = Depends(get_bula_service),
+) -> BulaResponse:
+    bula = await bula_service.update_private_alias(
+        bula_id=bula_id, user_id=cast(int, current_user.id), alias=payload.alias
+    )
+    return BulaResponse.model_validate(bula)

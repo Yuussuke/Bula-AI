@@ -1,9 +1,11 @@
 from datetime import UTC, datetime
 from uuid import uuid4
+import unicodedata
 
 import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import Connection
 
 from app.modules.bulas.models import (
     Bula,
@@ -101,6 +103,55 @@ async def create_system_bula(
     await db_session.commit()
     await db_session.refresh(bula)
     return bula
+
+
+@pytest.mark.anyio
+async def test_verified_publication_preserves_unknown_metadata_and_full_strength(
+    client: AsyncClient,
+    db_session: AsyncSession,
+) -> None:
+    access_token = await get_access_token(client, email="import-catalog@example.com")
+    bula = await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Verified Import",
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    publication = await db_session.get(SystemBulaPublication, bula.id)
+    assert publication is not None
+    publication.manufacturer = None
+    publication.expedition_number = None
+    publication.transaction_number = None
+    publication.source_record_id = None
+    publication.source_published_at = None
+    publication.source_updated_at = None
+    publication.search_query = None
+    publication.downloader_version = None
+    publication.downloaded_at = None
+    publication.reviewed_by_name = None
+    publication.reviewed_at = None
+    publication.strength = "; ".join(
+        f"Presentation {index}: {index} mg" for index in range(25)
+    )
+    await db_session.commit()
+
+    response = await client.get(
+        "/api/v1/bulas/system", headers=auth_headers(access_token)
+    )
+
+    assert response.status_code == 200
+    item = response.json()[0]
+    assert item["strength"] == publication.strength
+    for key in (
+        "manufacturer",
+        "expedition_number",
+        "transaction_number",
+        "source_record_id",
+        "source_published_at",
+        "reviewed_by",
+        "reviewed_at",
+    ):
+        assert item[key] is None
 
 
 @pytest.mark.anyio
@@ -270,3 +321,219 @@ async def test_system_catalog_requires_authentication(client: AsyncClient) -> No
     response = await client.get("/api/v1/bulas/system")
 
     assert response.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_personal_list_includes_only_owned_private_bulas(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    token = await get_access_token(client, email="personal-catalog@example.com")
+    await get_access_token(client, email="other-catalog@example.com")
+    await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Public source owned by user",
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    own_private = Bula(
+        user_id=1,
+        drug_name="My private document",
+        corpus=BulaCorpus.PRIVATE,
+        status=BulaStatus.PENDING,
+    )
+    other_private = Bula(
+        user_id=2,
+        drug_name="Another user's document",
+        corpus=BulaCorpus.PRIVATE,
+        status=BulaStatus.READY,
+    )
+    db_session.add_all([own_private, other_private])
+    await db_session.commit()
+
+    response = await client.get("/api/v1/bulas/", headers=auth_headers(token))
+
+    assert response.status_code == 200
+    assert [item["id"] for item in response.json()] == [str(own_private.id)]
+    assert response.json()[0]["status"] == "pending"
+
+
+@pytest.fixture
+async def catalog_search_functions(db_session: AsyncSession) -> None:
+    """Provide the existing PostgreSQL unaccent dependency in the SQLite fixture."""
+
+    def unaccent(value: str | None) -> str | None:
+        if value is None:
+            return None
+        return "".join(
+            character
+            for character in unicodedata.normalize("NFD", value)
+            if not unicodedata.combining(character)
+        )
+
+    def register(connection: Connection) -> None:
+        connection.connection.dbapi_connection.create_function("unaccent", 1, unaccent)
+
+    connection = await db_session.connection()
+    await connection.run_sync(register)
+
+
+@pytest.mark.anyio
+async def test_catalog_search_filters_before_pagination_and_counts_only_authorized_sources(
+    client: AsyncClient, db_session: AsyncSession, catalog_search_functions: None
+) -> None:
+    token = await get_access_token(client, email="paged-catalog@example.com")
+    for number in range(25):
+        await create_system_bula(
+            db_session,
+            owner_id=1,
+            product_name=f"Produto {number:02}",
+            state=SystemBulaPublicationState.PUBLISHED,
+        )
+    private = await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Produto privado",
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    private.corpus = BulaCorpus.PRIVATE
+    await db_session.commit()
+    await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Produto retirado",
+        state=SystemBulaPublicationState.WITHDRAWN,
+    )
+    await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Produto divergente",
+        state=SystemBulaPublicationState.PUBLISHED,
+        has_matching_checksum=False,
+    )
+
+    first = await client.get("/api/v1/bulas/system/search", headers=auth_headers(token))
+    second = await client.get(
+        "/api/v1/bulas/system/search",
+        params={"offset": 20},
+        headers=auth_headers(token),
+    )
+    matched = await client.get(
+        "/api/v1/bulas/system/search",
+        params={"query": "PRODUTO 24"},
+        headers=auth_headers(token),
+    )
+
+    assert first.status_code == second.status_code == matched.status_code == 200
+    assert first.json()["total"] == second.json()["total"] == 25
+    assert len(first.json()["items"]) == 20 and len(second.json()["items"]) == 5
+    assert second.json()["offset"] == 20
+    assert not {row["id"] for row in first.json()["items"]} & {
+        row["id"] for row in second.json()["items"]
+    }
+    assert matched.json()["total"] == 1
+    assert matched.json()["items"][0]["product_name"] == "Produto 24"
+    descending = await client.get(
+        "/api/v1/bulas/system/search",
+        params={"sort": "name_desc", "limit": 1},
+        headers=auth_headers(token),
+    )
+    assert descending.json()["total"] == 25
+    assert descending.json()["items"][0]["product_name"] == "Produto 24"
+    assert all(
+        row["id"] != str(private.id)
+        for row in first.json()["items"] + second.json()["items"]
+    )
+
+
+@pytest.mark.anyio
+async def test_catalog_search_handles_accents_multiple_fields_literal_wildcards_and_audience(
+    client: AsyncClient, db_session: AsyncSession, catalog_search_functions: None
+) -> None:
+    token = await get_access_token(client, email="accent-catalog@example.com")
+    bula = await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Ácido 10%",
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    publication = await db_session.get(SystemBulaPublication, bula.id)
+    assert publication is not None
+    publication.audience = "professional"
+    publication.manufacturer = None
+    publication.strength = "100 mg"
+    await db_session.commit()
+    await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Outro produto",
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    for query in ("acido 100", "ÁCIDO", "%"):
+        response = await client.get(
+            "/api/v1/bulas/system/search",
+            params={"query": query},
+            headers=auth_headers(token),
+        )
+        assert response.status_code == 200
+        assert response.json()["total"] == 1
+        assert response.json()["items"][0]["id"] == str(bula.id)
+    response = await client.get(
+        "/api/v1/bulas/system/search",
+        params={"audience": "patient", "query": "acido"},
+        headers=auth_headers(token),
+    )
+    assert response.json()["total"] == 0 and response.json()["items"] == []
+    unauthorized = await client.get("/api/v1/bulas/system/search")
+    assert unauthorized.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_alias_edit_is_private_owner_only_and_preserves_official_identity(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    token = await get_access_token(client, email="alias-owner@example.com")
+    other_token = await get_access_token(client, email="alias-other@example.com")
+    private = Bula(
+        user_id=1,
+        drug_name="Official product",
+        manufacturer="Official maker",
+        corpus=BulaCorpus.PRIVATE,
+        status=BulaStatus.READY,
+    )
+    db_session.add(private)
+    await db_session.commit()
+    path = f"/api/v1/bulas/{private.id}/alias"
+
+    denied = await client.patch(
+        path, json={"alias": "Not mine"}, headers=auth_headers(other_token)
+    )
+    assert denied.status_code == 404
+    unauthenticated = await client.patch(path, json={"alias": "Unknown"})
+    assert unauthenticated.status_code == 401
+    response = await client.patch(
+        path, json={"alias": "  Meu apelido  "}, headers=auth_headers(token)
+    )
+    assert response.status_code == 200
+    assert response.json()["alias"] == "Meu apelido"
+    assert response.json()["drug_name"] == "Official product"
+    assert response.json()["manufacturer"] == "Official maker"
+    assert response.json()["status"] == "ready"
+    listed = await client.get("/api/v1/bulas/", headers=auth_headers(token))
+    assert listed.json()[0]["alias"] == "Meu apelido"
+    cleared = await client.patch(
+        path, json={"alias": "   "}, headers=auth_headers(token)
+    )
+    assert cleared.json()["alias"] is None
+
+    system = await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Published source",
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    denied = await client.patch(
+        f"/api/v1/bulas/{system.id}/alias",
+        json={"alias": "Changed"},
+        headers=auth_headers(token),
+    )
+    assert denied.status_code == 404

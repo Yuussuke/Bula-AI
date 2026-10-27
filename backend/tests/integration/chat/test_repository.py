@@ -135,6 +135,37 @@ async def test_list_user_sessions_paginated(db_session: AsyncSession) -> None:
 
 
 @pytest.mark.anyio
+async def test_recently_active_session_is_selected_before_pagination_without_changing_default(
+    db_session: AsyncSession,
+) -> None:
+    user = await create_user(db_session, email="resume@bulaai.com")
+    other = await create_user(db_session, email="resume-other@bulaai.com")
+    repo = ChatRepository(db=db_session)
+    old = await repo.create_session(
+        user_id=user.id, first_question="Older conversation"
+    )
+    new = await repo.create_session(user_id=user.id, first_question="New conversation")
+    await repo.create_session(
+        user_id=other.id, first_question="Another user's conversation"
+    )
+    await repo.add_turn(
+        session=old,
+        question="Continuing the older conversation",
+        answer="A new answer",
+        retrieval_mode=RetrievalMode.HYBRID,
+        source_chunks=[],
+    )
+
+    recently_active = await repo.list_user_sessions(
+        user_id=user.id, sort="updated_at", limit=1
+    )
+    recently_created = await repo.list_user_sessions(user_id=user.id, limit=1)
+
+    assert [session.id for session in recently_active] == [old.id]
+    assert [session.id for session in recently_created] == [new.id]
+
+
+@pytest.mark.anyio
 async def test_recent_history_returns_latest_messages_in_chronological_order(
     db_session: AsyncSession,
 ) -> None:
