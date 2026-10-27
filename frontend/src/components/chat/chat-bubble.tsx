@@ -1,14 +1,13 @@
 import { Bot, User } from "lucide-react";
-import { lazy, type ReactElement, Suspense, useState } from "react";
+import { lazy, memo, type ReactElement, Suspense, useCallback, useState } from "react";
 
 import { ModeIndicator } from "@/components/chat/mode-indicator";
-import { buildSourceChunkId } from "@/components/chat/source-chunk-navigation";
 import { SourceChunks } from "@/components/chat/source-chunks";
 import type { ChatTimelineMessage } from "@/components/chat/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-const MessageMarkdown = lazy(() => import("@/components/chat/message-markdown"));
+const MessageMarkdown = memo(lazy(() => import("@/components/chat/message-markdown")));
 
 interface ChatBubbleProps {
   message: ChatTimelineMessage;
@@ -19,15 +18,12 @@ export function ChatBubble({ message }: ChatBubbleProps): ReactElement {
   const authorLabel = isUserMessage ? "Você" : "Bula AI";
   const isTransientMessage = message.deliveryStatus !== undefined;
   const [areSourcesOpen, setAreSourcesOpen] = useState(false);
+  const [selectedCitation, setSelectedCitation] = useState(1);
 
-  const handleCitationClick = (citationNumber: number): void => {
+  const handleCitationClick = useCallback((citationNumber: number): void => {
+    setSelectedCitation(citationNumber);
     setAreSourcesOpen(true);
-    window.setTimeout(() => {
-      const sourceElement = document.getElementById(buildSourceChunkId(message.id, citationNumber));
-      sourceElement?.focus({ preventScroll: true });
-      sourceElement?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 0);
-  };
+  }, []);
 
   return (
     <article
@@ -84,6 +80,7 @@ export function ChatBubble({ message }: ChatBubbleProps): ReactElement {
             messageId={message.id}
             isOpen={areSourcesOpen}
             onOpenChange={setAreSourcesOpen}
+            selectedCitation={selectedCitation}
           />
         )}
       </div>

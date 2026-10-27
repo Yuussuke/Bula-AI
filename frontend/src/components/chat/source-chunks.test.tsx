@@ -36,7 +36,7 @@ describe("SourceChunks", () => {
         ]}
       />
     );
-    await user.click(screen.getByRole("button", { name: "Ver 2 fontes na bula" }));
+    await user.click(screen.getByRole("button", { name: "Ver 2 referências" }));
     expect(screen.getByText("Produto A")).toBeInTheDocument();
     expect(screen.getByText("Produto B")).toBeInTheDocument();
     expect(screen.getByText(/Fabricante A · gotas · 50 mg\/mL/)).toBeInTheDocument();
@@ -48,7 +48,7 @@ describe("SourceChunks", () => {
   });
   it("presents Markdown as readable headings, lists and tables", async () => {
     const user = userEvent.setup();
-    const { container } = render(
+    render(
       <SourceChunks
         sourceChunks={[
           {
@@ -71,7 +71,7 @@ describe("SourceChunks", () => {
       />
     );
 
-    await user.click(screen.getByRole("button", { name: "Ver 1 fonte na bula" }));
+    await user.click(screen.getByRole("button", { name: "Ver 1 referência" }));
 
     expect(screen.getAllByText("POSOLOGIA")).toHaveLength(1);
     expect(
@@ -80,7 +80,7 @@ describe("SourceChunks", () => {
     expect(screen.getByText("Tomar 1 comprimido de 500 mg.")).toBeInTheDocument();
     expect(screen.getByRole("columnheader", { name: "Peso" })).toBeInTheDocument();
     expect(screen.getByRole("cell", { name: "40 kg" })).toBeInTheDocument();
-    expect(container).not.toHaveTextContent("##");
-    expect(container).not.toHaveTextContent("| Peso | Dose |");
+    expect(screen.getByRole("dialog")).not.toHaveTextContent("##");
+    expect(screen.getByRole("dialog")).not.toHaveTextContent("| Peso | Dose |");
   }, 10_000);
 });

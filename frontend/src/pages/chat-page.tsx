@@ -1,23 +1,30 @@
 import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, ArrowLeft, FileText, History } from "lucide-react";
-import { type ReactElement, useState } from "react";
-import { Link, Navigate, useParams, useSearchParams } from "react-router-dom";
+import { AlertCircle, ArrowLeft, History } from "lucide-react";
+import { lazy, type ReactElement, Suspense, useState } from "react";
+import { Link, Navigate, useLocation, useParams, useSearchParams } from "react-router-dom";
 
 import { getQueryableBula } from "@/api/bulas";
 import type { ChatContext, ChatScope } from "@/api/chat";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatSessionNavigation } from "@/components/chat/chat-session-navigation";
-import { ModeIndicator } from "@/components/chat/mode-indicator";
-import { ModeSelector } from "@/components/chat/mode-selector";
-import { MedicalWarning } from "@/components/medical-warning";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChatSession } from "@/hooks/use-chat-session";
 import { ApiError } from "@/lib/api";
+
+const ModeSelector = lazy(() =>
+  import("@/components/chat/mode-selector").then((module) => ({ default: module.ModeSelector }))
+);
 
 function isNotFoundError(error: Error | null): boolean {
   return error instanceof ApiError && error.status === 404;
@@ -25,10 +32,14 @@ function isNotFoundError(error: Error | null): boolean {
 
 function ChatPageLoadingState(): ReactElement {
   return (
-    <div role="status" aria-label="Carregando conversa" className="bg-muted/20 flex min-h-screen">
+    <div
+      role="status"
+      aria-label="Carregando conversa"
+      className="bg-background flex h-dvh overflow-hidden"
+    >
       <span className="sr-only">Carregando conversa…</span>
 
-      <aside className="bg-sidebar border-sidebar-border hidden w-72 shrink-0 border-r lg:block">
+      <aside className="bg-sidebar border-sidebar-border hidden w-64 shrink-0 border-r lg:block">
         <div className="border-sidebar-border flex items-center gap-3 border-b p-5">
           <Skeleton className="bg-sidebar-accent h-9 w-9 shrink-0" />
           <div className="flex-1 space-y-2">
@@ -49,7 +60,7 @@ function ChatPageLoadingState(): ReactElement {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="bg-card border-border border-b">
+        <header className="bg-card border-border border-b lg:hidden">
           <div className="mx-auto flex max-w-5xl items-center gap-3 px-3 py-3 sm:px-6 sm:py-4">
             <Skeleton className="h-9 w-9 lg:hidden" />
             <div className="min-w-0 flex-1 space-y-2">
@@ -60,29 +71,24 @@ function ChatPageLoadingState(): ReactElement {
           </div>
         </header>
 
-        <main className="mx-auto flex w-full max-w-5xl flex-1 p-3 sm:p-6">
-          <Card className="flex min-h-[75vh] w-full flex-col gap-0 overflow-hidden py-0">
-            <div className="border-border border-b p-4">
-              <Skeleton className="h-16 w-full" />
-            </div>
-            <div className="flex-1 space-y-6 p-4 sm:p-5">
-              <div className="flex gap-3">
-                <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
-                <div className="w-full max-w-lg space-y-2">
-                  <Skeleton className="h-4 w-24" />
-                  <Skeleton className="h-20 w-full" />
-                </div>
-              </div>
-              <div className="ml-auto w-full max-w-md space-y-2">
-                <Skeleton className="ml-auto h-4 w-20" />
-                <Skeleton className="h-14 w-full" />
+        <main className="flex min-h-0 flex-1 flex-col">
+          <div className="mx-auto w-full max-w-3xl flex-1 space-y-6 p-4 sm:p-5">
+            <div className="flex gap-3">
+              <Skeleton className="h-8 w-8 shrink-0 rounded-full" />
+              <div className="w-full max-w-lg space-y-2">
+                <Skeleton className="h-4 w-24" />
+                <Skeleton className="h-20 w-full" />
               </div>
             </div>
-            <div className="border-border flex gap-3 border-t p-4">
-              <Skeleton className="h-11 flex-1" />
-              <Skeleton className="h-11 w-11" />
+            <div className="ml-auto w-full max-w-md space-y-2">
+              <Skeleton className="ml-auto h-4 w-20" />
+              <Skeleton className="h-14 w-full" />
             </div>
-          </Card>
+          </div>
+          <div className="mx-auto flex w-full max-w-3xl gap-3 p-4">
+            <Skeleton className="h-11 flex-1" />
+            <Skeleton className="h-11 w-11" />
+          </div>
         </main>
       </div>
     </div>
@@ -106,6 +112,16 @@ function ChatPageUnavailable({ message }: { message: string }): ReactElement {
 
 export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElement {
   const { bulaId } = useParams<{ bulaId: string }>();
+  const location = useLocation();
+  const navigationState: unknown = location.state;
+  const catalogReturnTo =
+    typeof navigationState === "object" &&
+    navigationState !== null &&
+    "returnTo" in navigationState &&
+    typeof navigationState.returnTo === "string" &&
+    /^\/catalogo(?:\?|$)/.test(navigationState.returnTo)
+      ? navigationState.returnTo
+      : null;
   const [searchParams, setSearchParams] = useSearchParams();
   const [question, setQuestion] = useState("");
   const [isMobileSessionsOpen, setIsMobileSessionsOpen] = useState(false);
@@ -124,7 +140,7 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
     context,
     sessionId,
     onSessionCreated: (createdSessionId) => {
-      setSearchParams({ session: createdSessionId }, { replace: true });
+      setSearchParams({ session: createdSessionId }, { replace: true, state: navigationState });
     },
   });
 
@@ -145,7 +161,7 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
   const handleStartNewSession = (): void => {
     chatSession.invalidatePendingConversation();
     setQuestion("");
-    setSearchParams({}, { replace: true });
+    setSearchParams({}, { replace: true, state: navigationState });
   };
 
   if (scope === "bula" && !bulaId) {
@@ -178,7 +194,7 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
   const bulaDisplayName = scope === "cross_bula" ? "Chat geral" : bula?.alias || bula?.product_name;
   const bulaDescription =
     scope === "cross_bula"
-      ? "Consulta às bulas de sistema publicadas · busca não exaustiva"
+      ? "Consulta às bulas disponíveis no catálogo"
       : [
           bula?.alias ? bula.product_name : bula?.active_ingredient,
           bula?.strength,
@@ -187,14 +203,53 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
           .filter((value): value is string => Boolean(value))
           .join(" · ");
 
+  const returnTo =
+    scope === "cross_bula"
+      ? "/"
+      : bula?.corpus === "private"
+        ? "/minhas-bulas"
+        : (catalogReturnTo ?? "/catalogo");
+  const selectSuggestion = (suggestion: string): void => {
+    setQuestion(suggestion);
+    document.getElementById("chat-question")?.focus();
+  };
+
+  const sidebarDetails = (
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <p className="text-sm font-semibold break-words">{bulaDisplayName}</p>
+        {scope === "cross_bula" ? (
+          <p className="text-sidebar-foreground/60 text-xs leading-relaxed">{bulaDescription}</p>
+        ) : (
+          <details className="text-sidebar-foreground/70 text-xs">
+            <summary className="cursor-pointer py-1">Identificação da bula</summary>
+            <p className="mt-1 max-h-32 overflow-y-auto leading-relaxed break-words">
+              {bulaDescription || "Documento enviado por você"}
+            </p>
+          </details>
+        )}
+      </div>
+      <Suspense fallback={<Skeleton className="bg-sidebar-accent h-20 w-full" />}>
+        <ModeSelector
+          value={chatSession.mode}
+          onChange={chatSession.setMode}
+          isDisabled={chatSession.isSending}
+        />
+      </Suspense>
+    </div>
+  );
+
   return (
-    <div className="bg-muted/20 flex min-h-screen">
-      <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-72 shrink-0 border-r lg:block">
+    <div className="bg-background flex h-dvh overflow-hidden">
+      <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-64 shrink-0 border-r lg:block">
         <ChatSessionNavigation
           context={context}
           currentSessionId={sessionId}
           onStartNewSession={handleStartNewSession}
-        />
+          returnTo={returnTo}
+        >
+          {sidebarDetails}
+        </ChatSessionNavigation>
       </aside>
 
       <Sheet open={isMobileSessionsOpen} onOpenChange={setIsMobileSessionsOpen}>
@@ -206,19 +261,23 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
             <SheetTitle>
               {scope === "cross_bula" ? "Conversas gerais" : "Conversas desta bula"}
             </SheetTitle>
+            <SheetDescription>Abra uma conversa anterior ou inicie outra.</SheetDescription>
           </SheetHeader>
           <ChatSessionNavigation
             context={context}
             currentSessionId={sessionId}
             onStartNewSession={handleStartNewSession}
+            returnTo={returnTo}
             onNavigate={() => setIsMobileSessionsOpen(false)}
-          />
+          >
+            {sidebarDetails}
+          </ChatSessionNavigation>
         </SheetContent>
       </Sheet>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="bg-card border-border border-b">
-          <div className="mx-auto flex max-w-5xl items-center gap-2 px-3 py-3 sm:gap-3 sm:px-6 sm:py-4">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <header className="bg-background border-border shrink-0 border-b lg:hidden">
+          <div className="flex items-center gap-2 px-3 py-2">
             <Button
               type="button"
               variant="ghost"
@@ -236,73 +295,61 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
               aria-label="Voltar para as bulas"
               className="lg:hidden"
             >
-              <Link to="/">
+              <Link to={returnTo}>
                 <ArrowLeft aria-hidden="true" className="h-5 w-5" />
               </Link>
             </Button>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2">
-                <FileText aria-hidden="true" className="text-primary h-4 w-4 shrink-0" />
-                <h1 className="truncate text-base font-semibold sm:text-lg">{bulaDisplayName}</h1>
-              </div>
-              <p className="text-muted-foreground truncate text-xs sm:text-sm">
-                {bulaDescription || "Bula enviada por você"}
-              </p>
-            </div>
-            <ModeIndicator
-              mode={
-                chatSession.messages.findLast((message) => message.role === "assistant")
-                  ?.retrievalMode ?? (sessionId ? null : "hybrid")
-              }
-            />
+            <p className="min-w-0 truncate text-sm font-medium">{bulaDisplayName}</p>
           </div>
         </header>
 
-        <main className="mx-auto flex w-full max-w-5xl flex-1 p-3 sm:p-6">
-          <Card className="flex min-h-[75vh] w-full flex-col overflow-hidden py-0">
-            <MedicalWarning />
-            <ModeSelector
-              value={chatSession.mode}
-              onChange={chatSession.setMode}
-              isDisabled={chatSession.isSending}
-            />
-            {chatSession.modeWarning ? (
-              <p role="status" className="text-muted-foreground px-4 py-2 text-sm">
-                {chatSession.modeWarning}
-              </p>
-            ) : null}
-            {sessionId && chatSession.messages.length === 0 ? (
-              <Alert className="m-4 w-auto">
-                <AlertCircle aria-hidden="true" />
-                <AlertTitle>Conversa sem mensagens</AlertTitle>
-                <AlertDescription>
-                  Esta sessão ainda não possui mensagens. Envie uma pergunta para começar.
-                </AlertDescription>
-              </Alert>
-            ) : null}
-            <ChatMessageList messages={chatSession.messages} isResponding={chatSession.isSending} />
-            {chatSession.sendError ? (
-              <Alert variant="destructive" className="mx-4 mb-3 w-auto sm:mx-5">
-                <AlertCircle aria-hidden="true" />
-                <AlertTitle>
-                  {isNotFoundError(chatSession.sendError)
-                    ? "Conversa indisponível"
-                    : "Não foi possível enviar"}
-                </AlertTitle>
-                <AlertDescription>
-                  {isNotFoundError(chatSession.sendError)
-                    ? "A conversa ou a bula pode ter sido retirada. Sua pergunta foi preservada."
-                    : "Sua pergunta foi preservada. Tente novamente em alguns instantes."}
-                </AlertDescription>
-              </Alert>
-            ) : null}
-            <ChatComposer
-              value={question}
-              isDisabled={chatSession.isSending}
-              onChange={setQuestion}
-              onSubmit={handleSendQuestion}
-            />
-          </Card>
+        <main className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
+          <h1 className="sr-only">{bulaDisplayName}</h1>
+          {chatSession.modeWarning ? (
+            <p
+              role="status"
+              className="text-muted-foreground mx-auto w-full max-w-3xl shrink-0 px-4 py-2 text-sm"
+            >
+              {chatSession.modeWarning}
+            </p>
+          ) : null}
+          {sessionId && chatSession.messages.length === 0 ? (
+            <Alert className="m-4 w-auto">
+              <AlertCircle aria-hidden="true" />
+              <AlertTitle>Conversa sem mensagens</AlertTitle>
+              <AlertDescription>
+                Esta sessão ainda não possui mensagens. Envie uma pergunta para começar.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          <ChatMessageList
+            messages={chatSession.messages}
+            isResponding={chatSession.isSending}
+            scope={scope}
+            onSuggestionSelected={selectSuggestion}
+          />
+          {chatSession.sendError ? (
+            <Alert variant="destructive" className="mx-4 mb-3 w-auto sm:mx-5">
+              <AlertCircle aria-hidden="true" />
+              <AlertTitle>
+                {isNotFoundError(chatSession.sendError)
+                  ? "Conversa indisponível"
+                  : "Não foi possível enviar"}
+              </AlertTitle>
+              <AlertDescription>
+                {isNotFoundError(chatSession.sendError)
+                  ? "A conversa ou a bula pode ter sido retirada. Sua pergunta foi preservada."
+                  : "Sua pergunta foi preservada. Tente novamente em alguns instantes."}
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          <ChatComposer
+            scope={scope}
+            value={question}
+            isDisabled={chatSession.isSending}
+            onChange={setQuestion}
+            onSubmit={handleSendQuestion}
+          />
         </main>
       </div>
     </div>
