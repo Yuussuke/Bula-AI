@@ -2,10 +2,13 @@ import { type ReactElement, useEffect } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import { AuthView } from "@/components/auth-view";
+import { SystemBulaCatalog } from "@/components/bulas/system-bula-catalog";
+import { UserBulaSection } from "@/components/bulas/user-bula-section";
 import { DashboardView } from "@/components/dashboard-view";
 import { bootstrapAuthSession } from "@/lib/api";
 import { getPostAuthPath } from "@/lib/auth-navigation";
 import { ChatPage } from "@/pages/chat-page";
+import { HomePage } from "@/pages/home-page";
 import { useAuthStore } from "@/store/auth";
 
 interface ProtectedRouteProps {
@@ -65,7 +68,11 @@ export default function App(): ReactElement {
         <Route
           element={<ProtectedRoute authResolved={authResolved} isAuthenticated={isAuthenticated} />}
         >
-          <Route path="/" element={<DashboardView />} />
+          <Route element={<DashboardView />}>
+            <Route index element={<HomePage />} />
+            <Route path="/catalogo" element={<SystemBulaCatalog />} />
+            <Route path="/minhas-bulas" element={<UserBulaSection />} />
+          </Route>
           <Route path="/chat" element={<ChatPage scope="cross_bula" />} />
           <Route path="/bulas/:bulaId/chat" element={<ChatPage />} />
         </Route>

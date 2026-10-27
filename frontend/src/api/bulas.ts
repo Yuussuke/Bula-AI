@@ -40,16 +40,16 @@ export interface SystemBulaResponse {
   pharmaceutical_form: string;
   presentation: string;
   audience: BulaAudience;
-  manufacturer: string;
+  manufacturer: string | null;
   company_tax_id: string;
   anvisa_product_id: number;
   registration_number: string;
   process_number: string;
-  expedition_number: string;
-  transaction_number: string;
-  source_record_id: string;
+  expedition_number: string | null;
+  transaction_number: string | null;
+  source_record_id: string | null;
   canonical_source_url: string;
-  source_published_at: string;
+  source_published_at: string | null;
   source_updated_at: string | null;
   sha256_checksum: string;
   content_size_bytes: number;
@@ -80,27 +80,36 @@ export interface QueryableBulaResponse {
   ingestion_status: BulaStatus;
 }
 
-export interface ListSystemBulasOptions {
-  limit?: number;
-  offset?: number;
-}
-
-export async function listSystemBulas({
-  limit = 100,
-  offset = 0,
-}: ListSystemBulasOptions = {}): Promise<SystemBulaResponse[]> {
-  const searchParams = new URLSearchParams({
-    limit: String(limit),
-    offset: String(offset),
-  });
-
-  return requestJson<SystemBulaResponse[]>(`/api/v1/bulas/system?${searchParams.toString()}`, {
+export async function getSystemBula(bulaId: string): Promise<SystemBulaResponse> {
+  return requestJson<SystemBulaResponse>(`/api/v1/bulas/system/${bulaId}`, {
     method: "GET",
   });
 }
 
-export async function getSystemBula(bulaId: string): Promise<SystemBulaResponse> {
-  return requestJson<SystemBulaResponse>(`/api/v1/bulas/system/${bulaId}`, {
+export interface SystemBulaSearchOptions {
+  query: string;
+  audience: "all" | BulaAudience;
+  limit: number;
+  offset: number;
+  sort?: "name_asc" | "name_desc";
+}
+
+export interface SystemBulaPage {
+  items: SystemBulaResponse[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export async function searchSystemBulas(options: SystemBulaSearchOptions): Promise<SystemBulaPage> {
+  const searchParams = new URLSearchParams({
+    query: options.query,
+    audience: options.audience,
+    limit: String(options.limit),
+    offset: String(options.offset),
+  });
+  if (options.sort) searchParams.set("sort", options.sort);
+  return requestJson<SystemBulaPage>(`/api/v1/bulas/system/search?${searchParams.toString()}`, {
     method: "GET",
   });
 }
@@ -114,6 +123,17 @@ export async function getQueryableBula(bulaId: string): Promise<QueryableBulaRes
 export async function getBulaStatus(bulaId: string): Promise<BulaStatusResponse> {
   return requestJson<BulaStatusResponse>(`/api/v1/bulas/${bulaId}/status`, {
     method: "GET",
+  });
+}
+
+export async function updateBulaAlias(
+  bulaId: string,
+  alias: string | null
+): Promise<UserBulaResponse> {
+  return requestJson<UserBulaResponse>(`/api/v1/bulas/${bulaId}/alias`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ alias }),
   });
 }
 

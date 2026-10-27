@@ -1,4 +1,5 @@
-import { useQuery, type UseQueryResult } from "@tanstack/react-query";
+import { useQuery, useQueryClient, type UseQueryResult } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 import {
   type BulaStatus,
@@ -6,6 +7,7 @@ import {
   getBulaStatus,
   type UserBulaResponse,
 } from "@/api/bulas";
+import { userBulasQueryKey } from "@/hooks/use-user-bulas";
 
 export const BULA_STATUS_POLL_INTERVAL_MS = 3_000;
 
@@ -20,8 +22,9 @@ export function useBulaStatus(
   >
 ): UseQueryResult<BulaStatusResponse, Error> {
   const hasTerminalInitialStatus = isTerminalBulaStatus(bula.status);
+  const queryClient = useQueryClient();
 
-  return useQuery({
+  const result = useQuery({
     queryKey: ["user-bula-status", bula.id],
     queryFn: () => getBulaStatus(bula.id),
     initialData: {
@@ -41,4 +44,25 @@ export function useBulaStatus(
     refetchOnWindowFocus: false,
     retry: false,
   });
+  // Keep the personal list's filters/counts consistent with existing card polling.
+  useEffect(() => {
+    const status = result.data;
+    if (!status) return;
+    queryClient.setQueryData<UserBulaResponse[]>(userBulasQueryKey, (current) => {
+      if (
+        !current?.some(
+          (item) =>
+            item.id === status.id &&
+            (item.status !== status.status ||
+              item.drug_name !== status.drug_name ||
+              item.alias !== status.alias ||
+              item.manufacturer !== status.manufacturer ||
+              item.error_message !== status.error_message)
+        )
+      )
+        return current;
+      return current.map((item) => (item.id === status.id ? { ...item, ...status } : item));
+    });
+  }, [queryClient, result.data]);
+  return result;
 }

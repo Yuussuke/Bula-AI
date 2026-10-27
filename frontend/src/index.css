@@ -125,12 +125,10 @@
 @keyframes route-enter {
   from {
     opacity: 0.45;
-    transform: translateY(0.25rem);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
@@ -153,6 +151,45 @@
 
 .chat-message-enter {
   animation: chat-message-enter 160ms ease-out both;
+}
+
+.sidebar-scroll {
+  scrollbar-width: none;
+}
+
+.sidebar-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.clean-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--primary) 30%, transparent) transparent;
+}
+
+.clean-scroll:hover {
+  scrollbar-color: color-mix(in oklab, var(--primary) 55%, transparent) transparent;
+}
+
+.clean-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.clean-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.clean-scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--primary) 30%, transparent);
+}
+
+.clean-scroll:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--primary) 55%, transparent);
+}
+
+.clean-scroll::-webkit-scrollbar-button {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -207,7 +207,7 @@ describe("ChatPage", () => {
   it("starts general chat without loading a target leaflet and preserves its session", async () => {
     const user = userEvent.setup();
     renderChatPage("/chat");
-    expect(screen.getByRole("heading", { name: "Chat geral" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Chat geral", level: 1 })).toBeInTheDocument();
     expect(getQueryableBulaMock).not.toHaveBeenCalled();
     await user.type(
       screen.getByRole("textbox", { name: "Digite sua pergunta sobre a bula" }),
@@ -339,7 +339,7 @@ describe("ChatPage", () => {
     expect(scrollIntoViewMock.mock.calls.length).toBeGreaterThan(scrollCallCountBeforeSend);
   });
 
-  it("lists only sessions from the current bula and opens the selected conversation", async () => {
+  it("lists medication conversations across documents and opens the selected conversation", async () => {
     const user = userEvent.setup();
     renderChatPage();
 
@@ -350,7 +350,7 @@ describe("ChatPage", () => {
       },
       { timeout: 5_000 }
     );
-    expect(screen.queryByText("Conversa de outra bula")).not.toBeInTheDocument();
+    expect(screen.getByText("Conversa de outra bula")).toBeInTheDocument();
 
     await user.click(sessionLink);
 
@@ -365,7 +365,7 @@ describe("ChatPage", () => {
     renderChatPage(`/bulas/${BULA_ID}/chat?session=${SESSION_ID}`);
     expect(await screen.findByText("Resposta persistida no PostgreSQL.")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Nova conversa" }));
+    await user.click(screen.getByRole("button", { name: "Nova conversa desta bula" }));
 
     expect(screen.getByTestId("location")).toHaveTextContent(`/bulas/${BULA_ID}/chat`);
     expect(screen.queryByText("Resposta persistida no PostgreSQL.")).not.toBeInTheDocument();

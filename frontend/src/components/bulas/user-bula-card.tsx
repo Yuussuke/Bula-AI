@@ -10,9 +10,11 @@ import type { ReactElement } from "react";
 import { Link } from "react-router-dom";
 
 import type { BulaStatus, UserBulaResponse } from "@/api/bulas";
+import { BulaAliasDialog } from "@/components/bulas/bula-alias-dialog";
+import { ResumeBulaChat } from "@/components/bulas/resume-bula-chat";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { useBulaStatus } from "@/hooks/use-bula-status";
@@ -107,7 +109,7 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
             <FileText aria-hidden="true" className="text-primary h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">
-            <CardTitle id={`user-bula-${bula.id}-title`} className="truncate text-base">
+            <h2 id={`user-bula-${bula.id}-title`} className="truncate text-base font-semibold">
               {currentAlias ? (
                 currentAlias
               ) : isMetadataPending ? (
@@ -118,13 +120,14 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
               ) : (
                 currentDrugName
               )}
-            </CardTitle>
+            </h2>
             {isMetadataPending ? (
               <Skeleton aria-label="Identificando fabricante" className="mt-2 h-4 w-1/2" />
             ) : (
               <p className="text-muted-foreground mt-1 truncate text-sm">{metadataDescription}</p>
             )}
           </div>
+          <BulaAliasDialog bulaId={bula.id} alias={currentAlias} drugName={currentDrugName} />
         </div>
       </CardHeader>
 
@@ -142,7 +145,7 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
       </CardContent>
 
       {currentStatus === "ready" ? (
-        <CardFooter className="border-border bg-muted/20 mt-auto border-t px-5 pt-4">
+        <CardFooter className="border-border bg-muted/20 mt-auto flex-col gap-2 border-t px-5 pt-4">
           <Button asChild size="lg" className="group w-full justify-between rounded-lg shadow-sm">
             <Link to={`/bulas/${bula.id}/chat`}>
               <span className="flex items-center gap-2">
@@ -155,6 +158,7 @@ export function UserBulaCard({ bula }: UserBulaCardProps): ReactElement {
               />
             </Link>
           </Button>
+          <ResumeBulaChat bulaId={bula.id} />
         </CardFooter>
       ) : null}
     </Card>

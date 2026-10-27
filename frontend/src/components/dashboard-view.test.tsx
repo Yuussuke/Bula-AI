@@ -1,24 +1,35 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, render, screen, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactElement } from "react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { listSystemBulas, listUserBulas, type SystemBulaResponse } from "@/api/bulas";
+import {
+  listUserBulas,
+  searchSystemBulas,
+  type SystemBulaPage,
+  type SystemBulaResponse,
+} from "@/api/bulas";
+import { listChatSessions } from "@/api/chat";
+import { SystemBulaCatalog } from "@/components/bulas/system-bula-catalog";
+import { UserBulaSection } from "@/components/bulas/user-bula-section";
 import { DashboardView } from "@/components/dashboard-view";
 import { ApiError } from "@/lib/api";
+import { HomePage } from "@/pages/home-page";
 import { useAuthStore } from "@/store/auth";
 
 vi.mock("@/api/bulas", () => ({
   getBulaStatus: vi.fn(),
-  listSystemBulas: vi.fn(),
+  searchSystemBulas: vi.fn(),
   listUserBulas: vi.fn(),
   uploadBula: vi.fn(),
 }));
 
+vi.mock("@/api/chat", () => ({ listChatSessions: vi.fn() }));
+
 const BULA_ID = "11111111-1111-4111-8111-111111111111";
-const listSystemBulasMock = vi.mocked(listSystemBulas);
+const searchSystemBulasMock = vi.mocked(searchSystemBulas);
 const listUserBulasMock = vi.mocked(listUserBulas);
 
 interface DeferredPromise<T> {
@@ -69,23 +80,33 @@ function buildSystemBula(overrides: Partial<SystemBulaResponse> = {}): SystemBul
 
 function LocationProbe(): ReactElement {
   const location = useLocation();
-  return <output data-testid="location">{location.pathname}</output>;
+  return (
+    <output data-testid="location">
+      {location.pathname}
+      {location.search}
+    </output>
+  );
 }
 
-function renderDashboard(): ReturnType<typeof render> {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: { retry: false },
-      mutations: { retry: false },
-    },
-  });
+function results(items: SystemBulaResponse[], total = items.length, offset = 0): SystemBulaPage {
+  return { items, total, limit: 20, offset };
+}
 
+function renderDashboard(path = "/catalogo"): ReturnType<typeof render> {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  });
   return render(
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter initialEntries={["/"]}>
+      <MemoryRouter initialEntries={[path]}>
         <Routes>
-          <Route path="/" element={<DashboardView />} />
+          <Route element={<DashboardView />}>
+            <Route index element={<HomePage />} />
+            <Route path="/catalogo" element={<SystemBulaCatalog />} />
+            <Route path="/minhas-bulas" element={<UserBulaSection />} />
+          </Route>
           <Route path="/bulas/:bulaId/chat" element={<p>Chat da bula</p>} />
+          <Route path="/chat" element={<p>Chat geral de teste</p>} />
         </Routes>
         <LocationProbe />
       </MemoryRouter>
@@ -95,198 +116,283 @@ function renderDashboard(): ReturnType<typeof render> {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  listSystemBulasMock.mockResolvedValue([buildSystemBula()]);
+  searchSystemBulasMock.mockResolvedValue(results([buildSystemBula()]));
   listUserBulasMock.mockResolvedValue([]);
+  vi.mocked(listChatSessions).mockResolvedValue([]);
   useAuthStore.setState({
-    user: {
-      id: 5,
-      email: "admin@bulaai.com",
-      name: "Administrador Bula AI",
-      role: "admin",
-    },
+    user: { id: 5, email: "admin@bulaai.com", name: "Administrador Bula AI", role: "admin" },
     accessToken: "access-token",
     authResolved: true,
     isAuthenticated: true,
   });
 });
 
-describe("DashboardView system bula catalog", () => {
-  it("shows a loading state while the authenticated catalog is requested", async () => {
-    const deferredCatalog = createDeferredPromise<SystemBulaResponse[]>();
-    listSystemBulasMock.mockReturnValue(deferredCatalog.promise);
-    renderDashboard();
-
-    const catalogLoadingState = screen.getByRole("status", { name: "Carregando catálogo" });
-    expect(catalogLoadingState).toBeInTheDocument();
-    expect(catalogLoadingState.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(
-      20
+describe("library navigation", () => {
+  it("makes a saved medication conversation discoverable from the home sidebar", async () => {
+    vi.mocked(listChatSessions).mockImplementation(({ scope } = {}) =>
+      Promise.resolve(
+        scope === "bula"
+          ? [
+              {
+                id: "saved-session",
+                user_id: 5,
+                bula_id: BULA_ID,
+                scope: "bula",
+                title: "Dúvida sobre losartana",
+                created_at: "2026-10-25T10:00:00Z",
+                updated_at: "2026-10-26T10:00:00Z",
+                messages: [],
+              },
+            ]
+          : []
+      )
     );
-    expect(screen.getByRole("complementary")).toHaveClass("w-72", "shrink-0");
-
-    await act(async () => {
-      deferredCatalog.resolve([buildSystemBula()]);
-      await deferredCatalog.promise;
-    });
-
-    expect(
-      await within(screen.getByRole("main")).findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")
-    ).toBeInTheDocument();
-  });
-
-  it("shows an actionable empty state when no published bula is available", async () => {
-    listSystemBulasMock.mockResolvedValue([]);
-    renderDashboard();
-
-    expect(await screen.findByText("Nenhuma bula disponível")).toBeInTheDocument();
-    expect(screen.getByText(/Ainda não existem bulas publicadas e prontas/)).toBeInTheDocument();
-  });
-
-  it("renders publication, ingestion and provenance separately", async () => {
     const user = userEvent.setup();
-    renderDashboard();
-
-    expect(await screen.findByText("Publicada")).toBeInTheDocument();
-    expect(screen.getByText("Pronta")).toBeInTheDocument();
-    expect(screen.getByText("EMS S/A")).toBeInTheDocument();
-    expect(within(screen.getByRole("main")).getByText("500 mg + 125 mg")).toBeInTheDocument();
-
-    const provenanceSummary = screen.getByText("Sobre esta bula");
-    await user.click(provenanceSummary);
-
-    expect(provenanceSummary.closest("details")).toHaveAttribute("open");
-    expect(screen.getByText("102350532")).toBeInTheDocument();
-    expect(screen.getByText("Bula do paciente")).toBeInTheDocument();
-    expect(
-      screen.getByRole("link", {
-        name: "Consultar esta bula no Bulário Eletrônico da ANVISA",
-      })
-    ).toHaveAttribute(
+    renderDashboard("/");
+    const savedConversation = await screen.findByRole("link", { name: /Dúvida sobre losartana/ });
+    expect(savedConversation).toHaveAttribute(
       "href",
-      "https://consultas.anvisa.gov.br/#/bulario/q/?numeroRegistro=102350532"
+      `/bulas/${BULA_ID}/chat?session=saved-session`
     );
-    expect(screen.queryByText("253510242290107")).not.toBeInTheDocument();
-    expect(screen.queryByText(/Allan Yuussuke Kita/)).not.toBeInTheDocument();
+    await user.click(savedConversation);
+    expect(await screen.findByText("Chat da bula")).toBeInTheDocument();
+    expect(searchSystemBulasMock).not.toHaveBeenCalled();
   });
 
-  it("filters the small catalog by accent-insensitive text and audience", async () => {
+  it("offers three destinations without downloading document lists on the home page", async () => {
     const user = userEvent.setup();
-    listSystemBulasMock.mockResolvedValue([
-      buildSystemBula(),
-      buildSystemBula({
-        id: "22222222-2222-4222-8222-222222222222",
-        product_name: "DIPIRONA MONOIDRATADA",
-        active_ingredient: "dipirona monoidratada",
-        manufacturer: "Sanofi Medley",
-        audience: "professional",
-      }),
-    ]);
-    renderDashboard();
-    const catalogMain = screen.getByRole("main");
-
-    const searchInput = await screen.findByRole("searchbox", {
-      name: "Buscar no catálogo de bulas",
-    });
-    await user.type(searchInput, "potassio");
-
+    renderDashboard("/");
+    const main = within(screen.getByRole("main"));
+    expect(main.getAllByRole("link")).toHaveLength(3);
+    expect(searchSystemBulasMock).not.toHaveBeenCalled();
+    expect(listUserBulasMock).not.toHaveBeenCalled();
     expect(
-      within(catalogMain).getByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")
-    ).toBeInTheDocument();
-    expect(within(catalogMain).queryByText("DIPIRONA MONOIDRATADA")).not.toBeInTheDocument();
+      within(screen.getByRole("navigation", { name: "Navegação principal" })).getAllByRole("link")
+    ).toHaveLength(3);
+    await user.click(main.getByRole("link", { name: /Catálogo ANVISA/ }));
+    expect(await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")).toBeInTheDocument();
+    expect(screen.getByTestId("location")).toHaveTextContent("/catalogo");
+  });
 
-    await user.clear(searchInput);
+  it("keeps private uploads on their own page", async () => {
+    renderDashboard("/minhas-bulas");
+    expect(await screen.findByText("Nenhuma bula enviada")).toBeInTheDocument();
+    expect(screen.getByText(/Seus uploads são privados/)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Enviar bula" })).toBeInTheDocument();
+    expect(searchSystemBulasMock).not.toHaveBeenCalled();
+  });
+});
+
+describe("server-paginated system catalog", () => {
+  it("keeps controls together and clears search without redundant filter tags", async () => {
+    const user = userEvent.setup();
+    renderDashboard("/catalogo?q=amox&publico=patient&pagina=3");
+    await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO");
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "Ordenar catálogo" }),
+      "name_desc"
+    );
+    expect(searchSystemBulasMock).toHaveBeenLastCalledWith({
+      query: "amox",
+      audience: "patient",
+      limit: 20,
+      offset: 0,
+      sort: "name_desc",
+    });
+    expect(screen.queryByLabelText("Filtros ativos")).not.toBeInTheDocument();
+    await user.clear(screen.getByRole("searchbox"));
+    await waitFor(() =>
+      expect(searchSystemBulasMock).toHaveBeenLastCalledWith({
+        query: "",
+        audience: "patient",
+        limit: 20,
+        offset: 0,
+        sort: "name_desc",
+      })
+    );
+  });
+  it("shows only one bounded page and supports next/previous navigation", async () => {
+    const firstItems = Array.from({ length: 20 }, (_, index) =>
+      buildSystemBula({ id: "first-" + index, product_name: "Produto " + index })
+    );
+    searchSystemBulasMock.mockImplementation(({ offset }) =>
+      Promise.resolve(
+        results(
+          offset === 0 ? firstItems : [buildSystemBula({ product_name: "Segunda página" })],
+          41,
+          offset
+        )
+      )
+    );
+    const user = userEvent.setup();
+    renderDashboard();
+    expect(await screen.findByText("41 bulas encontradas")).toBeInTheDocument();
+    expect(screen.getAllByRole("article")).toHaveLength(20);
+    expect(screen.getAllByText("Página 1 de 3")).toHaveLength(2);
+    const topPagination = within(
+      screen.getByRole("navigation", { name: "Paginação superior do catálogo" })
+    );
+    const bottomPagination = within(
+      screen.getByRole("navigation", { name: "Paginação inferior do catálogo" })
+    );
+    expect(topPagination.getByRole("button", { name: "Anterior" })).toBeDisabled();
+    expect(bottomPagination.getByRole("button", { name: "Anterior" })).toBeDisabled();
+    await user.click(topPagination.getByRole("button", { name: "Próxima" }));
+    expect(await screen.findByText("Segunda página")).toBeInTheDocument();
+    expect(searchSystemBulasMock).toHaveBeenLastCalledWith({
+      query: "",
+      audience: "all",
+      limit: 20,
+      offset: 20,
+    });
+    expect(screen.getAllByText("Página 2 de 3")).toHaveLength(2);
+    await user.click(
+      within(screen.getByRole("navigation", { name: "Paginação inferior do catálogo" })).getByRole(
+        "button",
+        { name: "Anterior" }
+      )
+    );
+    expect(await screen.findByText("Produto 0")).toBeInTheDocument();
+    expect(screen.getAllByRole("article")).toHaveLength(20);
+  });
+
+  it("searches the server and resets pagination instead of filtering the downloaded page", async () => {
+    searchSystemBulasMock.mockImplementation(({ query, offset }) =>
+      Promise.resolve(
+        results(
+          [buildSystemBula({ product_name: query ? "Resultado remoto" : "Página inicial" })],
+          query ? 1 : 60,
+          offset
+        )
+      )
+    );
+    const user = userEvent.setup();
+    renderDashboard("/catalogo?pagina=2");
+    await screen.findByText("Página inicial");
+    await user.type(screen.getByRole("searchbox"), "termo alternativo");
+    expect(await screen.findByText("Resultado remoto")).toBeInTheDocument();
+    expect(screen.getByRole("searchbox")).toHaveFocus();
+    expect(searchSystemBulasMock).toHaveBeenLastCalledWith({
+      query: "termo alternativo",
+      audience: "all",
+      limit: 20,
+      offset: 0,
+    });
+    expect(screen.getAllByText("Página 1 de 1")).toHaveLength(2);
+    expect(screen.getByTestId("location")).toHaveTextContent("q=termo+alternativo");
     await user.selectOptions(screen.getByLabelText("Filtrar por público da bula"), "professional");
-
-    expect(within(catalogMain).getByText("DIPIRONA MONOIDRATADA")).toBeInTheDocument();
-    expect(
-      within(catalogMain).queryByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")
-    ).not.toBeInTheDocument();
-  });
-
-  it("offers ready published bulas as shortcuts in the sidebar", async () => {
-    const user = userEvent.setup();
-    renderDashboard();
-
-    const sidebar = screen.getByRole("navigation", { name: "Navegação principal" });
-    const bulaShortcut = await within(sidebar).findByRole("link", {
-      name: /Conversar sobre AMOXICILINA \+ CLAVULANATO DE POTÁSSIO, 500 mg \+ 125 mg/,
+    await screen.findByText("Resultado remoto");
+    expect(searchSystemBulasMock).toHaveBeenLastCalledWith({
+      query: "termo alternativo",
+      audience: "professional",
+      limit: 20,
+      offset: 0,
     });
-    await user.click(bulaShortcut);
-
-    expect(await screen.findByText("Chat da bula")).toBeInTheDocument();
-    expect(screen.getByTestId("location")).toHaveTextContent(`/bulas/${BULA_ID}/chat`);
   });
 
-  it("opens the selected ready and published bula in its routed chat page", async () => {
+  it("restores filters and page from the URL", async () => {
+    renderDashboard("/catalogo?q=potassio&publico=patient&pagina=3");
+    await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO");
+    expect(searchSystemBulasMock).toHaveBeenCalledWith({
+      query: "potassio",
+      audience: "patient",
+      limit: 20,
+      offset: 40,
+    });
+    expect(screen.getByRole("searchbox")).toHaveValue("potassio");
+    expect(screen.getByLabelText("Filtrar por público da bula")).toHaveValue("patient");
+  });
+
+  it("keeps missing metadata explicit and source details collapsed until requested", async () => {
+    searchSystemBulasMock.mockResolvedValue(
+      results([
+        buildSystemBula({
+          manufacturer: null,
+          source_published_at: null,
+          source_updated_at: null,
+          reviewed_by: null,
+          reviewed_at: null,
+        }),
+      ])
+    );
     const user = userEvent.setup();
     renderDashboard();
-
-    await user.click(await screen.findByRole("link", { name: "Conversar sobre esta bula" }));
-
-    expect(await screen.findByText("Chat da bula")).toBeInTheDocument();
-    expect(screen.getByTestId("location")).toHaveTextContent(`/bulas/${BULA_ID}/chat`);
+    expect(await screen.findByText("Fabricante não informado")).toBeInTheDocument();
+    const summary = screen.getByText("Detalhes e fonte");
+    expect(summary.closest("details")).not.toHaveAttribute("open");
+    await user.click(summary);
+    expect(summary.closest("details")).toHaveAttribute("open");
+    expect(screen.getByText("Não informado")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Consultar fonte na ANVISA" })).toHaveAttribute(
+      "href",
+      buildSystemBula().canonical_source_url
+    );
   });
 
-  it("hides unpublished documents and disables a published document that is not ready", async () => {
-    listSystemBulasMock.mockResolvedValue([
-      buildSystemBula({
-        id: "22222222-2222-4222-8222-222222222222",
-        product_name: "BULA EM REVISÃO",
-        publication_state: "vetted",
-      }),
-      buildSystemBula({
-        product_name: "BULA EM PROCESSAMENTO",
-        ingestion_status: "processing",
-      }),
-    ]);
-    renderDashboard();
-
-    expect(await screen.findByText("BULA EM PROCESSAMENTO")).toBeInTheDocument();
-    expect(screen.queryByText("BULA EM REVISÃO")).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Chat indisponível" })).toBeDisabled();
-    expect(
-      within(screen.getByRole("main")).getByText("Nenhuma bula pronta para conversa")
-    ).toBeInTheDocument();
-  });
-
-  it("offers retry after a catalog request fails", async () => {
+  it("opens a selected document in the individual chat", async () => {
     const user = userEvent.setup();
-    listSystemBulasMock
-      .mockRejectedValueOnce(new Error("Backend unavailable"))
-      .mockResolvedValueOnce([buildSystemBula()]);
     renderDashboard();
+    await user.click(await screen.findByRole("link", { name: /Conversar sobre AMOXICILINA/ }));
+    expect(await screen.findByText("Chat da bula")).toBeInTheDocument();
+  });
 
+  it("offers a first-page recovery for an out-of-range URL", async () => {
+    searchSystemBulasMock.mockImplementation(({ offset }) =>
+      Promise.resolve(results(offset ? [] : [buildSystemBula()], 1, offset))
+    );
+    const user = userEvent.setup();
+    renderDashboard("/catalogo?pagina=99");
+    expect(await screen.findByText("Esta página não tem resultados")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Voltar à primeira página" }));
+    expect(await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")).toBeInTheDocument();
+  });
+
+  it("shows loading without rendering the full catalog", async () => {
+    const deferred = createDeferredPromise<SystemBulaPage>();
+    searchSystemBulasMock.mockReturnValue(deferred.promise);
+    renderDashboard();
+    expect(screen.getByRole("status", { name: "Carregando catálogo" })).toBeInTheDocument();
+    expect(screen.queryByRole("article")).not.toBeInTheDocument();
+    await act(async () => {
+      deferred.resolve(results([buildSystemBula()]));
+      await deferred.promise;
+    });
+    expect(await screen.findByRole("article")).toBeInTheDocument();
+  });
+
+  it("distinguishes an empty catalog from an empty search", async () => {
+    searchSystemBulasMock.mockResolvedValue(results([]));
+    renderDashboard();
+    expect(await screen.findByText("Nenhuma bula disponível")).toBeInTheDocument();
+  });
+
+  it("clears an unsuccessful search", async () => {
+    searchSystemBulasMock.mockImplementation(({ query }) =>
+      Promise.resolve(results(query ? [] : [buildSystemBula()]))
+    );
+    const user = userEvent.setup();
+    renderDashboard("/catalogo?q=inexistente");
+    expect(await screen.findByText("Nenhuma bula encontrada")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Limpar busca e filtros" }));
+    expect(await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")).toBeInTheDocument();
+    expect(screen.getByRole("searchbox")).toHaveValue("");
+  });
+
+  it("offers retry for a failed request", async () => {
+    searchSystemBulasMock
+      .mockRejectedValueOnce(new Error("Unavailable"))
+      .mockResolvedValueOnce(results([buildSystemBula()]));
+    const user = userEvent.setup();
+    renderDashboard();
     expect(await screen.findByText("Não foi possível carregar o catálogo")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Tentar novamente" }));
-
-    expect(
-      await within(screen.getByRole("main")).findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")
-    ).toBeInTheDocument();
-    expect(listSystemBulasMock).toHaveBeenCalledTimes(2);
+    expect(await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")).toBeInTheDocument();
   });
 
-  it("explains when access to the catalog is denied", async () => {
-    listSystemBulasMock.mockRejectedValue(new ApiError(403, "Forbidden"));
+  it("explains denied access without retrying it", async () => {
+    searchSystemBulasMock.mockRejectedValue(new ApiError(403, "Forbidden"));
     renderDashboard();
-
     expect(await screen.findByText("Acesso ao catálogo não autorizado")).toBeInTheDocument();
-    expect(
-      screen.getByText(/Sua sessão expirou ou sua conta não possui acesso/)
-    ).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Tentar novamente" })).not.toBeInTheDocument();
-  });
-
-  it("loads the authenticated catalog again after the dashboard is remounted", async () => {
-    const firstDashboard = renderDashboard();
-    expect(
-      await within(screen.getByRole("main")).findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")
-    ).toBeInTheDocument();
-
-    firstDashboard.unmount();
-    renderDashboard();
-
-    expect(
-      await within(screen.getByRole("main")).findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")
-    ).toBeInTheDocument();
-    expect(listSystemBulasMock).toHaveBeenCalledTimes(2);
   });
 });

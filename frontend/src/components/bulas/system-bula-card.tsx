@@ -1,162 +1,101 @@
-import { ExternalLink, FileCheck2, MessageSquareText, ShieldCheck } from "lucide-react";
+import { ChevronDown, ExternalLink, MessageSquareText } from "lucide-react";
 import type { ReactElement } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-import type { BulaStatus, SystemBulaPublicationState, SystemBulaResponse } from "@/api/bulas";
-import { Badge } from "@/components/ui/badge";
+import type { SystemBulaResponse } from "@/api/bulas";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-
-const ANVISA_ELECTRONIC_LEAFLET_URL = "https://consultas.anvisa.gov.br/#/bulario/";
-
-function buildAnvisaElectronicLeafletUrl(registrationNumber: string): string {
-  const normalizedRegistrationNumber = registrationNumber.trim();
-  if (!normalizedRegistrationNumber) {
-    return ANVISA_ELECTRONIC_LEAFLET_URL;
-  }
-
-  const searchParams = new URLSearchParams({ numeroRegistro: normalizedRegistrationNumber });
-  return `${ANVISA_ELECTRONIC_LEAFLET_URL}q/?${searchParams.toString()}`;
-}
 
 interface SystemBulaCardProps {
   bula: SystemBulaResponse;
 }
 
-interface StatusPresentation {
-  label: string;
-  className: string;
-}
-
-const publicationPresentations: Record<SystemBulaPublicationState, StatusPresentation> = {
-  staged: { label: "Em preparação", className: "border-amber-200 bg-amber-50 text-amber-800" },
-  vetted: { label: "Revisada", className: "border-sky-200 bg-sky-50 text-sky-800" },
-  published: { label: "Publicada", className: "border-emerald-200 bg-emerald-50 text-emerald-800" },
-  withdrawn: { label: "Retirada", className: "border-slate-200 bg-slate-50 text-slate-700" },
-  rejected: { label: "Rejeitada", className: "border-red-200 bg-red-50 text-red-800" },
-};
-
-const ingestionPresentations: Record<BulaStatus, StatusPresentation> = {
-  pending: { label: "Pendente", className: "border-amber-200 bg-amber-50 text-amber-800" },
-  processing: { label: "Processando", className: "border-amber-200 bg-amber-50 text-amber-800" },
-  ready: { label: "Pronta", className: "border-emerald-200 bg-emerald-50 text-emerald-800" },
-  failed: { label: "Falha", className: "border-red-200 bg-red-50 text-red-800" },
-  error: { label: "Erro", className: "border-red-200 bg-red-50 text-red-800" },
-};
-
-const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
-  dateStyle: "medium",
-  timeZone: "America/Sao_Paulo",
-});
-
-function formatDate(dateValue: string | null): string {
-  if (!dateValue) {
-    return "Não informado";
-  }
-
-  const parsedDate = new Date(dateValue);
-  if (Number.isNaN(parsedDate.getTime())) {
-    return "Data inválida";
-  }
-
-  return dateFormatter.format(parsedDate);
+function formatDate(value: string | null): string {
+  if (!value) return "Não informado";
+  return new Intl.DateTimeFormat("pt-BR", {
+    dateStyle: "medium",
+    timeZone: "America/Sao_Paulo",
+  }).format(new Date(value));
 }
 
 export function SystemBulaCard({ bula }: SystemBulaCardProps): ReactElement {
-  const publicationPresentation = publicationPresentations[bula.publication_state];
-  const ingestionPresentation = ingestionPresentations[bula.ingestion_status];
+  const location = useLocation();
   const canOpenChat = bula.publication_state === "published" && bula.ingestion_status === "ready";
-  const anvisaElectronicLeafletUrl = buildAnvisaElectronicLeafletUrl(bula.registration_number);
-
   return (
-    <Card className="gap-0 overflow-hidden py-0">
-      <CardHeader className="gap-3 border-b py-5">
-        <div className="flex flex-wrap gap-2">
-          <Badge variant="outline" className={cn("gap-1", publicationPresentation.className)}>
-            <ShieldCheck aria-hidden="true" className="h-3.5 w-3.5" />
-            {publicationPresentation.label}
-          </Badge>
-          <Badge variant="outline" className={cn("gap-1", ingestionPresentation.className)}>
-            <FileCheck2 aria-hidden="true" className="h-3.5 w-3.5" />
-            {ingestionPresentation.label}
-          </Badge>
+    <article className="bg-card space-y-3 px-4 py-4 sm:px-5" aria-labelledby={`catalog-${bula.id}`}>
+      <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
+        <div className="min-w-0 space-y-1">
+          <h2 id={`catalog-${bula.id}`} className="font-semibold">
+            {bula.product_name}
+          </h2>
+          <p className="text-muted-foreground line-clamp-2 text-sm">
+            {bula.strength} · {bula.pharmaceutical_form}
+          </p>
+          <p className="text-muted-foreground text-xs">
+            {bula.manufacturer ?? "Fabricante não informado"}
+          </p>
         </div>
-        <div>
-          <CardTitle className="text-lg leading-snug">{bula.product_name}</CardTitle>
-          <p className="text-muted-foreground mt-1 text-sm">{bula.manufacturer}</p>
-        </div>
-      </CardHeader>
-
-      <CardContent className="flex-1 space-y-4 py-5">
-        <dl className="grid gap-3 text-sm">
-          <div>
-            <dt className="text-muted-foreground text-xs">Princípio ativo</dt>
-            <dd className="font-medium">{bula.active_ingredient}</dd>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <dt className="text-muted-foreground text-xs">Concentração</dt>
-              <dd>{bula.strength}</dd>
-            </div>
-            <div>
-              <dt className="text-muted-foreground text-xs">Público</dt>
-              <dd>{bula.audience === "patient" ? "Paciente" : "Profissional"}</dd>
-            </div>
-          </div>
-          <div>
-            <dt className="text-muted-foreground text-xs">Forma farmacêutica</dt>
-            <dd>{bula.pharmaceutical_form}</dd>
-          </div>
-          <div>
-            <dt className="text-muted-foreground text-xs">Apresentação</dt>
-            <dd>{bula.presentation}</dd>
-          </div>
-        </dl>
-
-        <details className="border-border rounded-lg border px-3 py-2 text-sm">
-          <summary className="cursor-pointer font-medium">Sobre esta bula</summary>
-          <dl className="mt-3 grid gap-2 text-xs">
-            <div>
-              <dt className="text-muted-foreground">Registro ANVISA</dt>
-              <dd className="break-all">{bula.registration_number}</dd>
-            </div>
-            <div>
-              <dt className="text-muted-foreground">Atualização no Bulário</dt>
-              <dd>{formatDate(bula.source_updated_at ?? bula.source_published_at)}</dd>
-            </div>
-            <div>
-              <dt className="text-muted-foreground">Tipo de documento</dt>
-              <dd>{bula.audience === "patient" ? "Bula do paciente" : "Bula profissional"}</dd>
-            </div>
-          </dl>
-          <a
-            href={anvisaElectronicLeafletUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary mt-3 inline-flex items-center gap-1 text-xs hover:underline"
-          >
-            Consultar esta bula no Bulário Eletrônico da ANVISA
-            <ExternalLink aria-hidden="true" className="h-3 w-3" />
-          </a>
-        </details>
-      </CardContent>
-
-      <CardFooter className="border-t py-4">
         {canOpenChat ? (
-          <Button asChild className="w-full gap-2">
-            <Link to={`/bulas/${bula.id}/chat`}>
-              <MessageSquareText aria-hidden="true" className="h-4 w-4" />
-              Conversar sobre esta bula
+          <Button asChild variant="outline" size="sm" className="shrink-0 self-start">
+            <Link
+              to={`/bulas/${bula.id}/chat`}
+              state={{ returnTo: `${location.pathname}${location.search}` }}
+              aria-label={`Conversar sobre ${bula.product_name}, ${bula.strength}`}
+            >
+              <MessageSquareText aria-hidden="true" className="mr-2 h-4 w-4" />
+              Conversar
             </Link>
           </Button>
         ) : (
-          <Button disabled className="w-full gap-2">
-            <MessageSquareText aria-hidden="true" className="h-4 w-4" />
+          <Button disabled variant="outline" size="sm">
             Chat indisponível
           </Button>
         )}
-      </CardFooter>
-    </Card>
+      </div>
+      <details className="group text-sm">
+        <summary className="text-primary flex w-fit cursor-pointer list-none items-center gap-1 rounded-sm text-xs focus-visible:outline-2">
+          <ChevronDown
+            aria-hidden="true"
+            className="h-3.5 w-3.5 transition-transform group-open:rotate-180"
+          />
+          Detalhes e fonte
+        </summary>
+        <div className="bg-muted/30 mt-3 grid gap-3 rounded-lg p-4 sm:grid-cols-2">
+          <div>
+            <p className="text-muted-foreground text-xs">Princípio ativo</p>
+            <p>{bula.active_ingredient}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground text-xs">Apresentação</p>
+            <p>{bula.presentation}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground text-xs">Concentração e forma</p>
+            <p>
+              {bula.strength} · {bula.pharmaceutical_form}
+            </p>
+          </div>
+          <div>
+            <p className="text-muted-foreground text-xs">Registro ANVISA</p>
+            <p>{bula.registration_number}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground text-xs">Atualização da fonte</p>
+            <p>{formatDate(bula.source_updated_at ?? bula.source_published_at)}</p>
+          </div>
+          <p className="text-muted-foreground text-xs">
+            {bula.audience === "patient" ? "Bula do paciente" : "Bula profissional"}
+          </p>
+          <a
+            href={bula.canonical_source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary inline-flex items-center gap-1 text-xs underline underline-offset-4"
+          >
+            Consultar fonte na ANVISA
+            <ExternalLink aria-hidden="true" className="h-3 w-3" />
+          </a>
+        </div>
+      </details>
+    </article>
   );
 }

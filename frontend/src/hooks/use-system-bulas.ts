@@ -1,17 +1,13 @@
 import { useQuery, type UseQueryResult } from "@tanstack/react-query";
 
-import { listSystemBulas, type SystemBulaResponse } from "@/api/bulas";
+import { searchSystemBulas, type SystemBulaPage, type SystemBulaSearchOptions } from "@/api/bulas";
 
-const SYSTEM_BULA_LIST_LIMIT = 100;
-
-export const systemBulasQueryKey = [
-  "system-bulas",
-  { limit: SYSTEM_BULA_LIST_LIMIT, offset: 0 },
-] as const;
-
-export function useSystemBulas(): UseQueryResult<SystemBulaResponse[], Error> {
+export function useSystemBulas(
+  options: SystemBulaSearchOptions
+): UseQueryResult<SystemBulaPage, Error> {
   return useQuery({
-    queryKey: systemBulasQueryKey,
-    queryFn: () => listSystemBulas({ limit: SYSTEM_BULA_LIST_LIMIT, offset: 0 }),
+    queryKey: ["system-bulas", options],
+    queryFn: () => searchSystemBulas(options),
+    staleTime: 30_000,
   });
 }

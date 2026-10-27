@@ -4,8 +4,8 @@ import {
   getBulaStatus,
   getQueryableBula,
   getSystemBula,
-  listSystemBulas,
   listUserBulas,
+  searchSystemBulas,
   type SystemBulaResponse,
   uploadBula,
   type UserBulaResponse,
@@ -56,18 +56,21 @@ describe("system bula API", () => {
 
   it("lists the authenticated system catalog with bounded pagination", async () => {
     const fetchMock = vi.fn<typeof fetch>();
+    const page = { items: [], total: 0, limit: 20, offset: 40 };
     fetchMock.mockResolvedValue(
-      new Response(JSON.stringify([]), {
+      new Response(JSON.stringify(page), {
         status: 200,
         headers: { "Content-Type": "application/json" },
       })
     );
     vi.stubGlobal("fetch", fetchMock);
 
-    await expect(listSystemBulas({ limit: 50, offset: 10 })).resolves.toEqual([]);
+    await expect(
+      searchSystemBulas({ query: "ácido 500", audience: "patient", limit: 20, offset: 40 })
+    ).resolves.toEqual(page);
 
     expect(fetchMock).toHaveBeenCalledWith(
-      `${API_BASE_URL}/api/v1/bulas/system?limit=50&offset=10`,
+      `${API_BASE_URL}/api/v1/bulas/system/search?query=%C3%A1cido+500&audience=patient&limit=20&offset=40`,
       expect.objectContaining({ method: "GET", credentials: "include" })
     );
     const requestHeaders = new Headers(fetchMock.mock.calls[0][1]?.headers);
