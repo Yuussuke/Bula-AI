@@ -1,15 +1,19 @@
 "use client";
 
-import { AlertCircle } from "lucide-react";
+import { Info } from "lucide-react";
+import type { ReactElement } from "react";
 
-export function MedicalWarning() {
+export function MedicalWarning(): ReactElement {
   return (
-    <div className="bg-accent/10 border-accent/20 flex items-start gap-3 border-b px-4 py-3 sm:px-6">
-      <AlertCircle className="text-accent mt-0.5 h-5 w-5 flex-shrink-0" />
-      <p className="text-foreground text-sm">
-        <span className="font-semibold">Aviso:</span> O Bula AI é um assistente informacional e não
-        substitui a avaliação de um médico. Sempre consulte seu médico antes de fazer mudanças em
-        sua medicação.
+    <div
+      role="note"
+      aria-label="Aviso sobre o Bula AI"
+      className="mb-3 flex items-start gap-2.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm leading-relaxed text-amber-950"
+    >
+      <Info aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-amber-700" />
+      <p>
+        <strong className="font-semibold">Importante:</strong> O Bula AI consulta bulas e não
+        substitui a orientação de um profissional de saúde.
       </p>
     </div>
   );

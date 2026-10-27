@@ -48,17 +48,17 @@ describe("ChatBubble citations", () => {
     await waitFor(
       () => {
         const citedChunk = document.getElementById("chat-message-assistant-1-source-1");
-        expect(screen.getByRole("button", { name: "Ver 1 fonte na bula" })).toHaveAttribute(
-          "data-state",
-          "open"
-        );
+        expect(screen.getByRole("dialog", { name: "Fontes da resposta" })).toBeVisible();
         expect(citedChunk).toHaveFocus();
         expect(scrollIntoViewMock).toHaveBeenCalledWith({
-          behavior: "smooth",
-          block: "center",
+          behavior: "auto",
+          block: "start",
         });
       },
       { timeout: 5_000 }
     );
+    await user.click(screen.getByRole("button", { name: "Fechar" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    await waitFor(() => expect(citationLink).toHaveFocus());
   }, 10_000);
 });

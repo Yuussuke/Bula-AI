@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { authFetch, SessionExpiredError } from "@/lib/api";
+import { ApiError, authFetch, requestJson, SessionExpiredError } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { useAuthStore } from "@/store/auth";
 
@@ -118,5 +118,21 @@ describe("authFetch", () => {
       isAuthenticated: false,
     });
     expect(queryClient.getQueryData(["private-session"])).toBeUndefined();
+  });
+
+  it("preserves the rejected field without resending a validation failure", async () => {
+    const detail = [{ loc: ["body", "mode"], msg: "Unsupported mode" }];
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(createJsonResponse({ detail }, 422));
+    vi.stubGlobal("fetch", fetchMock);
+    const error: unknown = await requestJson("/api/v1/chat/ask", { method: "POST" }).catch(
+      (caught: unknown) => caught
+    );
+    expect(error).toBeInstanceOf(ApiError);
+    expect(error).toMatchObject({
+      status: 422,
+      message: "Unsupported mode",
+      validationErrors: detail,
+    });
+    expect(fetchMock).toHaveBeenCalledOnce();
   });
 });

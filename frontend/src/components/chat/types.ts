@@ -13,5 +13,6 @@ export interface ChatTimeline {
   sessionId: string;
   bulaId: string | null;
   scope: ChatScope;
+  hasInvalidMode: boolean;
   messages: ChatTimelineMessage[];
 }
