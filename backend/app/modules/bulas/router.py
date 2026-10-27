@@ -17,6 +17,7 @@ from app.modules.auth.dependencies import get_current_user
 from app.modules.bulas.dependencies import get_bula_service
 from app.modules.bulas.schemas import (
     BulaResponse,
+    BulaAliasUpdate,
     BulaStatusResponse,
     QueryableBulaResponse,
     SystemBulaResponse,
@@ -140,3 +141,16 @@ async def get_bula_status(
         user_id=cast(int, current_user.id),
     )
     return BulaStatusResponse.model_validate(bula)
+
+
+@router.patch("/{bula_id}/alias", response_model=BulaResponse)
+async def update_private_alias(
+    bula_id: UUID,
+    payload: BulaAliasUpdate,
+    current_user: auth_models.User = Depends(get_current_user),
+    bula_service: BulaService = Depends(get_bula_service),
+) -> BulaResponse:
+    bula = await bula_service.update_private_alias(
+        bula_id=bula_id, user_id=cast(int, current_user.id), alias=payload.alias
+    )
+    return BulaResponse.model_validate(bula)

@@ -123,6 +123,14 @@ class BulaService:
     async def list_bulas_for_user(self, *, user_id: int) -> list[Bula]:
         return await self.repo.list_by_user(user_id=user_id, corpus=BulaCorpus.PRIVATE)
 
+    async def update_private_alias(
+        self, *, bula_id: UUID, user_id: int, alias: str | None
+    ) -> Bula:
+        bula = await self.repo.get_by_id_for_user(bula_id=bula_id, user_id=user_id)
+        if bula is None or bula.corpus != BulaCorpus.PRIVATE:
+            raise HTTPException(status_code=404, detail="Bula privada não encontrada.")
+        return await self.repo.update_alias(bula=bula, alias=self._clean_alias(alias))
+
     async def list_published_system_bulas(
         self,
         *,

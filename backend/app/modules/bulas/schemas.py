@@ -51,6 +51,12 @@ class BulaResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class BulaAliasUpdate(BaseModel):
+    alias: str | None = Field(max_length=100)
+
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
+
+
 class BulaUploadResponse(BaseModel):
     filename: str
     pages: int

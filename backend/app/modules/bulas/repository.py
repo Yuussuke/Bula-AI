@@ -400,6 +400,12 @@ class BulaRepository:
         await self.db.refresh(bula)
         return bula
 
+    async def update_alias(self, *, bula: Bula, alias: str | None) -> Bula:
+        bula.alias = alias
+        await self.db.commit()
+        await self.db.refresh(bula)
+        return bula
+
     async def update_extracted_metadata(
         self,
         *,

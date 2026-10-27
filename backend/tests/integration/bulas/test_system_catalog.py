@@ -485,3 +485,55 @@ async def test_catalog_search_handles_accents_multiple_fields_literal_wildcards_
     assert response.json()["total"] == 0 and response.json()["items"] == []
     unauthorized = await client.get("/api/v1/bulas/system/search")
     assert unauthorized.status_code == 401
+
+
+@pytest.mark.anyio
+async def test_alias_edit_is_private_owner_only_and_preserves_official_identity(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    token = await get_access_token(client, email="alias-owner@example.com")
+    other_token = await get_access_token(client, email="alias-other@example.com")
+    private = Bula(
+        user_id=1,
+        drug_name="Official product",
+        manufacturer="Official maker",
+        corpus=BulaCorpus.PRIVATE,
+        status=BulaStatus.READY,
+    )
+    db_session.add(private)
+    await db_session.commit()
+    path = f"/api/v1/bulas/{private.id}/alias"
+
+    denied = await client.patch(
+        path, json={"alias": "Not mine"}, headers=auth_headers(other_token)
+    )
+    assert denied.status_code == 404
+    unauthenticated = await client.patch(path, json={"alias": "Unknown"})
+    assert unauthenticated.status_code == 401
+    response = await client.patch(
+        path, json={"alias": "  Meu apelido  "}, headers=auth_headers(token)
+    )
+    assert response.status_code == 200
+    assert response.json()["alias"] == "Meu apelido"
+    assert response.json()["drug_name"] == "Official product"
+    assert response.json()["manufacturer"] == "Official maker"
+    assert response.json()["status"] == "ready"
+    listed = await client.get("/api/v1/bulas/", headers=auth_headers(token))
+    assert listed.json()[0]["alias"] == "Meu apelido"
+    cleared = await client.patch(
+        path, json={"alias": "   "}, headers=auth_headers(token)
+    )
+    assert cleared.json()["alias"] is None
+
+    system = await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Published source",
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    denied = await client.patch(
+        f"/api/v1/bulas/{system.id}/alias",
+        json={"alias": "Changed"},
+        headers=auth_headers(token),
+    )
+    assert denied.status_code == 404

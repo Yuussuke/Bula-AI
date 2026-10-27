@@ -14,3 +14,7 @@ whole authorized catalog before counting and pagination; wildcard characters are
 literal. Stable A–Z/Z–A ordering includes document-ID tie-breaking. The legacy
 system list remains available. `GET /api/v1/bulas/` returns owned private uploads.
 These metadata requests invoke no embeddings, reranker or language model.
+
+`PATCH /api/v1/bulas/{id}/alias` accepts `{alias: string | null}` for owned private
+uploads only. Whitespace is trimmed; null/blank restores the official display name.
+The official product name, sources and indexed content are unchanged.
