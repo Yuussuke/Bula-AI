@@ -1,227 +1,232 @@
-import { AlertCircle, FileSearch, RefreshCw } from "lucide-react";
-import { type ReactElement, useMemo, useState } from "react";
+import { AlertCircle, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { type ReactElement, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 
-import { type SystemBulaResponse } from "@/api/bulas";
 import { SystemBulaCard } from "@/components/bulas/system-bula-card";
-import { type AudienceFilter, SystemBulaFilters } from "@/components/bulas/system-bula-filters";
+import {
+  type AudienceFilter,
+  type CatalogSort,
+  SystemBulaFilters,
+} from "@/components/bulas/system-bula-filters";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useSystemBulas } from "@/hooks/use-system-bulas";
 import { ApiError, SessionExpiredError } from "@/lib/api";
 
-function normalizeSearchValue(value: string): string {
-  return value
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLocaleLowerCase("pt-BR")
-    .trim();
-}
-
-function matchesSearchTerm(bula: SystemBulaResponse, normalizedSearchTerm: string): boolean {
-  if (!normalizedSearchTerm) {
-    return true;
-  }
-
-  const searchableValues = [
-    bula.product_name,
-    bula.active_ingredient,
-    bula.manufacturer,
-    bula.strength,
-    bula.pharmaceutical_form,
-  ];
-
-  return searchableValues.some((value) =>
-    normalizeSearchValue(value).includes(normalizedSearchTerm)
-  );
-}
-
-function CatalogLoadingState(): ReactElement {
-  return (
-    <section role="status" aria-label="Carregando catálogo" className="space-y-5">
-      <span className="sr-only">Carregando catálogo de bulas…</span>
-
-      <div className="space-y-2">
-        <Skeleton className="h-7 w-48" />
-        <Skeleton className="h-4 w-full max-w-xl" />
-      </div>
-
-      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_14.5rem]">
-        <Skeleton className="h-10 w-full" />
-        <Skeleton className="h-10 w-full" />
-      </div>
-
-      <Skeleton className="h-4 w-32" />
-
-      <div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {Array.from({ length: 6 }, (_, index) => (
-          <div key={index} className="border-border bg-card rounded-xl border p-5">
-            <div className="flex gap-2">
-              <Skeleton className="h-6 w-20" />
-              <Skeleton className="h-6 w-16" />
-            </div>
-            <Skeleton className="mt-5 h-6 w-4/5" />
-            <Skeleton className="mt-2 h-4 w-2/5" />
-            <div className="mt-7 space-y-4">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-4/5" />
-              <Skeleton className="h-4 w-3/5" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-            <Skeleton className="mt-7 h-10 w-full" />
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-interface EmptyCatalogStateProps {
-  hasActiveFilters: boolean;
-  onClearFilters: () => void;
-}
-
-function EmptyCatalogState({
-  hasActiveFilters,
-  onClearFilters,
-}: EmptyCatalogStateProps): ReactElement {
-  return (
-    <Card className="border-dashed">
-      <CardContent className="flex flex-col items-center py-16 text-center">
-        <div className="bg-muted mb-4 flex h-14 w-14 items-center justify-center rounded-full">
-          <FileSearch aria-hidden="true" className="text-muted-foreground h-7 w-7" />
-        </div>
-        <h2 className="text-lg font-semibold">
-          {hasActiveFilters ? "Nenhuma bula encontrada" : "Nenhuma bula disponível"}
-        </h2>
-        <p className="text-muted-foreground mt-2 max-w-lg text-sm">
-          {hasActiveFilters
-            ? "Tente buscar por outro medicamento, princípio ativo ou fabricante."
-            : "Ainda não existem bulas publicadas e prontas para consulta no catálogo."}
-        </p>
-        {hasActiveFilters ? (
-          <Button type="button" variant="outline" className="mt-5" onClick={onClearFilters}>
-            Limpar busca e filtros
-          </Button>
-        ) : null}
-      </CardContent>
-    </Card>
-  );
-}
+const PAGE_SIZE = 20;
 
 export function SystemBulaCatalog(): ReactElement {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [audience, setAudience] = useState<AudienceFilter>("all");
-  const catalogQuery = useSystemBulas();
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const [parameters, setParameters] = useSearchParams();
+  const searchTerm = parameters.get("q") ?? "";
+  const audienceValue = parameters.get("publico");
+  const sort: CatalogSort = parameters.get("ordem") === "za" ? "name_desc" : "name_asc";
+  const audience: AudienceFilter =
+    audienceValue === "patient" || audienceValue === "professional" ? audienceValue : "all";
+  const requestedPage = Number(parameters.get("pagina") ?? 1);
+  const page =
+    Number.isSafeInteger(requestedPage) &&
+    requestedPage > 0 &&
+    requestedPage <= Math.floor(Number.MAX_SAFE_INTEGER / PAGE_SIZE)
+      ? requestedPage
+      : 1;
+  const catalogQuery = useSystemBulas({
+    query: searchTerm,
+    audience,
+    limit: PAGE_SIZE,
+    offset: (page - 1) * PAGE_SIZE,
+    ...(sort === "name_desc" ? { sort } : {}),
+  });
+  const items = catalogQuery.data?.items ?? [];
+  const total = catalogQuery.data?.total ?? 0;
+  const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const hasFilters = searchTerm.length > 0 || audience !== "all";
 
-  const publishedBulas = useMemo(
-    () => (catalogQuery.data ?? []).filter((bula) => bula.publication_state === "published"),
-    [catalogQuery.data]
-  );
-  const filteredBulas = useMemo(() => {
-    const normalizedSearchTerm = normalizeSearchValue(searchTerm);
-
-    return publishedBulas.filter((bula) => {
-      const matchesAudience = audience === "all" || bula.audience === audience;
-      return matchesAudience && matchesSearchTerm(bula, normalizedSearchTerm);
-    });
-  }, [audience, publishedBulas, searchTerm]);
-  const hasActiveFilters = searchTerm.trim().length > 0 || audience !== "all";
-  const hasReadyBula = publishedBulas.some((bula) => bula.ingestion_status === "ready");
-
-  const clearFilters = (): void => {
-    setSearchTerm("");
-    setAudience("all");
+  const navigateToResults = (
+    query: string,
+    targetAudience: AudienceFilter,
+    targetPage = 1,
+    targetSort: CatalogSort = sort
+  ): void => {
+    const next = new URLSearchParams();
+    if (query) next.set("q", query);
+    if (targetAudience !== "all") next.set("publico", targetAudience);
+    if (targetPage > 1) next.set("pagina", String(targetPage));
+    if (targetSort === "name_desc") next.set("ordem", "za");
+    setParameters(next);
+    if (targetPage !== page) titleRef.current?.scrollIntoView?.({ block: "start" });
   };
 
-  if (catalogQuery.isLoading) {
-    return <CatalogLoadingState />;
-  }
-
-  if (catalogQuery.isError) {
-    const isAccessDenied =
-      catalogQuery.error instanceof SessionExpiredError ||
-      (catalogQuery.error instanceof ApiError && catalogQuery.error.status === 403);
-
-    return (
-      <Alert variant="destructive">
-        <AlertCircle aria-hidden="true" />
-        <AlertTitle>
-          {isAccessDenied
-            ? "Acesso ao catálogo não autorizado"
-            : "Não foi possível carregar o catálogo"}
-        </AlertTitle>
-        <AlertDescription className="flex flex-col items-start gap-3">
-          <span>
-            {isAccessDenied
-              ? "Sua sessão expirou ou sua conta não possui acesso a este conteúdo. Entre novamente."
-              : "Verifique a conexão com o servidor e tente novamente."}
-          </span>
-          {!isAccessDenied ? (
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="gap-2"
-              onClick={() => void catalogQuery.refetch()}
-            >
-              <RefreshCw aria-hidden="true" className="h-3.5 w-3.5" />
-              Tentar novamente
-            </Button>
-          ) : null}
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
-  if (publishedBulas.length === 0) {
-    return <EmptyCatalogState hasActiveFilters={false} onClearFilters={clearFilters} />;
-  }
-
+  const isAccessDenied =
+    catalogQuery.error instanceof SessionExpiredError ||
+    (catalogQuery.error instanceof ApiError && catalogQuery.error.status === 403);
   return (
-    <section aria-labelledby="system-catalog-title" className="space-y-5">
-      <div className="space-y-1">
-        <h2 id="system-catalog-title" className="text-xl font-semibold">
-          Bulas verificadas
-        </h2>
+    <section className="space-y-5" aria-labelledby="system-catalog-title">
+      <div className="space-y-2">
+        <h1
+          ref={titleRef}
+          id="system-catalog-title"
+          className="text-2xl font-semibold tracking-tight"
+        >
+          Catálogo ANVISA
+        </h1>
         <p className="text-muted-foreground text-sm">
-          Escolha uma bula publicada para conversar com o Bula AI usando o conteúdo oficial.
+          Pesquise no catálogo e confira o fabricante, a concentração e a apresentação antes de
+          conversar.
         </p>
       </div>
-
       <SystemBulaFilters
         searchTerm={searchTerm}
         audience={audience}
-        onSearchTermChange={setSearchTerm}
-        onAudienceChange={setAudience}
+        sort={sort}
+        onSearch={(query, selectedAudience, selectedSort) =>
+          navigateToResults(query, selectedAudience, 1, selectedSort)
+        }
       />
-
-      {!hasReadyBula ? (
-        <Alert>
+      {catalogQuery.isLoading ? (
+        <div role="status" aria-label="Carregando catálogo" className="space-y-3">
+          {Array.from({ length: 5 }, (_, index) => (
+            <Skeleton key={index} className="h-24 w-full" />
+          ))}
+        </div>
+      ) : null}
+      {catalogQuery.isError ? (
+        <Alert variant="destructive">
           <AlertCircle aria-hidden="true" />
-          <AlertTitle>Nenhuma bula pronta para conversa</AlertTitle>
+          <AlertTitle>
+            {isAccessDenied
+              ? "Acesso ao catálogo não autorizado"
+              : "Não foi possível carregar o catálogo"}
+          </AlertTitle>
           <AlertDescription>
-            As bulas publicadas ainda estão sendo processadas ou precisam de atenção.
+            <p>
+              {isAccessDenied
+                ? "Sua sessão expirou ou sua conta não possui acesso a este conteúdo. Entre novamente."
+                : "Verifique a conexão com o servidor e tente novamente."}
+            </p>
+            {!isAccessDenied ? (
+              <Button
+                variant="outline"
+                size="sm"
+                className="mt-3"
+                onClick={() => void catalogQuery.refetch()}
+              >
+                <RefreshCw aria-hidden="true" className="mr-2 h-4 w-4" />
+                Tentar novamente
+              </Button>
+            ) : null}
           </AlertDescription>
         </Alert>
       ) : null}
-
-      <p className="text-muted-foreground text-sm" role="status">
-        {filteredBulas.length === 1
-          ? "1 bula encontrada"
-          : `${filteredBulas.length} bulas encontradas`}
-      </p>
-
-      {filteredBulas.length === 0 ? (
-        <EmptyCatalogState hasActiveFilters={hasActiveFilters} onClearFilters={clearFilters} />
-      ) : (
-        <div className="grid items-stretch gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {filteredBulas.map((bula) => (
-            <SystemBulaCard key={bula.id} bula={bula} />
-          ))}
-        </div>
-      )}
+      {catalogQuery.isSuccess ? (
+        <>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <p role="status" className="text-muted-foreground flex flex-wrap gap-x-3 text-sm">
+              <span>{total === 1 ? "1 bula encontrada" : `${total} bulas encontradas`}</span>
+              {items.length > 0 ? (
+                <span>
+                  Mostrando {(page - 1) * PAGE_SIZE + 1}–{(page - 1) * PAGE_SIZE + items.length}
+                </span>
+              ) : null}
+            </p>
+            {total > 0 ? (
+              <CatalogPagination
+                position="superior"
+                page={page}
+                pageCount={pageCount}
+                onPageChange={(nextPage) => navigateToResults(searchTerm, audience, nextPage)}
+              />
+            ) : null}
+          </div>
+          {items.length > 0 ? (
+            <div className="divide-y overflow-hidden rounded-xl border">
+              {items.map((bula) => (
+                <SystemBulaCard key={bula.id} bula={bula} />
+              ))}
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed p-10 text-center">
+              <h2 className="font-medium">
+                {total > 0
+                  ? "Esta página não tem resultados"
+                  : hasFilters
+                    ? "Nenhuma bula encontrada"
+                    : "Nenhuma bula disponível"}
+              </h2>
+              <p className="text-muted-foreground mt-2 text-sm">
+                {total > 0
+                  ? "Volte à primeira página para consultar os resultados disponíveis."
+                  : hasFilters
+                    ? "Tente outro nome, princípio ativo, fabricante ou concentração."
+                    : "Ainda não existem bulas publicadas e prontas para consulta no catálogo."}
+              </p>
+              {hasFilters || page > 1 ? (
+                <Button
+                  variant="outline"
+                  className="mt-4"
+                  onClick={() =>
+                    navigateToResults(page > 1 ? searchTerm : "", page > 1 ? audience : "all")
+                  }
+                >
+                  {page > 1 ? "Voltar à primeira página" : "Limpar busca e filtros"}
+                </Button>
+              ) : null}
+            </div>
+          )}
+          {total > 0 ? (
+            <CatalogPagination
+              position="inferior"
+              page={page}
+              pageCount={pageCount}
+              onPageChange={(nextPage) => navigateToResults(searchTerm, audience, nextPage)}
+            />
+          ) : null}
+        </>
+      ) : null}
     </section>
+  );
+}
+
+function CatalogPagination({
+  position,
+  page,
+  pageCount,
+  onPageChange,
+}: {
+  position: "superior" | "inferior";
+  page: number;
+  pageCount: number;
+  onPageChange: (page: number) => void;
+}): ReactElement {
+  return (
+    <nav
+      aria-label={`Paginação ${position} do catálogo`}
+      className="flex flex-wrap items-center justify-between gap-3"
+    >
+      <span className="text-muted-foreground text-sm">
+        Página {page} de {pageCount}
+      </span>
+      <div className="flex gap-2">
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={page === 1}
+          onClick={() => onPageChange(page - 1)}
+        >
+          <ChevronLeft aria-hidden="true" className="mr-1 h-4 w-4" />
+          Anterior
+        </Button>
+        <Button
+          size="sm"
+          variant="outline"
+          disabled={page >= pageCount}
+          onClick={() => onPageChange(page + 1)}
+        >
+          Próxima
+          <ChevronRight aria-hidden="true" className="ml-1 h-4 w-4" />
+        </Button>
+      </div>
+    </nav>
   );
 }

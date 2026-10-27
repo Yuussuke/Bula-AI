@@ -69,6 +69,7 @@ export interface ListChatSessionsOptions {
   offset?: number;
   scope?: ChatScope;
   bulaId?: string;
+  sort?: "created_at" | "updated_at";
 }
 
 export async function askCrossBulaQuestion(payload: AskRequest): Promise<AskResponse> {
@@ -109,6 +110,7 @@ export async function listChatSessions({
   offset = 0,
   scope,
   bulaId,
+  sort,
 }: ListChatSessionsOptions = {}): Promise<ChatSessionResponse[]> {
   const searchParams = new URLSearchParams({
     limit: String(limit),
@@ -116,6 +118,7 @@ export async function listChatSessions({
   });
   if (scope) searchParams.set("scope", scope);
   if (bulaId) searchParams.set("bula_id", bulaId);
+  if (sort) searchParams.set("sort", sort);
 
   return requestJson<ChatSessionResponse[]>(`${CHAT_SESSIONS_PREFIX}?${searchParams.toString()}`, {
     method: "GET",

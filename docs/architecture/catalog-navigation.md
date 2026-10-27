@@ -22,3 +22,10 @@ The official product name, sources and indexed content are unchanged.
 Session listing optionally accepts `sort=updated_at`, applied before pagination;
 its default remains creation order. Completed turns update session activity in
 the same transaction as both messages. Ownership and scope filters are preserved.
+
+## Client navigation
+
+Home links to `/minhas-bulas`, `/catalogo` and `/chat`. The catalog searches after
+350 ms, retains filters in the URL and offers pagination above/below its rows.
+Private uploads have client-side search/status filters and 12-card pages; their
+list endpoint remains unpaginated. Aliases never replace official identity.
