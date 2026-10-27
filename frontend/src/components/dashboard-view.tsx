@@ -3,6 +3,7 @@ import { BookOpenText, House, Library, LogOut, Menu, Pill } from "lucide-react";
 import { type ReactElement, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 
+import { RecentConversations } from "@/components/chat/recent-conversations";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -75,6 +76,7 @@ export function DashboardView(): ReactElement {
             </NavLink>
           ))}
         </nav>
+        <RecentConversations onNavigate={() => setIsMobileMenuOpen(false)} />
       </div>
       <div className="border-sidebar-border border-t p-4">
         <p className="truncate text-sm font-medium">{user?.name ?? "Usuário"}</p>

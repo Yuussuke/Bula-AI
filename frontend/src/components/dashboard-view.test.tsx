@@ -128,6 +128,37 @@ beforeEach(() => {
 });
 
 describe("library navigation", () => {
+  it("makes a saved medication conversation discoverable from the home sidebar", async () => {
+    vi.mocked(listChatSessions).mockImplementation(({ scope } = {}) =>
+      Promise.resolve(
+        scope === "bula"
+          ? [
+              {
+                id: "saved-session",
+                user_id: 5,
+                bula_id: BULA_ID,
+                scope: "bula",
+                title: "Dúvida sobre losartana",
+                created_at: "2026-10-25T10:00:00Z",
+                updated_at: "2026-10-26T10:00:00Z",
+                messages: [],
+              },
+            ]
+          : []
+      )
+    );
+    const user = userEvent.setup();
+    renderDashboard("/");
+    const savedConversation = await screen.findByRole("link", { name: /Dúvida sobre losartana/ });
+    expect(savedConversation).toHaveAttribute(
+      "href",
+      `/bulas/${BULA_ID}/chat?session=saved-session`
+    );
+    await user.click(savedConversation);
+    expect(await screen.findByText("Chat da bula")).toBeInTheDocument();
+    expect(searchSystemBulasMock).not.toHaveBeenCalled();
+  });
+
   it("offers three destinations without downloading document lists on the home page", async () => {
     const user = userEvent.setup();
     renderDashboard("/");
