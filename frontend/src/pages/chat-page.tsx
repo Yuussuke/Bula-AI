@@ -9,6 +9,7 @@ import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatSessionNavigation } from "@/components/chat/chat-session-navigation";
 import { ModeIndicator } from "@/components/chat/mode-indicator";
+import { ModeSelector } from "@/components/chat/mode-selector";
 import { MedicalWarning } from "@/components/medical-warning";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -260,6 +261,16 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
         <main className="mx-auto flex w-full max-w-5xl flex-1 p-3 sm:p-6">
           <Card className="flex min-h-[75vh] w-full flex-col overflow-hidden py-0">
             <MedicalWarning />
+            <ModeSelector
+              value={chatSession.mode}
+              onChange={chatSession.setMode}
+              isDisabled={chatSession.isSending}
+            />
+            {chatSession.modeWarning ? (
+              <p role="status" className="text-muted-foreground px-4 py-2 text-sm">
+                {chatSession.modeWarning}
+              </p>
+            ) : null}
             {sessionId && chatSession.messages.length === 0 ? (
               <Alert className="m-4 w-auto">
                 <AlertCircle aria-hidden="true" />

@@ -728,8 +728,10 @@ earlier strategy choices even when a later question changes mode.
 This is a coordinated API/client contract change: `retrieval_mode` is a
 response/history field, **not** a request alias. Old requests using it, unknown
 fields, invalid modes and empty questions return 422. Deploy/reload backend and
-frontend together. The frontend omits `mode` until a visual selector is added,
-so the server owns the default. No schema migration is required; the existing
+frontend together. Both chat screens offer a mode selector, default to hybrid
+for new conversations, send `mode` explicitly and restore the last stored mode
+when reopening history. Invalid modes preserve the draft for manual resubmission
+without an automatic retry. No schema migration is required; the existing
 PostgreSQL enum and stored historical values are unchanged.
 
 Authorization precedes retriever/model construction. The request-scoped

@@ -36,11 +36,13 @@ export interface AuthFetchOptions extends RequestInit {
 
 export class ApiError extends Error {
   readonly status: number;
+  readonly validationErrors: ValidationErrorItem[];
 
-  constructor(status: number, message: string) {
+  constructor(status: number, message: string, validationErrors: ValidationErrorItem[] = []) {
     super(message);
     this.name = "ApiError";
     this.status = status;
+    this.validationErrors = validationErrors;
   }
 }
 
@@ -51,26 +53,30 @@ export class SessionExpiredError extends Error {
   }
 }
 
-async function parseErrorMessage(response: Response): Promise<string> {
+async function parseApiError(response: Response): Promise<ApiError> {
   try {
     const body = (await response.json()) as ApiErrorPayload;
     if (typeof body.detail === "string" && body.detail.length > 0) {
-      return body.detail;
+      return new ApiError(response.status, body.detail);
     }
 
     if (Array.isArray(body.detail) && body.detail.length > 0) {
       const firstValidationError = body.detail[0];
       if (typeof firstValidationError?.msg === "string" && firstValidationError.msg.length > 0) {
-        return firstValidationError.msg;
+        return new ApiError(response.status, firstValidationError.msg, body.detail);
       }
 
-      return "Os dados enviados sao invalidos. Revise os campos e tente novamente.";
+      return new ApiError(
+        response.status,
+        "Os dados enviados sao invalidos. Revise os campos e tente novamente.",
+        body.detail
+      );
     }
   } catch {
     // Fall back to status text.
   }
 
-  return `Request failed with status ${response.status}`;
+  return new ApiError(response.status, `Request failed with status ${response.status}`);
 }
 
 function clearAuthAndCache(): void {
@@ -169,7 +175,7 @@ export async function authFetch(path: string, init: AuthFetchOptions = {}): Prom
 export async function requestJson<T>(path: string, init?: AuthFetchOptions): Promise<T> {
   const response = await authFetch(path, init);
   if (!response.ok) {
-    throw new ApiError(response.status, await parseErrorMessage(response));
+    throw await parseApiError(response);
   }
 
   return (await response.json()) as T;
@@ -215,7 +221,7 @@ export async function logoutRequest(): Promise<void> {
   });
 
   if (!response.ok && response.status !== 401) {
-    throw new ApiError(response.status, await parseErrorMessage(response));
+    throw await parseApiError(response);
   }
 }
 

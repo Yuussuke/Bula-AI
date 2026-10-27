@@ -9,8 +9,11 @@ import {
   type ChatSessionResponse,
   continueChatSession,
   getChatSession,
+  type RetrievalMode,
 } from "@/api/chat";
 import type { ChatTimeline, ChatTimelineMessage } from "@/components/chat/types";
+import { ApiError } from "@/lib/api";
+import { isRetrievalMode } from "@/lib/retrieval-mode";
 
 interface SendQuestionVariables {
   question: string;
@@ -19,6 +22,7 @@ interface SendQuestionVariables {
   context: ChatContext;
   contextKey: string;
   conversationRevision: number;
+  mode: RetrievalMode;
 }
 
 interface TransientChatMessage extends ChatTimelineMessage {
@@ -41,6 +45,9 @@ interface UseChatSessionResult {
   sendError: Error | null;
   sendQuestion: (question: string) => Promise<boolean | null>;
   invalidatePendingConversation: () => void;
+  mode: RetrievalMode;
+  setMode: (mode: RetrievalMode) => void;
+  modeWarning: string | null;
 }
 
 class ChatContextMismatchError extends Error {}
@@ -53,16 +60,20 @@ function buildSessionQueryKey(
 }
 
 function mapSessionToTimeline(session: ChatSessionResponse): ChatTimeline {
+  const lastAssistantMode = session.messages.findLast(
+    (message) => message.role === "assistant"
+  )?.retrieval_mode;
   return {
     sessionId: session.id,
     bulaId: session.bula_id,
     scope: session.scope ?? "bula",
+    hasInvalidMode: lastAssistantMode != null && !isRetrievalMode(lastAssistantMode),
     messages: session.messages.map((message) => ({
       id: message.id,
       role: message.role,
       content: message.content,
       sourceChunks: message.source_chunks ?? [],
-      retrievalMode: message.retrieval_mode,
+      retrievalMode: isRetrievalMode(message.retrieval_mode) ? message.retrieval_mode : null,
     })),
   };
 }
@@ -84,7 +95,7 @@ function buildTurnMessages(
       role: "assistant",
       content: response.answer,
       sourceChunks: response.source_chunks,
-      retrievalMode: response.retrieval_mode,
+      retrievalMode: isRetrievalMode(response.retrieval_mode) ? response.retrieval_mode : null,
     },
   ];
 }
@@ -102,6 +113,11 @@ export function useChatSession({
   const isSendInFlightRef = useRef(false);
   const conversationRevisionRef = useRef(0);
   const isMountedRef = useRef(false);
+  const [preference, setPreference] = useState<{
+    conversationKey: string;
+    mode: RetrievalMode;
+  } | null>(null);
+  const [rejectedModeConversation, setRejectedModeConversation] = useState<string | null>(null);
   const [transientUserMessage, setTransientUserMessage] = useState<TransientChatMessage | null>(
     null
   );
@@ -143,13 +159,14 @@ export function useChatSession({
       question,
       sessionId: existingSessionId,
       context: questionContext,
+      mode,
     }: SendQuestionVariables) => {
       if (existingSessionId) {
-        return continueChatSession(existingSessionId, { question });
+        return continueChatSession(existingSessionId, { question, mode });
       }
 
-      if (questionContext.scope === "cross_bula") return askCrossBulaQuestion({ question });
-      return askBulaQuestion(questionContext.bulaId, { question });
+      if (questionContext.scope === "cross_bula") return askCrossBulaQuestion({ question, mode });
+      return askBulaQuestion(questionContext.bulaId, { question, mode });
     },
     onSuccess: (response, variables) => {
       const nextSessionId = response.session_id;
@@ -169,6 +186,7 @@ export function useChatSession({
         sessionId: nextSessionId,
         bulaId: variables.context.scope === "bula" ? variables.context.bulaId : null,
         scope: variables.context.scope,
+        hasInvalidMode: !isRetrievalMode(response.retrieval_mode),
         messages: [...(existingTimeline?.messages ?? []), ...newMessages],
       });
       void queryClient.invalidateQueries({ queryKey: ["chat-sessions"] });
@@ -179,6 +197,13 @@ export function useChatSession({
     },
     retry: false,
   });
+
+  const lastMode = sessionQuery.data?.messages.findLast(
+    (message) => message.role === "assistant"
+  )?.retrievalMode;
+  const hasInvalidMode = sessionQuery.data?.hasInvalidMode ?? false;
+  const restoredMode = !hasInvalidMode && isRetrievalMode(lastMode) ? lastMode : "hybrid";
+  const mode = preference?.conversationKey === conversationKey ? preference.mode : restoredMode;
 
   const sendQuestion = async (question: string): Promise<boolean | null> => {
     if (sessionId && (!sessionQuery.data || sessionQuery.error)) return false;
@@ -206,13 +231,22 @@ export function useChatSession({
         context,
         contextKey,
         conversationRevision,
+        mode,
       });
       setTransientUserMessage((currentMessage) =>
         currentMessage?.id === optimisticUserMessage.id ? null : currentMessage
       );
       return isCurrentRequest(conversationRevision) ? true : null;
-    } catch {
+    } catch (error) {
       if (isCurrentRequest(conversationRevision)) {
+        if (
+          error instanceof ApiError &&
+          error.status === 422 &&
+          error.validationErrors.some((item) => item.loc?.[0] === "body" && item.loc[1] === "mode")
+        ) {
+          setPreference({ conversationKey, mode: "hybrid" });
+          setRejectedModeConversation(conversationKey);
+        }
         setTransientUserMessage((currentMessage) =>
           currentMessage?.id === optimisticUserMessage.id
             ? { ...currentMessage, deliveryStatus: "failed" }
@@ -229,6 +263,17 @@ export function useChatSession({
     transientUserMessage?.conversationKey === conversationKey ? transientUserMessage : null;
 
   return {
+    mode,
+    setMode: (selectedMode) => {
+      setPreference({ conversationKey, mode: selectedMode });
+      setRejectedModeConversation(null);
+    },
+    modeWarning:
+      rejectedModeConversation === conversationKey
+        ? "Modo de busca inválido. Usando híbrido como padrão. Confira a pergunta e envie novamente."
+        : hasInvalidMode
+          ? "O servidor informou um modo de busca inválido. O padrão para novas consultas é híbrido; você pode escolher outro modo."
+          : null,
     messages: [
       ...(sessionQuery.data?.messages ?? []),
       ...(visibleTransientMessage ? [visibleTransientMessage] : []),
@@ -244,6 +289,8 @@ export function useChatSession({
         : null,
     sendQuestion,
     invalidatePendingConversation: () => {
+      setPreference(null);
+      setRejectedModeConversation(null);
       conversationRevisionRef.current += 1;
       setTransientUserMessage(null);
     },

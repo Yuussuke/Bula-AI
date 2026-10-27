@@ -14,6 +14,7 @@ import {
   continueChatSession,
   getChatSession,
   listChatSessions,
+  type RetrievalMode,
 } from "@/api/chat";
 import { ApiError } from "@/lib/api";
 import { ChatPage } from "@/pages/chat-page";
@@ -171,6 +172,126 @@ beforeEach(() => {
 });
 
 describe("ChatPage", () => {
+  it.each([
+    ["/chat", "dense"],
+    ["/chat", "bm25"],
+    ["/chat", "hybrid"],
+    [`/bulas/${BULA_ID}/chat`, "dense"],
+    [`/bulas/${BULA_ID}/chat`, "bm25"],
+    [`/bulas/${BULA_ID}/chat`, "hybrid"],
+  ] as const)("sends and retains %s / %s across turns", async (path, mode) => {
+    const user = userEvent.setup();
+    const response = { ...FIRST_RESPONSE, retrieval_mode: mode };
+    askBulaQuestionMock.mockResolvedValue(response);
+    askCrossBulaQuestionMock.mockResolvedValue(response);
+    renderChatPage(path);
+    const selector = await screen.findByRole("combobox", { name: "Modo de busca" });
+    expect(selector).toHaveValue("hybrid");
+    await user.selectOptions(selector, mode);
+    await user.type(screen.getByRole("textbox"), "Para que serve?");
+    await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+    expect(await screen.findByText(FIRST_RESPONSE.answer)).toBeInTheDocument();
+    const request = { question: "Para que serve?", mode };
+    if (path === "/chat") expect(askCrossBulaQuestionMock).toHaveBeenCalledWith(request);
+    else expect(askBulaQuestionMock).toHaveBeenCalledWith(BULA_ID, request);
+    expect(selector).toHaveValue(mode);
+    await user.type(screen.getByRole("textbox"), "E como funciona?");
+    await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+    await waitFor(() =>
+      expect(continueChatSessionMock).toHaveBeenCalledWith(SESSION_ID, {
+        question: "E como funciona?",
+        mode,
+      })
+    );
+  });
+
+  it("restores the last stored mode and resets a new conversation to hybrid", async () => {
+    const user = userEvent.setup();
+    renderChatPage(`/bulas/${BULA_ID}/chat?session=${SESSION_ID}`);
+    expect(await screen.findByText("Resposta persistida no PostgreSQL.")).toBeInTheDocument();
+    const selector = screen.getByRole("combobox", { name: "Modo de busca" });
+    expect(selector).toHaveValue("dense");
+    await user.selectOptions(selector, "bm25");
+    await user.click(screen.getByRole("button", { name: "Nova conversa desta bula" }));
+    expect(selector).toHaveValue("hybrid");
+  });
+
+  it("does not mislabel an unknown stored mode and defaults new requests to hybrid", async () => {
+    const session = buildPersistedSession();
+    session.messages[1].retrieval_mode = "unknown" as RetrievalMode;
+    getChatSessionMock.mockResolvedValue(session);
+    renderChatPage(`/bulas/${BULA_ID}/chat?session=${SESSION_ID}`);
+    expect(await screen.findByText("Resposta persistida no PostgreSQL.")).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Modo de busca" })).toHaveValue("hybrid");
+    expect(screen.getByText(/O servidor informou um modo de busca inválido/)).toBeInTheDocument();
+    expect(screen.getAllByText("Modo não informado").length).toBeGreaterThan(0);
+  });
+
+  it("keeps a valid last mode when an older message has an invalid mode", async () => {
+    const session = buildPersistedSession();
+    session.messages.push({
+      ...session.messages[1],
+      id: "new-assistant",
+      content: "Resposta mais recente",
+      retrieval_mode: "bm25",
+    });
+    session.messages[1].retrieval_mode = "unknown" as RetrievalMode;
+    getChatSessionMock.mockResolvedValue(session);
+    renderChatPage(`/bulas/${BULA_ID}/chat?session=${SESSION_ID}`);
+    expect(await screen.findByText("Resposta mais recente")).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Modo de busca" })).toHaveValue("bm25");
+    expect(
+      screen.queryByText(/O servidor informou um modo de busca inválido/)
+    ).not.toBeInTheDocument();
+  });
+
+  it("does not reset another conversation when an old request rejects its mode", async () => {
+    const user = userEvent.setup();
+    const deferred = createDeferredPromise<AskResponse>();
+    askCrossBulaQuestionMock.mockImplementation(() =>
+      deferred.promise.then(() => {
+        throw new ApiError(422, "Unsupported mode", [{ loc: ["body", "mode"] }]);
+      })
+    );
+    const session = { ...buildPersistedSession(), scope: "cross_bula" as const, bula_id: null };
+    listChatSessionsMock.mockResolvedValue([session]);
+    getChatSessionMock.mockResolvedValue(session);
+    renderChatPage("/chat");
+    await user.selectOptions(screen.getByRole("combobox", { name: "Modo de busca" }), "bm25");
+    await user.type(screen.getByRole("textbox"), "Para que serve?");
+    await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+    await user.click(await screen.findByRole("link", { name: /Para que serve este medicamento/ }));
+    expect(await screen.findByText("Resposta persistida no PostgreSQL.")).toBeInTheDocument();
+    await act(async () => {
+      deferred.resolve(FIRST_RESPONSE);
+      await deferred.promise;
+    });
+    await waitFor(() => expect(screen.getByRole("textbox")).not.toBeDisabled());
+    expect(screen.getByRole("combobox", { name: "Modo de busca" })).toHaveValue("dense");
+    expect(screen.queryByText(/Modo de busca inválido/)).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toHaveValue("");
+  });
+
+  it.each(["mode", "question"])(
+    "handles a rejected %s without repeating the request",
+    async (field) => {
+      const user = userEvent.setup();
+      askCrossBulaQuestionMock.mockRejectedValue(
+        new ApiError(422, "Invalid input", [{ loc: ["body", field], msg: "Invalid input" }])
+      );
+      renderChatPage("/chat");
+      const selector = screen.getByRole("combobox", { name: "Modo de busca" });
+      await user.selectOptions(selector, "bm25");
+      await user.type(screen.getByRole("textbox"), "Posso tomar?");
+      await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+      expect(await screen.findByRole("alert")).toBeInTheDocument();
+      expect(screen.getByRole("textbox")).toHaveValue("Posso tomar?");
+      expect(askCrossBulaQuestionMock).toHaveBeenCalledOnce();
+      expect(selector).toHaveValue(field === "mode" ? "hybrid" : "bm25");
+      expect(Boolean(screen.queryByText(/Modo de busca inválido/))).toBe(field === "mode");
+    }
+  );
+
   it.each([false, true])(
     "ignores an old request after opening another general session (failure=%s)",
     async (hasFailed) => {
@@ -217,6 +338,7 @@ describe("ChatPage", () => {
     expect(await screen.findByText(FIRST_RESPONSE.answer)).toBeInTheDocument();
     expect(askCrossBulaQuestionMock).toHaveBeenCalledWith({
       question: "Quais orientações existem?",
+      mode: "hybrid",
     });
     expect(askBulaQuestionMock).not.toHaveBeenCalled();
     expect(screen.getByTestId("location")).toHaveTextContent(`/chat?session=${SESSION_ID}`);
@@ -253,6 +375,7 @@ describe("ChatPage", () => {
     ).toBeInTheDocument();
     expect(continueChatSessionMock).toHaveBeenCalledWith(SESSION_ID, {
       question: "E para crianças?",
+      mode: "dense",
     });
     expect(askCrossBulaQuestionMock).not.toHaveBeenCalled();
   });
@@ -282,7 +405,7 @@ describe("ChatPage", () => {
     expect(
       await screen.findByRole("heading", { name: QUERYABLE_BULA.product_name })
     ).toBeInTheDocument();
-    expect(screen.getByText("Híbrido")).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Modo de busca" })).toHaveValue("hybrid");
     expect(screen.getByRole("complementary")).toHaveClass("w-72", "shrink-0");
     expect(getQueryableBulaMock).toHaveBeenCalledWith(BULA_ID);
     expect(getChatSessionMock).not.toHaveBeenCalled();
@@ -331,6 +454,7 @@ describe("ChatPage", () => {
     ).toBeInTheDocument();
     expect(askBulaQuestionMock).toHaveBeenCalledWith(BULA_ID, {
       question: "Para que serve este medicamento?",
+      mode: "hybrid",
     });
     expect(continueChatSessionMock).not.toHaveBeenCalled();
     expect(screen.getByTestId("location")).toHaveTextContent(
@@ -395,6 +519,7 @@ describe("ChatPage", () => {
     const loadingText = await screen.findByText(/Bula AI está preparando a resposta/);
     expect(loadingText.closest('[role="status"]')).toBeInTheDocument();
     expect(questionInput).toBeDisabled();
+    expect(screen.getByRole("combobox", { name: "Modo de busca" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "Enviar pergunta" })).toBeDisabled();
     expect(askBulaQuestionMock).toHaveBeenCalledOnce();
 
@@ -525,6 +650,7 @@ describe("ChatPage", () => {
     ).toBeInTheDocument();
     expect(continueChatSessionMock).toHaveBeenCalledWith(SESSION_ID, {
       question: "E para criancas?",
+      mode: "dense",
     });
     expect(askBulaQuestionMock).not.toHaveBeenCalled();
   });

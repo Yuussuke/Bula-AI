@@ -14,5 +14,20 @@ messages and completed requests retain their originating context.
 Sources show original numbering, medication, available presentation/manufacturer
 and canonical HTTP(S) links. Individual/grouped citations navigate to the same
 source order. These links do not certify semantic support. Message badges show
-the executed retrieval mode; the full mode selector (#51) remains separate.
+the executed retrieval mode, independently of the next request's selection.
 No dependencies, datasets, provider prompts or experimental results change.
+
+## Retrieval mode selection (#51)
+
+Both chat routes offer Semântico (`dense`), Palavras-chave (`bm25`) and Híbrido
+(`hybrid`), with short explanations. New conversations default to hybrid.
+Every question explicitly sends the selected mode; the selector is disabled
+during a request. Reopening a session restores the last assistant message's
+stored mode, using the existing history contract without a new database field.
+An unsent selection is local state, not a persisted session preference.
+
+Unknown returned modes remain unidentified in history and produce a warning;
+new requests default to hybrid. A field-specific HTTP 422 for `body.mode` resets
+the next selection to hybrid and preserves the question for manual resubmission.
+There is no automatic retry. Other validation errors do not change the mode,
+and a late failure from another conversation cannot reset the current selection.
