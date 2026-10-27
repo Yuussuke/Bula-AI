@@ -18,3 +18,7 @@ These metadata requests invoke no embeddings, reranker or language model.
 `PATCH /api/v1/bulas/{id}/alias` accepts `{alias: string | null}` for owned private
 uploads only. Whitespace is trimmed; null/blank restores the official display name.
 The official product name, sources and indexed content are unchanged.
+
+Session listing optionally accepts `sort=updated_at`, applied before pagination;
+its default remains creation order. Completed turns update session activity in
+the same transaction as both messages. Ownership and scope filters are preserved.

@@ -16,6 +16,7 @@ from app.modules.chat.schemas import (
     DirectAskRequest,
     DirectAskResponse,
     SourceChunkResponse,
+    SessionSortOrder,
 )
 from app.modules.rag.chain import RAGChainFactory, NO_CONTEXT_MESSAGE
 
@@ -272,6 +273,7 @@ class ChatService:
         offset: int,
         scope: ChatScope | None = None,
         bula_id: UUID | None = None,
+        sort: SessionSortOrder = "created_at",
     ) -> list[ChatSession]:
         return await self.chat_repository.list_user_sessions(
             user_id=user_id,
@@ -279,6 +281,7 @@ class ChatService:
             offset=offset,
             scope=scope,
             bula_id=bula_id,
+            sort=sort,
         )
 
     async def get_session_with_history(
