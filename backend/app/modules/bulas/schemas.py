@@ -174,6 +174,21 @@ class SystemBulaResponse(BaseModel):
         )
 
 
+class SystemBulaSearchQuery(BaseModel):
+    query: str = Field(default="", max_length=200)
+    audience: Literal["all", "patient", "professional"] = "all"
+    sort: Literal["name_asc", "name_desc"] = "name_asc"
+    limit: int = Field(default=20, ge=1, le=100)
+    offset: int = Field(default=0, ge=0)
+
+
+class SystemBulaPageResponse(BaseModel):
+    items: list[SystemBulaResponse]
+    total: int
+    limit: int
+    offset: int
+
+
 class SystemBulaManifestEntry(BaseModel):
     target_id: str = Field(min_length=1, pattern=r"^[a-z0-9][a-z0-9_-]*$")
     active_ingredient: str = Field(min_length=1)

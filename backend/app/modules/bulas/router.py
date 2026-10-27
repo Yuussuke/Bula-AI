@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Annotated, cast
 from uuid import UUID
 
 from fastapi import (
@@ -20,6 +20,8 @@ from app.modules.bulas.schemas import (
     BulaStatusResponse,
     QueryableBulaResponse,
     SystemBulaResponse,
+    SystemBulaPageResponse,
+    SystemBulaSearchQuery,
 )
 from app.modules.bulas.service import (
     BulaService,
@@ -73,6 +75,22 @@ async def list_system_bulas(
         offset=offset,
     )
     return [SystemBulaResponse.from_bula(bula) for bula in bulas]
+
+
+@router.get("/system/search", response_model=SystemBulaPageResponse)
+async def search_system_bulas(
+    filters: Annotated[SystemBulaSearchQuery, Query()],
+    current_user: auth_models.User = Depends(get_current_user),
+    bula_service: BulaService = Depends(get_bula_service),
+) -> SystemBulaPageResponse:
+    _ = current_user
+    bulas, total = await bula_service.search_published_system_bulas(filters=filters)
+    return SystemBulaPageResponse(
+        items=[SystemBulaResponse.from_bula(bula) for bula in bulas],
+        total=total,
+        limit=filters.limit,
+        offset=filters.offset,
+    )
 
 
 @router.get("/system/{bula_id}", response_model=SystemBulaResponse)
