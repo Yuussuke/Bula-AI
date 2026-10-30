@@ -80,8 +80,9 @@ On 2026-10-30, the import report matched both corpus manifests: 50+50 documents
 and 100 canonical ANVISA links. After Docker started, read-only live checks
 verified all 100 stored PDF hashes and authorized document accesses, 2,974
 matching PostgreSQL/Qdrant chunk payloads, and migration head `d510a102b002`.
-Browser checks passed five catalog pages, source links, the three search modes,
-saved history/source-panel reopening and mobile navigation, with no page errors.
+API checks traversed all five catalog pages. Browser checks passed pagination,
+source links, the three search modes, saved history/source-panel reopening and
+mobile navigation, with no page errors.
 The API loaded the pinned BGE on the local CUDA GPU. Data counts were unchanged.
 
 Authentication used an ephemeral signed token, not an interactive login test.
