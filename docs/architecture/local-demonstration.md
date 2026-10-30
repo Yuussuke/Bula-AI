@@ -76,11 +76,16 @@ synthetic browser checks covered desktop/mobile and light/dark favicon themes.
 One initial asynchronous-render test timed out while build and tests ran
 concurrently; the complete rerun without concurrent build passed unchanged.
 
-On 2026-10-30, an offline cross-check of the preserved import report against both
-corpus manifests confirmed all 100 PDF hashes and canonical ANVISA links,
-50 documents per corpus and the recorded 2,974 chunks/points. It did not request
-the remote links or inspect a running database. Docker was unavailable at the
-start of this closure, so a fresh live rehearsal is still pending.
-No ingestion, new embeddings, paid calls or experimental metrics were performed
-for these publication checks. Complete the checklist before claiming operational
-readiness on the presentation notebook.
+On 2026-10-30, the import report matched both corpus manifests: 50+50 documents
+and 100 canonical ANVISA links. After Docker started, read-only live checks
+verified all 100 stored PDF hashes and authorized document accesses, 2,974
+matching PostgreSQL/Qdrant chunk payloads, and migration head `d510a102b002`.
+Browser checks passed five catalog pages, source links, the three search modes,
+saved history/source-panel reopening and mobile navigation, with no page errors.
+The API loaded the pinned BGE on the local CUDA GPU. Data counts were unchanged.
+
+Authentication used an ephemeral signed token, not an interactive login test.
+External ANVISA availability and new provider generations were not tested.
+No ingestion, new embeddings, paid calls or experimental metrics were performed.
+The remaining presentation-day checks are interactive login, connectivity and
+the two manual live questions in step 5; this is not a new answer-quality study.
