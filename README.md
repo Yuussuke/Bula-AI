@@ -92,6 +92,8 @@ methodological limitations and reproduction requirements. The evaluated
 RRF-B + BGE evaluation is preserved independently of the subsequent
 [runtime integration](docs/architecture/rrfb-bge-runtime.md);
 technical acceptance and documentary assessment are not clinical certification.
+The [local demonstration checklist](docs/architecture/local-demonstration.md)
+documents the existing 100-leaflet ANVISA catalog, external dependencies and rehearsal gate.
 
 The project is developed with criteria that support both thesis evaluation and engineering quality:
 
