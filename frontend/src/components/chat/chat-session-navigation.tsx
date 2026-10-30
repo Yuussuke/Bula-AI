@@ -1,8 +1,9 @@
-import { ArrowLeft, Pill } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { type ReactElement, type ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 import type { ChatContext } from "@/api/chat";
+import { BrandLogo } from "@/components/brand-logo";
 import { RecentConversations } from "@/components/chat/recent-conversations";
 import { Button } from "@/components/ui/button";
 
@@ -27,9 +28,7 @@ export function ChatSessionNavigation({
     <div className="flex h-full flex-col">
       <div className="border-sidebar-border shrink-0 border-b p-5">
         <Link to="/" className="flex items-center gap-3" onClick={onNavigate}>
-          <div className="bg-sidebar-primary/20 flex h-9 w-9 items-center justify-center rounded-xl">
-            <Pill aria-hidden="true" className="text-sidebar-primary h-5 w-5" />
-          </div>
+          <BrandLogo variant="white" className="h-10 w-12" />
           <div>
             <p className="font-semibold">Bula AI</p>
             <p className="text-sidebar-foreground/60 text-xs">Assistente de medicamentos</p>

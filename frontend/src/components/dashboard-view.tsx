@@ -1,8 +1,9 @@
 import { useMutation } from "@tanstack/react-query";
-import { BookOpenText, House, Library, LogOut, Menu, Pill } from "lucide-react";
+import { BookOpenText, House, Library, LogOut, Menu } from "lucide-react";
 import { type ReactElement, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { RecentConversations } from "@/components/chat/recent-conversations";
 import { Button } from "@/components/ui/button";
 import {
@@ -46,9 +47,7 @@ export function DashboardView(): ReactElement {
         onClick={() => setIsMobileMenuOpen(false)}
         className="border-sidebar-border flex items-center gap-3 border-b px-5 py-5"
       >
-        <span className="bg-sidebar-primary/20 rounded-xl p-2.5">
-          <Pill aria-hidden="true" className="text-sidebar-primary h-5 w-5" />
-        </span>
+        <BrandLogo variant="white" className="h-10 w-12" />
         <span>
           <span className="block text-lg font-bold">Bula AI</span>
           <span className="text-sidebar-foreground/60 text-xs">Informação com fontes</span>

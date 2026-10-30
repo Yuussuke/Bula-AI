@@ -1,10 +1,11 @@
 "use client";
 
 import { useMutation } from "@tanstack/react-query";
-import { Pill, Shield, Sparkles } from "lucide-react";
+import { Shield, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -86,9 +87,7 @@ export function AuthView() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-8 text-center">
-          <div className="bg-primary/10 mb-4 inline-flex h-16 w-16 items-center justify-center rounded-2xl">
-            <Pill className="text-primary h-8 w-8" />
-          </div>
+          <BrandLogo className="mx-auto mb-4 h-20 w-24" />
           <h1 className="text-foreground text-3xl font-bold tracking-tight">Bula AI</h1>
           <p className="text-muted-foreground mt-2">
             Inteligência artificial para bulas de medicamentos
