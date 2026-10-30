@@ -1,6 +1,7 @@
-import { Bot, User } from "lucide-react";
+import { User } from "lucide-react";
 import { lazy, memo, type ReactElement, Suspense, useCallback, useState } from "react";
 
+import { BrandLogo } from "@/components/brand-logo";
 import { ModeIndicator } from "@/components/chat/mode-indicator";
 import { SourceChunks } from "@/components/chat/source-chunks";
 import type { ChatTimelineMessage } from "@/components/chat/types";
@@ -41,7 +42,7 @@ export function ChatBubble({ message }: ChatBubbleProps): ReactElement {
           isUserMessage ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
         )}
       >
-        {isUserMessage ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}
+        {isUserMessage ? <User className="h-4 w-4" /> : <BrandLogo className="h-5 w-6" />}
       </div>
       <div
         className={cn(

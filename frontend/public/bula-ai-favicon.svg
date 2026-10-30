@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <title>Bula AI</title>
+  <style>
+    :root { color: #007c68; }
+    @media (prefers-color-scheme: dark) { :root { color: #fff; } }
+  </style>
+  <path fill="currentColor" d="m32 13 13-6c8-3 15 1 17 8 3 8-1 16-8 19l-12 5Z"/>
+  <path fill="none" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"
+    d="m26 20-12 5C5 28 1 35 4 43c3 8 11 12 20 8 5 2 6 6 5 10 4-4 6-9 8-13 5-3 6-7 3-13l-7-13c-1-3-4-4-7-2Z"/>
+  <g fill="currentColor">
+    <circle cx="12" cy="39" r="2"/>
+    <circle cx="20" cy="36" r="2"/>
+    <circle cx="28" cy="33" r="2"/>
+  </g>
+</svg>
