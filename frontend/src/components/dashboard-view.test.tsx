@@ -168,7 +168,7 @@ describe("library navigation", () => {
     expect(listUserBulasMock).not.toHaveBeenCalled();
     expect(
       within(screen.getByRole("navigation", { name: "Navegação principal" })).getAllByRole("link")
-    ).toHaveLength(3);
+    ).toHaveLength(6);
     await user.click(main.getByRole("link", { name: /Catálogo ANVISA/ }));
     expect(await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")).toBeInTheDocument();
     expect(screen.getByTestId("location")).toHaveTextContent("/catalogo");

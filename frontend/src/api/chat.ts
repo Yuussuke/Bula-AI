@@ -13,6 +13,7 @@ export interface AskRequest {
 }
 
 export interface SourceChunkResponse {
+  corpus?: "system" | "shared" | "private";
   chunk_id?: string | null;
   bula_id?: string | null;
   drug_name?: string | null;
@@ -26,6 +27,7 @@ export interface SourceChunkResponse {
 }
 
 export interface SourceBulaResponse {
+  corpus?: "system" | "shared" | "private" | null;
   bula_id: string;
   drug_name: string;
   manufacturer?: string | null;

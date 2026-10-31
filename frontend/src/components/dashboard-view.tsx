@@ -1,5 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
-import { BookOpenText, House, Library, LogOut, Menu } from "lucide-react";
+import {
+  BookOpenText,
+  ClipboardCheck,
+  Files,
+  House,
+  Library,
+  LogOut,
+  Menu,
+  Users,
+} from "lucide-react";
 import { type ReactElement, useState } from "react";
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 
@@ -30,7 +39,20 @@ export function DashboardView(): ReactElement {
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const title = navigation.find((item) => item.path === location.pathname)?.label ?? "Bula AI";
+  const visibleNavigation = [
+    ...navigation,
+    { path: "/compartilhadas", label: "Bulas compartilhadas", icon: Files },
+  ];
+  if (user?.role === "reviewer" || user?.role === "admin")
+    visibleNavigation.push({ path: "/curadoria", label: "Curadoria", icon: ClipboardCheck });
+  if (user?.role === "admin")
+    visibleNavigation.push({
+      path: "/administracao/usuarios",
+      label: "Perfis de acesso",
+      icon: Users,
+    });
+  const title =
+    visibleNavigation.find((item) => item.path === location.pathname)?.label ?? "Bula AI";
   const logoutMutation = useMutation({
     mutationFn: logoutRequest,
     onSettled: () => {
@@ -55,7 +77,7 @@ export function DashboardView(): ReactElement {
       </Link>
       <div className="sidebar-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain">
         <nav className="space-y-1 p-3" aria-label="Navegação principal">
-          {navigation.map(({ path, label, icon: Icon }) => (
+          {visibleNavigation.map(({ path, label, icon: Icon }) => (
             <NavLink
               key={path}
               to={path}
