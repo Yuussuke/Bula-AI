@@ -45,6 +45,17 @@ class SharedUploadInput(SharedSourceInput):
     file: UploadFile
 
 
+class SharedMetadataSuggestion(BaseModel):
+    bula_id: UUID
+    version: int
+    sha256_checksum: str
+    parser_version: str
+    product_name: str | None = None
+    manufacturer: str | None = None
+    presentation: str | None = None
+    strength: str | None = None
+
+
 class SharedBulaResponse(BaseModel):
     id: UUID
     product_name: str

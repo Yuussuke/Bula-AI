@@ -15,6 +15,7 @@ from app.modules.bulas.curation_queue_repository import (
 )
 from app.modules.storage.client import ObjectStoreClient
 from app.modules.storage.dependencies import get_object_store_client
+from app.modules.rag.parsers.pdf_parser import BulaParser
 from pgqueuer.queries import Queries
 
 
@@ -48,14 +49,21 @@ def get_curation_queue_repository(
     return CurationQueueRepository(db)
 
 
+def get_curation_metadata_parser() -> BulaParser:
+    # Local PDF parsing only; importing RAG dependencies here would form a cycle.
+    return BulaParser(ocr_enabled=False)
+
+
 def get_curation_service(
     db: AsyncSession = Depends(get_db),
     object_store: ObjectStoreClient = Depends(get_object_store_client),
     ingestion_queue: CurationIngestionQueue = Depends(get_curation_queue_repository),
     settings: Settings = Depends(get_settings),
+    metadata_parser: BulaParser = Depends(get_curation_metadata_parser),
 ) -> CurationService:
     return CurationService(
         repository=CurationRepository(db, queue=ingestion_queue),
         object_store=object_store,
         max_upload_size_bytes=settings.max_bula_upload_size_bytes,
+        metadata_parser=metadata_parser,
     )

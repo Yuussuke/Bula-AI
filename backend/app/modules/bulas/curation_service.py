@@ -23,11 +23,13 @@ from app.modules.bulas.curation_schemas import (
     SharedBulaPage,
     CurationEventResponse,
     CurationMutationResponse,
+    SharedMetadataSuggestion,
 )
 from app.modules.bulas.helpers import InvalidPdfError, validate_pdf_bytes
 from app.modules.bulas.models import Bula
 from app.modules.bulas.curation_queue_repository import IngestionQueueUnavailableError
 from app.modules.storage.client import ObjectStoreClient
+from app.modules.rag.parsers.pdf_parser import BulaParser
 
 logger = structlog.get_logger(__name__)
 
@@ -39,10 +41,12 @@ class CurationService:
         repository: CurationRepository,
         object_store: ObjectStoreClient,
         max_upload_size_bytes: int,
+        metadata_parser: BulaParser,
     ) -> None:
         self.repository = repository
         self.object_store = object_store
         self.max_upload_size_bytes = max_upload_size_bytes
+        self.metadata_parser = metadata_parser
 
     def require_reviewer(self, actor: User) -> None:
         if actor.role not in {UserRole.ADMIN, UserRole.REVIEWER}:
@@ -198,6 +202,57 @@ class CurationService:
     async def read_pdf(self, *, actor: User, bula_id: UUID) -> bytes:
         bula = await self.get_visible(actor=actor, bula_id=bula_id)
         return await self._verified_pdf(bula)
+
+    async def suggest_metadata(
+        self, *, actor: User, bula_id: UUID
+    ) -> SharedMetadataSuggestion:
+        self.require_reviewer(actor)
+        bula = await self.get_visible(actor=actor, bula_id=bula_id)
+        submission = bula.shared_submission
+        if submission is None or submission.review_status != "pending":
+            raise HTTPException(
+                409, "As sugestões são destinadas a submissões aguardando curadoria."
+            )
+        version = submission.version
+        checksum = submission.sha256_checksum
+        content = await self._verified_pdf(bula)
+        parsed = await self.metadata_parser.parse(
+            pdf_bytes=content, filename="bula.pdf"
+        )
+        if not parsed.success:
+            raise HTTPException(
+                422,
+                "Não foi possível extrair a identificação automaticamente. Confira o PDF e preencha os campos manualmente.",
+            )
+        current = await self.repository.get(bula_id)
+        if (
+            current is None
+            or current.shared_submission is None
+            or current.shared_submission.version != version
+            or current.shared_submission.sha256_checksum != checksum
+        ):
+            raise HTTPException(
+                409, "A submissão mudou durante a leitura. Atualize a conferência."
+            )
+        front_matter = parsed.metadata.get("front_matter")
+        fields = front_matter if isinstance(front_matter, dict) else {}
+
+        def text(value: object) -> str | None:
+            return value.strip() if isinstance(value, str) and value.strip() else None
+
+        product_name = text(parsed.metadata.get("drug_name"))
+        if parsed.metadata.get("drug_name_source") == "filename_best_effort":
+            product_name = None
+        return SharedMetadataSuggestion(
+            bula_id=bula_id,
+            version=version,
+            sha256_checksum=checksum,
+            parser_version=parsed.parser_version,
+            product_name=product_name,
+            manufacturer=text(parsed.metadata.get("manufacturer")),
+            presentation=text(fields.get("presentation")),
+            strength=text(fields.get("strength")),
+        )
 
     async def detail(self, *, actor: User, bula_id: UUID) -> SharedBulaDetail:
         bula = await self.get_visible(actor=actor, bula_id=bula_id)

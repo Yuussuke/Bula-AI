@@ -14,6 +14,7 @@ from app.modules.bulas.curation_schemas import (
     SharedSourceInput,
     SharedUploadInput,
     CurationMutationResponse,
+    SharedMetadataSuggestion,
 )
 from app.modules.bulas.curation_service import CurationService
 from app.modules.bulas.dependencies import get_curation_service
@@ -76,6 +77,17 @@ async def get_shared_pdf(
             "X-Content-Type-Options": "nosniff",
         },
     )
+
+
+@router.get("/{bula_id}/metadata-suggestions", response_model=SharedMetadataSuggestion)
+async def suggest_shared_metadata(
+    bula_id: UUID,
+    response: Response,
+    actor: User = Depends(get_current_user),
+    service: CurationService = Depends(get_curation_service),
+) -> SharedMetadataSuggestion:
+    response.headers["Cache-Control"] = "private, no-store"
+    return await service.suggest_metadata(actor=actor, bula_id=bula_id)
 
 
 @router.post("/{bula_id}/{action}", response_model=CurationMutationResponse)

@@ -39,6 +39,7 @@ Primary objectives:
 
 - User authentication with JWT.
 - PDF leaflet upload and metadata management.
+- [Shared leaflet curation](docs/shared-leaflet-curation.md) with administrator-designated Contributors and Curators.
 - Retrieval-oriented question answering flow.
 - API-first backend for integration with frontend clients.
 - Request tracing and structured logging for debugging and monitoring.

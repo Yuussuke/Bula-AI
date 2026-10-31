@@ -9,7 +9,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.main import app
 from app.modules.auth.models import User, UserRole, UserRoleAssignment
-from app.modules.bulas.dependencies import get_curation_queue_repository
+from app.modules.bulas.dependencies import (
+    get_curation_queue_repository,
+    get_curation_metadata_parser,
+)
+from app.modules.rag.parsers.pdf_parser import BulaParser, ParseResult
 from app.modules.bulas.curation_queue_repository import IngestionQueueUnavailableError
 from app.modules.bulas.models import (
     Bula,
@@ -38,6 +42,31 @@ class CurationQueue:
 
     async def has_active_job(self, *, bula_id: UUID) -> bool:
         return bula_id in self.active_jobs
+
+
+class MetadataParser(BulaParser):
+    def __init__(self) -> None:
+        self.calls = 0
+        self.succeeds = True
+
+    async def parse(self, pdf_bytes: bytes, filename: str) -> ParseResult:
+        self.calls += 1
+        assert pdf_bytes.startswith(b"%PDF")
+        return ParseResult(
+            markdown="Synthetic PDF",
+            sections=[],
+            extraction_tier="synthetic",
+            success=self.succeeds,
+            metadata={
+                "drug_name": "Nome extraído",
+                "drug_name_source": "front_matter",
+                "manufacturer": "Fabricante extraído",
+                "front_matter": {
+                    "presentation": "Comprimidos de 2 mg",
+                    "strength": "2 mg",
+                },
+            },
+        )
 
 
 @pytest.fixture(autouse=True)
@@ -101,6 +130,85 @@ async def submit(
 
 
 @pytest.mark.anyio
+async def test_metadata_suggestions_are_authorized_verified_and_never_approve_or_change_a_submission(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    owner_id, contributor = await account(
+        client, db_session, UserRole.CONTRIBUTOR, "contributor"
+    )
+    _, reviewer = await account(client, db_session, UserRole.REVIEWER, "reviewer")
+    _, reader = await account(client, db_session, UserRole.USER, "reader")
+    document = await submit(client, contributor)
+    parser = MetadataParser()
+    app.dependency_overrides[get_curation_metadata_parser] = lambda: parser
+    endpoint = f"/api/v1/bulas/shared/{document['id']}/metadata-suggestions"
+    for headers, code in (({}, 401), (contributor, 403), (reader, 403)):
+        assert (await client.get(endpoint, headers=headers)).status_code == code
+    assert parser.calls == 0
+    result = await client.get(endpoint, headers=reviewer)
+    assert result.status_code == 200, result.text
+    assert result.json()["sha256_checksum"] == document["sha256_checksum"]
+    assert result.json()["product_name"] == "Nome extraído"
+    assert result.json()["presentation"] == "Comprimidos de 2 mg"
+    assert result.headers["cache-control"] == "private, no-store"
+    persisted = (
+        await client.get(f"/api/v1/bulas/shared/{document['id']}", headers=reviewer)
+    ).json()
+    assert persisted["document"]["product_name"] == document["product_name"]
+    assert persisted["document"]["submitted_by_id"] == owner_id
+    assert (
+        persisted["document"]["version"] == 1
+        and persisted["document"]["review_status"] == "pending"
+    )
+    assert (
+        len(persisted["events"]) == 1
+        and persisted["events"][0]["action"] == "submitted"
+    )
+    parser.succeeds = False
+    assert (await client.get(endpoint, headers=reviewer)).status_code == 422
+    row = await db_session.get(SharedBulaSubmission, UUID(str(document["id"])))
+    assert row is not None
+    row.sha256_checksum = "0" * 64
+    await db_session.commit()
+    calls = parser.calls
+    assert (await client.get(endpoint, headers=reviewer)).status_code == 409
+    assert parser.calls == calls
+
+
+@pytest.mark.anyio
+async def test_metadata_preview_rejects_a_changed_revision_and_never_rewrites_approved_records(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    _, contributor = await account(
+        client, db_session, UserRole.CONTRIBUTOR, "contributor"
+    )
+    _, reviewer = await account(client, db_session, UserRole.REVIEWER, "reviewer")
+    document = await submit(client, contributor)
+    row = await db_session.get(SharedBulaSubmission, UUID(str(document["id"])))
+    assert row is not None
+
+    class RevisionChangingParser(MetadataParser):
+        async def parse(self, pdf_bytes: bytes, filename: str) -> ParseResult:
+            parsed = await super().parse(pdf_bytes, filename)
+            row.version += 1
+            await db_session.commit()
+            return parsed
+
+    parser = RevisionChangingParser()
+    app.dependency_overrides[get_curation_metadata_parser] = lambda: parser
+    endpoint = f"/api/v1/bulas/shared/{document['id']}/metadata-suggestions"
+    assert (await client.get(endpoint, headers=reviewer)).status_code == 409
+    row.review_status = "approved"
+    await db_session.commit()
+    calls = parser.calls
+    assert (await client.get(endpoint, headers=reviewer)).status_code == 409
+    assert parser.calls == calls
+    preserved = await db_session.get(Bula, UUID(str(document["id"])))
+    assert preserved is not None and preserved.drug_name == document["product_name"]
+    assert preserved.manufacturer is None
+
+
+@pytest.mark.anyio
 async def test_review_gates_ingestion_public_access_and_withdrawal(
     client: AsyncClient, db_session: AsyncSession
 ) -> None:
@@ -144,6 +252,16 @@ async def test_review_gates_ingestion_public_access_and_withdrawal(
     assert response.status_code == 200, response.text
     assert not response.json()["is_available"]
     assert queue.jobs == [UUID(identifier)]
+    # Approval is visible to the submitter and reviewers while ingestion is queued,
+    # but does not publish the unfinished document to other readers.
+    for view, headers in (("mine", contributor), ("review", reviewer)):
+        tracking = await client.get(
+            "/api/v1/bulas/shared", params={"view": view}, headers=headers
+        )
+        assert tracking.status_code == 200
+        assert tracking.json()["items"][0]["id"] == identifier
+        assert tracking.json()["items"][0]["ingestion_status"] == "pending"
+        assert tracking.json()["items"][0]["is_available"] is False
     stale = await client.post(
         f"/api/v1/bulas/shared/{identifier}/reject",
         headers=reviewer,
