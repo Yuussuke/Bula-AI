@@ -89,6 +89,12 @@ class RAGIngestionService:
                 return bula
 
             publication = bula.system_publication
+            if bula.corpus == BulaCorpus.SHARED:
+                shared = bula.shared_submission
+                if shared is None or shared.review_status != "approved":
+                    raise BulaIngestionError(
+                        "Shared PDF must be approved before ingestion."
+                    )
             verified_pdf_bytes: bytes | None = None
             if is_reprocessing:
                 if bula.corpus != BulaCorpus.SYSTEM or publication is None:
@@ -167,6 +173,17 @@ class RAGIngestionService:
                     if verified_pdf_bytes is not None
                     else await self.object_store.get_bytes(file_address)
                 )
+                if bula.corpus == BulaCorpus.SHARED:
+                    shared = bula.shared_submission
+                    if (
+                        shared is None
+                        or hashlib.sha256(pdf_bytes).hexdigest()
+                        != shared.sha256_checksum
+                        or len(pdf_bytes) != shared.content_size_bytes
+                    ):
+                        raise BulaIngestionError(
+                            "Shared PDF does not match its reviewed identity."
+                        )
                 stage.add_fields(pdf_size_bytes=len(pdf_bytes))
 
             parse_result: ParseResult | None = None
@@ -196,6 +213,8 @@ class RAGIngestionService:
                         )
                 raise
 
+            # Shared identity was confirmed by a Curator against this exact PDF.
+            # Parser-derived names never overwrite the approved identification.
             if bula.corpus == BulaCorpus.PRIVATE:
                 async with observer.stage("persist_extracted_metadata") as stage:
                     extracted_drug_name = self._get_metadata_text(

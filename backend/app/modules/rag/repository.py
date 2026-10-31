@@ -179,7 +179,9 @@ class ChunkMetadataRepository:
         statement = select(ChunkMetadata).where(
             ChunkMetadata.chunk_id.in_(chunk_ids),
             ChunkMetadata.bula_id.in_(bula_ids),
-            ChunkMetadata.corpus == BulaCorpus.SYSTEM.value,
+            ChunkMetadata.corpus.in_(
+                [BulaCorpus.SYSTEM.value, BulaCorpus.SHARED.value]
+            ),
         )
         result = await self.db.execute(
             statement.execution_options(populate_existing=True)

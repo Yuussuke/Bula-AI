@@ -22,6 +22,7 @@ from app.core.request_logging import RequestLoggingMiddleware
 from app.modules.auth.router import router as auth_router
 from app.modules.auth.administration_router import router as administration_router
 from app.modules.bulas.router import router as bulas_router
+from app.modules.bulas.curation_router import router as curation_router
 from app.modules.chat.router import router as chat_router
 from app.modules.rag.bge_engine import BGEEngine
 from app.modules.rag.qdrant_client import (
@@ -117,6 +118,7 @@ def create_app() -> FastAPI:
     async def health() -> dict[str, str]:
         return {"status": "ok"}
 
+    app.include_router(curation_router, prefix="/api/v1")
     app.include_router(bulas_router, prefix="/api/v1")
     app.include_router(auth_router, prefix="/api/v1")
     app.include_router(administration_router, prefix="/api/v1")

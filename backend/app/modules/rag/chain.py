@@ -136,7 +136,7 @@ class RAGChainFactory:
         retriever = self.retriever_factory.build(
             mode=mode,
             bula_id=None,
-            corpus=(BulaCorpus.SYSTEM,),
+            corpus=(BulaCorpus.SYSTEM, BulaCorpus.SHARED),
             allowed_bula_ids=tuple(sources),
             validate_candidates=validate_candidates,
         )
@@ -150,8 +150,27 @@ class RAGChainFactory:
         *,
         bula_id: UUID,
         mode: RetrievalMode,
+        sources: dict[UUID, dict[str, str]] | None = None,
     ) -> Runnable[dict[str, object], dict[str, object]]:
-        retriever = self.retriever_factory.build(bula_id=bula_id, mode=mode)
+        if sources is None:
+            retriever = self.retriever_factory.build(bula_id=bula_id, mode=mode)
+        else:
+
+            def validate_candidates(candidate: BaseRetriever) -> BaseRetriever:
+                return PublishedEvidenceRetriever(
+                    wrapped_retriever=candidate,
+                    source_index=self.source_index,
+                    sources=sources,
+                )
+
+            retriever = self.retriever_factory.build(
+                bula_id=bula_id,
+                mode=mode,
+                corpus=(BulaCorpus.SHARED,),
+                allowed_bula_ids=tuple(sources),
+                validate_candidates=validate_candidates,
+            )
+            retriever = validate_candidates(retriever)
         llm = self.llm_builder()
         return build_grounded_rag_chain(retriever=retriever, llm=llm)
 
@@ -230,6 +249,7 @@ def build_source_chunks(documents: list[Document]) -> list[dict[str, object]]:
             for key in (
                 "chunk_id",
                 "bula_id",
+                "corpus",
                 "drug_name",
                 "manufacturer",
                 "presentation",

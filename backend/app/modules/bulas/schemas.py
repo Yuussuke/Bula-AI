@@ -109,7 +109,9 @@ class QueryableBulaResponse(BaseModel):
             product_name=bula.drug_name,
             alias=bula.alias,
             active_ingredient=None,
-            strength=None,
+            strength=bula.shared_submission.strength
+            if bula.corpus == BulaCorpus.SHARED and bula.shared_submission
+            else None,
             manufacturer=bula.manufacturer,
             corpus=bula.corpus,
             ingestion_status=bula.status,

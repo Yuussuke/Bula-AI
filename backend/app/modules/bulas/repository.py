@@ -16,6 +16,13 @@ from app.modules.bulas.models import (
 )
 from app.modules.bulas.schemas import SystemBulaManifestEntry, SystemBulaSearchQuery
 from app.modules.storage.models import StoredObject
+from app.modules.bulas.curation_repository import (
+    CurationRepository,
+    approved_shared_conditions,
+)
+from app.modules.bulas.models import SharedBulaSubmission
+from app.modules.bulas.models import BulaCurationEvent
+from app.modules.bulas.curation_audit import shared_bula_snapshot
 
 
 MAX_ERROR_MESSAGE_LENGTH = 1000
@@ -89,7 +96,9 @@ class BulaRepository:
     async def get_by_id(self, *, bula_id: UUID) -> Bula | None:
         statement = (
             select(Bula)
-            .options(joinedload(Bula.system_publication))
+            .options(
+                joinedload(Bula.system_publication), joinedload(Bula.shared_submission)
+            )
             .where(Bula.id == bula_id)
         )
         result = await self.db.execute(statement)
@@ -123,6 +132,7 @@ class BulaRepository:
             StoredObject.sha256_checksum == SystemBulaPublication.sha256_checksum,
             StoredObject.content_size_bytes == SystemBulaPublication.content_size_bytes,
         )
+        approved_shared_access = and_(*approved_shared_conditions())
         statement = (
             select(Bula)
             .outerjoin(
@@ -133,8 +143,14 @@ class BulaRepository:
                 StoredObject,
                 StoredObject.object_address == Bula.file_address,
             )
-            .options(joinedload(Bula.system_publication))
-            .where(Bula.id == bula_id, or_(private_access, published_system_access))
+            .outerjoin(SharedBulaSubmission, SharedBulaSubmission.bula_id == Bula.id)
+            .options(
+                joinedload(Bula.system_publication), joinedload(Bula.shared_submission)
+            )
+            .where(
+                Bula.id == bula_id,
+                or_(private_access, published_system_access, approved_shared_access),
+            )
         )
         result = await self.db.execute(statement)
         return result.unique().scalar_one_or_none()
@@ -360,6 +376,13 @@ class BulaRepository:
         )
         return list(result.unique().scalars().all())
 
+    async def list_queryable_public_bulas(
+        self, *, bula_ids: Sequence[UUID] | None = None
+    ) -> list[Bula]:
+        system = await self.list_queryable_system_bulas(bula_ids=bula_ids)
+        shared = await CurationRepository(self.db).list_public(bula_ids=bula_ids)
+        return sorted([*system, *shared], key=lambda bula: bula.id)
+
     def _published_system_bula_statement(self) -> Select[tuple[Bula]]:
         return (
             select(Bula)
@@ -390,12 +413,45 @@ class BulaRepository:
         error_message: str | None = None,
         qdrant_collection: str | None = None,
     ) -> Bula:
+        before_state = None
+        if bula.corpus == BulaCorpus.SHARED:
+            await self.db.execute(
+                select(Bula.id).where(Bula.id == bula.id).with_for_update()
+            )
+            current = await self.db.scalar(
+                select(Bula)
+                .options(joinedload(Bula.shared_submission))
+                .where(Bula.id == bula.id)
+                .execution_options(populate_existing=True)
+            )
+            if current is None:
+                raise BulaPersistenceError(
+                    "Shared source disappeared during ingestion."
+                )
+            bula = current
+            before_state = shared_bula_snapshot(bula)
         bula.status = status
         bula.error_message = self._clean_error_message(error_message)
 
         if qdrant_collection is not None:
             bula.qdrant_collection = qdrant_collection
 
+        if before_state is not None and bula.shared_submission is not None:
+            after_state = shared_bula_snapshot(bula)
+            if before_state != after_state:
+                self.db.add(
+                    BulaCurationEvent(
+                        bula_id=bula.id,
+                        actor_id=None,
+                        actor_name="Sistema de ingestão",
+                        actor_role="system",
+                        action=f"ingestion_{status.value}",
+                        reason="Transição técnica de processamento, sem decisão humana.",
+                        version=bula.shared_submission.version,
+                        before_state=before_state,
+                        after_state=after_state,
+                    )
+                )
         await self.db.commit()
         await self.db.refresh(bula)
         return bula
