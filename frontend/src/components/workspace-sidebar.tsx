@@ -3,6 +3,7 @@ import { type ReactElement, type ReactNode, useId, useRef, useState } from "reac
 import { NavLink } from "react-router-dom";
 
 import { BrandLogo } from "@/components/brand-logo";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ActionHint } from "@/components/ui/action-hint";
 import { Button } from "@/components/ui/button";
 import { UserInitialsAvatar } from "@/components/user-initials-avatar";
@@ -94,6 +95,7 @@ export function WorkspaceSidebar({
             ) : null}
           </nav>
           <div className="flex shrink-0 flex-col items-center gap-2 py-3">
+            <ThemeToggle className={sidebarShortcutClass} />
             <ActionHint label={user?.name ?? "Usuário"}>
               <span>
                 <UserInitialsAvatar name={user?.name} />

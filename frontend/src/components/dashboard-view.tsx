@@ -15,6 +15,7 @@ import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import { BrandLogo } from "@/components/brand-logo";
 import { RecentConversations } from "@/components/chat/recent-conversations";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ActionHint } from "@/components/ui/action-hint";
 import { Button } from "@/components/ui/button";
 import {
@@ -102,6 +103,7 @@ export function DashboardView(): ReactElement {
         <RecentConversations onNavigate={() => setIsMobileMenuOpen(false)} />
       </div>
       <div className="border-sidebar-border border-t p-4">
+        <ThemeToggle />
         <p className="truncate text-sm font-medium">{user?.name ?? "Usuário"}</p>
         <p className="text-sidebar-foreground/60 truncate text-xs">{user?.email}</p>
       </div>

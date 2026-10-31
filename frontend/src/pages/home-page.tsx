@@ -12,7 +12,7 @@ const destinations = [
       "Seus PDFs em um só lugar. Envie documentos, acompanhe o processamento e consulte suas bulas em particular.",
     action: "Abrir meu espaço",
     icon: LockKeyhole,
-    style: "bg-sky-50 text-sky-700",
+    style: "bg-sky-50 text-sky-700 dark:bg-sky-950/50 dark:text-sky-300",
   },
   {
     path: "/catalogo",
@@ -21,7 +21,7 @@ const destinations = [
       "Consulte bulas da ANVISA e compartilhadas após curadoria. Escolha as fontes antes de conversar.",
     action: "Explorar catálogo",
     icon: BookOpenText,
-    style: "bg-emerald-50 text-emerald-700",
+    style: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300",
   },
   {
     path: "/chat",
@@ -30,7 +30,7 @@ const destinations = [
       "Faça uma pergunta sobre medicamentos disponíveis no catálogo e consulte as fontes usadas na resposta.",
     action: "Iniciar conversa",
     icon: MessageSquareText,
-    style: "bg-violet-50 text-violet-700",
+    style: "bg-violet-50 text-violet-700 dark:bg-violet-950/50 dark:text-violet-300",
   },
 ];
 

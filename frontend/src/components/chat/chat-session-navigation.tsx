@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 import type { ChatContext } from "@/api/chat";
 import { RecentConversations } from "@/components/chat/recent-conversations";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { ActionHint } from "@/components/ui/action-hint";
 import { Button } from "@/components/ui/button";
 import { sidebarShortcutClass, WorkspaceSidebar } from "@/components/workspace-sidebar";
@@ -54,7 +55,9 @@ export function ChatSessionNavigation({
     return (
       <div className="flex h-full flex-col">
         {conversations}
-        <div className="border-sidebar-border border-t p-3"></div>
+        <div className="border-sidebar-border border-t p-3">
+          <ThemeToggle />
+        </div>
       </div>
     );
   return (

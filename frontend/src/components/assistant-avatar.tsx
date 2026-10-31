@@ -10,7 +10,7 @@ export function AssistantAvatar({ className }: { className?: string }): ReactEle
       aria-hidden="true"
       width={1280}
       height={1280}
-      className={cn("h-10 w-10 shrink-0 object-contain", className)}
+      className={cn("h-10 w-10 shrink-0 object-contain dark:brightness-150", className)}
     />
   );
 }

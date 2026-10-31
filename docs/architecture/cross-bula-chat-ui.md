@@ -72,3 +72,9 @@ before pagination. A separate paginated Pinned group appears above Recents;
 pinned conversations are excluded from both recent scope groups. Unpinning
 restores a conversation to its original scope. Apply Alembic migration
 `e610a130b004` before starting this version; existing sessions default to unpinned.
+
+The shared rail includes an animated light/dark shortcut, also available in the
+compact navigation drawers. The existing next-themes provider follows the OS
+initially and stores only an explicit theme preference under `bula-ai-theme`.
+Dark colors reuse semantic tokens; warnings and status badges have dedicated
+dark variants. Icon transitions respect reduced-motion preferences.
