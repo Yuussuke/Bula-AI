@@ -235,6 +235,7 @@ describe("ChatPage", () => {
     await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
     await waitFor(() =>
       expect(askCrossBulaQuestionMock).toHaveBeenCalledWith({
+        catalog_scope: "all",
         question: "Pergunta de teste",
         mode: "bm25",
       })
@@ -302,7 +303,8 @@ describe("ChatPage", () => {
     await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
     expect(await screen.findByText(FIRST_RESPONSE.answer)).toBeInTheDocument();
     const request = { question: "Para que serve?", mode };
-    if (path === "/chat") expect(askCrossBulaQuestionMock).toHaveBeenCalledWith(request);
+    if (path === "/chat")
+      expect(askCrossBulaQuestionMock).toHaveBeenCalledWith({ ...request, catalog_scope: "all" });
     else expect(askBulaQuestionMock).toHaveBeenCalledWith(BULA_ID, request);
     expect(selector).toHaveTextContent(MODE_NAMES[mode]);
     await user.type(screen.getByRole("textbox"), "E como funciona?");
@@ -453,6 +455,7 @@ describe("ChatPage", () => {
     await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
     expect(await screen.findByText(FIRST_RESPONSE.answer)).toBeInTheDocument();
     expect(askCrossBulaQuestionMock).toHaveBeenCalledWith({
+      catalog_scope: "all",
       question: "Quais orientações existem?",
       mode: "hybrid",
     });
@@ -814,5 +817,101 @@ describe("ChatPage", () => {
     await waitFor(() => {
       expect(getChatSessionMock).toHaveBeenCalledWith(SESSION_ID);
     });
+  });
+});
+
+describe("catalog source selection", () => {
+  it("sends the selected catalog only when creating a general conversation", async () => {
+    const user = userEvent.setup();
+    askCrossBulaQuestionMock.mockResolvedValue({ ...FIRST_RESPONSE, catalog_scope: "shared" });
+    renderChatPage("/chat?catalogo=shared");
+    expect(await screen.findByRole("combobox", { name: "Catálogo consultado" })).toHaveTextContent(
+      "Catálogo Compartilhado"
+    );
+    await user.type(screen.getByRole("textbox"), "Como conservar?");
+    await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+    await waitFor(() =>
+      expect(askCrossBulaQuestionMock).toHaveBeenCalledWith({
+        question: "Como conservar?",
+        mode: "hybrid",
+        catalog_scope: "shared",
+      })
+    );
+    await screen.findByText(FIRST_RESPONSE.answer);
+    expect(screen.getByTestId("location")).toHaveTextContent("catalogo=shared");
+    await user.type(screen.getByRole("textbox"), "E depois?");
+    await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+    await waitFor(() =>
+      expect(continueChatSessionMock).toHaveBeenCalledWith(SESSION_ID, {
+        question: "E depois?",
+        mode: "hybrid",
+      })
+    );
+  });
+
+  it("restores the server catalog even if the URL requests a different scope", async () => {
+    getChatSessionMock.mockResolvedValue({
+      ...buildPersistedSession(),
+      scope: "cross_bula",
+      bula_id: null,
+      catalog_scope: "shared",
+    });
+    const user = userEvent.setup();
+    renderChatPage(`/chat?session=${SESSION_ID}&catalogo=system`);
+    expect(await screen.findByRole("combobox", { name: "Catálogo consultado" })).toHaveTextContent(
+      "Catálogo Compartilhado"
+    );
+    await user.type(screen.getByRole("textbox"), "E agora?");
+    await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+    await waitFor(() =>
+      expect(continueChatSessionMock).toHaveBeenCalledWith(SESSION_ID, {
+        question: "E agora?",
+        mode: "dense",
+      })
+    );
+    expect(askCrossBulaQuestionMock).not.toHaveBeenCalled();
+  });
+
+  it("starts a new conversation on catalog change, preserving the unsent draft and saved history", async () => {
+    const user = userEvent.setup();
+    const session = {
+      ...buildPersistedSession(),
+      scope: "cross_bula" as const,
+      bula_id: null,
+      catalog_scope: "system" as const,
+    };
+    getChatSessionMock.mockResolvedValue(session);
+    listChatSessionsMock.mockImplementation(({ scope } = {}) =>
+      Promise.resolve(scope === "cross_bula" ? [session] : [])
+    );
+    renderChatPage(`/chat?session=${SESSION_ID}&catalogo=system`);
+    await screen.findByText("Resposta persistida no PostgreSQL.");
+    await user.type(screen.getByRole("textbox"), "Minha dúvida");
+    await user.click(screen.getByRole("combobox", { name: "Catálogo consultado" }));
+    await user.click(screen.getByRole("option", { name: "Catálogo Compartilhado" }));
+    expect(screen.getByTestId("location")).toHaveTextContent("/chat?catalogo=shared");
+    expect(screen.getByTestId("location")).not.toHaveTextContent("session=");
+    expect(screen.getByRole("textbox")).toHaveValue("Minha dúvida");
+    expect(screen.queryByText("Resposta persistida no PostgreSQL.")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Para que serve este medicamento/ })).toHaveAttribute(
+      "href",
+      `/chat?catalogo=system&session=${SESSION_ID}`
+    );
+    expect(continueChatSessionMock).not.toHaveBeenCalled();
+  });
+
+  it("disables catalog changes while a question is being processed", async () => {
+    const pending = createDeferredPromise<AskResponse>();
+    askCrossBulaQuestionMock.mockReturnValue(pending.promise);
+    const user = userEvent.setup();
+    renderChatPage("/chat");
+    await user.type(screen.getByRole("textbox"), "Conservação?");
+    await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
+    expect(screen.getByRole("combobox", { name: "Catálogo consultado" })).toBeDisabled();
+    await act(async () => {
+      pending.resolve(FIRST_RESPONSE);
+      await pending.promise;
+    });
+    await screen.findByText(FIRST_RESPONSE.answer);
   });
 });

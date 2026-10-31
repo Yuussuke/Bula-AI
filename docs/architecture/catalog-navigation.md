@@ -34,4 +34,17 @@ A shared sidebar exposes independently collapsible general/medication history,
 ten sessions per page ordered by activity, with more pages on demand. Each link
 preserves its original scope/document; deleted-document sessions are not treated
 as general conversations. Starting an individual chat requires choosing a PDF.
-The UI never changes the general chat's authorized corpus based on catalog filters.
+## Public catalog boundary
+
+`GET /api/v1/bulas/catalog/search` reuses the search/pagination contract and adds
+`catalog_scope=all|system|shared` (default `all`). It lists published/ready system
+documents and approved/ready shared documents with matching stored PDF identity.
+Private uploads and pending/withdrawn sources are excluded before counting and
+pagination. Shared cards retain their declared origin; unknown ANVISA metadata
+remains null. The audience control is shown only for the ANVISA selection.
+
+The same small selector appears in the catalog and general-chat sidebar.
+`catalogo=system|shared` persists navigation; `all` combines both public catalogs.
+Search text and audience filters only affect browsing, not chat retrieval.
+Only the selected catalog boundary is passed to a new conversation. See
+`cross-bula-chat.md` for persistence and authorization.

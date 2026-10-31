@@ -1,29 +1,39 @@
 import { AlertCircle, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { type ReactElement, useRef } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 
-import { SystemBulaCard } from "@/components/bulas/system-bula-card";
+import { CatalogBulaCard } from "@/components/bulas/catalog-bula-card";
 import {
   type AudienceFilter,
+  CatalogFilters,
   type CatalogSort,
-  SystemBulaFilters,
-} from "@/components/bulas/system-bula-filters";
+} from "@/components/bulas/catalog-filters";
+import { CatalogSelector } from "@/components/bulas/catalog-selector";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useSystemBulas } from "@/hooks/use-system-bulas";
+import { usePublicCatalog } from "@/hooks/use-public-catalog";
 import { ApiError, SessionExpiredError } from "@/lib/api";
+import {
+  CATALOG_SCOPES,
+  catalogParameters,
+  type CatalogScope,
+  readCatalogScope,
+} from "@/lib/catalog-scope";
 
 const PAGE_SIZE = 20;
 
-export function SystemBulaCatalog(): ReactElement {
+export function BulaCatalog(): ReactElement {
   const titleRef = useRef<HTMLHeadingElement>(null);
   const [parameters, setParameters] = useSearchParams();
   const searchTerm = parameters.get("q") ?? "";
+  const catalogScope = readCatalogScope(parameters.get("catalogo"));
   const audienceValue = parameters.get("publico");
   const sort: CatalogSort = parameters.get("ordem") === "za" ? "name_desc" : "name_asc";
   const audience: AudienceFilter =
-    audienceValue === "patient" || audienceValue === "professional" ? audienceValue : "all";
+    catalogScope === "system" && (audienceValue === "patient" || audienceValue === "professional")
+      ? audienceValue
+      : "all";
   const requestedPage = Number(parameters.get("pagina") ?? 1);
   const page =
     Number.isSafeInteger(requestedPage) &&
@@ -31,7 +41,8 @@ export function SystemBulaCatalog(): ReactElement {
     requestedPage <= Math.floor(Number.MAX_SAFE_INTEGER / PAGE_SIZE)
       ? requestedPage
       : 1;
-  const catalogQuery = useSystemBulas({
+  const catalogQuery = usePublicCatalog({
+    catalog_scope: catalogScope,
     query: searchTerm,
     audience,
     limit: PAGE_SIZE,
@@ -47,9 +58,10 @@ export function SystemBulaCatalog(): ReactElement {
     query: string,
     targetAudience: AudienceFilter,
     targetPage = 1,
-    targetSort: CatalogSort = sort
+    targetSort: CatalogSort = sort,
+    targetCatalogScope: CatalogScope = catalogScope
   ): void => {
-    const next = new URLSearchParams();
+    const next = catalogParameters(targetCatalogScope);
     if (query) next.set("q", query);
     if (targetAudience !== "all") next.set("publico", targetAudience);
     if (targetPage > 1) next.set("pagina", String(targetPage));
@@ -69,14 +81,27 @@ export function SystemBulaCatalog(): ReactElement {
           id="system-catalog-title"
           className="text-2xl font-semibold tracking-tight"
         >
-          Catálogo ANVISA
+          {CATALOG_SCOPES[catalogScope]}
         </h1>
         <p className="text-muted-foreground text-sm">
           Pesquise no catálogo e confira o fabricante, a concentração e a apresentação antes de
           conversar.
         </p>
       </div>
-      <SystemBulaFilters
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <CatalogSelector
+          value={catalogScope}
+          onChange={(selected) => navigateToResults(searchTerm, "all", 1, sort, selected)}
+        />
+        <Button asChild variant="outline" size="sm">
+          <Link to={`/chat?${catalogParameters(catalogScope).toString()}`}>
+            Conversar com este catálogo
+          </Link>
+        </Button>
+      </div>
+      <CatalogFilters
+        key={catalogScope}
+        showAudience={catalogScope === "system"}
         searchTerm={searchTerm}
         audience={audience}
         sort={sort}
@@ -142,7 +167,7 @@ export function SystemBulaCatalog(): ReactElement {
           {items.length > 0 ? (
             <div className="divide-y overflow-hidden rounded-xl border">
               {items.map((bula) => (
-                <SystemBulaCard key={bula.id} bula={bula} />
+                <CatalogBulaCard key={bula.id} bula={bula} />
               ))}
             </div>
           ) : (

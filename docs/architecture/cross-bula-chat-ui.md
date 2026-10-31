@@ -3,8 +3,10 @@
 The authenticated `/chat` page reuses the existing chat components. The catalog
 links to it; `/bulas/:id/chat` remains document-scoped. It requires the backend's
 `POST /chat/ask`, explicit session `scope` and server-side history filters.
-Deploy the backend migration/API first. General chat searches published system
-leaflets; shared leaflets remain blocked. BGE is configured by the backend,
+Deploy the backend migration/API first. General chat offers General, ANVISA and
+Shared catalogs; only eligible public sources are available. The catalog boundary
+is saved per conversation and restored from the server. Changing it starts a new
+conversation, preserving the draft and existing history. BGE is configured by the backend,
 independently of these controls; see `rrfb-bge-runtime.md`.
 
 Query keys include document/general context. Loaded session scope and document

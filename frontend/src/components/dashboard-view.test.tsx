@@ -3,16 +3,16 @@ import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ReactElement } from "react";
 import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
   listUserBulas,
-  searchSystemBulas,
-  type SystemBulaPage,
-  type SystemBulaResponse,
+  type PublicCatalogBulaResponse,
+  type PublicCatalogPage,
+  searchPublicCatalog,
 } from "@/api/bulas";
 import { listChatSessions } from "@/api/chat";
-import { SystemBulaCatalog } from "@/components/bulas/system-bula-catalog";
+import { BulaCatalog } from "@/components/bulas/bula-catalog";
 import { UserBulaSection } from "@/components/bulas/user-bula-section";
 import { DashboardView } from "@/components/dashboard-view";
 import { ApiError } from "@/lib/api";
@@ -21,7 +21,7 @@ import { useAuthStore } from "@/store/auth";
 
 vi.mock("@/api/bulas", () => ({
   getBulaStatus: vi.fn(),
-  searchSystemBulas: vi.fn(),
+  searchPublicCatalog: vi.fn(),
   listUserBulas: vi.fn(),
   uploadBula: vi.fn(),
 }));
@@ -29,7 +29,7 @@ vi.mock("@/api/bulas", () => ({
 vi.mock("@/api/chat", () => ({ listChatSessions: vi.fn() }));
 
 const BULA_ID = "11111111-1111-4111-8111-111111111111";
-const searchSystemBulasMock = vi.mocked(searchSystemBulas);
+const searchPublicCatalogMock = vi.mocked(searchPublicCatalog);
 const listUserBulasMock = vi.mocked(listUserBulas);
 
 interface DeferredPromise<T> {
@@ -46,10 +46,13 @@ function createDeferredPromise<T>(): DeferredPromise<T> {
   return { promise, resolve: resolvePromise };
 }
 
-function buildSystemBula(overrides: Partial<SystemBulaResponse> = {}): SystemBulaResponse {
+function buildSystemBula(
+  overrides: Partial<PublicCatalogBulaResponse> = {}
+): PublicCatalogBulaResponse {
   return {
     id: BULA_ID,
-    target_id: "amoxicilina-clavulanato-500mg-125mg-comprimido-ems",
+    corpus: "system",
+    is_available: true,
     product_name: "AMOXICILINA + CLAVULANATO DE POTÁSSIO",
     active_ingredient: "amoxicilina + clavulanato de potássio",
     strength: "500 mg + 125 mg",
@@ -57,23 +60,10 @@ function buildSystemBula(overrides: Partial<SystemBulaResponse> = {}): SystemBul
     presentation: "embalagem com 12 unidades",
     audience: "patient",
     manufacturer: "EMS S/A",
-    company_tax_id: "57507378000365",
-    anvisa_product_id: 124891,
     registration_number: "102350532",
-    process_number: "253510242290107",
-    expedition_number: "0186508263",
-    transaction_number: "2551962026",
-    source_record_id: "35934920",
-    canonical_source_url: "https://consultas.anvisa.gov.br/api/consulta/bulario",
+    source_url: "https://consultas.anvisa.gov.br/api/consulta/bulario",
     source_published_at: "2026-02-25T17:20:51Z",
     source_updated_at: "2026-08-26T03:00:00Z",
-    sha256_checksum: "f".repeat(64),
-    content_size_bytes: 231137,
-    ingestion_status: "ready",
-    publication_state: "published",
-    reviewed_by: "Allan Yuussuke Kita",
-    reviewed_at: "2026-09-02T02:50:18Z",
-    published_at: "2026-09-02T02:50:35Z",
     ...overrides,
   };
 }
@@ -88,7 +78,11 @@ function LocationProbe(): ReactElement {
   );
 }
 
-function results(items: SystemBulaResponse[], total = items.length, offset = 0): SystemBulaPage {
+function results(
+  items: PublicCatalogBulaResponse[],
+  total = items.length,
+  offset = 0
+): PublicCatalogPage {
   return { items, total, limit: 20, offset };
 }
 
@@ -102,7 +96,7 @@ function renderDashboard(path = "/catalogo"): ReturnType<typeof render> {
         <Routes>
           <Route element={<DashboardView />}>
             <Route index element={<HomePage />} />
-            <Route path="/catalogo" element={<SystemBulaCatalog />} />
+            <Route path="/catalogo" element={<BulaCatalog />} />
             <Route path="/minhas-bulas" element={<UserBulaSection />} />
           </Route>
           <Route path="/bulas/:bulaId/chat" element={<p>Chat da bula</p>} />
@@ -114,9 +108,18 @@ function renderDashboard(path = "/catalogo"): ReturnType<typeof render> {
   );
 }
 
+beforeAll(() => {
+  Object.defineProperties(HTMLElement.prototype, {
+    hasPointerCapture: { configurable: true, value: () => false },
+    setPointerCapture: { configurable: true, value: () => undefined },
+    releasePointerCapture: { configurable: true, value: () => undefined },
+    scrollIntoView: { configurable: true, value: () => undefined },
+  });
+});
+
 beforeEach(() => {
   vi.clearAllMocks();
-  searchSystemBulasMock.mockResolvedValue(results([buildSystemBula()]));
+  searchPublicCatalogMock.mockResolvedValue(results([buildSystemBula()]));
   listUserBulasMock.mockResolvedValue([]);
   vi.mocked(listChatSessions).mockResolvedValue([]);
   useAuthStore.setState({
@@ -156,7 +159,7 @@ describe("library navigation", () => {
     );
     await user.click(savedConversation);
     expect(await screen.findByText("Chat da bula")).toBeInTheDocument();
-    expect(searchSystemBulasMock).not.toHaveBeenCalled();
+    expect(searchPublicCatalogMock).not.toHaveBeenCalled();
   });
 
   it("offers three destinations without downloading document lists on the home page", async () => {
@@ -164,12 +167,12 @@ describe("library navigation", () => {
     renderDashboard("/");
     const main = within(screen.getByRole("main"));
     expect(main.getAllByRole("link")).toHaveLength(3);
-    expect(searchSystemBulasMock).not.toHaveBeenCalled();
+    expect(searchPublicCatalogMock).not.toHaveBeenCalled();
     expect(listUserBulasMock).not.toHaveBeenCalled();
     expect(
       within(screen.getByRole("navigation", { name: "Navegação principal" })).getAllByRole("link")
     ).toHaveLength(6);
-    await user.click(main.getByRole("link", { name: /Catálogo ANVISA/ }));
+    await user.click(main.getByRole("link", { name: /Catálogo Geral/ }));
     expect(await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")).toBeInTheDocument();
     expect(screen.getByTestId("location")).toHaveTextContent("/catalogo");
   });
@@ -179,20 +182,21 @@ describe("library navigation", () => {
     expect(await screen.findByText("Nenhuma bula enviada")).toBeInTheDocument();
     expect(screen.getByText(/Seus uploads são privados/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Enviar bula" })).toBeInTheDocument();
-    expect(searchSystemBulasMock).not.toHaveBeenCalled();
+    expect(searchPublicCatalogMock).not.toHaveBeenCalled();
   });
 });
 
 describe("server-paginated system catalog", () => {
   it("keeps controls together and clears search without redundant filter tags", async () => {
     const user = userEvent.setup();
-    renderDashboard("/catalogo?q=amox&publico=patient&pagina=3");
+    renderDashboard("/catalogo?catalogo=system&q=amox&publico=patient&pagina=3");
     await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO");
     await user.selectOptions(
       screen.getByRole("combobox", { name: "Ordenar catálogo" }),
       "name_desc"
     );
-    expect(searchSystemBulasMock).toHaveBeenLastCalledWith({
+    expect(searchPublicCatalogMock).toHaveBeenLastCalledWith({
+      catalog_scope: "system",
       query: "amox",
       audience: "patient",
       limit: 20,
@@ -202,7 +206,8 @@ describe("server-paginated system catalog", () => {
     expect(screen.queryByLabelText("Filtros ativos")).not.toBeInTheDocument();
     await user.clear(screen.getByRole("searchbox"));
     await waitFor(() =>
-      expect(searchSystemBulasMock).toHaveBeenLastCalledWith({
+      expect(searchPublicCatalogMock).toHaveBeenLastCalledWith({
+        catalog_scope: "system",
         query: "",
         audience: "patient",
         limit: 20,
@@ -215,7 +220,7 @@ describe("server-paginated system catalog", () => {
     const firstItems = Array.from({ length: 20 }, (_, index) =>
       buildSystemBula({ id: "first-" + index, product_name: "Produto " + index })
     );
-    searchSystemBulasMock.mockImplementation(({ offset }) =>
+    searchPublicCatalogMock.mockImplementation(({ offset }) =>
       Promise.resolve(
         results(
           offset === 0 ? firstItems : [buildSystemBula({ product_name: "Segunda página" })],
@@ -239,7 +244,8 @@ describe("server-paginated system catalog", () => {
     expect(bottomPagination.getByRole("button", { name: "Anterior" })).toBeDisabled();
     await user.click(topPagination.getByRole("button", { name: "Próxima" }));
     expect(await screen.findByText("Segunda página")).toBeInTheDocument();
-    expect(searchSystemBulasMock).toHaveBeenLastCalledWith({
+    expect(searchPublicCatalogMock).toHaveBeenLastCalledWith({
+      catalog_scope: "all",
       query: "",
       audience: "all",
       limit: 20,
@@ -257,7 +263,7 @@ describe("server-paginated system catalog", () => {
   });
 
   it("searches the server and resets pagination instead of filtering the downloaded page", async () => {
-    searchSystemBulasMock.mockImplementation(({ query, offset }) =>
+    searchPublicCatalogMock.mockImplementation(({ query, offset }) =>
       Promise.resolve(
         results(
           [buildSystemBula({ product_name: query ? "Resultado remoto" : "Página inicial" })],
@@ -267,12 +273,13 @@ describe("server-paginated system catalog", () => {
       )
     );
     const user = userEvent.setup();
-    renderDashboard("/catalogo?pagina=2");
+    renderDashboard("/catalogo?catalogo=system&pagina=2");
     await screen.findByText("Página inicial");
     await user.type(screen.getByRole("searchbox"), "termo alternativo");
     expect(await screen.findByText("Resultado remoto")).toBeInTheDocument();
     expect(screen.getByRole("searchbox")).toHaveFocus();
-    expect(searchSystemBulasMock).toHaveBeenLastCalledWith({
+    expect(searchPublicCatalogMock).toHaveBeenLastCalledWith({
+      catalog_scope: "system",
       query: "termo alternativo",
       audience: "all",
       limit: 20,
@@ -282,7 +289,8 @@ describe("server-paginated system catalog", () => {
     expect(screen.getByTestId("location")).toHaveTextContent("q=termo+alternativo");
     await user.selectOptions(screen.getByLabelText("Filtrar por público da bula"), "professional");
     await screen.findByText("Resultado remoto");
-    expect(searchSystemBulasMock).toHaveBeenLastCalledWith({
+    expect(searchPublicCatalogMock).toHaveBeenLastCalledWith({
+      catalog_scope: "system",
       query: "termo alternativo",
       audience: "professional",
       limit: 20,
@@ -291,9 +299,10 @@ describe("server-paginated system catalog", () => {
   });
 
   it("restores filters and page from the URL", async () => {
-    renderDashboard("/catalogo?q=potassio&publico=patient&pagina=3");
+    renderDashboard("/catalogo?catalogo=system&q=potassio&publico=patient&pagina=3");
     await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO");
-    expect(searchSystemBulasMock).toHaveBeenCalledWith({
+    expect(searchPublicCatalogMock).toHaveBeenCalledWith({
+      catalog_scope: "system",
       query: "potassio",
       audience: "patient",
       limit: 20,
@@ -304,14 +313,12 @@ describe("server-paginated system catalog", () => {
   });
 
   it("keeps missing metadata explicit and source details collapsed until requested", async () => {
-    searchSystemBulasMock.mockResolvedValue(
+    searchPublicCatalogMock.mockResolvedValue(
       results([
         buildSystemBula({
           manufacturer: null,
           source_published_at: null,
           source_updated_at: null,
-          reviewed_by: null,
-          reviewed_at: null,
         }),
       ])
     );
@@ -325,7 +332,7 @@ describe("server-paginated system catalog", () => {
     expect(screen.getByText("Não informado")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Consultar fonte na ANVISA" })).toHaveAttribute(
       "href",
-      buildSystemBula().canonical_source_url
+      buildSystemBula().source_url
     );
   });
 
@@ -337,7 +344,7 @@ describe("server-paginated system catalog", () => {
   });
 
   it("offers a first-page recovery for an out-of-range URL", async () => {
-    searchSystemBulasMock.mockImplementation(({ offset }) =>
+    searchPublicCatalogMock.mockImplementation(({ offset }) =>
       Promise.resolve(results(offset ? [] : [buildSystemBula()], 1, offset))
     );
     const user = userEvent.setup();
@@ -348,8 +355,8 @@ describe("server-paginated system catalog", () => {
   });
 
   it("shows loading without rendering the full catalog", async () => {
-    const deferred = createDeferredPromise<SystemBulaPage>();
-    searchSystemBulasMock.mockReturnValue(deferred.promise);
+    const deferred = createDeferredPromise<PublicCatalogPage>();
+    searchPublicCatalogMock.mockReturnValue(deferred.promise);
     renderDashboard();
     expect(screen.getByRole("status", { name: "Carregando catálogo" })).toBeInTheDocument();
     expect(screen.queryByRole("article")).not.toBeInTheDocument();
@@ -361,13 +368,13 @@ describe("server-paginated system catalog", () => {
   });
 
   it("distinguishes an empty catalog from an empty search", async () => {
-    searchSystemBulasMock.mockResolvedValue(results([]));
+    searchPublicCatalogMock.mockResolvedValue(results([]));
     renderDashboard();
     expect(await screen.findByText("Nenhuma bula disponível")).toBeInTheDocument();
   });
 
   it("clears an unsuccessful search", async () => {
-    searchSystemBulasMock.mockImplementation(({ query }) =>
+    searchPublicCatalogMock.mockImplementation(({ query }) =>
       Promise.resolve(results(query ? [] : [buildSystemBula()]))
     );
     const user = userEvent.setup();
@@ -379,7 +386,7 @@ describe("server-paginated system catalog", () => {
   });
 
   it("offers retry for a failed request", async () => {
-    searchSystemBulasMock
+    searchPublicCatalogMock
       .mockRejectedValueOnce(new Error("Unavailable"))
       .mockResolvedValueOnce(results([buildSystemBula()]));
     const user = userEvent.setup();
@@ -390,9 +397,63 @@ describe("server-paginated system catalog", () => {
   });
 
   it("explains denied access without retrying it", async () => {
-    searchSystemBulasMock.mockRejectedValue(new ApiError(403, "Forbidden"));
+    searchPublicCatalogMock.mockRejectedValue(new ApiError(403, "Forbidden"));
     renderDashboard();
     expect(await screen.findByText("Acesso ao catálogo não autorizado")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Tentar novamente" })).not.toBeInTheDocument();
+  });
+});
+
+describe("public catalog source boundary", () => {
+  it("restores shared scope and keeps unknown metadata explicit", async () => {
+    searchPublicCatalogMock.mockResolvedValue(
+      results([
+        buildSystemBula({
+          corpus: "shared",
+          audience: null,
+          registration_number: null,
+          active_ingredient: null,
+          pharmaceutical_form: null,
+          source_url: "https://source.example/leaflet.pdf",
+        }),
+      ])
+    );
+    renderDashboard("/catalogo?catalogo=shared&pagina=2&publico=patient");
+    await screen.findByRole("article");
+    expect(searchPublicCatalogMock).toHaveBeenCalledWith({
+      catalog_scope: "shared",
+      query: "",
+      audience: "all",
+      limit: 20,
+      offset: 20,
+    });
+    expect(screen.queryByLabelText("Filtrar por público da bula")).not.toBeInTheDocument();
+    expect(screen.getByText("Compartilhada")).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Conversar com este catálogo" })).toHaveAttribute(
+      "href",
+      "/chat?catalogo=shared"
+    );
+    expect(screen.getByRole("link", { name: "Consultar fonte original" })).toHaveAttribute(
+      "href",
+      "https://source.example/leaflet.pdf"
+    );
+  });
+
+  it("changes catalog and resets pagination and audience without losing search", async () => {
+    const user = userEvent.setup();
+    renderDashboard("/catalogo?catalogo=system&q=amox&publico=patient&pagina=3");
+    await screen.findByRole("article");
+    await user.click(screen.getByRole("combobox", { name: "Catálogo consultado" }));
+    await user.click(screen.getByRole("option", { name: "Catálogo Compartilhado" }));
+    await waitFor(() =>
+      expect(searchPublicCatalogMock).toHaveBeenLastCalledWith({
+        catalog_scope: "shared",
+        query: "amox",
+        audience: "all",
+        limit: 20,
+        offset: 0,
+      })
+    );
+    expect(screen.getByTestId("location")).toHaveTextContent("/catalogo?catalogo=shared&q=amox");
   });
 });

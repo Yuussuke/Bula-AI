@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { catalogParameters } from "@/lib/catalog-scope";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
@@ -143,10 +144,14 @@ function ConversationGroup({
               }
               const isCurrentSession = session.id === currentSessionId;
               const isSameBula = context?.scope === "bula" && context.bulaId === session.bula_id;
+              const parameters = catalogParameters(
+                scope === "cross_bula" ? (session.catalog_scope ?? "all") : "all"
+              );
+              parameters.set("session", session.id);
               return (
                 <li key={session.id}>
                   <Link
-                    to={`${scope === "cross_bula" ? "/chat" : `/bulas/${session.bula_id}/chat`}?session=${session.id}`}
+                    to={`${scope === "cross_bula" ? "/chat" : `/bulas/${session.bula_id}/chat`}?${parameters.toString()}`}
                     state={isSameBula && returnTo ? { returnTo } : undefined}
                     aria-current={isCurrentSession ? "page" : undefined}
                     onClick={onNavigate}

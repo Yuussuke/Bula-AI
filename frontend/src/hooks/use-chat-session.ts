@@ -13,9 +13,11 @@ import {
 } from "@/api/chat";
 import type { ChatTimeline, ChatTimelineMessage } from "@/components/chat/types";
 import { ApiError } from "@/lib/api";
+import { type CatalogScope, isCatalogScope } from "@/lib/catalog-scope";
 import { isRetrievalMode } from "@/lib/retrieval-mode";
 
 interface SendQuestionVariables {
+  catalogScope: CatalogScope;
   question: string;
   sessionId: string | null;
   optimisticUserMessageId: string;
@@ -30,12 +32,14 @@ interface TransientChatMessage extends ChatTimelineMessage {
 }
 
 interface UseChatSessionOptions {
+  catalogScope?: CatalogScope;
   context: ChatContext;
   sessionId: string | null;
   onSessionCreated: (sessionId: string) => void;
 }
 
 interface UseChatSessionResult {
+  catalogScope: CatalogScope;
   messages: ChatTimelineMessage[];
   loadedBulaId: string | null;
   hasContextMismatch: boolean;
@@ -60,10 +64,14 @@ function buildSessionQueryKey(
 }
 
 function mapSessionToTimeline(session: ChatSessionResponse): ChatTimeline {
+  if (session.catalog_scope != null && !isCatalogScope(session.catalog_scope)) {
+    throw new Error("O servidor informou um catálogo inválido para esta conversa.");
+  }
   const lastAssistantMode = session.messages.findLast(
     (message) => message.role === "assistant"
   )?.retrieval_mode;
   return {
+    catalogScope: session.catalog_scope ?? "all",
     sessionId: session.id,
     bulaId: session.bula_id,
     scope: session.scope ?? "bula",
@@ -105,6 +113,7 @@ function buildConversationKey(contextKey: string, sessionId: string | null): str
 }
 
 export function useChatSession({
+  catalogScope = "all",
   context,
   sessionId,
   onSessionCreated,
@@ -122,7 +131,7 @@ export function useChatSession({
     null
   );
   const bulaId = context.scope === "bula" ? context.bulaId : null;
-  const contextKey = `${context.scope}:${bulaId ?? "general"}`;
+  const contextKey = `${context.scope}:${bulaId ?? catalogScope}`;
   const conversationKey = buildConversationKey(contextKey, sessionId);
   useLayoutEffect(() => {
     isMountedRef.current = true;
@@ -160,12 +169,14 @@ export function useChatSession({
       sessionId: existingSessionId,
       context: questionContext,
       mode,
+      catalogScope: requestedCatalogScope,
     }: SendQuestionVariables) => {
       if (existingSessionId) {
         return continueChatSession(existingSessionId, { question, mode });
       }
 
-      if (questionContext.scope === "cross_bula") return askCrossBulaQuestion({ question, mode });
+      if (questionContext.scope === "cross_bula")
+        return askCrossBulaQuestion({ question, mode, catalog_scope: requestedCatalogScope });
       return askBulaQuestion(questionContext.bulaId, { question, mode });
     },
     onSuccess: (response, variables) => {
@@ -183,6 +194,8 @@ export function useChatSession({
       );
 
       queryClient.setQueryData<ChatTimeline>(nextQueryKey, {
+        catalogScope:
+          response.catalog_scope ?? existingTimeline?.catalogScope ?? variables.catalogScope,
         sessionId: nextSessionId,
         bulaId: variables.context.scope === "bula" ? variables.context.bulaId : null,
         scope: variables.context.scope,
@@ -232,6 +245,7 @@ export function useChatSession({
         contextKey,
         conversationRevision,
         mode,
+        catalogScope: sessionQuery.data?.catalogScope ?? catalogScope,
       });
       setTransientUserMessage((currentMessage) =>
         currentMessage?.id === optimisticUserMessage.id ? null : currentMessage
@@ -263,6 +277,7 @@ export function useChatSession({
     transientUserMessage?.conversationKey === conversationKey ? transientUserMessage : null;
 
   return {
+    catalogScope: sessionQuery.data?.catalogScope ?? catalogScope,
     mode,
     setMode: (selectedMode) => {
       setPreference({ conversationKey, mode: selectedMode });
