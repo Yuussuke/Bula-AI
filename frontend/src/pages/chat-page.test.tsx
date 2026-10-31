@@ -12,12 +12,14 @@ import {
   type AskResponse,
   type ChatSessionResponse,
   continueChatSession,
+  deleteChatSession,
   getChatSession,
   listChatSessions,
   type RetrievalMode,
 } from "@/api/chat";
 import { ApiError } from "@/lib/api";
 import { ChatPage } from "@/pages/chat-page";
+import { setViewportWidth } from "@/test/viewport";
 
 vi.mock("@/api/bulas", () => ({
   getQueryableBula: vi.fn(),
@@ -29,6 +31,7 @@ vi.mock("@/api/chat", () => ({
   continueChatSession: vi.fn(),
   getChatSession: vi.fn(),
   listChatSessions: vi.fn(),
+  deleteChatSession: vi.fn(),
 }));
 
 const BULA_ID = "11111111-1111-4111-8111-111111111111";
@@ -222,15 +225,16 @@ describe("ChatPage", () => {
     ).toContainElement(screen.getByRole("textbox"));
   });
 
-  it("allows changing the mode from the mobile conversation drawer", async () => {
+  it("allows changing the mode directly from the compact header", async () => {
+    setViewportWidth(800);
     const user = userEvent.setup();
     renderChatPage("/chat");
-    await user.click(await screen.findByRole("button", { name: "Abrir conversas" }));
-    const drawer = screen.getByRole("dialog", { name: "Conversas gerais" });
-    expect(within(drawer).getByRole("button", { name: "Chat geral" })).toBeVisible();
+    expect(
+      within(screen.getByRole("banner")).getByRole("combobox", { name: "Modo de busca" })
+    ).toBeVisible();
     await chooseMode(user, "bm25");
     await user.keyboard("{Escape}");
-    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     await user.type(screen.getByRole("textbox"), "Pergunta de teste");
     await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
     await waitFor(() =>
@@ -245,14 +249,14 @@ describe("ChatPage", () => {
     const user = userEvent.setup();
     const returnTo = "/catalogo?q=amox&publico=patient&pagina=3&ordem=za";
     renderChatPage({ pathname: `/bulas/${BULA_ID}/chat`, state: { returnTo } });
-    expect(await screen.findByRole("link", { name: "Voltar ao catálogo" })).toHaveAttribute(
+    expect(await screen.findByRole("link", { name: "Explorar catálogo de bulas" })).toHaveAttribute(
       "href",
       returnTo
     );
     await user.type(screen.getByRole("textbox"), "Para que serve?");
     await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
     await screen.findByText(FIRST_RESPONSE.answer);
-    expect(screen.getByRole("link", { name: "Voltar ao catálogo" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "Explorar catálogo de bulas" })).toHaveAttribute(
       "href",
       returnTo
     );
@@ -278,7 +282,7 @@ describe("ChatPage", () => {
   it("explains every search mode on demand without sending a question", async () => {
     const user = userEvent.setup();
     renderChatPage("/chat");
-    await user.click(await screen.findByRole("button", { name: "Entender os modos de busca" }));
+    await user.click(await screen.findByRole("combobox", { name: "Modo de busca" }));
     expect(screen.getByText(/Busca por termos presentes/)).toBeVisible();
     expect(screen.getByText(/Busca por significado/)).toBeVisible();
     expect(askCrossBulaQuestionMock).not.toHaveBeenCalled();
@@ -537,7 +541,7 @@ describe("ChatPage", () => {
 
     const loadingState = screen.getByRole("status", { name: "Carregando conversa" });
     expect(loadingState.querySelectorAll('[data-slot="skeleton"]').length).toBeGreaterThan(10);
-    expect(screen.getByRole("complementary")).toHaveClass("w-64", "shrink-0");
+    expect(screen.queryByRole("combobox", { name: "Modo de busca" })).not.toBeInTheDocument();
 
     await act(async () => {
       deferredBula.resolve(QUERYABLE_BULA);
@@ -558,7 +562,10 @@ describe("ChatPage", () => {
     expect(screen.getByRole("combobox", { name: "Modo de busca" })).toHaveTextContent(
       MODE_NAMES.hybrid
     );
-    expect(screen.getByRole("complementary")).toHaveClass("w-64", "shrink-0");
+    expect(screen.getByRole("button", { name: "Recolher barra lateral" })).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    );
     expect(getQueryableBulaMock).toHaveBeenCalledWith(BULA_ID);
     expect(getChatSessionMock).not.toHaveBeenCalled();
   });
@@ -821,12 +828,47 @@ describe("ChatPage", () => {
 });
 
 describe("catalog source selection", () => {
+  it("clears a deleted active conversation without widening its catalog", async () => {
+    const session = {
+      ...buildPersistedSession(),
+      scope: "cross_bula" as const,
+      bula_id: null,
+      catalog_scope: "shared" as const,
+    };
+    let isDeleted = false;
+    getChatSessionMock.mockResolvedValue(session);
+    listChatSessionsMock.mockImplementation(({ scope } = {}) =>
+      Promise.resolve(scope === "cross_bula" && !isDeleted ? [session] : [])
+    );
+    vi.mocked(deleteChatSession).mockImplementation(() => {
+      isDeleted = true;
+      return Promise.resolve({ session_id: SESSION_ID });
+    });
+    const user = userEvent.setup();
+    renderChatPage(`/chat?session=${SESSION_ID}`);
+    await screen.findByText("Resposta persistida no PostgreSQL.");
+    await user.click(
+      await screen.findByRole("button", { name: `Opções da conversa ${session.title}` })
+    );
+    await user.click(screen.getByRole("menuitem", { name: "Excluir" }));
+    await user.click(screen.getByRole("button", { name: "Excluir conversa" }));
+    await waitFor(() =>
+      expect(screen.getByTestId("location")).toHaveTextContent("/chat?catalogo=shared")
+    );
+    expect(screen.getByTestId("location")).not.toHaveTextContent("session=");
+    expect(screen.queryByText("Resposta persistida no PostgreSQL.")).not.toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "Catálogo consultado" })).toHaveTextContent(
+      "Compartilhado"
+    );
+    expect(askCrossBulaQuestionMock).not.toHaveBeenCalled();
+    expect(continueChatSessionMock).not.toHaveBeenCalled();
+  });
   it("sends the selected catalog only when creating a general conversation", async () => {
     const user = userEvent.setup();
     askCrossBulaQuestionMock.mockResolvedValue({ ...FIRST_RESPONSE, catalog_scope: "shared" });
     renderChatPage("/chat?catalogo=shared");
     expect(await screen.findByRole("combobox", { name: "Catálogo consultado" })).toHaveTextContent(
-      "Catálogo Compartilhado"
+      "Compartilhado"
     );
     await user.type(screen.getByRole("textbox"), "Como conservar?");
     await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
@@ -859,7 +901,7 @@ describe("catalog source selection", () => {
     const user = userEvent.setup();
     renderChatPage(`/chat?session=${SESSION_ID}&catalogo=system`);
     expect(await screen.findByRole("combobox", { name: "Catálogo consultado" })).toHaveTextContent(
-      "Catálogo Compartilhado"
+      "Compartilhado"
     );
     await user.type(screen.getByRole("textbox"), "E agora?");
     await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
@@ -913,5 +955,96 @@ describe("catalog source selection", () => {
       await pending.promise;
     });
     await screen.findByText(FIRST_RESPONSE.answer);
+  });
+});
+
+describe("compact conversation navigation", () => {
+  it.each([390, 800])("keeps both settings in the header at %i pixels", async (width) => {
+    setViewportWidth(width);
+    const user = userEvent.setup();
+    renderChatPage("/chat");
+    const header = screen.getByRole("banner");
+    expect(await within(header).findByRole("combobox", { name: "Modo de busca" })).toBeVisible();
+    expect(within(header).getByRole("combobox", { name: "Catálogo consultado" })).toBeVisible();
+    expect(screen.queryByRole("complementary")).not.toBeInTheDocument();
+    await user.type(screen.getByRole("textbox"), "Minha dúvida");
+    await user.click(within(header).getByRole("combobox", { name: "Catálogo consultado" }));
+    await user.click(screen.getByRole("option", { name: "Catálogo ANVISA" }));
+    expect(screen.getByTestId("location")).toHaveTextContent("catalogo=system");
+    expect(screen.getByRole("textbox")).toHaveValue("Minha dúvida");
+    expect(askCrossBulaQuestionMock).not.toHaveBeenCalled();
+  });
+
+  it("keeps settings and messages when collapsing or resizing the workspace", async () => {
+    const user = userEvent.setup();
+    getChatSessionMock.mockResolvedValue({
+      ...buildPersistedSession(),
+      scope: "cross_bula",
+      bula_id: null,
+      catalog_scope: "shared",
+    });
+    renderChatPage(`/chat?session=${SESSION_ID}`);
+    await screen.findByText("Resposta persistida no PostgreSQL.");
+    await user.click(screen.getByRole("button", { name: "Recolher barra lateral" }));
+    expect(
+      screen.queryByRole("navigation", { name: "Conversas recentes" })
+    ).not.toBeInTheDocument();
+    const rail = screen.getByRole("navigation", { name: "Atalhos do chat" });
+    expect(within(rail).getByRole("combobox", { name: "Catálogo consultado" })).toHaveTextContent(
+      "Compartilhado"
+    );
+    expect(within(rail).getByRole("combobox", { name: "Modo de busca" })).toHaveTextContent(
+      "Semântico"
+    );
+    expect(screen.getByText("Resposta persistida no PostgreSQL.")).toBeVisible();
+    act(() => setViewportWidth(800));
+    expect(
+      within(screen.getByRole("banner")).getByRole("combobox", { name: "Catálogo consultado" })
+    ).toHaveTextContent("Compartilhado");
+    act(() => setViewportWidth(1280));
+    await user.click(screen.getByRole("button", { name: "Expandir barra lateral" }));
+    expect(screen.getByRole("navigation", { name: "Conversas recentes" })).toBeVisible();
+    expect(screen.getByRole("combobox", { name: "Modo de busca" })).toHaveTextContent("Semântico");
+    expect(continueChatSessionMock).not.toHaveBeenCalled();
+  });
+
+  it("supports dragging, cancellation and keyboard expansion without losing the conversation", async () => {
+    const user = userEvent.setup();
+    renderChatPage("/chat");
+    await screen.findByRole("combobox", { name: "Modo de busca" });
+    const handle = screen.getByRole("button", { name: "Ajustar barra lateral" });
+    fireEvent.pointerDown(handle, { button: 0, clientX: 288, pointerId: 1 });
+    fireEvent.pointerMove(handle, { clientX: 120, pointerId: 1 });
+    const draggingWidth = Number.parseFloat(screen.getByRole("complementary").style.width);
+    expect(draggingWidth).toBeGreaterThan(120);
+    expect(draggingWidth).toBeLessThan(288);
+    fireEvent.pointerUp(handle, { clientX: 120, pointerId: 1 });
+    expect(screen.getByRole("button", { name: "Expandir barra lateral" })).toBeVisible();
+    handle.focus();
+    await user.keyboard("{ArrowRight}");
+    expect(screen.getByRole("button", { name: "Recolher barra lateral" })).toBeVisible();
+    fireEvent.pointerDown(handle, { button: 0, clientX: 288, pointerId: 2 });
+    fireEvent.pointerMove(handle, { clientX: 120, pointerId: 2 });
+    fireEvent.pointerCancel(handle, { pointerId: 2 });
+    expect(screen.getByRole("button", { name: "Recolher barra lateral" })).toBeVisible();
+    await user.keyboard("{ArrowLeft}");
+    expect(screen.getByRole("button", { name: "Expandir barra lateral" })).toBeVisible();
+    expect(screen.getByRole("textbox")).toBeVisible();
+  });
+
+  it("explains rail icons on hover and keyboard focus", async () => {
+    const user = userEvent.setup();
+    renderChatPage("/chat");
+    await screen.findByRole("combobox", { name: "Modo de busca" });
+    const catalog = screen.getByRole("link", { name: "Explorar catálogo de bulas" });
+    await user.hover(catalog);
+    expect(
+      await screen.findByRole("tooltip", { name: "Explorar catálogo de bulas" })
+    ).toBeVisible();
+    await user.unhover(catalog);
+    catalog.focus();
+    expect(
+      await screen.findByRole("tooltip", { name: "Explorar catálogo de bulas" })
+    ).toBeVisible();
   });
 });

@@ -34,7 +34,7 @@ function BulaStatusBadge({ drugName, status, errorMessage }: BulaStatusBadgeProp
     return (
       <Badge
         variant="outline"
-        className="border-amber-200 bg-amber-50 text-amber-800"
+        className="border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800/60 dark:bg-amber-950/40 dark:text-amber-200"
         aria-label={`${drugName}: processando`}
       >
         <Loader2 aria-hidden="true" className="animate-spin" />
@@ -47,7 +47,7 @@ function BulaStatusBadge({ drugName, status, errorMessage }: BulaStatusBadgeProp
     return (
       <Badge
         variant="outline"
-        className="border-emerald-200 bg-emerald-50 text-emerald-800"
+        className="border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800/60 dark:bg-emerald-950/40 dark:text-emerald-200"
         aria-label={`${drugName}: pronta`}
       >
         <CheckCircle2 aria-hidden="true" />
@@ -67,7 +67,10 @@ function BulaStatusBadge({ drugName, status, errorMessage }: BulaStatusBadgeProp
           className="rounded-full focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:outline-none"
           aria-label={`Ver erro de processamento de ${drugName}`}
         >
-          <Badge variant="outline" className="cursor-help border-red-200 bg-red-50 text-red-800">
+          <Badge
+            variant="outline"
+            className="cursor-help border-red-200 bg-red-50 text-red-800 dark:border-red-800/60 dark:bg-red-950/40 dark:text-red-200"
+          >
             <AlertCircle aria-hidden="true" />
             Erro
           </Badge>

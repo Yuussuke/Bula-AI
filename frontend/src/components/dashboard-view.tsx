@@ -7,13 +7,16 @@ import {
   Library,
   LogOut,
   Menu,
+  MessageSquarePlus,
   Users,
 } from "lucide-react";
 import { type ReactElement, useState } from "react";
-import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import { BrandLogo } from "@/components/brand-logo";
 import { RecentConversations } from "@/components/chat/recent-conversations";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { ActionHint } from "@/components/ui/action-hint";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -22,6 +25,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { sidebarShortcutClass, WorkspaceSidebar } from "@/components/workspace-sidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { logoutRequest } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { cn } from "@/lib/utils";
@@ -35,10 +40,10 @@ const navigation = [
 
 export function DashboardView(): ReactElement {
   const navigate = useNavigate();
-  const location = useLocation();
   const user = useAuthStore((state) => state.user);
   const clearAuth = useAuthStore((state) => state.clearAuth);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const isCompactLayout = useIsMobile(1024);
   const visibleNavigation = [
     ...navigation,
     { path: "/compartilhadas", label: "Bulas compartilhadas", icon: Files },
@@ -51,8 +56,6 @@ export function DashboardView(): ReactElement {
       label: "Perfis de acesso",
       icon: Users,
     });
-  const title =
-    visibleNavigation.find((item) => item.path === location.pathname)?.label ?? "Bula AI";
   const logoutMutation = useMutation({
     mutationFn: logoutRequest,
     onSettled: () => {
@@ -100,6 +103,7 @@ export function DashboardView(): ReactElement {
         <RecentConversations onNavigate={() => setIsMobileMenuOpen(false)} />
       </div>
       <div className="border-sidebar-border border-t p-4">
+        <ThemeToggle />
         <p className="truncate text-sm font-medium">{user?.name ?? "Usuário"}</p>
         <p className="text-sidebar-foreground/60 truncate text-xs">{user?.email}</p>
       </div>
@@ -108,9 +112,51 @@ export function DashboardView(): ReactElement {
 
   return (
     <div className="bg-background flex h-dvh overflow-hidden">
-      <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-60 shrink-0 flex-col border-r md:flex">
-        {renderSidebarContent()}
-      </aside>
+      {!isCompactLayout ? (
+        <WorkspaceSidebar
+          navigationLabel="Navegação principal"
+          shortcuts={
+            <>
+              <ActionHint label="Nova conversa geral">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={sidebarShortcutClass}
+                  aria-label="Iniciar nova conversa geral"
+                  onClick={() => void navigate("/chat")}
+                >
+                  <MessageSquarePlus aria-hidden="true" />
+                </Button>
+              </ActionHint>
+              {visibleNavigation
+                .filter((item) => item.path !== "/")
+                .map(({ path, label, icon: Icon }) => (
+                  <ActionHint key={path} label={label}>
+                    <NavLink
+                      to={path}
+                      end
+                      aria-label={label}
+                      className={cn(
+                        sidebarShortcutClass,
+                        "aria-[current=page]:bg-sidebar-accent aria-[current=page]:text-sidebar-accent-foreground"
+                      )}
+                    >
+                      <Icon aria-hidden="true" className="h-4 w-4" />
+                    </NavLink>
+                  </ActionHint>
+                ))}
+            </>
+          }
+        >
+          <div className="sidebar-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain pt-2">
+            <RecentConversations />
+          </div>
+          <div className="border-sidebar-border border-t p-4">
+            <p className="truncate text-sm font-medium">{user?.name ?? "Usuário"}</p>
+            <p className="text-sidebar-foreground/60 truncate text-xs">{user?.email}</p>
+          </div>
+        </WorkspaceSidebar>
+      ) : null}
       <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
         <SheetContent side="left" className="bg-sidebar text-sidebar-foreground w-64 p-0">
           <SheetHeader className="sr-only">
@@ -122,33 +168,33 @@ export function DashboardView(): ReactElement {
           <div className="flex h-full flex-col">{renderSidebarContent()}</div>
         </SheetContent>
       </Sheet>
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-border bg-card flex min-h-16 shrink-0 items-center justify-between gap-3 border-b px-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-2">
+      <div className="relative flex min-w-0 flex-1 flex-col">
+        <div className="pointer-events-none absolute inset-x-0 top-3 z-20 flex items-center justify-between px-4 sm:px-6">
+          <div className="pointer-events-auto">
             <Button
               type="button"
               variant="ghost"
               size="icon-sm"
-              className="md:hidden"
+              className="lg:hidden"
               onClick={() => setIsMobileMenuOpen(true)}
               aria-label="Abrir menu"
             >
               <Menu aria-hidden="true" className="h-5 w-5" />
             </Button>
-            <p className="truncate font-medium">{title}</p>
           </div>
           <Button
             type="button"
             variant="ghost"
             size="sm"
+            className="bg-background/90 pointer-events-auto backdrop-blur-sm"
             onClick={() => logoutMutation.mutate()}
             disabled={logoutMutation.isPending}
           >
             <LogOut aria-hidden="true" className="mr-2 h-4 w-4" />
             {logoutMutation.isPending ? "Saindo..." : "Sair"}
           </Button>
-        </header>
-        <main className="clean-scroll min-h-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+        </div>
+        <main className="clean-scroll min-h-0 flex-1 overflow-y-auto p-4 pt-16 sm:p-6 sm:pt-16 lg:p-8 lg:pt-16">
           <div className="mx-auto w-full max-w-6xl">
             <Outlet />
           </div>

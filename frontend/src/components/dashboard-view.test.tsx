@@ -18,6 +18,7 @@ import { DashboardView } from "@/components/dashboard-view";
 import { ApiError } from "@/lib/api";
 import { HomePage } from "@/pages/home-page";
 import { useAuthStore } from "@/store/auth";
+import { setViewportWidth } from "@/test/viewport";
 
 vi.mock("@/api/bulas", () => ({
   getBulaStatus: vi.fn(),
@@ -131,6 +132,53 @@ beforeEach(() => {
 });
 
 describe("library navigation", () => {
+  it("offers logout without duplicating the page title in a header", () => {
+    renderDashboard("/");
+    expect(screen.getByRole("button", { name: "Sair" })).toBeVisible();
+    expect(screen.queryByRole("banner")).not.toBeInTheDocument();
+  });
+  it("preserves sized navigation links and active state through icon hints", async () => {
+    renderDashboard("/catalogo");
+    await screen.findByRole("article");
+    const navigation = screen.getByRole("navigation", { name: "Navegação principal" });
+    for (const link of within(navigation).getAllByRole("link")) {
+      expect(link).toHaveClass("h-11", "w-11", "shrink-0");
+    }
+    expect(within(navigation).getByRole("link", { name: "Catálogo Geral" })).toHaveAttribute(
+      "aria-current",
+      "page"
+    );
+  });
+  it("preserves sidebar collapse across home, catalog and private documents", async () => {
+    const user = userEvent.setup();
+    renderDashboard("/");
+    await user.click(screen.getByRole("button", { name: "Recolher barra lateral" }));
+    expect(
+      screen.queryByRole("navigation", { name: "Conversas recentes" })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole("link", { name: "Catálogo Geral" }));
+    await screen.findByRole("article");
+    expect(screen.getByRole("button", { name: "Expandir barra lateral" })).toBeVisible();
+    await user.click(screen.getByRole("link", { name: "Minhas bulas" }));
+    await screen.findByText("Nenhuma bula enviada");
+    expect(screen.getByRole("button", { name: "Expandir barra lateral" })).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Expandir barra lateral" }));
+    expect(screen.getByRole("navigation", { name: "Conversas recentes" })).toBeVisible();
+  });
+
+  it("keeps navigation available in the compact layout", async () => {
+    setViewportWidth(800);
+    const user = userEvent.setup();
+    renderDashboard("/");
+    expect(
+      screen.queryByRole("button", { name: "Recolher barra lateral" })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Abrir menu" }));
+    const menu = screen.getByRole("dialog");
+    await user.click(within(menu).getByRole("link", { name: "Catálogo Geral" }));
+    await screen.findByRole("article");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
   it("makes a saved medication conversation discoverable from the home sidebar", async () => {
     vi.mocked(listChatSessions).mockImplementation(({ scope } = {}) =>
       Promise.resolve(

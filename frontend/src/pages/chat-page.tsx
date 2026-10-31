@@ -21,8 +21,11 @@ import {
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChatSession } from "@/hooks/use-chat-session";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { ApiError } from "@/lib/api";
 import { catalogParameters, type CatalogScope, readCatalogScope } from "@/lib/catalog-scope";
+import { cn } from "@/lib/utils";
+import { useSidebarStore } from "@/store/sidebar";
 
 const ModeSelector = lazy(() =>
   import("@/components/chat/mode-selector").then((module) => ({ default: module.ModeSelector }))
@@ -33,6 +36,7 @@ function isNotFoundError(error: Error | null): boolean {
 }
 
 function ChatPageLoadingState(): ReactElement {
+  const isSidebarCollapsed = useSidebarStore((state) => state.isCollapsed);
   return (
     <div
       role="status"
@@ -41,7 +45,10 @@ function ChatPageLoadingState(): ReactElement {
     >
       <span className="sr-only">Carregando conversa…</span>
 
-      <aside className="bg-sidebar border-sidebar-border hidden w-64 shrink-0 border-r lg:block">
+      <aside
+        className="bg-sidebar border-sidebar-border hidden shrink-0 overflow-hidden border-r lg:block"
+        style={{ width: isSidebarCollapsed ? 56 : 288 }}
+      >
         <div className="border-sidebar-border flex items-center gap-3 border-b p-5">
           <Skeleton className="bg-sidebar-accent h-9 w-9 shrink-0" />
           <div className="flex-1 space-y-2">
@@ -127,6 +134,7 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
   const [searchParams, setSearchParams] = useSearchParams();
   const [question, setQuestion] = useState("");
   const [isMobileSessionsOpen, setIsMobileSessionsOpen] = useState(false);
+  const isCompactLayout = useIsMobile(1024);
   const sessionId = searchParams.get("session");
   const requestedCatalogScope = readCatalogScope(searchParams.get("catalogo"));
   const resolvedBulaId = bulaId ?? "";
@@ -226,55 +234,58 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
     document.getElementById("chat-question")?.focus();
   };
 
-  const sidebarDetails = (
-    <div className="space-y-4">
-      <div className="space-y-1">
-        <p className="text-sm font-semibold break-words">{bulaDisplayName}</p>
-        {scope !== "cross_bula" ? (
-          <details className="text-sidebar-foreground/70 text-xs">
-            <summary className="cursor-pointer py-1">Identificação da bula</summary>
-            <p className="mt-1 max-h-32 overflow-y-auto leading-relaxed break-words">
-              {bulaDescription || "Documento enviado por você"}
-            </p>
-          </details>
-        ) : null}
-      </div>
+  const renderChatControls = (variant: "compact" | "icon", isSidebar: boolean): ReactElement => (
+    <div className={cn("flex flex-wrap items-center gap-1", variant === "icon" && "flex-col")}>
       {scope === "cross_bula" ? (
-        <div className="space-y-2">
-          <p className="text-sidebar-foreground/70 text-xs font-medium">Fontes da conversa</p>
-          <CatalogSelector
-            value={chatSession.catalogScope}
-            onChange={handleCatalogChange}
-            isDisabled={chatSession.isSending}
-            isSidebar
-          />
-          <p className="text-sidebar-foreground/60 text-xs">
-            Trocar o catálogo inicia outra conversa.
-          </p>
-        </div>
+        <CatalogSelector
+          value={chatSession.catalogScope}
+          onChange={handleCatalogChange}
+          isDisabled={chatSession.isSending}
+          isSidebar={isSidebar}
+          variant={variant}
+        />
       ) : null}
-      <Suspense fallback={<Skeleton className="bg-sidebar-accent h-20 w-full" />}>
+      <Suspense fallback={<Skeleton className="h-9 w-16" />}>
         <ModeSelector
           value={chatSession.mode}
           onChange={chatSession.setMode}
           isDisabled={chatSession.isSending}
+          isSidebar={isSidebar}
+          variant={variant}
         />
       </Suspense>
     </div>
   );
 
+  const sidebarDetails = (
+    <div className="space-y-2">
+      {scope !== "cross_bula" ? (
+        <details className="text-sidebar-foreground/70 text-xs">
+          <summary className="cursor-pointer truncate py-1">{bulaDisplayName}</summary>
+          <p className="mt-1 max-h-32 overflow-y-auto leading-relaxed break-words">
+            {bulaDescription || "Documento enviado por você"}
+          </p>
+        </details>
+      ) : null}
+      {renderChatControls("compact", true)}
+    </div>
+  );
+
   return (
     <div className="bg-background flex h-dvh overflow-hidden">
-      <aside className="bg-sidebar text-sidebar-foreground border-sidebar-border hidden w-64 shrink-0 border-r lg:block">
+      {!isCompactLayout ? (
         <ChatSessionNavigation
           context={context}
           currentSessionId={sessionId}
           onStartNewSession={handleStartNewSession}
           returnTo={returnTo}
+          isDesktop
+          isCurrentSessionBusy={chatSession.isSending}
+          railControls={renderChatControls("icon", true)}
         >
           {sidebarDetails}
         </ChatSessionNavigation>
-      </aside>
+      ) : null}
 
       <Sheet open={isMobileSessionsOpen} onOpenChange={setIsMobileSessionsOpen}>
         <SheetContent
@@ -293,39 +304,34 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
             onStartNewSession={handleStartNewSession}
             returnTo={returnTo}
             onNavigate={() => setIsMobileSessionsOpen(false)}
-          >
-            {sidebarDetails}
-          </ChatSessionNavigation>
+            isCurrentSessionBusy={chatSession.isSending}
+          ></ChatSessionNavigation>
         </SheetContent>
       </Sheet>
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        <header className="bg-background border-border shrink-0 border-b lg:hidden">
-          <div className="flex items-center gap-2 px-3 py-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              aria-label="Abrir conversas"
-              className="lg:hidden"
-              onClick={() => setIsMobileSessionsOpen(true)}
-            >
-              <History aria-hidden="true" className="h-5 w-5" />
-            </Button>
-            <Button
-              asChild
-              variant="ghost"
-              size="icon"
-              aria-label="Voltar para as bulas"
-              className="lg:hidden"
-            >
-              <Link to={returnTo}>
-                <ArrowLeft aria-hidden="true" className="h-5 w-5" />
-              </Link>
-            </Button>
-            <p className="min-w-0 truncate text-sm font-medium">{bulaDisplayName}</p>
-          </div>
-        </header>
+        {isCompactLayout ? (
+          <header className="bg-background border-border shrink-0 border-b">
+            <div className="flex items-center gap-2 px-3 py-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                aria-label="Abrir conversas"
+                onClick={() => setIsMobileSessionsOpen(true)}
+              >
+                <History aria-hidden="true" className="h-5 w-5" />
+              </Button>
+              <Button asChild variant="ghost" size="icon" aria-label="Voltar para as bulas">
+                <Link to={returnTo}>
+                  <ArrowLeft aria-hidden="true" className="h-5 w-5" />
+                </Link>
+              </Button>
+              <p className="min-w-0 flex-1 truncate text-sm font-medium">{bulaDisplayName}</p>
+              {renderChatControls("compact", false)}
+            </div>
+          </header>
+        ) : null}
 
         <main className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
           <h1 className="sr-only">{bulaDisplayName}</h1>

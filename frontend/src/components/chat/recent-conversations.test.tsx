@@ -5,10 +5,21 @@ import type { ComponentProps } from "react";
 import { MemoryRouter } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { type ChatSessionResponse, listChatSessions } from "@/api/chat";
+import {
+  type ChatSessionResponse,
+  deleteChatSession,
+  listChatSessions,
+  renameChatSession,
+  setChatSessionPinned,
+} from "@/api/chat";
 import { RecentConversations } from "@/components/chat/recent-conversations";
 
-vi.mock("@/api/chat", () => ({ listChatSessions: vi.fn() }));
+vi.mock("@/api/chat", () => ({
+  listChatSessions: vi.fn(),
+  renameChatSession: vi.fn(),
+  deleteChatSession: vi.fn(),
+  setChatSessionPinned: vi.fn(),
+}));
 const listSessionsMock = vi.mocked(listChatSessions);
 
 function session(
@@ -52,6 +63,182 @@ beforeEach(() => {
 });
 
 describe("recent conversations", () => {
+  it("moves pinned chats above recent chats and restores them when unpinned", async () => {
+    let isPinned = false;
+    listSessionsMock.mockImplementation((options = {}) => {
+      const current = { ...session("geral", "cross_bula"), is_pinned: isPinned };
+      return Promise.resolve(
+        Boolean(options.isPinned) === isPinned && (!options.scope || options.scope === "cross_bula")
+          ? [current]
+          : []
+      );
+    });
+    vi.mocked(setChatSessionPinned).mockImplementation((id, nextPinned) => {
+      isPinned = nextPinned;
+      return Promise.resolve({ ...session(id, "cross_bula"), is_pinned: isPinned });
+    });
+    const user = userEvent.setup();
+    renderNavigation();
+    expect(screen.queryByText("Fixados")).not.toBeInTheDocument();
+    await user.click(
+      await screen.findByRole(
+        "button",
+        { name: "Opções da conversa Conversa geral" },
+        { timeout: 3000 }
+      )
+    );
+    expect(screen.getAllByRole("menuitem")).toHaveLength(3);
+    await user.click(screen.getByRole("menuitem", { name: "Fixar" }));
+    await screen.findByText("Fixados");
+    expect(screen.getAllByRole("link", { name: /Conversa geral/ })).toHaveLength(1);
+    expect(setChatSessionPinned).toHaveBeenCalledWith("geral", true);
+    await user.click(
+      await screen.findByRole("button", { name: "Opções da conversa Conversa geral" })
+    );
+    await user.click(screen.getByRole("menuitem", { name: "Desafixar" }));
+    await waitFor(() => expect(screen.queryByText("Fixados")).not.toBeInTheDocument());
+    expect(await screen.findByRole("link", { name: /Conversa geral/ })).toBeVisible();
+    expect(setChatSessionPinned).toHaveBeenCalledWith("geral", false);
+  });
+
+  it("leaves a chat in place when pinning fails", async () => {
+    vi.mocked(setChatSessionPinned).mockRejectedValue(new Error("Synthetic outage"));
+    const user = userEvent.setup();
+    renderNavigation();
+    await user.click(
+      await screen.findByRole("button", { name: "Opções da conversa Conversa geral" })
+    );
+    await user.click(screen.getByRole("menuitem", { name: "Fixar" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Não foi possível alterar a fixação"
+    );
+    expect(screen.queryByText("Fixados")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: /Conversa geral/ })).toBeVisible();
+  });
+  it("renames a conversation and refreshes its visible title", async () => {
+    let title = "Conversa geral";
+    listSessionsMock.mockImplementation(({ scope } = {}) =>
+      Promise.resolve(scope === "cross_bula" ? [{ ...session("geral", "cross_bula"), title }] : [])
+    );
+    vi.mocked(renameChatSession).mockImplementation((id, nextTitle) => {
+      title = nextTitle;
+      return Promise.resolve({ ...session(id, "cross_bula"), title });
+    });
+    const user = userEvent.setup();
+    renderNavigation();
+    await user.click(
+      await screen.findByRole("button", { name: "Opções da conversa Conversa geral" })
+    );
+    await user.click(screen.getByRole("menuitem", { name: "Renomear" }));
+    const dialog = screen.getByRole("dialog", { name: "Renomear conversa" });
+    const input = within(dialog).getByLabelText("Nome da conversa");
+    await user.clear(input);
+    await user.type(input, "  Minhas dúvidas  ");
+    await user.click(within(dialog).getByRole("button", { name: "Salvar" }));
+    expect(await screen.findByRole("link", { name: /Minhas dúvidas/ })).toBeVisible();
+    expect(renameChatSession).toHaveBeenCalledWith("geral", "Minhas dúvidas");
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    expect(deleteChatSession).not.toHaveBeenCalled();
+  });
+
+  it("preserves the rename draft and permits a manual retry after an error", async () => {
+    vi.mocked(renameChatSession)
+      .mockRejectedValueOnce(new Error("Synthetic outage"))
+      .mockResolvedValueOnce({ ...session("geral", "cross_bula"), title: "Meu nome" });
+    const user = userEvent.setup();
+    renderNavigation();
+    await user.click(
+      await screen.findByRole("button", { name: "Opções da conversa Conversa geral" })
+    );
+    await user.click(screen.getByRole("menuitem", { name: "Renomear" }));
+    const input = screen.getByLabelText("Nome da conversa");
+    await user.clear(input);
+    await user.type(input, "Meu nome");
+    await user.click(screen.getByRole("button", { name: "Salvar" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Não foi possível salvar o nome");
+    expect(input).toHaveValue("Meu nome");
+    expect(renameChatSession).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole("button", { name: "Salvar" }));
+    await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument());
+    expect(renameChatSession).toHaveBeenCalledTimes(2);
+  });
+
+  it("requires confirmation and clears only the deleted conversation's cache", async () => {
+    let isDeleted = false;
+    listSessionsMock.mockImplementation(({ scope } = {}) =>
+      Promise.resolve(
+        scope === "cross_bula"
+          ? isDeleted
+            ? []
+            : [session("geral", "cross_bula")]
+          : [session("losartana", "bula", "pdf-losartana")]
+      )
+    );
+    vi.mocked(deleteChatSession).mockImplementation(() => {
+      isDeleted = true;
+      return Promise.resolve({ session_id: "geral" });
+    });
+    const user = userEvent.setup();
+    const startNew = vi.fn();
+    const client = renderNavigation({
+      context: { scope: "cross_bula" },
+      currentSessionId: "geral",
+      onStartNewSession: startNew,
+    });
+    client.setQueryData(["chat-session", "cross_bula:all", "geral"], { sessionId: "geral" });
+    client.setQueryData(["chat-session", "bula:pdf-losartana", "losartana"], {
+      sessionId: "losartana",
+    });
+    await user.click(
+      await screen.findByRole("button", { name: "Opções da conversa Conversa geral" })
+    );
+    await user.click(screen.getByRole("menuitem", { name: "Excluir" }));
+    expect(screen.getByRole("alertdialog", { name: "Excluir conversa?" })).toBeVisible();
+    expect(deleteChatSession).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    expect(screen.getByRole("link", { name: /Conversa geral/ })).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "Opções da conversa Conversa geral" }));
+    await user.click(screen.getByRole("menuitem", { name: "Excluir" }));
+    await user.click(screen.getByRole("button", { name: "Excluir conversa" }));
+    await waitFor(() =>
+      expect(screen.queryByRole("link", { name: /Conversa geral/ })).not.toBeInTheDocument()
+    );
+    expect(screen.getByRole("link", { name: /Conversa losartana/ })).toBeVisible();
+    expect(client.getQueryData(["chat-session", "cross_bula:all", "geral"])).toBeUndefined();
+    expect(client.getQueryData(["chat-session", "bula:pdf-losartana", "losartana"])).toBeDefined();
+    expect(startNew).toHaveBeenCalledOnce();
+  });
+
+  it("keeps a conversation when deletion fails", async () => {
+    vi.mocked(deleteChatSession).mockRejectedValueOnce(new Error("Synthetic outage"));
+    const user = userEvent.setup();
+    renderNavigation();
+    await user.click(
+      await screen.findByRole("button", { name: "Opções da conversa Conversa geral" })
+    );
+    await user.click(screen.getByRole("menuitem", { name: "Excluir" }));
+    await user.click(screen.getByRole("button", { name: "Excluir conversa" }));
+    expect(await screen.findByRole("alert")).toHaveTextContent("Não foi possível excluir");
+    expect(deleteChatSession).toHaveBeenCalledOnce();
+    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    expect(screen.getByRole("link", { name: /Conversa geral/ })).toBeVisible();
+  });
+
+  it("allows managing orphaned history and disables only a conversation being processed", async () => {
+    listSessionsMock.mockImplementation(({ scope } = {}) =>
+      Promise.resolve(
+        scope === "cross_bula" ? [session("geral", "cross_bula")] : [session("orfanada", "bula")]
+      )
+    );
+    const user = userEvent.setup();
+    renderNavigation({ currentSessionId: "geral", isCurrentSessionBusy: true });
+    expect(
+      await screen.findByRole("button", { name: "Opções da conversa Conversa geral" })
+    ).toBeDisabled();
+    await user.click(screen.getByRole("button", { name: "Opções da conversa Conversa orfanada" }));
+    expect(screen.getByRole("menuitem", { name: "Renomear" })).toBeVisible();
+    expect(screen.getByRole("menuitem", { name: "Excluir" })).toBeVisible();
+  });
   it("shows both scopes and reopens each with its own document and session", async () => {
     renderNavigation({ context: { scope: "cross_bula" } });
     expect(await screen.findByRole("link", { name: /Conversa losartana/ })).toHaveAttribute(
@@ -64,12 +251,14 @@ describe("recent conversations", () => {
     );
     expect(listSessionsMock).toHaveBeenCalledWith({
       scope: "bula",
+      isPinned: false,
       limit: 10,
       offset: 0,
       sort: "updated_at",
     });
     expect(listSessionsMock).toHaveBeenCalledWith({
       scope: "cross_bula",
+      isPinned: false,
       limit: 10,
       offset: 0,
       sort: "updated_at",
@@ -132,6 +321,7 @@ describe("recent conversations", () => {
     expect(listSessionsMock).toHaveBeenCalledWith({
       scope: "bula",
       sort: "updated_at",
+      isPinned: false,
       limit: 10,
       offset: 10,
     });

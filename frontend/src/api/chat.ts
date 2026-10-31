@@ -62,6 +62,7 @@ export interface ChatMessageResponse {
 }
 
 export interface ChatSessionResponse {
+  is_pinned?: boolean;
   catalog_scope?: CatalogScope;
   id: string;
   user_id: number;
@@ -74,6 +75,7 @@ export interface ChatSessionResponse {
 }
 
 export interface ListChatSessionsOptions {
+  isPinned?: boolean;
   limit?: number;
   offset?: number;
   scope?: ChatScope;
@@ -114,12 +116,41 @@ export async function getChatSession(sessionId: string): Promise<ChatSessionResp
   });
 }
 
+export async function renameChatSession(
+  sessionId: string,
+  title: string
+): Promise<ChatSessionResponse> {
+  return requestJson<ChatSessionResponse>(`${CHAT_SESSIONS_PREFIX}/${sessionId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ title }),
+  });
+}
+
+export async function deleteChatSession(sessionId: string): Promise<{ session_id: string }> {
+  return requestJson<{ session_id: string }>(`${CHAT_SESSIONS_PREFIX}/${sessionId}`, {
+    method: "DELETE",
+  });
+}
+
+export async function setChatSessionPinned(
+  sessionId: string,
+  isPinned: boolean
+): Promise<ChatSessionResponse> {
+  return requestJson<ChatSessionResponse>(`${CHAT_SESSIONS_PREFIX}/${sessionId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ is_pinned: isPinned }),
+  });
+}
+
 export async function listChatSessions({
   limit = 100,
   offset = 0,
   scope,
   bulaId,
   sort,
+  isPinned,
 }: ListChatSessionsOptions = {}): Promise<ChatSessionResponse[]> {
   const searchParams = new URLSearchParams({
     limit: String(limit),
@@ -128,6 +159,7 @@ export async function listChatSessions({
   if (scope) searchParams.set("scope", scope);
   if (bulaId) searchParams.set("bula_id", bulaId);
   if (sort) searchParams.set("sort", sort);
+  if (isPinned !== undefined) searchParams.set("is_pinned", String(isPinned));
 
   return requestJson<ChatSessionResponse[]>(`${CHAT_SESSIONS_PREFIX}?${searchParams.toString()}`, {
     method: "GET",

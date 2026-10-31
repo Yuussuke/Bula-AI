@@ -6,8 +6,11 @@ import {
   type AskResponse,
   type ChatSessionResponse,
   continueChatSession,
+  deleteChatSession,
   getChatSession,
   listChatSessions,
+  renameChatSession,
+  setChatSessionPinned,
 } from "@/api/chat";
 import { ApiError } from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
@@ -32,6 +35,37 @@ function expectAuthenticatedRequest(requestInit: RequestInit | undefined): void 
 }
 
 describe("chat API", () => {
+  it("persists pin preferences and filters pins through the authenticated client", async () => {
+    const fetchMock = vi
+      .fn<typeof fetch>()
+      .mockImplementation(() =>
+        Promise.resolve(createJsonResponse({ id: SESSION_ID, is_pinned: true }))
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    await setChatSessionPinned(SESSION_ID, true);
+    expect(fetchMock.mock.calls[0][1]?.method).toBe("PATCH");
+    expect(fetchMock.mock.calls[0][1]?.body).toBe(JSON.stringify({ is_pinned: true }));
+    expectAuthenticatedRequest(fetchMock.mock.calls[0][1]);
+    await listChatSessions({ isPinned: false, limit: 10 });
+    expect(fetchMock.mock.calls[1][0]).toBe(
+      `${API_BASE_URL}/api/v1/chat/sessions?limit=10&offset=0&is_pinned=false`
+    );
+  });
+  it("renames and deletes a session through the authenticated client", async () => {
+    const fetchMock = vi.fn<typeof fetch>();
+    fetchMock
+      .mockResolvedValueOnce(createJsonResponse({ id: SESSION_ID, title: "Novo nome" }))
+      .mockResolvedValueOnce(createJsonResponse({ session_id: SESSION_ID }));
+    vi.stubGlobal("fetch", fetchMock);
+    await renameChatSession(SESSION_ID, "Novo nome");
+    expect(fetchMock.mock.calls[0][0]).toBe(`${API_BASE_URL}/api/v1/chat/sessions/${SESSION_ID}`);
+    expect(fetchMock.mock.calls[0][1]?.method).toBe("PATCH");
+    expect(fetchMock.mock.calls[0][1]?.body).toBe(JSON.stringify({ title: "Novo nome" }));
+    expectAuthenticatedRequest(fetchMock.mock.calls[0][1]);
+    expect(await deleteChatSession(SESSION_ID)).toEqual({ session_id: SESSION_ID });
+    expect(fetchMock.mock.calls[1][1]?.method).toBe("DELETE");
+    expectAuthenticatedRequest(fetchMock.mock.calls[1][1]);
+  });
   it("posts general questions without a target ID and filters history server-side", async () => {
     const fetchMock = vi.fn<typeof fetch>();
     fetchMock.mockImplementation(() =>
