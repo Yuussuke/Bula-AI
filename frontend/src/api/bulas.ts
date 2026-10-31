@@ -1,4 +1,5 @@
 import { requestJson } from "@/lib/api";
+import type { CatalogScope } from "@/lib/catalog-scope";
 
 export type BulaStatus = "pending" | "processing" | "ready" | "failed" | "error";
 export type SystemBulaPublicationState =
@@ -99,6 +100,50 @@ export interface SystemBulaPage {
   total: number;
   limit: number;
   offset: number;
+}
+
+export interface PublicCatalogBulaResponse {
+  id: string;
+  product_name: string;
+  corpus: "system" | "shared";
+  manufacturer: string | null;
+  active_ingredient: string | null;
+  strength: string | null;
+  pharmaceutical_form: string | null;
+  presentation: string | null;
+  audience: BulaAudience | null;
+  registration_number: string | null;
+  source_url: string;
+  source_updated_at: string | null;
+  source_published_at: string | null;
+  is_available: boolean;
+}
+
+export interface PublicCatalogSearchOptions extends SystemBulaSearchOptions {
+  catalog_scope: CatalogScope;
+}
+
+export interface PublicCatalogPage {
+  items: PublicCatalogBulaResponse[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+
+export async function searchPublicCatalog(
+  options: PublicCatalogSearchOptions
+): Promise<PublicCatalogPage> {
+  const parameters = new URLSearchParams({
+    query: options.query,
+    audience: options.audience,
+    catalog_scope: options.catalog_scope,
+    limit: String(options.limit),
+    offset: String(options.offset),
+    sort: options.sort ?? "name_asc",
+  });
+  return requestJson<PublicCatalogPage>(`/api/v1/bulas/catalog/search?${parameters.toString()}`, {
+    method: "GET",
+  });
 }
 
 export async function searchSystemBulas(options: SystemBulaSearchOptions): Promise<SystemBulaPage> {

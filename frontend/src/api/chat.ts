@@ -1,4 +1,5 @@
 import { requestJson } from "@/lib/api";
+import type { CatalogScope } from "@/lib/catalog-scope";
 
 const CHAT_SESSIONS_PREFIX = "/api/v1/chat/sessions";
 
@@ -10,6 +11,10 @@ export type ChatContext = { scope: "bula"; bulaId: string } | { scope: "cross_bu
 export interface AskRequest {
   question: string;
   mode?: RetrievalMode;
+}
+
+export interface CrossBulaAskRequest extends AskRequest {
+  catalog_scope?: CatalogScope;
 }
 
 export interface SourceChunkResponse {
@@ -37,6 +42,7 @@ export interface SourceBulaResponse {
 }
 
 export interface AskResponse {
+  catalog_scope?: CatalogScope | null;
   session_id: string;
   answer: string;
   retrieval_mode: RetrievalMode;
@@ -56,6 +62,7 @@ export interface ChatMessageResponse {
 }
 
 export interface ChatSessionResponse {
+  catalog_scope?: CatalogScope;
   id: string;
   user_id: number;
   bula_id: string | null;
@@ -74,7 +81,7 @@ export interface ListChatSessionsOptions {
   sort?: "created_at" | "updated_at";
 }
 
-export async function askCrossBulaQuestion(payload: AskRequest): Promise<AskResponse> {
+export async function askCrossBulaQuestion(payload: CrossBulaAskRequest): Promise<AskResponse> {
   return requestJson<AskResponse>("/api/v1/chat/ask", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

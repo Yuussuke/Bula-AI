@@ -1,12 +1,20 @@
-# Cross-bula chat (system corpus)
+# Cross-bula chat (public catalogs)
 
-Authenticated `POST /api/v1/chat/ask` accepts `{question, mode}` (default
-`hybrid`). It searches all eligible system leaflets, not an inferred target PDF.
-Private and shared leaflets are excluded. Shared publication remains dependent
-on #44; this is a partial delivery of #46, not full shared-corpus support.
+Authenticated `POST /api/v1/chat/ask` accepts `{question, mode, catalog_scope}`.
+Defaults are `hybrid` and `all`. The catalog boundary is `all`, `system` or
+`shared`; private documents cannot be selected. Shared eligibility requires the
+curation workflow described in `../shared-leaflet-curation.md`. No medicine-name
+filter is inferred from the question.
 
-The service authorizes ready, published system documents with matching stored
-object checksum/size. Their IDs constrain dense/BM25 candidates **before** ranking
+Alembic `e610a130b003` adds `chat_sessions.catalog_scope`. Existing sessions use
+`all`, preserving their previous public-corpus boundary; individual/orphaned
+sessions remain individual. Continuations use the server's saved catalog and
+reject scope overrides in the message body. Changing the UI selector starts a
+new conversation and preserves unsent text. A downgrade refuses to discard
+restricted conversations. Apply the migration before deploying API and UI.
+
+The service authorizes eligible public documents within the saved catalog with
+matching stored object checksum/size. Their IDs constrain dense/BM25 candidates **before** ranking
 and Top-K. Retrieval validates chunk identity, section and text against PostgreSQL,
 then supplies canonical document labels to selection/generation. Invalid candidates
 are discarded without extra retrieval; counts are logged without source text.
@@ -44,8 +52,8 @@ remain `bula`; only newly created general sessions use `cross_bula` with null
 `GET /chat/sessions` accepts optional `scope` and `bula_id` filters before pagination.
 Saved history is historical evidence, not a guarantee of current publication.
 
-This change does not enable RRF-B/BGE, retune prompts or reproduce the evaluated
-runtime. Citation syntax checks do not establish semantic entailment, and Top-K
+This catalog change preserves the configured retrieval runtime and prompts;
+see `rrfb-bge-runtime.md`. Citation syntax checks do not establish semantic entailment, and Top-K
 retrieval is not an exhaustive survey of all drugs. No frozen datasets, indexes,
 snapshots or ingestion settings change. Tests use synthetic providers; real BM25
 tests require a separately migrated `BM25_TEST_DATABASE_URL` containing `test`.

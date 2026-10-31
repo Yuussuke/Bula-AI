@@ -30,7 +30,7 @@ import { useAuthStore } from "@/store/auth";
 const navigation = [
   { path: "/", label: "Início", icon: House },
   { path: "/minhas-bulas", label: "Minhas bulas", icon: Library },
-  { path: "/catalogo", label: "Catálogo ANVISA", icon: BookOpenText },
+  { path: "/catalogo", label: "Catálogo Geral", icon: BookOpenText },
 ];
 
 export function DashboardView(): ReactElement {

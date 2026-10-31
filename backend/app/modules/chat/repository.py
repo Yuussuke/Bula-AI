@@ -6,6 +6,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, ChatScope
+from app.modules.bulas.models import PublicCatalogScope
 from app.modules.chat.schemas import SessionSortOrder
 from app.modules.rag.retrieval_mode import RetrievalMode
 
@@ -54,11 +55,13 @@ class ChatRepository:
         retrieval_mode: RetrievalMode,
         source_chunks: list[dict[str, str | float]],
         scope: ChatScope = ChatScope.BULA,
+        catalog_scope: PublicCatalogScope = PublicCatalogScope.ALL,
     ) -> tuple[ChatSession, ChatMessage, ChatMessage]:
         chat_session = ChatSession(
             user_id=user_id,
             bula_id=bula_id,
             scope=scope.value,
+            catalog_scope=catalog_scope.value,
             title=self._extract_title(first_question),
         )
         self.db.add(chat_session)

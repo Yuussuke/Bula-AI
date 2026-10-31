@@ -5,6 +5,7 @@ import { Link, Navigate, useLocation, useParams, useSearchParams } from "react-r
 
 import { getQueryableBula } from "@/api/bulas";
 import type { ChatContext, ChatScope } from "@/api/chat";
+import { CatalogSelector } from "@/components/bulas/catalog-selector";
 import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatSessionNavigation } from "@/components/chat/chat-session-navigation";
@@ -21,6 +22,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useChatSession } from "@/hooks/use-chat-session";
 import { ApiError } from "@/lib/api";
+import { catalogParameters, type CatalogScope, readCatalogScope } from "@/lib/catalog-scope";
 
 const ModeSelector = lazy(() =>
   import("@/components/chat/mode-selector").then((module) => ({ default: module.ModeSelector }))
@@ -126,6 +128,7 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
   const [question, setQuestion] = useState("");
   const [isMobileSessionsOpen, setIsMobileSessionsOpen] = useState(false);
   const sessionId = searchParams.get("session");
+  const requestedCatalogScope = readCatalogScope(searchParams.get("catalogo"));
   const resolvedBulaId = bulaId ?? "";
   const context: ChatContext =
     scope === "cross_bula" ? { scope: "cross_bula" } : { scope: "bula", bulaId: resolvedBulaId };
@@ -137,10 +140,13 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
     staleTime: 5 * 60 * 1000,
   });
   const chatSession = useChatSession({
+    catalogScope: requestedCatalogScope,
     context,
     sessionId,
     onSessionCreated: (createdSessionId) => {
-      setSearchParams({ session: createdSessionId }, { replace: true, state: navigationState });
+      const parameters = catalogParameters(requestedCatalogScope);
+      parameters.set("session", createdSessionId);
+      setSearchParams(parameters, { replace: true, state: navigationState });
     },
   });
 
@@ -161,7 +167,16 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
   const handleStartNewSession = (): void => {
     chatSession.invalidatePendingConversation();
     setQuestion("");
-    setSearchParams({}, { replace: true, state: navigationState });
+    setSearchParams(catalogParameters(chatSession.catalogScope), {
+      replace: true,
+      state: navigationState,
+    });
+  };
+
+  const handleCatalogChange = (selected: CatalogScope): void => {
+    if (selected === chatSession.catalogScope || chatSession.isSending) return;
+    chatSession.invalidatePendingConversation();
+    setSearchParams(catalogParameters(selected), { replace: true, state: navigationState });
   };
 
   if (scope === "bula" && !bulaId) {
@@ -192,20 +207,17 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
 
   const bula = bulaQuery.data;
   const bulaDisplayName = scope === "cross_bula" ? "Chat geral" : bula?.alias || bula?.product_name;
-  const bulaDescription =
-    scope === "cross_bula"
-      ? "Consulta às bulas disponíveis no catálogo"
-      : [
-          bula?.alias ? bula.product_name : bula?.active_ingredient,
-          bula?.strength,
-          bula?.manufacturer,
-        ]
-          .filter((value): value is string => Boolean(value))
-          .join(" · ");
+  const bulaDescription = [
+    bula?.alias ? bula.product_name : bula?.active_ingredient,
+    bula?.strength,
+    bula?.manufacturer,
+  ]
+    .filter((value): value is string => Boolean(value))
+    .join(" · ");
 
   const returnTo =
     scope === "cross_bula"
-      ? "/"
+      ? `/catalogo?${catalogParameters(chatSession.catalogScope).toString()}`
       : bula?.corpus === "private"
         ? "/minhas-bulas"
         : (catalogReturnTo ?? "/catalogo");
@@ -218,17 +230,29 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
     <div className="space-y-4">
       <div className="space-y-1">
         <p className="text-sm font-semibold break-words">{bulaDisplayName}</p>
-        {scope === "cross_bula" ? (
-          <p className="text-sidebar-foreground/60 text-xs leading-relaxed">{bulaDescription}</p>
-        ) : (
+        {scope !== "cross_bula" ? (
           <details className="text-sidebar-foreground/70 text-xs">
             <summary className="cursor-pointer py-1">Identificação da bula</summary>
             <p className="mt-1 max-h-32 overflow-y-auto leading-relaxed break-words">
               {bulaDescription || "Documento enviado por você"}
             </p>
           </details>
-        )}
+        ) : null}
       </div>
+      {scope === "cross_bula" ? (
+        <div className="space-y-2">
+          <p className="text-sidebar-foreground/70 text-xs font-medium">Fontes da conversa</p>
+          <CatalogSelector
+            value={chatSession.catalogScope}
+            onChange={handleCatalogChange}
+            isDisabled={chatSession.isSending}
+            isSidebar
+          />
+          <p className="text-sidebar-foreground/60 text-xs">
+            Trocar o catálogo inicia outra conversa.
+          </p>
+        </div>
+      ) : null}
       <Suspense fallback={<Skeleton className="bg-sidebar-accent h-20 w-full" />}>
         <ModeSelector
           value={chatSession.mode}

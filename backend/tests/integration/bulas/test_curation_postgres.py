@@ -31,6 +31,7 @@ from app.modules.bulas.models import (
     SharedBulaSubmission,
 )
 from app.modules.storage.models import StoredObject
+from app.modules.chat.models import ChatSession, ChatScope
 
 
 def disposable_database_url() -> str:
@@ -259,7 +260,7 @@ async def test_postgres_migration_preserves_accounts_and_guards_contributor_down
             revision = await connection.run_sync(
                 lambda sync: MigrationContext.configure(sync).get_current_revision()
             )
-            assert revision == "e610a130b002"
+            assert revision == "e610a130b003"
         async with sessions() as database:
             user = await database.scalar(select(User).where(User.email == email))
             assert user is not None and user.role == UserRole.CONTRIBUTOR
@@ -493,3 +494,67 @@ async def test_concurrent_role_replay_preserves_original_document_author_profile
                 operation_id=operation_id,
                 request_fingerprint="f" * 64,
             )
+
+
+@pytest.mark.anyio
+async def test_catalog_migration_preserves_old_sessions_and_prevents_scope_loss(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database_url = disposable_database_url()
+    monkeypatch.setenv("DATABASE_URL", database_url)
+    configuration = Config("alembic.ini")
+    engine = create_async_engine(database_url)
+    sessions = async_sessionmaker(engine, expire_on_commit=False)
+    email = f"catalog-migration-{uuid4().hex}@example.com"
+    user_id = None
+    try:
+        async with sessions() as database:
+            user = User(
+                full_name="Catalog migration sentinel",
+                email=email,
+                hashed_password="synthetic",
+                role=UserRole.USER,
+            )
+            database.add(user)
+            await database.flush()
+            user_id = user.id
+            general = ChatSession(
+                user_id=user.id, title="General", scope=ChatScope.CROSS_BULA.value
+            )
+            orphaned = ChatSession(
+                user_id=user.id,
+                title="Deleted document",
+                scope=ChatScope.BULA.value,
+                bula_id=None,
+            )
+            database.add_all([general, orphaned])
+            await database.commit()
+            general_id, orphaned_id = general.id, orphaned.id
+        await engine.dispose()
+        await asyncio.to_thread(command.downgrade, configuration, "e610a130b002")
+        await asyncio.to_thread(command.upgrade, configuration, "head")
+        async with sessions() as database:
+            general = await database.get(ChatSession, general_id)
+            orphaned = await database.get(ChatSession, orphaned_id)
+            assert general is not None and general.catalog_scope == "all"
+            assert (
+                orphaned is not None
+                and orphaned.scope == "bula"
+                and orphaned.bula_id is None
+            )
+            general.catalog_scope = "shared"
+            await database.commit()
+        with pytest.raises(RuntimeError, match="Cannot discard catalog boundaries"):
+            await asyncio.to_thread(command.downgrade, configuration, "e610a130b002")
+        async with sessions() as database:
+            general = await database.get(ChatSession, general_id)
+            assert general is not None and general.catalog_scope == "shared"
+    finally:
+        async with sessions() as database:
+            if user_id is not None:
+                await database.execute(
+                    delete(ChatSession).where(ChatSession.user_id == user_id)
+                )
+                await database.execute(delete(User).where(User.id == user_id))
+                await database.commit()
+        await engine.dispose()

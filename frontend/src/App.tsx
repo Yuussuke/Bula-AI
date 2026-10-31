@@ -2,7 +2,7 @@ import { lazy, type ReactElement, Suspense, useEffect } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import { AuthView } from "@/components/auth-view";
-import { SystemBulaCatalog } from "@/components/bulas/system-bula-catalog";
+import { BulaCatalog } from "@/components/bulas/bula-catalog";
 import { UserBulaSection } from "@/components/bulas/user-bula-section";
 import { DashboardView } from "@/components/dashboard-view";
 import { bootstrapAuthSession } from "@/lib/api";
@@ -77,7 +77,7 @@ export default function App(): ReactElement {
         >
           <Route element={<DashboardView />}>
             <Route index element={<HomePage />} />
-            <Route path="/catalogo" element={<SystemBulaCatalog />} />
+            <Route path="/catalogo" element={<BulaCatalog />} />
             <Route path="/minhas-bulas" element={<UserBulaSection />} />
             <Route
               element={

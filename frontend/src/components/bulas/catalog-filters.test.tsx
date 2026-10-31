@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { SystemBulaFilters } from "@/components/bulas/system-bula-filters";
+import { CatalogFilters } from "@/components/bulas/catalog-filters";
 
 afterEach(() => vi.useRealTimers());
 
@@ -10,7 +10,7 @@ describe("dynamic catalog search", () => {
     vi.useFakeTimers();
     const onSearch = vi.fn();
     const { rerender } = render(
-      <SystemBulaFilters searchTerm="" audience="all" sort="name_asc" onSearch={onSearch} />
+      <CatalogFilters searchTerm="" audience="all" sort="name_asc" onSearch={onSearch} />
     );
     const input = screen.getByRole("searchbox");
     input.focus();
@@ -20,7 +20,7 @@ describe("dynamic catalog search", () => {
     await act(() => vi.advanceTimersByTime(1));
     expect(onSearch).toHaveBeenCalledExactlyOnceWith("dipirona", "all", "name_asc");
     rerender(
-      <SystemBulaFilters searchTerm="dipirona" audience="all" sort="name_asc" onSearch={onSearch} />
+      <CatalogFilters searchTerm="dipirona" audience="all" sort="name_asc" onSearch={onSearch} />
     );
     expect(input).toHaveFocus();
     fireEvent.change(input, { target: { value: "dipirona gotas" } });
@@ -31,7 +31,7 @@ describe("dynamic catalog search", () => {
   it("applies form submission or a select change immediately and cancels the queued search", async () => {
     vi.useFakeTimers();
     const onSearch = vi.fn();
-    render(<SystemBulaFilters searchTerm="" audience="all" sort="name_asc" onSearch={onSearch} />);
+    render(<CatalogFilters searchTerm="" audience="all" sort="name_asc" onSearch={onSearch} />);
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "metformina" } });
     fireEvent.change(screen.getByRole("combobox", { name: "Filtrar por público da bula" }), {
       target: { value: "patient" },
@@ -47,11 +47,11 @@ describe("dynamic catalog search", () => {
     vi.useFakeTimers();
     const onSearch = vi.fn();
     const { rerender, unmount } = render(
-      <SystemBulaFilters searchTerm="" audience="all" sort="name_asc" onSearch={onSearch} />
+      <CatalogFilters searchTerm="" audience="all" sort="name_asc" onSearch={onSearch} />
     );
     fireEvent.change(screen.getByRole("searchbox"), { target: { value: "unfinished" } });
     rerender(
-      <SystemBulaFilters
+      <CatalogFilters
         searchTerm="amoxicilina"
         audience="patient"
         sort="name_desc"

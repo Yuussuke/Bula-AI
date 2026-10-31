@@ -9,19 +9,21 @@ export type CatalogSort = "name_asc" | "name_desc";
 
 const SEARCH_DELAY_MS = 350;
 
-interface SystemBulaFiltersProps {
+interface CatalogFiltersProps {
+  showAudience?: boolean;
   searchTerm: string;
   audience: AudienceFilter;
   sort: CatalogSort;
   onSearch: (searchTerm: string, audience: AudienceFilter, sort: CatalogSort) => void;
 }
 
-export function SystemBulaFilters({
+export function CatalogFilters({
+  showAudience = true,
   searchTerm,
   audience,
   sort,
   onSearch,
-}: SystemBulaFiltersProps): ReactElement {
+}: CatalogFiltersProps): ReactElement {
   const inputRef = useRef<HTMLInputElement>(null);
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -53,11 +55,15 @@ export function SystemBulaFilters({
   return (
     <form
       onSubmit={handleSubmit}
-      className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_12rem_10rem]"
+      className={
+        showAudience
+          ? "grid gap-3 sm:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_12rem_10rem]"
+          : "grid gap-3 sm:grid-cols-[minmax(0,1fr)_10rem]"
+      }
       role="search"
-      aria-label="Buscar no Catálogo ANVISA"
+      aria-label="Buscar no catálogo de bulas"
     >
-      <div className="relative sm:col-span-2 lg:col-span-1">
+      <div className={showAudience ? "relative sm:col-span-2 lg:col-span-1" : "relative"}>
         <Search
           aria-hidden="true"
           className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
@@ -80,23 +86,27 @@ export function SystemBulaFilters({
           className="pl-9"
         />
       </div>
-      <label className="sr-only" htmlFor="bula-audience-filter">
-        Filtrar por público da bula
-      </label>
-      <select
-        name="audience"
-        id="bula-audience-filter"
-        value={audience}
-        onChange={(event) => {
-          const value = event.currentTarget.value;
-          applyFilters(value === "patient" || value === "professional" ? value : "all");
-        }}
-        className="border-input bg-background h-9 rounded-md border px-3 text-sm"
-      >
-        <option value="all">Todos os públicos</option>
-        <option value="patient">Paciente</option>
-        <option value="professional">Profissional de saúde</option>
-      </select>
+      {showAudience ? (
+        <>
+          <label className="sr-only" htmlFor="bula-audience-filter">
+            Filtrar por público da bula
+          </label>
+          <select
+            name="audience"
+            id="bula-audience-filter"
+            value={audience}
+            onChange={(event) => {
+              const value = event.currentTarget.value;
+              applyFilters(value === "patient" || value === "professional" ? value : "all");
+            }}
+            className="border-input bg-background h-9 rounded-md border px-3 text-sm"
+          >
+            <option value="all">Todos os públicos</option>
+            <option value="patient">Paciente</option>
+            <option value="professional">Profissional de saúde</option>
+          </select>
+        </>
+      ) : null}
       <label className="sr-only" htmlFor="catalog-sort">
         Ordenar catálogo
       </label>

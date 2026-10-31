@@ -30,6 +30,13 @@ class ChatSession(Base, UUIDMixin, TimestampMixin):
     __table_args__ = (
         CheckConstraint("scope IN ('bula', 'cross_bula')", name="valid_chat_scope"),
         CheckConstraint(
+            "catalog_scope IN ('all', 'system', 'shared')", name="valid_catalog_scope"
+        ),
+        CheckConstraint(
+            "scope = 'cross_bula' OR catalog_scope = 'all'",
+            name="individual_catalog_scope",
+        ),
+        CheckConstraint(
             "scope != 'cross_bula' OR bula_id IS NULL",
             name="cross_bula_without_document",
         ),
@@ -38,6 +45,9 @@ class ChatSession(Base, UUIDMixin, TimestampMixin):
         String(20), default=ChatScope.BULA.value, server_default=ChatScope.BULA.value
     )
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
+    catalog_scope: Mapped[str] = mapped_column(
+        String(10), default="all", server_default="all"
+    )
     title: Mapped[str] = mapped_column(String(50), nullable=False)
 
     bula_id: Mapped[uuid.UUID | None] = mapped_column(

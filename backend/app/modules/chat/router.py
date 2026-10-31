@@ -10,6 +10,7 @@ from app.modules.chat.dependencies import get_chat_service, require_chat_capacit
 from app.modules.chat.schemas import (
     AskRequest,
     AskResponse,
+    CrossBulaAskRequest,
     ChatSessionResponse,
     DirectAskRequest,
     DirectAskResponse,
@@ -28,13 +29,15 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 @router.post("/ask", response_model=AskResponse)
 async def ask_cross_bula(
-    payload: AskRequest,
+    payload: CrossBulaAskRequest,
     current_user: User = Depends(require_chat_capacity),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> AskResponse:
     try:
         return await chat_service.ask_cross_bula_question(
-            payload=payload, user_id=cast(int, current_user.id)
+            payload=payload,
+            user_id=cast(int, current_user.id),
+            catalog_scope=payload.catalog_scope,
         )
     except PublishedSourcesChangedError as exc:
         raise HTTPException(

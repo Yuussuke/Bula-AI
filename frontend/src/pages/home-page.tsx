@@ -16,9 +16,9 @@ const destinations = [
   },
   {
     path: "/catalogo",
-    title: "Catálogo ANVISA",
+    title: "Catálogo Geral",
     description:
-      "Encontre um medicamento no catálogo de fontes oficiais e confira a apresentação antes de iniciar uma conversa.",
+      "Consulte bulas da ANVISA e compartilhadas após curadoria. Escolha as fontes antes de conversar.",
     action: "Explorar catálogo",
     icon: BookOpenText,
     style: "bg-emerald-50 text-emerald-700",
