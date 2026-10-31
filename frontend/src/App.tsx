@@ -1,4 +1,4 @@
-import { type ReactElement, useEffect } from "react";
+import { lazy, type ReactElement, Suspense, useEffect } from "react";
 import { Navigate, Outlet, Route, Routes, useLocation } from "react-router-dom";
 
 import { AuthView } from "@/components/auth-view";
@@ -10,6 +10,13 @@ import { getPostAuthPath } from "@/lib/auth-navigation";
 import { ChatPage } from "@/pages/chat-page";
 import { HomePage } from "@/pages/home-page";
 import { useAuthStore } from "@/store/auth";
+
+const SharedBulasPage = lazy(() =>
+  import("@/pages/shared-bulas-page").then((module) => ({ default: module.SharedBulasPage }))
+);
+const CurationUsersPage = lazy(() =>
+  import("@/pages/curation-users-page").then((module) => ({ default: module.CurationUsersPage }))
+);
 
 interface ProtectedRouteProps {
   authResolved: boolean;
@@ -72,6 +79,17 @@ export default function App(): ReactElement {
             <Route index element={<HomePage />} />
             <Route path="/catalogo" element={<SystemBulaCatalog />} />
             <Route path="/minhas-bulas" element={<UserBulaSection />} />
+            <Route
+              element={
+                <Suspense fallback={<p role="status">Carregando…</p>}>
+                  <Outlet />
+                </Suspense>
+              }
+            >
+              <Route path="/compartilhadas" element={<SharedBulasPage />} />
+              <Route path="/curadoria" element={<SharedBulasPage review />} />
+              <Route path="/administracao/usuarios" element={<CurationUsersPage />} />
+            </Route>
           </Route>
           <Route path="/chat" element={<ChatPage scope="cross_bula" />} />
           <Route path="/bulas/:bulaId/chat" element={<ChatPage />} />

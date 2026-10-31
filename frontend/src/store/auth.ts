@@ -4,7 +4,7 @@ export interface AuthUser {
   id: number;
   email: string;
   name: string;
-  role: "user" | "admin" | "reviewer";
+  role: "user" | "admin" | "reviewer" | "contributor";
 }
 
 interface SetAuthPayload {

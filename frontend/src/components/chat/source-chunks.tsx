@@ -112,6 +112,11 @@ export function SourceChunks({
               </p>
               {sourceChunk.drug_name ? (
                 <div className="my-2 space-y-1 text-xs">
+                  {sourceChunk.corpus === "shared" && (
+                    <p className="text-muted-foreground">
+                      Bula compartilhada · conferência documental
+                    </p>
+                  )}
                   <p className="font-semibold">{sourceChunk.drug_name}</p>
                   <p>
                     {[sourceChunk.manufacturer, sourceChunk.presentation, sourceChunk.strength]
