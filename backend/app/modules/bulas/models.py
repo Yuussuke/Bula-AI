@@ -1,18 +1,24 @@
 from __future__ import annotations
 
 import enum
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 from uuid import UUID
 
 from sqlalchemy import (
     DateTime,
+    BigInteger,
+    JSON,
+    CheckConstraint,
     Enum as SqlEnum,
     ForeignKey,
     Integer,
     String,
     Text,
     Uuid,
+    UniqueConstraint,
+    Index,
+    column,
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -87,6 +93,89 @@ class Bula(Base, UUIDMixin, TimestampMixin):
         cascade="all, delete-orphan",
         foreign_keys="SystemBulaPublication.bula_id",
         uselist=False,
+    )
+    shared_submission: Mapped["SharedBulaSubmission | None"] = relationship(
+        back_populates="bula",
+        cascade="all, delete-orphan",
+        uselist=False,
+        foreign_keys="SharedBulaSubmission.bula_id",
+    )
+
+
+class SharedReviewStatus(str, enum.Enum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    WITHDRAWN = "withdrawn"
+
+
+class SharedBulaSubmission(Base, TimestampMixin):
+    """Immutable submitted PDF identity; availability also requires ready ingestion."""
+
+    __tablename__ = "shared_bula_submissions"
+    __table_args__ = (
+        CheckConstraint(
+            "review_status IN ('pending','approved','rejected','withdrawn')",
+            name="valid_shared_review_status",
+        ),
+        Index(
+            "uq_shared_active_pdf",
+            "sha256_checksum",
+            unique=True,
+            postgresql_where=column("review_status").in_(["pending", "approved"]),
+            sqlite_where=column("review_status").in_(["pending", "approved"]),
+        ),
+    )
+
+    bula_id: Mapped[UUID] = mapped_column(
+        ForeignKey("bulas.id", ondelete="CASCADE"), primary_key=True
+    )
+    source_url: Mapped[str] = mapped_column(String(2048))
+    source_description: Mapped[str] = mapped_column(String(1000))
+    sha256_checksum: Mapped[str] = mapped_column(String(64))
+    content_size_bytes: Mapped[int] = mapped_column(Integer)
+    review_status: Mapped[str] = mapped_column(
+        String(20), default="pending", server_default="pending", index=True
+    )
+    version: Mapped[int] = mapped_column(Integer, default=1, server_default="1")
+    presentation: Mapped[str | None] = mapped_column(Text, nullable=True)
+    strength: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    ingestion_job_id: Mapped[int | None] = mapped_column(BigInteger, nullable=True)
+    ingestion_operation_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    supersedes_bula_id: Mapped[UUID | None] = mapped_column(
+        ForeignKey("bulas.id"), nullable=True
+    )
+    bula: Mapped[Bula] = relationship(
+        back_populates="shared_submission", foreign_keys=[bula_id]
+    )
+
+
+class BulaCurationEvent(Base, UUIDMixin):
+    """Append-only decisions: no API rewrites an existing event."""
+
+    __tablename__ = "bula_curation_events"
+    __table_args__ = (
+        UniqueConstraint(
+            "actor_id", "operation_id", name="uq_curation_actor_operation"
+        ),
+    )
+    bula_id: Mapped[UUID] = mapped_column(
+        ForeignKey("bulas.id", ondelete="CASCADE"), index=True
+    )
+    actor_id: Mapped[int | None] = mapped_column(
+        ForeignKey("users.id", ondelete="SET NULL"), nullable=True
+    )
+    actor_name: Mapped[str] = mapped_column(Text)
+    actor_role: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    operation_id: Mapped[UUID | None] = mapped_column(Uuid, nullable=True)
+    request_fingerprint: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    before_state: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
+    after_state: Mapped[dict[str, object] | None] = mapped_column(JSON, nullable=True)
+    action: Mapped[str] = mapped_column(String(32))
+    reason: Mapped[str] = mapped_column(Text)
+    version: Mapped[int] = mapped_column(Integer)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC)
     )
 
 

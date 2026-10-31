@@ -2,12 +2,18 @@ import hashlib
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import cast
+from dataclasses import dataclass
+from uuid import UUID
+import structlog
 
 from sqlalchemy import select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.modules.auth.models import RefreshToken, User, UserRole
+from app.modules.auth.models import RefreshToken, User, UserRole, UserRoleAssignment
+from app.core.idempotency import IdempotencyConflictError
+
+logger = structlog.get_logger(__name__)
 
 
 class UserAlreadyExistsRepositoryError(Exception):
@@ -18,9 +24,146 @@ class RefreshTokenCreationError(Exception):
     """Raised when a refresh token cannot be persisted."""
 
 
+class RoleAssignmentConflictError(Exception):
+    """The expected role is stale or would not change the account."""
+
+
+class AdministrativeRoleProtectedError(Exception):
+    """Administrative accounts are managed outside the designation endpoint."""
+
+
+@dataclass(frozen=True)
+class RoleMutationResult:
+    user: User
+    replayed: bool
+
+
 class UserRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
+
+    async def search_users(self, *, query: str, limit: int, offset: int) -> list[User]:
+        result = await self.db.execute(
+            select(User)
+            .where(User.email.contains(query.strip().lower(), autoescape=True))
+            .order_by(User.email, User.id)
+            .limit(limit)
+            .offset(offset)
+        )
+        return list(result.scalars().all())
+
+    async def assign_role(
+        self,
+        *,
+        user_id: int,
+        actor: User,
+        previous_role: UserRole,
+        assigned_role: UserRole,
+        reason: str,
+        operation_id: UUID,
+        request_fingerprint: str,
+    ) -> RoleMutationResult:
+        actor_id = int(actor.id)
+        try:
+            replay = await self.replay_role_assignment(
+                actor_id=actor_id,
+                operation_id=operation_id,
+                request_fingerprint=request_fingerprint,
+            )
+            if replay is not None:
+                return replay
+            user = await self.db.scalar(
+                select(User)
+                .where(User.id == user_id)
+                .with_for_update()
+                .execution_options(populate_existing=True)
+            )
+            replay = await self.replay_role_assignment(
+                actor_id=actor_id,
+                operation_id=operation_id,
+                request_fingerprint=request_fingerprint,
+            )
+            if replay is not None:
+                return replay
+            if user is None:
+                raise RoleAssignmentConflictError()
+            if user.role == UserRole.ADMIN:
+                raise AdministrativeRoleProtectedError()
+            if user.role != previous_role or user.role == assigned_role:
+                raise RoleAssignmentConflictError()
+            await self.db.execute(
+                update(User).where(User.id == user_id).values(role=assigned_role)
+            )
+            self.db.add(
+                UserRoleAssignment(
+                    user_id=user_id,
+                    actor_id=actor_id,
+                    previous_role=previous_role.value,
+                    assigned_role=assigned_role.value,
+                    reason=reason,
+                    actor_name=actor.full_name,
+                    actor_role=actor.role.value,
+                    operation_id=operation_id,
+                    request_fingerprint=request_fingerprint,
+                )
+            )
+            await self.db.commit()
+        except IntegrityError:
+            await self.db.rollback()
+            replay = await self.replay_role_assignment(
+                actor_id=actor_id,
+                operation_id=operation_id,
+                request_fingerprint=request_fingerprint,
+            )
+            if replay is not None:
+                return replay
+            raise
+        except BaseException:
+            await self.db.rollback()
+            raise
+        return RoleMutationResult(user=user, replayed=False)
+
+    async def replay_role_assignment(
+        self, *, actor_id: int, operation_id: UUID, request_fingerprint: str
+    ) -> RoleMutationResult | None:
+        assignment = await self.db.scalar(
+            select(UserRoleAssignment).where(
+                UserRoleAssignment.actor_id == actor_id,
+                UserRoleAssignment.operation_id == operation_id,
+            )
+        )
+        if assignment is None:
+            return None
+        if assignment.request_fingerprint != request_fingerprint:
+            logger.warning(
+                "role_operation_key_conflict",
+                actor_id=actor_id,
+                operation_id=str(operation_id),
+                requested_fingerprint=request_fingerprint,
+                recorded_fingerprint=assignment.request_fingerprint,
+            )
+            raise IdempotencyConflictError()
+        user = await self.db.scalar(
+            select(User)
+            .where(User.id == assignment.user_id)
+            .execution_options(populate_existing=True)
+        )
+        if user is None:
+            raise RoleAssignmentConflictError()
+        await self.db.commit()
+        return RoleMutationResult(user=user, replayed=True)
+
+    async def role_history(
+        self, *, user_id: int, limit: int, offset: int
+    ) -> list[UserRoleAssignment]:
+        result = await self.db.execute(
+            select(UserRoleAssignment)
+            .where(UserRoleAssignment.user_id == user_id)
+            .order_by(UserRoleAssignment.created_at.desc(), UserRoleAssignment.id)
+            .limit(limit)
+            .offset(offset)
+        )
+        return list(result.scalars().all())
 
     async def get_user_by_email(self, email: str) -> User | None:
         """

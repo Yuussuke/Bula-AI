@@ -1,3 +1,7 @@
+from typing import Literal
+from uuid import UUID
+from datetime import datetime
+
 from pydantic import (
     AliasChoices,
     BaseModel,
@@ -11,6 +15,13 @@ from app.modules.auth.models import UserRole
 
 PASSWORD_MIN_LENGTH = 8
 PASSWORD_MAX_LENGTH = 64
+
+
+class RoleAssignmentRequest(BaseModel):
+    role: Literal["user", "contributor", "reviewer"]
+    expected_role: UserRole
+    reason: str = Field(min_length=3, max_length=1000)
+    model_config = ConfigDict(str_strip_whitespace=True, extra="forbid")
 
 
 class UserBase(BaseModel):
@@ -52,6 +63,26 @@ class UserResponse(UserBase):
     role: UserRole
 
     model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+
+
+class RoleAssignmentResponse(UserResponse):
+    operation_id: UUID
+    replayed: bool
+
+
+class RoleAssignmentAuditResponse(BaseModel):
+    id: UUID
+    user_id: int
+    actor_id: int | None
+    actor_name: str | None
+    actor_role: str | None
+    previous_role: UserRole
+    assigned_role: UserRole
+    reason: str
+    operation_id: UUID | None
+    request_fingerprint: str | None
+    created_at: datetime
+    model_config = ConfigDict(from_attributes=True)
 
 
 class Token(BaseModel):
