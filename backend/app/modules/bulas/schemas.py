@@ -16,6 +16,7 @@ from app.modules.bulas.models import (
     Bula,
     BulaCorpus,
     BulaStatus,
+    PublicCatalogScope,
     SystemBulaPublicationState,
 )
 
@@ -192,6 +193,66 @@ class SystemBulaSearchQuery(BaseModel):
 
 class SystemBulaPageResponse(BaseModel):
     items: list[SystemBulaResponse]
+    total: int
+    limit: int
+    offset: int
+
+
+class PublicCatalogSearchQuery(SystemBulaSearchQuery):
+    catalog_scope: PublicCatalogScope = PublicCatalogScope.ALL
+
+
+class PublicCatalogBulaResponse(BaseModel):
+    id: UUID
+    product_name: str
+    corpus: Literal[BulaCorpus.SYSTEM, BulaCorpus.SHARED]
+    manufacturer: str | None
+    active_ingredient: str | None = None
+    strength: str | None = None
+    pharmaceutical_form: str | None = None
+    presentation: str | None = None
+    audience: Literal["patient", "professional"] | None = None
+    registration_number: str | None = None
+    source_url: AnyHttpUrl
+    source_updated_at: datetime | None = None
+    source_published_at: datetime | None = None
+    is_available: bool = True
+
+    @classmethod
+    def from_bula(cls, bula: Bula) -> "PublicCatalogBulaResponse":
+        if bula.corpus == BulaCorpus.SYSTEM:
+            publication = SystemBulaResponse.from_bula(bula)
+            return cls(
+                id=bula.id,
+                product_name=publication.product_name,
+                corpus=BulaCorpus.SYSTEM,
+                manufacturer=publication.manufacturer,
+                active_ingredient=publication.active_ingredient,
+                strength=publication.strength,
+                pharmaceutical_form=publication.pharmaceutical_form,
+                presentation=publication.presentation,
+                audience=publication.audience,
+                registration_number=publication.registration_number,
+                source_url=AnyHttpUrl(publication.canonical_source_url),
+                source_updated_at=publication.source_updated_at,
+                source_published_at=publication.source_published_at,
+            )
+        shared = bula.shared_submission
+        if bula.corpus != BulaCorpus.SHARED or shared is None:
+            raise ValueError("Public catalog contains an ineligible document.")
+        return cls(
+            id=bula.id,
+            product_name=bula.drug_name,
+            corpus=BulaCorpus.SHARED,
+            manufacturer=bula.manufacturer,
+            strength=shared.strength,
+            presentation=shared.presentation,
+            source_url=AnyHttpUrl(shared.source_url),
+        )
+
+
+class PublicCatalogPageResponse(BaseModel):
+    items: list[PublicCatalogBulaResponse]
     total: int
     limit: int
     offset: int

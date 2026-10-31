@@ -23,6 +23,7 @@ from app.modules.bulas.schemas import (
     SystemBulaSeedFailure,
     SystemBulaSeedSummary,
     SystemBulaSearchQuery,
+    PublicCatalogSearchQuery,
 )
 from app.modules.storage.client import ObjectStoreClient
 
@@ -152,6 +153,11 @@ class BulaService:
         self, *, filters: SystemBulaSearchQuery
     ) -> tuple[list[Bula], int]:
         return await self.repo.search_published_system_bulas(filters=filters)
+
+    async def search_public_catalog(
+        self, *, filters: PublicCatalogSearchQuery
+    ) -> tuple[list[Bula], int]:
+        return await self.repo.search_public_catalog(filters=filters)
 
     async def get_queryable_bula_for_user(
         self,

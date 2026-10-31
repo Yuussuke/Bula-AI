@@ -109,6 +109,12 @@ class SharedReviewStatus(str, enum.Enum):
     WITHDRAWN = "withdrawn"
 
 
+class PublicCatalogScope(str, enum.Enum):
+    ALL = "all"
+    SYSTEM = "system"
+    SHARED = "shared"
+
+
 class SharedBulaSubmission(Base, TimestampMixin):
     """Immutable submitted PDF identity; availability also requires ready ingestion."""
 

@@ -9,7 +9,7 @@ from pydantic import ValidationError, HttpUrl
 
 from app.modules.bulas.repository import BulaRepository
 from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, ChatScope
-from app.modules.bulas.models import Bula, BulaCorpus
+from app.modules.bulas.models import Bula, BulaCorpus, PublicCatalogScope
 from app.modules.chat.repository import ChatRepository
 from app.modules.chat.schemas import (
     AskRequest,
@@ -65,13 +65,20 @@ class ChatService:
         self.chain_factory = chain_factory
 
     async def ask_cross_bula_question(
-        self, *, payload: AskRequest, user_id: int
+        self,
+        *,
+        payload: AskRequest,
+        user_id: int,
+        catalog_scope: PublicCatalogScope = PublicCatalogScope.ALL,
     ) -> AskResponse:
-        answer, source_chunks = await self._answer_cross_bula(payload=payload)
+        answer, source_chunks = await self._answer_cross_bula(
+            payload=payload, catalog_scope=catalog_scope
+        )
         chat_session, _, _ = await self.chat_repository.create_session_with_messages(
             user_id=user_id,
             bula_id=None,
             scope=ChatScope.CROSS_BULA,
+            catalog_scope=catalog_scope,
             first_question=payload.question,
             answer=answer,
             retrieval_mode=payload.mode,
@@ -79,6 +86,7 @@ class ChatService:
         )
         return AskResponse(
             session_id=chat_session.id,
+            catalog_scope=catalog_scope,
             answer=answer,
             retrieval_mode=payload.mode,
             source_chunks=source_chunks,
@@ -122,15 +130,22 @@ class ChatService:
         return metadata
 
     async def _answer_cross_bula(
-        self, *, payload: AskRequest, chat_history: list[BaseMessage] | None = None
+        self,
+        *,
+        payload: AskRequest,
+        chat_history: list[BaseMessage] | None = None,
+        catalog_scope: PublicCatalogScope = PublicCatalogScope.ALL,
     ) -> tuple[str, list[SourceChunkResponse]]:
-        bulas = await self.bula_repository.list_queryable_public_bulas()
+        bulas = await self.bula_repository.list_queryable_public_bulas(
+            catalog_scope=catalog_scope
+        )
         sources = {bula.id: self._published_source_metadata(bula) for bula in bulas}
         if not sources:
             logger.info(
                 "rag_cross_bula_empty_corpus",
                 retrieval_status="not_run",
                 requested_mode=payload.mode.value,
+                catalog_scope=catalog_scope.value,
             )
             return NO_CONTEXT_MESSAGE, []
         chain = self.chain_factory.build_cross_bula_chain(
@@ -254,12 +269,14 @@ class ChatService:
             raise ChatSessionNotFoundError()
 
         if chat_session.scope == ChatScope.CROSS_BULA.value:
+            catalog_scope = PublicCatalogScope(chat_session.catalog_scope)
             previous_messages = await self.chat_repository.get_recent_session_history(
                 session_id=session_id, message_limit=MAX_PRIOR_CHAT_MESSAGES
             )
             answer, source_chunks = await self._answer_cross_bula(
                 payload=payload,
                 chat_history=self._build_chat_history(previous_messages),
+                catalog_scope=catalog_scope,
             )
             await self.chat_repository.add_turn(
                 session=chat_session,
@@ -270,6 +287,7 @@ class ChatService:
             )
             return AskResponse(
                 session_id=session_id,
+                catalog_scope=catalog_scope,
                 answer=answer,
                 retrieval_mode=payload.mode,
                 source_chunks=source_chunks,

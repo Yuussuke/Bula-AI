@@ -15,6 +15,7 @@ from pydantic import (
 )
 
 from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, ChatScope
+from app.modules.bulas.models import PublicCatalogScope
 from app.modules.rag.retrieval_mode import RetrievalMode
 
 SessionSortOrder = Literal["created_at", "updated_at"]
@@ -97,6 +98,7 @@ class ChatSessionResponse(BaseModel):
     user_id: int
     bula_id: UUID | None
     scope: ChatScope = ChatScope.BULA
+    catalog_scope: PublicCatalogScope = PublicCatalogScope.ALL
     title: str
     created_at: datetime
     updated_at: datetime
@@ -117,6 +119,7 @@ class ChatSessionResponse(BaseModel):
             user_id=session.user_id,
             bula_id=session.bula_id,
             scope=ChatScope(session.scope),
+            catalog_scope=PublicCatalogScope(session.catalog_scope),
             title=session.title,
             created_at=session.created_at,
             updated_at=session.updated_at,
@@ -151,10 +154,15 @@ class AskRequest(BaseModel):
         return clean_question
 
 
+class CrossBulaAskRequest(AskRequest):
+    catalog_scope: PublicCatalogScope = PublicCatalogScope.ALL
+
+
 class AskResponse(BaseModel):
     session_id: UUID
     answer: str
     retrieval_mode: RetrievalMode
+    catalog_scope: PublicCatalogScope | None = None
     source_chunks: list[SourceChunkResponse] = Field(default_factory=list)
 
     @computed_field

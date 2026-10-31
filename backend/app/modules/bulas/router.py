@@ -20,6 +20,9 @@ from app.modules.bulas.schemas import (
     BulaAliasUpdate,
     BulaStatusResponse,
     QueryableBulaResponse,
+    PublicCatalogBulaResponse,
+    PublicCatalogPageResponse,
+    PublicCatalogSearchQuery,
     SystemBulaResponse,
     SystemBulaPageResponse,
     SystemBulaSearchQuery,
@@ -31,6 +34,22 @@ from app.modules.bulas.service import (
 )
 
 router = APIRouter(prefix="/bulas", tags=["bulas"])
+
+
+@router.get("/catalog/search", response_model=PublicCatalogPageResponse)
+async def search_public_catalog(
+    filters: Annotated[PublicCatalogSearchQuery, Query()],
+    current_user: auth_models.User = Depends(get_current_user),
+    bula_service: BulaService = Depends(get_bula_service),
+) -> PublicCatalogPageResponse:
+    _ = current_user
+    bulas, total = await bula_service.search_public_catalog(filters=filters)
+    return PublicCatalogPageResponse(
+        items=[PublicCatalogBulaResponse.from_bula(bula) for bula in bulas],
+        total=total,
+        limit=filters.limit,
+        offset=filters.offset,
+    )
 
 
 @router.post(

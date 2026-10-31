@@ -2,7 +2,7 @@ from datetime import datetime
 from collections.abc import Sequence
 from uuid import UUID
 
-from sqlalchemy import Select, and_, func, or_, select
+from sqlalchemy import Select, SQLColumnExpression, and_, func, or_, select, case
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
@@ -11,17 +11,22 @@ from app.modules.bulas.models import (
     Bula,
     BulaCorpus,
     BulaStatus,
+    BulaCurationEvent,
+    SharedBulaSubmission,
+    PublicCatalogScope,
     SystemBulaPublication,
     SystemBulaPublicationState,
 )
-from app.modules.bulas.schemas import SystemBulaManifestEntry, SystemBulaSearchQuery
+from app.modules.bulas.schemas import (
+    SystemBulaManifestEntry,
+    SystemBulaSearchQuery,
+    PublicCatalogSearchQuery,
+)
 from app.modules.storage.models import StoredObject
 from app.modules.bulas.curation_repository import (
     CurationRepository,
     approved_shared_conditions,
 )
-from app.modules.bulas.models import SharedBulaSubmission
-from app.modules.bulas.models import BulaCurationEvent
 from app.modules.bulas.curation_audit import shared_bula_snapshot
 
 
@@ -333,18 +338,9 @@ class BulaRepository:
         )
         # Filter the whole authorized catalog before counting or paginating.
         # unaccent is provided by the existing PostgreSQL ingestion migrations.
-        for term in filters.query.split():
-            escaped_term = term.replace("/", "//").replace("%", "/%").replace("_", "/_")
-            statement = statement.where(
-                or_(
-                    *(
-                        func.lower(func.unaccent(column)).contains(
-                            func.lower(func.unaccent(escaped_term)), escape="/"
-                        )
-                        for column in searchable_columns
-                    )
-                )
-            )
+        statement = self._apply_catalog_search(
+            statement, searchable_columns, filters.query
+        )
         total_statement = select(func.count()).select_from(
             statement.with_only_columns(Bula.id).order_by(None).subquery()
         )
@@ -377,11 +373,110 @@ class BulaRepository:
         return list(result.unique().scalars().all())
 
     async def list_queryable_public_bulas(
-        self, *, bula_ids: Sequence[UUID] | None = None
+        self,
+        *,
+        bula_ids: Sequence[UUID] | None = None,
+        catalog_scope: PublicCatalogScope = PublicCatalogScope.ALL,
     ) -> list[Bula]:
-        system = await self.list_queryable_system_bulas(bula_ids=bula_ids)
-        shared = await CurationRepository(self.db).list_public(bula_ids=bula_ids)
+        system: list[Bula] = []
+        shared: list[Bula] = []
+        if catalog_scope != PublicCatalogScope.SHARED:
+            system = await self.list_queryable_system_bulas(bula_ids=bula_ids)
+        if catalog_scope != PublicCatalogScope.SYSTEM:
+            shared = await CurationRepository(self.db).list_public(bula_ids=bula_ids)
         return sorted([*system, *shared], key=lambda bula: bula.id)
+
+    def _apply_catalog_search(
+        self,
+        statement: Select[tuple[Bula]],
+        columns: Sequence[SQLColumnExpression[str | None]],
+        query: str,
+    ) -> Select[tuple[Bula]]:
+        for term in query.split():
+            escaped_term = term.replace("/", "//").replace("%", "/%").replace("_", "/_")
+            statement = statement.where(
+                or_(
+                    *(
+                        func.lower(func.unaccent(column)).contains(
+                            func.lower(func.unaccent(escaped_term)), escape="/"
+                        )
+                        for column in columns
+                    )
+                )
+            )
+        return statement
+
+    async def search_public_catalog(
+        self, *, filters: PublicCatalogSearchQuery
+    ) -> tuple[list[Bula], int]:
+        system_ids = self._published_system_bula_statement().with_only_columns(Bula.id)
+        shared_ids = (
+            CurationRepository(self.db).public_statement().with_only_columns(Bula.id)
+        )
+        if filters.catalog_scope == PublicCatalogScope.SYSTEM:
+            authorized_ids = system_ids.subquery()
+        elif filters.catalog_scope == PublicCatalogScope.SHARED:
+            authorized_ids = shared_ids.subquery()
+        else:
+            authorized_ids = system_ids.union_all(shared_ids).subquery()
+        statement = (
+            select(Bula)
+            .join(authorized_ids, authorized_ids.c.id == Bula.id)
+            .outerjoin(SystemBulaPublication, SystemBulaPublication.bula_id == Bula.id)
+            .outerjoin(SharedBulaSubmission, SharedBulaSubmission.bula_id == Bula.id)
+            .options(
+                joinedload(Bula.system_publication), joinedload(Bula.shared_submission)
+            )
+        )
+        is_system = Bula.corpus == BulaCorpus.SYSTEM
+        name = case(
+            (is_system, SystemBulaPublication.product_name), else_=Bula.drug_name
+        )
+        manufacturer = case(
+            (is_system, SystemBulaPublication.manufacturer), else_=Bula.manufacturer
+        )
+        strength = case(
+            (is_system, SystemBulaPublication.strength),
+            else_=SharedBulaSubmission.strength,
+        )
+        presentation = case(
+            (is_system, SystemBulaPublication.presentation),
+            else_=SharedBulaSubmission.presentation,
+        )
+        if filters.audience != "all":
+            statement = statement.where(
+                is_system, SystemBulaPublication.audience == filters.audience
+            )
+        statement = self._apply_catalog_search(
+            statement,
+            [
+                name,
+                manufacturer,
+                strength,
+                presentation,
+                case((is_system, SystemBulaPublication.active_ingredient)),
+                case((is_system, SystemBulaPublication.pharmaceutical_form)),
+            ],
+            filters.query,
+        )
+        total = int(
+            await self.db.scalar(
+                select(func.count()).select_from(
+                    statement.with_only_columns(Bula.id).subquery()
+                )
+            )
+            or 0
+        )
+        result = await self.db.execute(
+            statement.order_by(
+                name.desc() if filters.sort == "name_desc" else name.asc(),
+                manufacturer.asc(),
+                Bula.id,
+            )
+            .limit(filters.limit)
+            .offset(filters.offset)
+        )
+        return list(result.unique().scalars().all()), total
 
     def _published_system_bula_statement(self) -> Select[tuple[Bula]]:
         return (
