@@ -12,6 +12,8 @@ from app.modules.chat.schemas import (
     AskResponse,
     CrossBulaAskRequest,
     ChatSessionResponse,
+    ChatSessionUpdate,
+    ChatSessionDeletedResponse,
     DirectAskRequest,
     DirectAskResponse,
     SessionSortOrder,
@@ -94,6 +96,7 @@ async def list_sessions(
     scope: ChatScope | None = Query(default=None),
     bula_id: UUID | None = Query(default=None),
     sort: SessionSortOrder = Query(default="created_at"),
+    is_pinned: bool | None = Query(default=None),
     current_user: User = Depends(get_current_user),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> list[ChatSessionResponse]:
@@ -109,6 +112,7 @@ async def list_sessions(
         scope=scope,
         bula_id=bula_id,
         sort=sort,
+        is_pinned=is_pinned,
     )
     return [ChatSessionResponse.from_session(session) for session in sessions]
 
@@ -130,6 +134,41 @@ async def get_session(
             detail="Conversa não encontrada.",
         ) from exc
     return ChatSessionResponse.from_session(session, messages=messages)
+
+
+@router.patch("/sessions/{session_id}", response_model=ChatSessionResponse)
+async def update_session(
+    session_id: UUID,
+    payload: ChatSessionUpdate,
+    current_user: User = Depends(get_current_user),
+    chat_service: ChatService = Depends(get_chat_service),
+) -> ChatSessionResponse:
+    try:
+        session = await chat_service.update_session_for_user(
+            session_id=session_id,
+            user_id=cast(int, current_user.id),
+            title=payload.title,
+            is_pinned=payload.is_pinned,
+        )
+    except ChatSessionNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Conversa não encontrada.") from exc
+    return ChatSessionResponse.from_session(session)
+
+
+@router.delete("/sessions/{session_id}", response_model=ChatSessionDeletedResponse)
+async def delete_session(
+    session_id: UUID,
+    current_user: User = Depends(get_current_user),
+    chat_service: ChatService = Depends(get_chat_service),
+) -> ChatSessionDeletedResponse:
+    try:
+        await chat_service.delete_session_for_user(
+            session_id=session_id,
+            user_id=cast(int, current_user.id),
+        )
+    except ChatSessionNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Conversa não encontrada.") from exc
+    return ChatSessionDeletedResponse(session_id=session_id)
 
 
 @router.post("/sessions/{session_id}/messages", response_model=AskResponse)

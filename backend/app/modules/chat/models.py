@@ -4,7 +4,16 @@ import enum
 import uuid
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, CheckConstraint, ForeignKey, String, Text, Uuid
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    CheckConstraint,
+    ForeignKey,
+    String,
+    Text,
+    Uuid,
+    false,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.base import Base, UUIDMixin, TimestampMixin
@@ -49,6 +58,9 @@ class ChatSession(Base, UUIDMixin, TimestampMixin):
         String(10), default="all", server_default="all"
     )
     title: Mapped[str] = mapped_column(String(50), nullable=False)
+    is_pinned: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=false()
+    )
 
     bula_id: Mapped[uuid.UUID | None] = mapped_column(
         Uuid(as_uuid=True),
