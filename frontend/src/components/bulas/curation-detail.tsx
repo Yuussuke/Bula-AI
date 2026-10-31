@@ -1,12 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { type ReactElement, useEffect, useState } from "react";
 
-import { decideSharedBula, getSharedBula, getSharedPdf, type SharedDetail } from "@/api/curation";
+import {
+  decideSharedBula,
+  getSharedBula,
+  getSharedMetadataSuggestion,
+  getSharedPdf,
+  type SharedBula,
+  type SharedDetail,
+} from "@/api/curation";
+import { SharedBulaStatus } from "@/components/bulas/shared-bula-status";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useIdempotencyKey } from "@/hooks/use-idempotency-key";
+import { isSharedBulaProcessing } from "@/lib/shared-bula-status";
 import { useAuthStore } from "@/store/auth";
 
 const eventLabels: Record<string, string> = {
@@ -24,18 +33,17 @@ const eventLabels: Record<string, string> = {
 export function CurationDetail({
   id,
   canReview,
+  onApproved,
 }: {
   id: string;
   canReview: boolean;
+  onApproved?: (document: SharedBula) => void;
 }): ReactElement {
   const detail = useQuery({
     queryKey: ["shared-bula", id],
     queryFn: () => getSharedBula(id),
     refetchInterval: (state) =>
-      state.state.data?.document.review_status === "approved" &&
-      ["pending", "processing"].includes(state.state.data.document.ingestion_status)
-        ? 6000
-        : false,
+      state.state.data && isSharedBulaProcessing(state.state.data.document) ? 6000 : false,
   });
   if (detail.isPending) return <p role="status">Carregando submissão…</p>;
   if (detail.isError)
@@ -53,6 +61,7 @@ export function CurationDetail({
       id={id}
       canReview={canReview}
       detail={detail.data}
+      onApproved={onApproved}
     />
   );
 }
@@ -61,20 +70,49 @@ function CurationDocumentDetail({
   id,
   canReview,
   detail,
+  onApproved,
 }: {
   id: string;
   canReview: boolean;
   detail: SharedDetail;
+  onApproved?: (document: SharedBula) => void;
 }): ReactElement {
   const cache = useQueryClient();
   const operation = useIdempotencyKey();
   const reviewerId = useAuthStore((state) => state.user?.id);
   const [pdf, setPdf] = useState<string | null>(null);
   const [reason, setReason] = useState("");
-  const [productName, setProductName] = useState(detail.document.product_name);
-  const [manufacturer, setManufacturer] = useState(detail.document.manufacturer ?? "");
-  const [presentation, setPresentation] = useState(detail.document.presentation ?? "");
-  const [strength, setStrength] = useState(detail.document.strength ?? "");
+  const document = detail.document;
+  const isSelfReview =
+    document.review_status === "pending" && reviewerId === document.submitted_by_id;
+  const suggestion = useQuery({
+    queryKey: ["shared-metadata-suggestion", id, document.version, document.sha256_checksum],
+    queryFn: async () => {
+      const result = await getSharedMetadataSuggestion(id);
+      if (
+        result.bula_id !== id ||
+        result.version !== document.version ||
+        result.sha256_checksum !== document.sha256_checksum
+      )
+        throw new Error("As sugestões não correspondem à versão exibida. Atualize a conferência.");
+      return result;
+    },
+    enabled: canReview && document.review_status === "pending" && !isSelfReview,
+    retry: false,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+  });
+  const [editedProductName, setProductName] = useState<string | null>(null);
+  const [editedManufacturer, setManufacturer] = useState<string | null>(null);
+  const [editedPresentation, setPresentation] = useState<string | null>(null);
+  const [editedStrength, setStrength] = useState<string | null>(null);
+  // A late suggestion may fill untouched fields, but never replace the reviewer's edits.
+  const productName = editedProductName ?? suggestion.data?.product_name ?? document.product_name;
+  const manufacturer =
+    editedManufacturer ?? suggestion.data?.manufacturer ?? document.manufacturer ?? "";
+  const presentation =
+    editedPresentation ?? suggestion.data?.presentation ?? document.presentation ?? "";
+  const strength = editedStrength ?? suggestion.data?.strength ?? document.strength ?? "";
   const [hasChecked, setHasChecked] = useState(false);
   const [error, setError] = useState("");
   useEffect(
@@ -105,7 +143,8 @@ function CurationDocumentDetail({
         operation.keyFor(JSON.stringify({ id, action, payload }))
       );
     },
-    onSuccess: () => {
+    onSuccess: (document, action) => {
+      if (action === "approve") onApproved?.(document);
       setReason("");
       setHasChecked(false);
       operation.reset();
@@ -118,9 +157,6 @@ function CurationDocumentDetail({
       ]);
     },
   });
-  const document = detail.document;
-  const isSelfReview =
-    document.review_status === "pending" && reviewerId === document.submitted_by_id;
   const pending = decision.isPending;
   const act = (action: "approve" | "reject" | "withdraw" | "retry"): void => {
     setError("");
@@ -131,6 +167,7 @@ function CurationDocumentDetail({
       className="bg-muted/30 space-y-4 rounded-xl border p-4"
       aria-label="Conferência documental"
     >
+      <SharedBulaStatus document={document} />
       {detail.submitted_by_name && (
         <p className="text-sm">
           Enviado por: <strong>{detail.submitted_by_name}</strong>
@@ -175,6 +212,41 @@ function CurationDocumentDetail({
           </p>
           {document.review_status === "pending" && (
             <>
+              {!isSelfReview && suggestion.isFetching ? (
+                <p role="status" className="text-muted-foreground text-sm">
+                  Lendo a identificação do PDF…
+                </p>
+              ) : null}
+              {suggestion.data && (
+                <div className="bg-primary/10 space-y-1 rounded-lg border p-3 text-sm">
+                  <p>
+                    Sugestões extraídas automaticamente do PDF. Confira os quatro campos antes de
+                    aprovar; eles ainda não foram validados pelo Curador.
+                  </p>
+                  <p className="text-muted-foreground text-xs">
+                    Parser: {suggestion.data.parser_version} · versão {suggestion.data.version}.
+                    Campos ausentes continuam sem preenchimento automático.
+                  </p>
+                </div>
+              )}
+              {suggestion.isError ? (
+                <div role="alert" className="space-y-1 text-sm">
+                  <p>
+                    Não foi possível sugerir os dados. Confira o PDF e preencha a identificação
+                    manualmente.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setHasChecked(false);
+                      void suggestion.refetch();
+                    }}
+                  >
+                    Tentar extrair novamente
+                  </Button>
+                </div>
+              ) : null}
               <Label htmlFor={`product-${id}`}>Nome conferido no PDF</Label>
               <Input
                 id={`product-${id}`}
@@ -227,7 +299,7 @@ function CurationDocumentDetail({
                     type="checkbox"
                     className="mt-1"
                     checked={hasChecked}
-                    disabled={pending}
+                    disabled={pending || suggestion.isFetching}
                     onChange={(event) => setHasChecked(event.target.checked)}
                   />
                   Conferi o PDF original, a identificação da fonte e as condições relevantes.
@@ -239,6 +311,7 @@ function CurationDocumentDetail({
                     <Button
                       disabled={
                         pending ||
+                        suggestion.isFetching ||
                         isSelfReview ||
                         productName.trim().length < 2 ||
                         !hasChecked ||

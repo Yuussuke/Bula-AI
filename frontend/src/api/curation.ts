@@ -43,6 +43,22 @@ export interface SharedDetail {
   events: CurationEvent[];
   submitted_by_name?: string | null;
 }
+export interface SharedMetadataSuggestion {
+  bula_id: string;
+  version: number;
+  sha256_checksum: string;
+  parser_version: string;
+  product_name: string | null;
+  manufacturer: string | null;
+  presentation: string | null;
+  strength: string | null;
+}
+
+export function getSharedMetadataSuggestion(id: string): Promise<SharedMetadataSuggestion> {
+  return requestJson<SharedMetadataSuggestion>(`/api/v1/bulas/shared/${id}/metadata-suggestions`, {
+    method: "GET",
+  });
+}
 export interface SharedPage {
   items: SharedBula[];
   total: number;

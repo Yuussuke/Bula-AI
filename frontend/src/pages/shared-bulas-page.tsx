@@ -5,8 +5,10 @@ import { Link } from "react-router-dom";
 import { type CurationView, listSharedBulas, type ReviewStatus } from "@/api/curation";
 import { CurationDetail } from "@/components/bulas/curation-detail";
 import { CurationSubmissionForm } from "@/components/bulas/curation-submission-form";
+import { SharedBulaStatus } from "@/components/bulas/shared-bula-status";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { isSharedBulaProcessing } from "@/lib/shared-bula-status";
 import { useAuthStore } from "@/store/auth";
 
 const statuses: Record<ReviewStatus, string> = {
@@ -17,11 +19,24 @@ const statuses: Record<ReviewStatus, string> = {
 };
 
 export function SharedBulasPage({ review = false }: { review?: boolean }): ReactElement {
+  return <SharedBulasContent key={review ? "queue" : "shared"} review={review} />;
+}
+
+function SharedBulasContent({ review }: { review: boolean }): ReactElement {
   const role = useAuthStore((state) => state.user?.role);
   const canSubmit = role === "admin" || role === "contributor";
   const canReview = role === "admin" || role === "reviewer";
-  const [mine, setMine] = useState(false);
-  const view: CurationView = review ? "review" : mine ? "mine" : "public";
+  const [selectedView, setSelectedView] = useState<CurationView>(
+    canReview ? "review" : canSubmit ? "mine" : "public"
+  );
+  const view: CurationView = review
+    ? "review"
+    : selectedView === "review" && !canReview
+      ? "public"
+      : selectedView === "mine" && !canSubmit
+        ? "public"
+        : selectedView;
+  const [approvedName, setApprovedName] = useState<string | null>(null);
   const [status, setStatus] = useState<ReviewStatus | "">(review ? "pending" : "");
   const [input, setInput] = useState("");
   const [query, setQuery] = useState("");
@@ -32,13 +47,7 @@ export function SharedBulasPage({ review = false }: { review?: boolean }): React
     queryFn: () => listSharedBulas(view, status, query, page),
     enabled: !review || canReview,
     refetchInterval: (state) =>
-      state.state.data?.items.some(
-        (item) =>
-          item.review_status === "approved" &&
-          ["pending", "processing"].includes(item.ingestion_status)
-      )
-        ? 6000
-        : false,
+      state.state.data?.items.some(isSharedBulaProcessing) ? 6000 : false,
   });
   const search = (event: FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
@@ -59,13 +68,22 @@ export function SharedBulasPage({ review = false }: { review?: boolean }): React
             : "Documentos submetidos por Contribuidores, conferidos por Curadores e processados para consulta. As fontes podem ser diferentes da ANVISA."}
         </p>
       </div>
+      {approvedName && (
+        <p role="status" className="bg-primary/10 rounded-xl border p-4 text-sm">
+          <strong>{approvedName}</strong>: aprovação registrada. A bula ficará disponível após a
+          conclusão do processamento.{" "}
+          <Link to="/compartilhadas" className="text-primary font-medium underline">
+            Acompanhar processamento
+          </Link>
+        </p>
+      )}
       {!review && canSubmit && <CurationSubmissionForm />}
       {!review && (
         <div className="flex flex-wrap gap-2">
           <Button
-            variant={!mine ? "default" : "outline"}
+            variant={view === "public" ? "default" : "outline"}
             onClick={() => {
-              setMine(false);
+              setSelectedView("public");
               setPage(1);
               setStatus("");
             }}
@@ -74,14 +92,26 @@ export function SharedBulasPage({ review = false }: { review?: boolean }): React
           </Button>
           {canSubmit && (
             <Button
-              variant={mine ? "default" : "outline"}
+              variant={view === "mine" ? "default" : "outline"}
               onClick={() => {
-                setMine(true);
+                setSelectedView("mine");
                 setPage(1);
                 setStatus("");
               }}
             >
               Minhas submissões
+            </Button>
+          )}
+          {canReview && (
+            <Button
+              variant={view === "review" ? "default" : "outline"}
+              onClick={() => {
+                setSelectedView("review");
+                setPage(1);
+                setStatus("");
+              }}
+            >
+              Acompanhar submissões
             </Button>
           )}
           {canReview && (
@@ -169,12 +199,7 @@ export function SharedBulasPage({ review = false }: { review?: boolean }): React
                         .join(" · ") || "Identificação completa disponível após o processamento."}
                     </p>
                   </div>
-                  <span className="text-muted-foreground text-xs">
-                    {statuses[document.review_status]}
-                    {document.review_status === "approved" && !document.is_available
-                      ? ` · ${document.ingestion_status === "failed" || document.ingestion_status === "error" ? "Falha no processamento" : "Aguardando processamento"}`
-                      : ""}
-                  </span>
+                  <SharedBulaStatus document={document} />
                 </div>
                 <p className="text-muted-foreground text-sm">
                   Fonte declarada: {document.source_description}
@@ -205,7 +230,11 @@ export function SharedBulasPage({ review = false }: { review?: boolean }): React
                   </Button>
                 </div>
                 {opened === document.id && (
-                  <CurationDetail id={document.id} canReview={review && canReview} />
+                  <CurationDetail
+                    id={document.id}
+                    canReview={view === "review" && canReview}
+                    onApproved={(approved) => setApprovedName(approved.product_name)}
+                  />
                 )}
               </article>
             ))}

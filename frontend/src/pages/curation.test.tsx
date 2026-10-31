@@ -10,6 +10,7 @@ import {
   decideSharedBula,
   getCurationRoleHistory,
   getSharedBula,
+  getSharedMetadataSuggestion,
   listCurationUsers,
   listSharedBulas,
   type SharedBula,
@@ -25,6 +26,7 @@ vi.mock("@/api/curation", () => ({
   assignCurationRole: vi.fn(),
   decideSharedBula: vi.fn(),
   getSharedBula: vi.fn(),
+  getSharedMetadataSuggestion: vi.fn(),
   getCurationRoleHistory: vi.fn(),
   getSharedPdf: vi.fn(),
   listCurationUsers: vi.fn(),
@@ -76,10 +78,117 @@ beforeEach(() => {
   authenticate("user");
   vi.mocked(listSharedBulas).mockResolvedValue({ items: [], total: 0, limit: 20, offset: 0 });
   vi.mocked(getSharedBula).mockResolvedValue({ document, events: [] });
+  vi.mocked(getSharedMetadataSuggestion).mockResolvedValue({
+    bula_id: document.id,
+    version: document.version,
+    sha256_checksum: document.sha256_checksum,
+    parser_version: "synthetic",
+    product_name: null,
+    manufacturer: null,
+    presentation: null,
+    strength: null,
+  });
   vi.mocked(getCurationRoleHistory).mockResolvedValue([]);
 });
 
 describe("shared leaflet curation", () => {
+  it("prefills extracted suggestions but requires an explicit documentary confirmation", async () => {
+    authenticate("reviewer");
+    vi.mocked(getSharedMetadataSuggestion).mockResolvedValue({
+      bula_id: document.id,
+      version: document.version,
+      sha256_checksum: document.sha256_checksum,
+      parser_version: "synthetic",
+      product_name: "Nome extraído",
+      manufacturer: "Fabricante do PDF",
+      presentation: "Comprimidos",
+      strength: "2 mg",
+    });
+    const user = userEvent.setup();
+    vi.mocked(decideSharedBula).mockResolvedValue({
+      ...document,
+      review_status: "approved",
+      version: 4,
+    });
+    renderPage(<CurationDetail id={document.id} canReview />);
+    await waitFor(() =>
+      expect(screen.getByLabelText("Nome conferido no PDF")).toHaveValue("Nome extraído")
+    );
+    expect(screen.getByLabelText("Fabricante conferido (opcional)")).toHaveValue(
+      "Fabricante do PDF"
+    );
+    expect(screen.getByLabelText("Concentração documentada (opcional)")).toHaveValue("2 mg");
+    expect(screen.getByText(/Sugestões extraídas automaticamente/)).toBeVisible();
+    await user.type(screen.getByLabelText("Parecer ou justificativa"), "Conferido no documento.");
+    expect(screen.getByRole("button", { name: "Aprovar e processar" })).toBeDisabled();
+    expect(decideSharedBula).not.toHaveBeenCalled();
+    await user.click(screen.getByRole("checkbox"));
+    await user.click(screen.getByRole("button", { name: "Aprovar e processar" }));
+    expect(decideSharedBula).toHaveBeenCalledWith(
+      document.id,
+      "approve",
+      expect.objectContaining({
+        product_name: "Nome extraído",
+        manufacturer: "Fabricante do PDF",
+        presentation: "Comprimidos",
+        strength: "2 mg",
+      }),
+      expect.any(String)
+    );
+  });
+
+  it("never replaces reviewer edits with a late suggestion", async () => {
+    let resolveSuggestion!: (
+      value: Awaited<ReturnType<typeof getSharedMetadataSuggestion>>
+    ) => void;
+    vi.mocked(getSharedMetadataSuggestion).mockReturnValue(
+      new Promise((resolve) => {
+        resolveSuggestion = resolve;
+      })
+    );
+    const user = userEvent.setup();
+    renderPage(<CurationDetail id={document.id} canReview />);
+    const name = await screen.findByLabelText("Nome conferido no PDF");
+    await user.clear(name);
+    await user.type(name, "Nome conferido manualmente");
+    expect(screen.getByRole("checkbox")).toBeDisabled();
+    act(() => {
+      resolveSuggestion({
+        bula_id: document.id,
+        version: document.version,
+        sha256_checksum: document.sha256_checksum,
+        parser_version: "synthetic",
+        product_name: "Outro nome sugerido",
+        manufacturer: "Fabricante sugerido",
+        presentation: null,
+        strength: null,
+      });
+    });
+    await waitFor(() =>
+      expect(screen.getByLabelText("Fabricante conferido (opcional)")).toHaveValue(
+        "Fabricante sugerido"
+      )
+    );
+    expect(name).toHaveValue("Nome conferido manualmente");
+  });
+
+  it("rejects stale suggestions and leaves manual identification possible after extraction failure", async () => {
+    vi.mocked(getSharedMetadataSuggestion).mockResolvedValue({
+      bula_id: document.id,
+      version: document.version + 1,
+      sha256_checksum: document.sha256_checksum,
+      parser_version: "synthetic",
+      product_name: "Nome de versão diferente",
+      manufacturer: null,
+      presentation: null,
+      strength: null,
+    });
+    renderPage(<CurationDetail id={document.id} canReview />);
+    expect(await screen.findByText(/Não foi possível sugerir os dados/)).toBeVisible();
+    expect(screen.getByLabelText("Nome conferido no PDF")).toHaveValue(document.product_name);
+    expect(screen.getByLabelText("Nome conferido no PDF")).toBeEnabled();
+    expect(screen.getByRole("checkbox")).not.toBeChecked();
+  });
   it("does not offer submission or review controls to a reader", async () => {
     renderPage(<SharedBulasPage />);
     await waitFor(() => expect(listSharedBulas).toHaveBeenCalledWith("public", "", "", 1));
@@ -97,10 +206,132 @@ describe("shared leaflet curation", () => {
     authenticate("contributor");
     const user = userEvent.setup();
     renderPage(<SharedBulasPage />);
+    await waitFor(() => expect(listSharedBulas).toHaveBeenCalledWith("mine", "", "", 1));
     expect(screen.getByText("Submeter uma bula para curadoria")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Minhas submissões" }));
     await waitFor(() => expect(listSharedBulas).toHaveBeenCalledWith("mine", "", "", 1));
     expect(screen.queryByRole("link", { name: "Abrir fila de curadoria" })).not.toBeInTheDocument();
+  });
+
+  it("opens all submission states for curators without changing the public catalog", async () => {
+    authenticate("reviewer");
+    vi.mocked(listSharedBulas).mockResolvedValue({
+      items: [{ ...document, review_status: "approved", ingestion_status: "processing" }],
+      total: 1,
+      limit: 20,
+      offset: 0,
+    });
+    const user = userEvent.setup();
+    renderPage(<SharedBulasPage />);
+    expect(await screen.findByText("Processando")).toBeVisible();
+    expect(listSharedBulas).toHaveBeenCalledWith("review", "", "", 1);
+    expect(
+      screen.queryByRole("link", { name: "Conversar sobre esta bula" })
+    ).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Disponíveis para consulta" }));
+    await waitFor(() => expect(listSharedBulas).toHaveBeenCalledWith("public", "", "", 1));
+  });
+
+  it("keeps an approval confirmation after the document leaves the pending queue", async () => {
+    authenticate("reviewer");
+    let hasApproved = false;
+    vi.mocked(listSharedBulas).mockImplementation(() =>
+      Promise.resolve({
+        items: hasApproved ? [] : [document],
+        total: hasApproved ? 0 : 1,
+        limit: 20,
+        offset: 0,
+      })
+    );
+    vi.mocked(decideSharedBula).mockImplementation(() => {
+      hasApproved = true;
+      return Promise.resolve({ ...document, review_status: "approved", version: 4 });
+    });
+    const user = userEvent.setup();
+    renderPage(<SharedBulasPage review />);
+    await user.click(await screen.findByRole("button", { name: "Conferir submissão" }));
+    await user.type(
+      await screen.findByLabelText("Parecer ou justificativa"),
+      "Documento conferido."
+    );
+    await user.click(screen.getByRole("checkbox"));
+    await user.click(screen.getByRole("button", { name: "Aprovar e processar" }));
+    expect(await screen.findByText(/aprovação registrada/)).toBeVisible();
+    expect(screen.getByRole("link", { name: "Acompanhar processamento" })).toHaveAttribute(
+      "href",
+      "/compartilhadas"
+    );
+    expect(await screen.findByText("Nenhum documento nesta situação.")).toBeVisible();
+  });
+
+  it("updates queued, processing and ready submissions automatically before enabling chat", async () => {
+    authenticate("reviewer");
+    vi.useFakeTimers();
+    const approved = { ...document, review_status: "approved" as const };
+    vi.mocked(listSharedBulas)
+      .mockResolvedValueOnce({ items: [approved], total: 1, limit: 20, offset: 0 })
+      .mockResolvedValueOnce({
+        items: [{ ...approved, ingestion_status: "processing" }],
+        total: 1,
+        limit: 20,
+        offset: 0,
+      })
+      .mockResolvedValue({
+        items: [{ ...approved, ingestion_status: "ready", is_available: true }],
+        total: 1,
+        limit: 20,
+        offset: 0,
+      });
+    const view = renderPage(<SharedBulasPage />);
+    try {
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(1);
+      });
+      expect(screen.getByText("Aguardando processamento")).toBeVisible();
+      expect(
+        screen.queryByRole("link", { name: "Conversar sobre esta bula" })
+      ).not.toBeInTheDocument();
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(6100);
+      });
+      expect(screen.getByText("Processando")).toBeVisible();
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(6100);
+      });
+      expect(screen.getByText("Disponível para consulta")).toBeVisible();
+      expect(screen.getByRole("link", { name: "Conversar sobre esta bula" })).toHaveAttribute(
+        "href",
+        `/bulas/${document.id}/chat`
+      );
+      const calls = vi.mocked(listSharedBulas).mock.calls.length;
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(12000);
+      });
+      expect(listSharedBulas).toHaveBeenCalledTimes(calls);
+    } finally {
+      view.unmount();
+      vi.useRealTimers();
+    }
+  });
+
+  it.each([
+    ["failed", "Falha no processamento"],
+    ["error", "Falha no processamento"],
+    ["ready", "Indisponível para consulta"],
+  ] as const)("does not label an unavailable %s document as waiting", async (status, expected) => {
+    authenticate("reviewer");
+    vi.mocked(listSharedBulas).mockResolvedValue({
+      items: [{ ...document, review_status: "approved", ingestion_status: status }],
+      total: 1,
+      limit: 20,
+      offset: 0,
+    });
+    renderPage(<SharedBulasPage />);
+    expect(await screen.findByText(expected)).toBeVisible();
+    expect(screen.queryByText("Aguardando processamento")).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("link", { name: "Conversar sobre esta bula" })
+    ).not.toBeInTheDocument();
   });
 
   it("submits the original file and declared origin without approving it", async () => {

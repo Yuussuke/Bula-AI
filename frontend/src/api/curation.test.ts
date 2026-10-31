@@ -1,6 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { assignCurationRole, decideSharedBula, submitSharedBula } from "@/api/curation";
+import {
+  assignCurationRole,
+  decideSharedBula,
+  getSharedMetadataSuggestion,
+  submitSharedBula,
+} from "@/api/curation";
 import { queryClient } from "@/lib/queryClient";
 import { useAuthStore } from "@/store/auth";
 
@@ -24,6 +29,18 @@ afterEach(() => {
 });
 
 describe("curation mutation transport", () => {
+  it("reads metadata suggestions without submitting a decision", async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(new Response("{}", { status: 200 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await getSharedMetadataSuggestion(operationId);
+    expect(fetchMock.mock.calls[0][0]).toContain(
+      `/api/v1/bulas/shared/${operationId}/metadata-suggestions`
+    );
+    const request = fetchMock.mock.calls[0][1];
+    expect(request?.method).toBe("GET");
+    expect(new Headers(request?.headers).get("Authorization")).toBe("Bearer synthetic-token");
+    expect(request?.body).toBeUndefined();
+  });
   it("keeps the explicit key on a multipart submission and sends its declared identity", async () => {
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue(new Response("{}", { status: 201 }));
     vi.stubGlobal("fetch", fetchMock);
