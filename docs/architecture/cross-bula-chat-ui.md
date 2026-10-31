@@ -37,8 +37,10 @@ and a late failure from another conversation cannot reset the current selection.
 
 ## Conversation workspace
 
-Chat fills the available viewport. Identity and search-mode controls live in the
-sidebar/mobile drawer; each answer still shows its executed mode. The input grows
+Chat fills the available viewport. On compact screens, catalog and search-mode
+controls sit in the header, outside the history drawer. Desktop controls use a
+small wrapping row, or icons when the sidebar is collapsed; labels are not clipped.
+Each answer still shows its executed mode. The input grows
 from one line to 144 px and retains a visible medical-information notice. Editable
 general-chat suggestions use `[medicamento]`; selecting one never submits it.
 
@@ -47,3 +49,26 @@ action. Numbered/grouped citations open a source panel without rewriting stored
 answers or renumbering references. Document identity and original links remain
 attached; closing the panel restores focus to the citation. Catalog return links
 retain filters/page. Retrieval, authorization and experimental artifacts are unchanged.
+
+The shared workspace sidebar is available throughout the site. Its rail contains
+the logo and navigation shortcuts; the adjacent panel contains conversations.
+Collapse by button, keyboard or dragging the edge. A fixed inner panel width
+avoids reflowing its text during the outer width transition. Layout state is shared
+across routes through Zustand, independently of chat/authentication data.
+Icon hints also open on keyboard focus and respect reduced-motion preferences.
+
+Conversation menus support renaming (1–50 trimmed characters) and confirmed
+deletion. Authenticated `PATCH /chat/sessions/{id}` accepts `{title}`; `DELETE`
+returns `{session_id}`. Both restrict the database mutation to the owner and use
+404 for missing/inaccessible sessions. Deletion cascades to that session's
+messages, preserving PDFs and other conversations. Failed mutations keep the
+dialog/draft for manual retry. Deleting the active conversation opens a new one
+within its existing catalog boundary; a turn in progress disables its menu.
+
+The same PATCH accepts `{is_pinned: true|false}`. Pins belong to the session's
+owner and persist across reloads without changing messages, source boundaries
+or last-activity timestamps. The optional `is_pinned` list filter is applied
+before pagination. A separate paginated Pinned group appears above Recents;
+pinned conversations are excluded from both recent scope groups. Unpinning
+restores a conversation to its original scope. Apply Alembic migration
+`e610a130b004` before starting this version; existing sessions default to unpinned.

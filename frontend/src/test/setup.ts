@@ -1,7 +1,10 @@
 import "@testing-library/jest-dom/vitest";
 
 import { cleanup } from "@testing-library/react";
-import { afterEach, vi } from "vitest";
+import { afterEach, beforeEach, vi } from "vitest";
+
+import { useSidebarStore } from "@/store/sidebar";
+import { installViewportMock } from "@/test/viewport";
 
 class ResizeObserverMock implements ResizeObserver {
   readonly observedElements: Element[] = [];
@@ -23,6 +26,11 @@ class ResizeObserverMock implements ResizeObserver {
 }
 
 vi.stubGlobal("ResizeObserver", ResizeObserverMock);
+
+beforeEach(() => {
+  installViewportMock();
+  useSidebarStore.setState({ isCollapsed: false });
+});
 
 afterEach(() => {
   cleanup();

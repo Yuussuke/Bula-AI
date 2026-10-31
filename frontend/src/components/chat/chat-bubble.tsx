@@ -1,7 +1,7 @@
 import { User } from "lucide-react";
 import { lazy, memo, type ReactElement, Suspense, useCallback, useState } from "react";
 
-import { BrandLogo } from "@/components/brand-logo";
+import { AssistantAvatar } from "@/components/assistant-avatar";
 import { ModeIndicator } from "@/components/chat/mode-indicator";
 import { SourceChunks } from "@/components/chat/source-chunks";
 import type { ChatTimelineMessage } from "@/components/chat/types";
@@ -38,11 +38,11 @@ export function ChatBubble({ message }: ChatBubbleProps): ReactElement {
       <div
         aria-hidden="true"
         className={cn(
-          "flex h-8 w-8 shrink-0 items-center justify-center rounded-full",
-          isUserMessage ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"
+          "flex shrink-0 items-center justify-center rounded-full",
+          isUserMessage ? "bg-primary text-primary-foreground h-8 w-8" : "h-10 w-10"
         )}
       >
-        {isUserMessage ? <User className="h-4 w-4" /> : <BrandLogo className="h-5 w-6" />}
+        {isUserMessage ? <User className="h-4 w-4" /> : <AssistantAvatar />}
       </div>
       <div
         className={cn(

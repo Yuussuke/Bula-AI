@@ -1,9 +1,8 @@
-import { CircleHelp } from "lucide-react";
+import { Search } from "lucide-react";
 import { type ReactElement, useId } from "react";
 
 import type { RetrievalMode } from "@/api/chat";
-import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ActionHint } from "@/components/ui/action-hint";
 import {
   Select,
   SelectContent,
@@ -12,74 +11,93 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { isRetrievalMode, RETRIEVAL_MODES } from "@/lib/retrieval-mode";
+import { cn } from "@/lib/utils";
 
 interface ModeSelectorProps {
   value: RetrievalMode;
   isDisabled: boolean;
   onChange: (mode: RetrievalMode) => void;
+  variant?: "compact" | "icon";
+  isSidebar?: boolean;
 }
 
-export function ModeSelector({ value, isDisabled, onChange }: ModeSelectorProps): ReactElement {
+export function ModeSelector({
+  value,
+  isDisabled,
+  onChange,
+  variant = "compact",
+  isSidebar = true,
+}: ModeSelectorProps): ReactElement {
   const descriptionId = useId();
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="text-sidebar-foreground/70 text-xs font-medium">Modo de busca</span>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              size="icon-sm"
-              variant="ghost"
-              className="text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-foreground h-7 w-7"
-              aria-label="Entender os modos de busca"
-            >
-              <CircleHelp aria-hidden="true" className="h-4 w-4" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent
-            side="right"
-            align="end"
-            className="w-80 max-w-[calc(100vw-2rem)] space-y-3 text-sm"
-            aria-label="Como funcionam os modos de busca"
-          >
-            <p className="font-semibold">Como buscar nas bulas</p>
-            {Object.entries(RETRIEVAL_MODES).map(([mode, option]) => (
-              <p key={mode}>
-                <strong>{option.label}:</strong> {option.description}
-              </p>
-            ))}
-          </PopoverContent>
-        </Popover>
-      </div>
-      <Select
-        value={value}
-        disabled={isDisabled}
-        onValueChange={(mode) => {
-          if (isRetrievalMode(mode)) onChange(mode);
-        }}
+    <Select
+      value={value}
+      disabled={isDisabled}
+      onValueChange={(mode) => {
+        if (isRetrievalMode(mode)) onChange(mode);
+      }}
+    >
+      <ActionHint
+        side={variant === "icon" ? "right" : "bottom"}
+        label={`Modo de busca: ${RETRIEVAL_MODES[value].label}`}
       >
         <SelectTrigger
           aria-label="Modo de busca"
           aria-describedby={descriptionId}
-          className="border-sidebar-border bg-sidebar-accent text-sidebar-foreground hover:bg-sidebar-accent/80 [&_svg]:text-sidebar-foreground/60 w-full rounded-lg shadow-none"
+          className={cn(
+            "gap-2 rounded-lg border-transparent bg-transparent shadow-none",
+            isSidebar ? "text-sidebar-foreground hover:bg-sidebar-accent" : "hover:bg-muted",
+            variant === "icon"
+              ? "w-11 justify-center px-0 data-[size=default]:h-11 [&>svg:last-child]:hidden"
+              : "w-auto shrink-0 gap-1.5 px-2"
+          )}
         >
-          <SelectValue />
+          <Search aria-hidden="true" className="h-4 w-4" />
+          <SelectValue>
+            <span className={variant === "icon" ? "sr-only" : "sr-only sm:not-sr-only"}>
+              {RETRIEVAL_MODES[value].label}
+            </span>
+          </SelectValue>
         </SelectTrigger>
-        <SelectContent className="border-sidebar-border bg-sidebar text-sidebar-foreground">
-          {Object.entries(RETRIEVAL_MODES).map(([mode, option]) => (
-            <SelectItem
-              key={mode}
-              value={mode}
-              className="focus:bg-sidebar-accent focus:text-sidebar-foreground cursor-pointer py-2.5"
-            >
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      </ActionHint>
       <p id={descriptionId} className="sr-only">
         {RETRIEVAL_MODES[value].description}
       </p>
-    </div>
+      <SelectContent
+        className={cn(
+          "w-80 max-w-[calc(100vw-2rem)]",
+          isSidebar && "border-sidebar-border bg-sidebar text-sidebar-foreground"
+        )}
+      >
+        {Object.entries(RETRIEVAL_MODES).map(([mode, option]) => (
+          <SelectItem
+            key={mode}
+            value={mode}
+            textValue={option.label}
+            aria-labelledby={`${descriptionId}-${mode}-label`}
+            aria-describedby={`${descriptionId}-${mode}`}
+            className={cn(
+              "cursor-pointer py-2.5",
+              isSidebar && "focus:bg-sidebar-accent focus:text-sidebar-foreground"
+            )}
+          >
+            <span className="flex flex-col items-start gap-1">
+              <span id={`${descriptionId}-${mode}-label`} className="font-medium">
+                {option.label}
+              </span>
+              <span
+                id={`${descriptionId}-${mode}`}
+                className={cn(
+                  "text-xs leading-relaxed",
+                  isSidebar ? "text-sidebar-foreground/65" : "text-muted-foreground"
+                )}
+              >
+                {option.description}
+              </span>
+            </span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

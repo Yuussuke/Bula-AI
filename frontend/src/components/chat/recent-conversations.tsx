@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { AlertCircle, MessageSquarePlus, RefreshCw } from "lucide-react";
-import type { ReactElement } from "react";
+import { lazy, type ReactElement, Suspense } from "react";
 import { Link } from "react-router-dom";
 
 import { type ChatContext, type ChatScope, listChatSessions } from "@/api/chat";
@@ -16,6 +16,11 @@ import { catalogParameters } from "@/lib/catalog-scope";
 import { cn } from "@/lib/utils";
 
 const PAGE_SIZE = 10;
+const ConversationActions = lazy(() =>
+  import("@/components/chat/conversation-actions").then((module) => ({
+    default: module.ConversationActions,
+  }))
+);
 const sessionDateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
   month: "short",
@@ -28,10 +33,11 @@ interface RecentConversationsProps {
   onStartNewSession?: () => void;
   onNavigate?: () => void;
   returnTo?: string;
+  isCurrentSessionBusy?: boolean;
 }
 
 interface ConversationGroupProps extends RecentConversationsProps {
-  scope: ChatScope;
+  scope: ChatScope | "pinned";
 }
 
 function ConversationGroup({
@@ -41,11 +47,19 @@ function ConversationGroup({
   onStartNewSession,
   onNavigate,
   returnTo,
-}: ConversationGroupProps): ReactElement {
+  isCurrentSessionBusy = false,
+}: ConversationGroupProps): ReactElement | null {
+  const isPinned = scope === "pinned";
   const sessionsQuery = useInfiniteQuery({
-    queryKey: ["chat-sessions", scope, "recent", { limit: PAGE_SIZE, sort: "updated_at" }],
+    queryKey: ["chat-sessions", scope, { limit: PAGE_SIZE, sort: "updated_at", isPinned }],
     queryFn: ({ pageParam }) =>
-      listChatSessions({ scope, sort: "updated_at", limit: PAGE_SIZE, offset: pageParam }),
+      listChatSessions({
+        scope: scope === "pinned" ? undefined : scope,
+        isPinned,
+        sort: "updated_at",
+        limit: PAGE_SIZE,
+        offset: pageParam,
+      }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, pages) =>
       lastPage.length === PAGE_SIZE ? pages.length * PAGE_SIZE : undefined,
@@ -55,8 +69,9 @@ function ConversationGroup({
       (sessionsQuery.data?.pages.flat() ?? [])
         .filter(
           (session) =>
-            (session.scope ?? "bula") === scope &&
-            (scope !== "cross_bula" || session.bula_id === null)
+            (isPinned || (session.scope ?? "bula") === scope) &&
+            Boolean(session.is_pinned) === isPinned &&
+            ((session.scope ?? "bula") !== "cross_bula" || session.bula_id === null)
         )
         .map((session) => [session.id, session])
     ).values()
@@ -67,14 +82,20 @@ function ConversationGroup({
     onStartNewSession?.();
     onNavigate?.();
   };
+  if (isPinned && sessions.length === 0 && !sessionsQuery.isError) return null;
 
   return (
     <AccordionItem value={scope} className="border-sidebar-border">
-      <AccordionTrigger className="px-2 py-3 text-sm hover:no-underline [&>svg]:text-current">
-        {scope === "cross_bula" ? "Chat geral" : "Por medicamento"}
+      <AccordionTrigger
+        className={cn(
+          "px-2 py-3 text-sm hover:no-underline [&>svg]:text-current",
+          isPinned && "text-sidebar-foreground/60 text-xs font-semibold tracking-wide uppercase"
+        )}
+      >
+        {isPinned ? "Fixados" : scope === "cross_bula" ? "Chat geral" : "Por medicamento"}
       </AccordionTrigger>
       <AccordionContent className="space-y-2 pb-3">
-        {canStartInCurrentContext ? (
+        {isPinned ? null : canStartInCurrentContext ? (
           <Button
             variant="ghost"
             size="sm"
@@ -130,44 +151,68 @@ function ConversationGroup({
         {sessions.length > 0 ? (
           <ul className="space-y-1">
             {sessions.map((session) => {
+              const scope = session.scope ?? "bula";
               const updatedAt = new Date(session.updated_at);
               const dateLabel = Number.isNaN(updatedAt.getTime())
                 ? ""
                 : sessionDateFormatter.format(updatedAt);
-              if (scope === "bula" && session.bula_id === null) {
-                return (
-                  <li key={session.id} className="text-sidebar-foreground/60 px-3 py-2 text-xs">
-                    <span className="block truncate">{session.title}</span>
-                    <span>Documento indisponível</span>
-                  </li>
-                );
-              }
+              const isUnavailable = scope === "bula" && session.bula_id === null;
               const isCurrentSession = session.id === currentSessionId;
               const isSameBula = context?.scope === "bula" && context.bulaId === session.bula_id;
               const parameters = catalogParameters(
                 scope === "cross_bula" ? (session.catalog_scope ?? "all") : "all"
               );
               parameters.set("session", session.id);
-              return (
-                <li key={session.id}>
-                  <Link
-                    to={`${scope === "cross_bula" ? "/chat" : `/bulas/${session.bula_id}/chat`}?${parameters.toString()}`}
-                    state={isSameBula && returnTo ? { returnTo } : undefined}
-                    aria-current={isCurrentSession ? "page" : undefined}
-                    onClick={onNavigate}
-                    title={session.title}
-                    className={cn(
-                      "block rounded-lg px-3 py-2.5 transition-colors",
-                      isCurrentSession
-                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                        : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                    )}
-                  >
-                    <span className="block truncate text-sm font-medium">{session.title}</span>
+              const content = (
+                <>
+                  <span className="block truncate text-sm font-medium">{session.title}</span>
+                  {isUnavailable ? (
+                    <span className="text-sidebar-foreground/60 text-xs">
+                      Documento indisponível
+                    </span>
+                  ) : (
                     <time dateTime={session.updated_at} className="mt-0.5 block text-xs opacity-65">
                       {dateLabel}
                     </time>
-                  </Link>
+                  )}
+                </>
+              );
+              return (
+                <li
+                  key={session.id}
+                  className={cn(
+                    "flex flex-wrap items-start rounded-lg transition-colors",
+                    isCurrentSession
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      : "text-sidebar-foreground/75 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                  )}
+                >
+                  {isUnavailable ? (
+                    <div className="min-w-0 flex-1 px-3 py-2.5">{content}</div>
+                  ) : (
+                    <Link
+                      to={`${scope === "cross_bula" ? "/chat" : `/bulas/${session.bula_id}/chat`}?${parameters.toString()}`}
+                      state={isSameBula && returnTo ? { returnTo } : undefined}
+                      aria-current={isCurrentSession ? "page" : undefined}
+                      onClick={onNavigate}
+                      title={session.title}
+                      className="block min-w-0 flex-1 rounded-lg px-3 py-2.5"
+                    >
+                      {content}
+                    </Link>
+                  )}
+                  <Suspense fallback={<span className="mt-1 mr-1 h-8 w-8 shrink-0" />}>
+                    <ConversationActions
+                      session={session}
+                      isDisabled={isCurrentSession && isCurrentSessionBusy}
+                      onDeleted={() => {
+                        if (isCurrentSession) {
+                          onStartNewSession?.();
+                          onNavigate?.();
+                        }
+                      }}
+                    />
+                  </Suspense>
                 </li>
               );
             })}
@@ -192,6 +237,9 @@ function ConversationGroup({
 export function RecentConversations(props: RecentConversationsProps): ReactElement {
   return (
     <nav aria-label="Conversas recentes" className="px-3 py-2">
+      <Accordion type="multiple" defaultValue={["pinned"]}>
+        <ConversationGroup scope="pinned" {...props} />
+      </Accordion>
       <p className="text-sidebar-foreground/60 px-2 py-2 text-xs font-semibold tracking-wide uppercase">
         Conversas recentes
       </p>
