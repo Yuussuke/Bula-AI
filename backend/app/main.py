@@ -20,6 +20,7 @@ from app.core.middleware import CorrelationIdMiddleware
 from app.core.pgqueuer import PGQ_QUERIES_STATE_KEY, create_pgq_queries
 from app.core.request_logging import RequestLoggingMiddleware
 from app.modules.auth.router import router as auth_router
+from app.modules.auth.administration_router import router as administration_router
 from app.modules.bulas.router import router as bulas_router
 from app.modules.chat.router import router as chat_router
 from app.modules.rag.bge_engine import BGEEngine
@@ -118,6 +119,7 @@ def create_app() -> FastAPI:
 
     app.include_router(bulas_router, prefix="/api/v1")
     app.include_router(auth_router, prefix="/api/v1")
+    app.include_router(administration_router, prefix="/api/v1")
     app.include_router(chat_router, prefix="/api/v1")
 
     return app

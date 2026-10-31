@@ -12,6 +12,7 @@ from app.modules.auth.service import AuthService, InvalidCredentialsError, Token
 from app.modules.auth.security import PasswordHasher
 from app.modules.auth.models import User, UserRole
 from app.modules.auth.password_breach import PasswordBreachChecker
+from app.modules.auth.administration import UserAdministrationService
 
 security = HTTPBearer(auto_error=False)
 
@@ -48,6 +49,12 @@ def get_password_breach_checker() -> PasswordBreachChecker:
 def get_user_repository(db: AsyncSession = Depends(get_db)) -> UserRepository:
     """FastAPI gets the database session and wires the User Repository."""
     return UserRepository(db=db)
+
+
+def get_user_administration_service(
+    repository: UserRepository = Depends(get_user_repository),
+) -> UserAdministrationService:
+    return UserAdministrationService(repository)
 
 
 def get_refresh_token_repository(
