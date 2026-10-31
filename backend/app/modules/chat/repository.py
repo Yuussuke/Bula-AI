@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import UUID
 
-from sqlalchemy import select
+from sqlalchemy import select, update, delete
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -171,6 +171,53 @@ class ChatRepository:
         result = await self.db.execute(statement)
         return result.scalar_one_or_none()
 
+    async def update_session_for_user(
+        self,
+        *,
+        session_id: UUID,
+        user_id: int,
+        title: str | None = None,
+        is_pinned: bool | None = None,
+    ) -> ChatSession | None:
+        statement = (
+            update(ChatSession)
+            .where(ChatSession.id == session_id, ChatSession.user_id == user_id)
+            .values(
+                title=title if title is not None else ChatSession.title,
+                is_pinned=is_pinned if is_pinned is not None else ChatSession.is_pinned,
+                # Pinning is an organizational preference, not a new conversation turn.
+                updated_at=datetime.now(timezone.utc)
+                if title is not None
+                else ChatSession.updated_at,
+            )
+            .returning(ChatSession)
+            .execution_options(populate_existing=True)
+        )
+        try:
+            result = await self.db.execute(statement)
+            session = result.scalar_one_or_none()
+            await self.db.commit()
+        except SQLAlchemyError as exc:
+            await self.db.rollback()
+            raise ChatPersistenceError() from exc
+        return session
+
+    async def delete_session_for_user(self, *, session_id: UUID, user_id: int) -> bool:
+        # The existing FK cascade removes only this conversation's messages.
+        statement = (
+            delete(ChatSession)
+            .where(ChatSession.id == session_id, ChatSession.user_id == user_id)
+            .returning(ChatSession.id)
+        )
+        try:
+            result = await self.db.execute(statement)
+            deleted_session_id = result.scalar_one_or_none()
+            await self.db.commit()
+        except SQLAlchemyError as exc:
+            await self.db.rollback()
+            raise ChatPersistenceError() from exc
+        return deleted_session_id is not None
+
     async def get_session_history(self, *, session_id: UUID) -> list[ChatMessage]:
         statement = (
             select(ChatMessage)
@@ -205,12 +252,15 @@ class ChatRepository:
         scope: ChatScope | None = None,
         bula_id: UUID | None = None,
         sort: SessionSortOrder = "created_at",
+        is_pinned: bool | None = None,
     ) -> list[ChatSession]:
         filters = [ChatSession.user_id == user_id]
         if scope is not None:
             filters.append(ChatSession.scope == scope.value)
         if bula_id is not None:
             filters.append(ChatSession.bula_id == bula_id)
+        if is_pinned is not None:
+            filters.append(ChatSession.is_pinned == is_pinned)
         order_column = (
             ChatSession.updated_at if sort == "updated_at" else ChatSession.created_at
         )

@@ -343,6 +343,7 @@ class ChatService:
         scope: ChatScope | None = None,
         bula_id: UUID | None = None,
         sort: SessionSortOrder = "created_at",
+        is_pinned: bool | None = None,
     ) -> list[ChatSession]:
         return await self.chat_repository.list_user_sessions(
             user_id=user_id,
@@ -351,6 +352,7 @@ class ChatService:
             scope=scope,
             bula_id=bula_id,
             sort=sort,
+            is_pinned=is_pinned,
         )
 
     async def get_session_with_history(
@@ -370,6 +372,32 @@ class ChatService:
             session_id=session_id,
         )
         return chat_session, messages
+
+    async def update_session_for_user(
+        self,
+        *,
+        session_id: UUID,
+        user_id: int,
+        title: str | None = None,
+        is_pinned: bool | None = None,
+    ) -> ChatSession:
+        session = await self.chat_repository.update_session_for_user(
+            session_id=session_id,
+            user_id=user_id,
+            title=title,
+            is_pinned=is_pinned,
+        )
+        if session is None:
+            raise ChatSessionNotFoundError()
+        return session
+
+    async def delete_session_for_user(self, *, session_id: UUID, user_id: int) -> None:
+        is_deleted = await self.chat_repository.delete_session_for_user(
+            session_id=session_id,
+            user_id=user_id,
+        )
+        if not is_deleted:
+            raise ChatSessionNotFoundError()
 
     async def answer_question(
         self,

@@ -12,6 +12,7 @@ from pydantic import (
     HttpUrl,
     SerializerFunctionWrapHandler,
     model_serializer,
+    model_validator,
 )
 
 from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, ChatScope
@@ -93,6 +94,32 @@ class ChatSessionCreate(BaseModel):
     bula_id: UUID | None = None
 
 
+class ChatSessionUpdate(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    title: str | None = Field(default=None, min_length=1, max_length=50)
+    is_pinned: bool | None = None
+
+    @field_validator("title", mode="before")
+    @classmethod
+    def strip_title(cls, value: object) -> object:
+        return value.strip() if isinstance(value, str) else value
+
+    @model_validator(mode="after")
+    def require_changes(self) -> "ChatSessionUpdate":
+        if not self.model_fields_set or any(
+            getattr(self, field) is None for field in self.model_fields_set
+        ):
+            raise ValueError(
+                "Provide a title or a pin preference; null is not allowed."
+            )
+        return self
+
+
+class ChatSessionDeletedResponse(BaseModel):
+    session_id: UUID
+
+
 class ChatSessionResponse(BaseModel):
     id: UUID
     user_id: int
@@ -100,6 +127,7 @@ class ChatSessionResponse(BaseModel):
     scope: ChatScope = ChatScope.BULA
     catalog_scope: PublicCatalogScope = PublicCatalogScope.ALL
     title: str
+    is_pinned: bool = False
     created_at: datetime
     updated_at: datetime
 
@@ -121,6 +149,7 @@ class ChatSessionResponse(BaseModel):
             scope=ChatScope(session.scope),
             catalog_scope=PublicCatalogScope(session.catalog_scope),
             title=session.title,
+            is_pinned=session.is_pinned,
             created_at=session.created_at,
             updated_at=session.updated_at,
             messages=[

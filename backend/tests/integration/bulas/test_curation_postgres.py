@@ -260,7 +260,7 @@ async def test_postgres_migration_preserves_accounts_and_guards_contributor_down
             revision = await connection.run_sync(
                 lambda sync: MigrationContext.configure(sync).get_current_revision()
             )
-            assert revision == "e610a130b003"
+            assert revision == "e610a130b004"
         async with sessions() as database:
             user = await database.scalar(select(User).where(User.email == email))
             assert user is not None and user.role == UserRole.CONTRIBUTOR
@@ -537,11 +537,13 @@ async def test_catalog_migration_preserves_old_sessions_and_prevents_scope_loss(
             general = await database.get(ChatSession, general_id)
             orphaned = await database.get(ChatSession, orphaned_id)
             assert general is not None and general.catalog_scope == "all"
+            assert general.is_pinned is False
             assert (
                 orphaned is not None
                 and orphaned.scope == "bula"
                 and orphaned.bula_id is None
             )
+            assert orphaned.is_pinned is False
             general.catalog_scope = "shared"
             await database.commit()
         with pytest.raises(RuntimeError, match="Cannot discard catalog boundaries"):
