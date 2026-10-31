@@ -54,11 +54,17 @@ class PublishedEvidenceRetriever(BaseRetriever):
             chunk = canonical_chunks.get(chunk_id)
             if chunk is None or chunk.bula_id not in self.sources:
                 continue
-            if chunk.doc_id != str(chunk.bula_id) or chunk.corpus.value != "system":
+            source_corpus = self.sources[chunk.bula_id].get("corpus", "system")
+            if source_corpus not in {"system", "shared"}:
+                continue
+            if (
+                chunk.doc_id != str(chunk.bula_id)
+                or chunk.corpus.value != source_corpus
+            ):
                 continue
             if str(document.metadata.get("bula_id", "")) != str(chunk.bula_id):
                 continue
-            if document.metadata.get("corpus") != "system":
+            if document.metadata.get("corpus") != source_corpus:
                 continue
             if without_front_matter(document.page_content) != without_front_matter(
                 chunk.chunk_text

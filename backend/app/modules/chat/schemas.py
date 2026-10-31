@@ -27,6 +27,7 @@ class ChatMessageCreate(BaseModel):
 
 
 class SourceChunkResponse(BaseModel):
+    corpus: Literal["system", "shared", "private"] | None = None
     chunk_id: str | None = None
     bula_id: UUID | None = None
     drug_name: str | None = None
@@ -50,6 +51,7 @@ class SourceChunkResponse(BaseModel):
 
 
 class SourceBulaResponse(BaseModel):
+    corpus: Literal["system", "shared", "private"] | None = None
     bula_id: UUID
     drug_name: str
     manufacturer: str | None = None

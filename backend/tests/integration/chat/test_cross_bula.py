@@ -55,6 +55,7 @@ def install_factory(
     responses: list[str],
     observed_scopes: list[tuple[UUID, ...]],
     reranker: ResidentReranker | None = None,
+    scoped_bula_id: UUID | None = None,
 ) -> None:
     def build(
         *,
@@ -63,8 +64,12 @@ def install_factory(
         k: int,
         allowed_bula_ids: tuple[UUID, ...] | None = None,
     ) -> BaseRetriever:
-        assert bula_id is None
-        assert corpus == (BulaCorpus.SYSTEM,)
+        assert bula_id == scoped_bula_id
+        assert corpus == (
+            (BulaCorpus.SYSTEM, BulaCorpus.SHARED)
+            if scoped_bula_id is None
+            else (BulaCorpus.SHARED,)
+        )
         assert allowed_bula_ids is not None
         observed_scopes.append(allowed_bula_ids)
         return SourceRetriever(documents=documents[:k])
@@ -81,7 +86,11 @@ def install_factory(
 
 
 async def add_chunk(
-    db: AsyncSession, bula_id: UUID, text: str, suffix: str = "a"
+    db: AsyncSession,
+    bula_id: UUID,
+    text: str,
+    suffix: str = "a",
+    corpus: str = "system",
 ) -> Document:
     chunk_id = f"{bula_id}:{suffix}"
     db.add(
@@ -89,7 +98,7 @@ async def add_chunk(
             chunk_id=chunk_id,
             doc_id=str(bula_id),
             bula_id=bula_id,
-            corpus="system",
+            corpus=corpus,
             drug_name="Produto",
             section_title="Advertências",
             chunk_text=text,
@@ -102,7 +111,7 @@ async def add_chunk(
         metadata={
             "chunk_id": chunk_id,
             "bula_id": str(bula_id),
-            "corpus": "system",
+            "corpus": corpus,
             "section_title": "Advertências",
             "score": 0.5,
         },

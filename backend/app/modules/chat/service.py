@@ -4,11 +4,12 @@ from uuid import UUID
 import structlog
 
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+from langchain_core.runnables import Runnable
 from pydantic import ValidationError, HttpUrl
 
 from app.modules.bulas.repository import BulaRepository
 from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, ChatScope
-from app.modules.bulas.models import Bula
+from app.modules.bulas.models import Bula, BulaCorpus
 from app.modules.chat.repository import ChatRepository
 from app.modules.chat.schemas import (
     AskRequest,
@@ -19,6 +20,7 @@ from app.modules.chat.schemas import (
     SessionSortOrder,
 )
 from app.modules.rag.chain import RAGChainFactory, NO_CONTEXT_MESSAGE
+from app.modules.rag.retrieval_mode import RetrievalMode
 
 
 class ChatChainOutputError(RuntimeError):
@@ -83,6 +85,26 @@ class ChatService:
         )
 
     def _published_source_metadata(self, bula: Bula) -> dict[str, str]:
+        if bula.corpus == BulaCorpus.SHARED:
+            shared = bula.shared_submission
+            if shared is None:
+                raise PublishedSourceIntegrityError(
+                    "Shared source is missing provenance."
+                )
+            metadata = {
+                "drug_name": bula.drug_name,
+                "corpus": "shared",
+                "source_url": str(HttpUrl(shared.source_url)),
+                "content_sha256": shared.sha256_checksum,
+            }
+            for key, value in (
+                ("presentation", shared.presentation),
+                ("strength", shared.strength),
+                ("manufacturer", bula.manufacturer),
+            ):
+                if value:
+                    metadata[key] = value
+            return metadata
         publication = bula.system_publication
         if publication is None:
             raise PublishedSourceIntegrityError(
@@ -102,7 +124,7 @@ class ChatService:
     async def _answer_cross_bula(
         self, *, payload: AskRequest, chat_history: list[BaseMessage] | None = None
     ) -> tuple[str, list[SourceChunkResponse]]:
-        bulas = await self.bula_repository.list_queryable_system_bulas()
+        bulas = await self.bula_repository.list_queryable_public_bulas()
         sources = {bula.id: self._published_source_metadata(bula) for bula in bulas}
         if not sources:
             logger.info(
@@ -118,6 +140,19 @@ class ChatService:
             {"question": payload.question, "chat_history": chat_history or []}
         )
         answer, source_chunks = self._parse_chain_result(chain_result)
+        await self._validate_public_response(
+            sources=sources, source_chunks=source_chunks
+        )
+        return answer, source_chunks
+
+    async def _validate_public_response(
+        self,
+        *,
+        sources: dict[UUID, dict[str, str]] | None,
+        source_chunks: list[SourceChunkResponse],
+    ) -> None:
+        if sources is None:
+            return
         for chunk in source_chunks:
             if not chunk.chunk_id or chunk.bula_id not in sources:
                 raise ChatChainOutputError(
@@ -136,7 +171,7 @@ class ChatService:
             selected_bula_ids = {
                 chunk.bula_id for chunk in source_chunks if chunk.bula_id is not None
             }
-            current_bulas = await self.bula_repository.list_queryable_system_bulas(
+            current_bulas = await self.bula_repository.list_queryable_public_bulas(
                 bula_ids=sorted(selected_bula_ids)
             )
             current_sources = {
@@ -148,7 +183,19 @@ class ChatService:
                 if chunk.bula_id is not None
             ):
                 raise PublishedSourcesChangedError()
-        return answer, source_chunks
+
+    def _build_bula_chain(
+        self, *, bula: Bula, mode: RetrievalMode
+    ) -> tuple[
+        Runnable[dict[str, object], dict[str, object]],
+        dict[UUID, dict[str, str]] | None,
+    ]:
+        if bula.corpus != BulaCorpus.SHARED:
+            return self.chain_factory.build_chain(bula_id=bula.id, mode=mode), None
+        sources = {bula.id: self._published_source_metadata(bula)}
+        return self.chain_factory.build_chain(
+            bula_id=bula.id, mode=mode, sources=sources
+        ), sources
 
     async def ask_bula_question(
         self,
@@ -164,7 +211,7 @@ class ChatService:
         if bula is None:
             raise QueryableBulaNotFoundError()
 
-        chain = self.chain_factory.build_chain(bula_id=bula_id, mode=payload.mode)
+        chain, sources = self._build_bula_chain(bula=bula, mode=payload.mode)
         chain_result = await chain.ainvoke(
             {
                 "question": payload.question,
@@ -172,6 +219,9 @@ class ChatService:
             }
         )
         answer, source_chunks = self._parse_chain_result(chain_result)
+        await self._validate_public_response(
+            sources=sources, source_chunks=source_chunks
+        )
 
         chat_session, _, _ = await self.chat_repository.create_session_with_messages(
             user_id=user_id,
@@ -239,9 +289,7 @@ class ChatService:
             message_limit=MAX_PRIOR_CHAT_MESSAGES,
         )
         chat_history = self._build_chat_history(previous_messages)
-        chain = self.chain_factory.build_chain(
-            bula_id=chat_session.bula_id, mode=payload.mode
-        )
+        chain, sources = self._build_bula_chain(bula=bula, mode=payload.mode)
         chain_result = await chain.ainvoke(
             {
                 "question": payload.question,
@@ -250,6 +298,9 @@ class ChatService:
             }
         )
         answer, source_chunks = self._parse_chain_result(chain_result)
+        await self._validate_public_response(
+            sources=sources, source_chunks=source_chunks
+        )
 
         await self.chat_repository.add_turn(
             session=chat_session,

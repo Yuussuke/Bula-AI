@@ -7,6 +7,12 @@ from app.core.pgqueuer import get_pgq_queries
 from app.modules.bulas.queue import BulaIngestionQueue
 from app.modules.bulas.repository import BulaRepository
 from app.modules.bulas.service import BulaService
+from app.modules.bulas.curation_repository import CurationRepository
+from app.modules.bulas.curation_service import CurationService
+from app.modules.bulas.curation_queue_repository import (
+    CurationIngestionQueue,
+    CurationQueueRepository,
+)
 from app.modules.storage.client import ObjectStoreClient
 from app.modules.storage.dependencies import get_object_store_client
 from pgqueuer.queries import Queries
@@ -32,5 +38,24 @@ def get_bula_service(
         bula_repo=repo,
         object_store=object_store,
         ingestion_queue=ingestion_queue,
+        max_upload_size_bytes=settings.max_bula_upload_size_bytes,
+    )
+
+
+def get_curation_queue_repository(
+    db: AsyncSession = Depends(get_db),
+) -> CurationIngestionQueue:
+    return CurationQueueRepository(db)
+
+
+def get_curation_service(
+    db: AsyncSession = Depends(get_db),
+    object_store: ObjectStoreClient = Depends(get_object_store_client),
+    ingestion_queue: CurationIngestionQueue = Depends(get_curation_queue_repository),
+    settings: Settings = Depends(get_settings),
+) -> CurationService:
+    return CurationService(
+        repository=CurationRepository(db, queue=ingestion_queue),
+        object_store=object_store,
         max_upload_size_bytes=settings.max_bula_upload_size_bytes,
     )

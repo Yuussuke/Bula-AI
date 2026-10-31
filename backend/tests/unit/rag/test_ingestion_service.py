@@ -12,6 +12,7 @@ from app.modules.bulas.models import (
     Bula,
     BulaCorpus,
     BulaStatus,
+    SharedBulaSubmission,
     SystemBulaPublication,
     SystemBulaPublicationState,
 )
@@ -314,8 +315,22 @@ async def test_bm25_failure_never_marks_ready_and_retry_succeeds() -> None:
 
 
 @pytest.mark.anyio
-async def test_ingest_private_bula_persists_parser_metadata_before_indexing() -> None:
+@pytest.mark.parametrize("corpus", [BulaCorpus.PRIVATE, BulaCorpus.SHARED])
+async def test_ingest_uploaded_bula_persists_parser_metadata_before_indexing(
+    corpus: BulaCorpus,
+) -> None:
     bula = build_bula()
+    bula.corpus = corpus
+    if corpus == BulaCorpus.SHARED:
+        bula.drug_name = "Nome conferido pelo Curador"
+        bula.manufacturer = "Fabricante conferido"
+        bula.shared_submission = SharedBulaSubmission(
+            review_status="approved",
+            sha256_checksum=FAKE_PDF_CHECKSUM,
+            content_size_bytes=len(FAKE_PDF_BYTES),
+            source_url="https://example.com/bula.pdf",
+            source_description="Reviewed source",
+        )
     repo = FakeBulaRepository(bula)
     qdrant_store = FakeQdrantStore()
     parser = FakeParser(
@@ -328,11 +343,47 @@ async def test_ingest_private_bula_persists_parser_metadata_before_indexing() ->
 
     result = await service.ingest_bula(bula_id=BULA_ID)
 
-    assert result.drug_name == "DIPIRONA MONOIDRATADA"
-    assert result.manufacturer == "Sanofi Medley"
-    assert repo.metadata_updates == [("DIPIRONA MONOIDRATADA", "Sanofi Medley")]
-    assert qdrant_store.upserted_payloads[0]["drug_name"] == "DIPIRONA MONOIDRATADA"
-    assert qdrant_store.upserted_payloads[0]["manufacturer"] == "Sanofi Medley"
+    expected_name = (
+        "DIPIRONA MONOIDRATADA"
+        if corpus == BulaCorpus.PRIVATE
+        else "Nome conferido pelo Curador"
+    )
+    expected_manufacturer = (
+        "Sanofi Medley" if corpus == BulaCorpus.PRIVATE else "Fabricante conferido"
+    )
+    assert result.drug_name == expected_name
+    assert result.manufacturer == expected_manufacturer
+    assert repo.metadata_updates == (
+        [(expected_name, expected_manufacturer)] if corpus == BulaCorpus.PRIVATE else []
+    )
+    assert qdrant_store.upserted_payloads[0]["drug_name"] == expected_name
+    assert qdrant_store.upserted_payloads[0]["manufacturer"] == expected_manufacturer
+    assert qdrant_store.upserted_payloads[0]["corpus"] == corpus.value
+
+
+@pytest.mark.anyio
+@pytest.mark.parametrize("defect", ["unreviewed", "changed_pdf"])
+async def test_shared_ingestion_rejects_unreviewed_or_changed_source_before_embeddings(
+    defect: str,
+) -> None:
+    bula = build_bula()
+    bula.corpus = BulaCorpus.SHARED
+    bula.shared_submission = SharedBulaSubmission(
+        review_status="pending" if defect == "unreviewed" else "approved",
+        sha256_checksum=FAKE_PDF_CHECKSUM if defect == "unreviewed" else "0" * 64,
+        content_size_bytes=len(FAKE_PDF_BYTES),
+        source_url="https://example.com/bula.pdf",
+        source_description="Synthetic source",
+    )
+    embeddings = FakeEmbeddings()
+    qdrant_store = FakeQdrantStore()
+    service = build_service(
+        repo=FakeBulaRepository(bula), embeddings=embeddings, qdrant_store=qdrant_store
+    )
+    with pytest.raises(BulaIngestionError):
+        await service.ingest_bula(bula_id=BULA_ID)
+    assert embeddings.texts == []
+    assert qdrant_store.upserted_payloads == []
 
 
 @pytest.mark.anyio
