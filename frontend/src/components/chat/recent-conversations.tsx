@@ -10,6 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getChatSessionPath } from "@/lib/chat-navigation";
@@ -103,13 +104,13 @@ function ConversationGroup({
             className="w-full justify-start gap-2"
             onClick={handleStartNewSession}
           >
-            <MessageSquarePlus aria-hidden="true" className="h-4 w-4" />
+            <AnimatedIcon icon={MessageSquarePlus} effect="conversation" className="h-4 w-4" />
             {startLabel}
           </Button>
         ) : (
           <Button asChild variant="ghost" size="sm" className="w-full justify-start gap-2">
             <Link to={scope === "cross_bula" ? "/chat" : "/catalogo"} onClick={onNavigate}>
-              <MessageSquarePlus aria-hidden="true" className="h-4 w-4" />
+              <AnimatedIcon icon={MessageSquarePlus} effect="conversation" className="h-4 w-4" />
               {scope === "cross_bula" ? startLabel : "Escolher medicamento"}
             </Link>
           </Button>

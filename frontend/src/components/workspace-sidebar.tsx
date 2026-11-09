@@ -5,6 +5,7 @@ import { NavLink } from "react-router-dom";
 import { BrandLogo } from "@/components/brand-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ActionHint } from "@/components/ui/action-hint";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { Button } from "@/components/ui/button";
 import { UserInitialsAvatar } from "@/components/user-initials-avatar";
 import { cn } from "@/lib/utils";
@@ -66,7 +67,7 @@ export function WorkspaceSidebar({
             <ActionHint label="Bula AI — início">
               <Button asChild variant="ghost" size="icon" className={sidebarShortcutClass}>
                 <NavLink to="/" end aria-label="Início">
-                  <BrandLogo variant="white" className="h-7 w-9" />
+                  <BrandLogo variant="white" className="size-10" />
                 </NavLink>
               </Button>
             </ActionHint>
@@ -81,9 +82,9 @@ export function WorkspaceSidebar({
                 onClick={() => setCollapsed(!isCollapsed)}
               >
                 {isCollapsed ? (
-                  <PanelLeftOpen aria-hidden="true" />
+                  <AnimatedIcon icon={PanelLeftOpen} effect="panel" />
                 ) : (
-                  <PanelLeftClose aria-hidden="true" />
+                  <AnimatedIcon icon={PanelLeftClose} effect="panel" />
                 )}
               </Button>
             </ActionHint>

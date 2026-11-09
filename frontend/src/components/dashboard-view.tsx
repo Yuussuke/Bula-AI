@@ -15,9 +15,11 @@ import { type ReactElement, useCallback, useMemo, useRef, useState } from "react
 import { Link, NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 
 import { BrandLogo } from "@/components/brand-logo";
+import { CapsuleBackground } from "@/components/capsule-background";
 import { RecentConversations } from "@/components/chat/recent-conversations";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { ActionHint } from "@/components/ui/action-hint";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -126,7 +128,7 @@ export function DashboardView(): ReactElement {
                 )
               }
             >
-              <Icon aria-hidden="true" className="h-4 w-4" />
+              <AnimatedIcon icon={Icon} effect="nudge" className="h-4 w-4" />
               {label}
             </NavLink>
           ))}
@@ -166,7 +168,7 @@ export function DashboardView(): ReactElement {
                       startNewSession.current ? startNewSession.current() : void navigate("/chat")
                     }
                   >
-                    <MessageSquarePlus aria-hidden="true" />
+                    <AnimatedIcon icon={MessageSquarePlus} effect="conversation" />
                   </Button>
                 </ActionHint>
                 {visibleNavigation
@@ -193,7 +195,7 @@ export function DashboardView(): ReactElement {
                           "aria-[current=page]:bg-sidebar-accent aria-[current=page]:text-sidebar-accent-foreground"
                         )}
                       >
-                        <Icon aria-hidden="true" className="h-4 w-4" />
+                        <AnimatedIcon icon={Icon} effect="nudge" className="h-4 w-4" />
                       </NavLink>
                     </ActionHint>
                   ))}
@@ -205,7 +207,7 @@ export function DashboardView(): ReactElement {
                     aria-label="Mostrar conversas recentes"
                     onClick={() => setCollapsed(false)}
                   >
-                    <History aria-hidden="true" />
+                    <AnimatedIcon icon={History} effect="history" />
                   </Button>
                 </ActionHint>
               </>
@@ -236,6 +238,7 @@ export function DashboardView(): ReactElement {
           </SheetContent>
         </Sheet>
         <div className="@container relative isolate flex min-w-0 flex-1 flex-col">
+          <CapsuleBackground />
           <div
             className={cn(
               "pointer-events-none absolute inset-x-0 top-3 z-20 flex items-center gap-2 px-4 sm:gap-4 sm:px-6",
@@ -263,7 +266,7 @@ export function DashboardView(): ReactElement {
               onClick={() => logoutMutation.mutate()}
               disabled={logoutMutation.isPending}
             >
-              <LogOut aria-hidden="true" className="mr-2 h-4 w-4" />
+              <AnimatedIcon icon={LogOut} effect="logout" className="mr-2 h-4 w-4" />
               {logoutMutation.isPending ? "Saindo..." : "Sair"}
             </Button>
           </div>

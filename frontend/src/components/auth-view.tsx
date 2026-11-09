@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import { BrandLogo } from "@/components/brand-logo";
+import { CapsuleBackground } from "@/components/capsule-background";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Field, FieldGroup, FieldLabel } from "@/components/ui/field";
@@ -79,22 +81,22 @@ export function AuthView() {
   };
 
   return (
-    <div className="bg-background flex min-h-screen items-center justify-center p-4">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="bg-primary/5 absolute top-1/4 -left-20 h-72 w-72 rounded-full blur-3xl" />
-        <div className="bg-accent/5 absolute -right-20 bottom-1/4 h-96 w-96 rounded-full blur-3xl" />
+    <div className="bg-background relative isolate flex min-h-screen items-center justify-center p-4 py-14">
+      <div className="fixed top-4 right-4 z-20">
+        <ThemeToggle />
       </div>
+      <CapsuleBackground />
 
       <div className="relative z-10 w-full max-w-md">
         <div className="mb-8 text-center">
-          <BrandLogo className="mx-auto mb-4 h-20 w-24" />
-          <h1 className="text-foreground text-3xl font-bold tracking-tight">Bula AI</h1>
-          <p className="text-muted-foreground mt-2">
+          <BrandLogo className="mx-auto mb-4 h-16 w-20 dark:brightness-0 dark:invert" />
+          <h1 className="text-foreground text-3xl font-semibold tracking-tight">Bula AI</h1>
+          <p className="text-muted-foreground mt-2 text-sm">
             Inteligência artificial para bulas de medicamentos
           </p>
         </div>
 
-        <Card className="border-border/50 shadow-primary/5 shadow-xl">
+        <Card className="border-border rounded-2xl shadow-sm">
           <CardHeader className="pb-2 text-center">
             <CardTitle className="text-xl">Bem-vindo</CardTitle>
             <CardDescription>Acesse sua conta ou crie uma nova</CardDescription>
@@ -217,13 +219,13 @@ export function AuthView() {
           </CardContent>
         </Card>
 
-        <div className="text-muted-foreground mt-8 grid grid-cols-2 gap-4 text-center text-sm">
-          <div className="bg-card/50 flex flex-col items-center gap-2 rounded-lg p-4">
+        <div className="text-muted-foreground mt-6 grid grid-cols-2 gap-4 text-center text-xs">
+          <div className="flex flex-col items-center gap-2 p-3">
             <Shield className="text-primary h-5 w-5" />
             <span>Dados seguros e protegidos</span>
           </div>
-          <div className="bg-card/50 flex flex-col items-center gap-2 rounded-lg p-4">
-            <Sparkles className="text-accent h-5 w-5" />
+          <div className="flex flex-col items-center gap-2 p-3">
+            <Sparkles className="text-primary h-5 w-5" />
             <span>IA de última geração</span>
           </div>
         </div>

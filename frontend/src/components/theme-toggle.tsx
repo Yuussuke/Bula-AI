@@ -1,13 +1,16 @@
 import { Moon, Sun } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useTheme } from "next-themes";
 import type { ReactElement } from "react";
 
 import { ActionHint } from "@/components/ui/action-hint";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function ThemeToggle({ className }: { className?: string }): ReactElement {
   const { resolvedTheme, setTheme } = useTheme();
+  const shouldReduceMotion = useReducedMotion();
   const isDark = resolvedTheme === "dark";
   const label = isDark ? "Ativar tema claro" : "Ativar tema escuro";
   return (
@@ -21,14 +24,19 @@ export function ThemeToggle({ className }: { className?: string }): ReactElement
         aria-pressed={isDark}
         onClick={() => setTheme(isDark ? "light" : "dark")}
       >
-        <Sun
-          aria-hidden="true"
-          className="h-4 w-4 scale-100 rotate-0 opacity-100 transition-[transform,opacity] duration-300 motion-reduce:transition-none dark:scale-0 dark:-rotate-90 dark:opacity-0"
-        />
-        <Moon
-          aria-hidden="true"
-          className="absolute h-4 w-4 scale-0 rotate-90 opacity-0 transition-[transform,opacity] duration-300 motion-reduce:transition-none dark:scale-100 dark:rotate-0 dark:opacity-100"
-        />
+        <AnimatePresence initial={false} mode="wait">
+          <motion.span
+            key={isDark ? "moon" : "sun"}
+            aria-hidden="true"
+            className="inline-flex"
+            initial={{ opacity: 0, rotate: -90, scale: 0.5 }}
+            animate={{ opacity: 1, rotate: 0, scale: 1 }}
+            exit={{ opacity: 0, rotate: 90, scale: 0.5 }}
+            transition={{ duration: shouldReduceMotion ? 0 : 0.18 }}
+          >
+            <AnimatedIcon icon={isDark ? Moon : Sun} effect="theme" animateOnMount />
+          </motion.span>
+        </AnimatePresence>
       </Button>
     </ActionHint>
   );
