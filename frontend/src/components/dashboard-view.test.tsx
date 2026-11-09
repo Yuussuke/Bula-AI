@@ -27,7 +27,7 @@ vi.mock("@/api/bulas", () => ({
   uploadBula: vi.fn(),
 }));
 
-vi.mock("@/api/chat", () => ({ listChatSessions: vi.fn() }));
+vi.mock("@/api/chat", () => ({ listChatSessions: vi.fn(), getChatSession: vi.fn() }));
 
 const BULA_ID = "11111111-1111-4111-8111-111111111111";
 const searchPublicCatalogMock = vi.mocked(searchPublicCatalog);
