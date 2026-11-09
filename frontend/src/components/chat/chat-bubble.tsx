@@ -12,9 +12,10 @@ const MessageMarkdown = memo(lazy(() => import("@/components/chat/message-markdo
 
 interface ChatBubbleProps {
   message: ChatTimelineMessage;
+  isLoading?: boolean;
 }
 
-export function ChatBubble({ message }: ChatBubbleProps): ReactElement {
+export function ChatBubble({ message, isLoading = false }: ChatBubbleProps): ReactElement {
   const isUserMessage = message.role === "user";
   const authorLabel = isUserMessage ? "Você" : "Bula AI";
   const isTransientMessage = message.deliveryStatus !== undefined;
@@ -36,13 +37,13 @@ export function ChatBubble({ message }: ChatBubbleProps): ReactElement {
       )}
     >
       <div
-        aria-hidden="true"
+        aria-hidden={isUserMessage ? true : undefined}
         className={cn(
           "flex shrink-0 items-center justify-center rounded-full",
-          isUserMessage ? "bg-primary text-primary-foreground h-8 w-8" : "h-10 w-10"
+          isUserMessage ? "bg-primary text-primary-foreground h-8 w-8" : "h-12 w-12"
         )}
       >
-        {isUserMessage ? <User className="h-4 w-4" /> : <AssistantAvatar />}
+        {isUserMessage ? <User className="h-4 w-4" /> : <AssistantAvatar isLoading={isLoading} />}
       </div>
       <div
         className={cn(
@@ -52,7 +53,9 @@ export function ChatBubble({ message }: ChatBubbleProps): ReactElement {
             : "bg-card border-border text-card-foreground border"
         )}
       >
-        {isUserMessage ? (
+        {isLoading ? (
+          <p role="status">{message.content}</p>
+        ) : isUserMessage ? (
           <p className="leading-relaxed whitespace-pre-wrap">{message.content}</p>
         ) : (
           <Suspense
@@ -74,8 +77,8 @@ export function ChatBubble({ message }: ChatBubbleProps): ReactElement {
         {message.deliveryStatus === "failed" ? (
           <p className="text-primary-foreground/85 text-right text-xs">Não foi possível enviar</p>
         ) : null}
-        {!isUserMessage && <ModeIndicator mode={message.retrievalMode ?? null} />}
-        {!isUserMessage && (
+        {!isUserMessage && !isLoading && <ModeIndicator mode={message.retrievalMode ?? null} />}
+        {!isUserMessage && !isLoading && (
           <SourceChunks
             sourceChunks={message.sourceChunks}
             messageId={message.id}

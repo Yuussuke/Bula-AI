@@ -10,6 +10,7 @@ import { ChatComposer } from "@/components/chat/chat-composer";
 import { ChatMessageList } from "@/components/chat/chat-message-list";
 import { ChatSessionNavigation } from "@/components/chat/chat-session-navigation";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -289,7 +290,7 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
                 aria-label="Abrir conversas"
                 onClick={() => setIsMobileSessionsOpen(true)}
               >
-                <History aria-hidden="true" className="h-5 w-5" />
+                <AnimatedIcon icon={History} effect="history" className="h-5 w-5" />
               </Button>
               <Button asChild variant="ghost" size="icon" aria-label="Voltar para as bulas">
                 <Link to={returnTo}>

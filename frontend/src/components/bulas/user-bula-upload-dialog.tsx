@@ -2,6 +2,7 @@ import { AlertCircle, Loader2, Upload } from "lucide-react";
 import { type FormEvent, type ReactElement, useState } from "react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -64,7 +65,7 @@ export function UserBulaUploadDialog(): ReactElement {
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button type="button" className="gap-2">
-          <Upload aria-hidden="true" className="h-4 w-4" />
+          <AnimatedIcon icon={Upload} effect="upload" className="h-4 w-4" />
           Enviar bula
         </Button>
       </DialogTrigger>

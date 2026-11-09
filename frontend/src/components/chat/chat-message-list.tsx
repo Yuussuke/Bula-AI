@@ -1,4 +1,4 @@
-import { ArrowDown, Loader2 } from "lucide-react";
+import { ArrowDown } from "lucide-react";
 import { type ReactElement, useEffect, useRef, useState } from "react";
 
 import type { ChatScope } from "@/api/chat";
@@ -79,6 +79,29 @@ export function ChatMessageList({
           { label: "Como conservar?", question: "Como devo conservar este medicamento?" },
         ];
 
+  // Keep the reply row mounted from loading to completion so its avatar can settle.
+  const displayedMessages = messages.map((message, index) => ({
+    message,
+    key:
+      message.role === "assistant" && messages[index - 1]?.role === "user"
+        ? `reply:${messages[index - 1].id}`
+        : message.id,
+    isLoading: false,
+  }));
+  if (isResponding && messages.at(-1)?.role !== "assistant") {
+    const key = `reply:${messages.at(-1)?.id ?? "pending"}`;
+    displayedMessages.push({
+      key,
+      isLoading: true,
+      message: {
+        id: key,
+        role: "assistant",
+        content: "Bula AI está preparando a resposta…",
+        sourceChunks: [],
+      },
+    });
+  }
+
   return (
     <div className="relative min-h-0 flex-1">
       <div
@@ -140,19 +163,9 @@ export function ChatMessageList({
             </div>
           ) : null}
 
-          {messages.map((message) => (
-            <ChatBubble key={message.id} message={message} />
+          {displayedMessages.map(({ key, message, isLoading }) => (
+            <ChatBubble key={key} message={message} isLoading={isLoading} />
           ))}
-
-          {isResponding ? (
-            <div role="status" className="flex items-center gap-3">
-              <AssistantAvatar />
-              <div className="bg-card border-border flex items-center gap-2 rounded-xl border px-4 py-3 text-sm">
-                <Loader2 aria-hidden="true" className="text-primary h-4 w-4 animate-spin" />
-                <span>Bula AI está preparando a resposta…</span>
-              </div>
-            </div>
-          ) : null}
         </div>
       </div>
       {!isAtBottom ? (

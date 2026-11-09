@@ -11,6 +11,7 @@ import {
 
 import type { ChatScope } from "@/api/chat";
 import { MedicalWarning } from "@/components/medical-warning";
+import { AnimatedIcon } from "@/components/ui/animated-icon";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -99,7 +100,7 @@ export function ChatComposer({
             title="Enviar (Enter)"
             className="h-11 shrink-0 gap-2 rounded-xl px-3 sm:px-4"
           >
-            <Send aria-hidden="true" className="h-4 w-4" />
+            <AnimatedIcon icon={Send} effect="send" className="h-4 w-4" />
             <span className="hidden sm:inline">Enviar</span>
           </Button>
         </div>
