@@ -28,6 +28,7 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { WorkspaceSearch } from "@/components/workspace-search";
 import { sidebarShortcutClass, WorkspaceSidebar } from "@/components/workspace-sidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { logoutRequest } from "@/lib/api";
@@ -257,7 +258,9 @@ export function DashboardView(): ReactElement {
                 <Menu aria-hidden="true" className="h-5 w-5" />
               </Button>
             </div>
-            <div className="min-w-0 flex-1" />
+            <div className="min-w-0 flex-1">
+              <WorkspaceSearch />
+            </div>
             <Button
               type="button"
               variant="ghost"

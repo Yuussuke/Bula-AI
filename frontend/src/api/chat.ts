@@ -8,6 +8,34 @@ export type ChatRole = "user" | "assistant";
 export type ChatScope = "bula" | "cross_bula";
 export type ChatContext = { scope: "bula"; bulaId: string } | { scope: "cross_bula" };
 
+export type WorkspaceSearchKind = "all" | "chats" | "medications";
+export type WorkspaceSearchResult =
+  | {
+      kind: "chat";
+      session: ChatSessionResponse;
+      matched_in: "title" | "message";
+      message_id: string | null;
+      excerpt: string | null;
+      matched_at: string;
+    }
+  | { kind: "medication"; medication: PublicCatalogBulaResponse };
+export interface WorkspaceSearchPage {
+  items: WorkspaceSearchResult[];
+  next_cursor: string | null;
+}
+
+export async function searchWorkspace(
+  options: { query: string; kind: WorkspaceSearchKind; cursor?: string },
+  signal?: AbortSignal
+): Promise<WorkspaceSearchPage> {
+  const parameters = new URLSearchParams({ query: options.query, kind: options.kind });
+  if (options.cursor) parameters.set("cursor", options.cursor);
+  return requestJson<WorkspaceSearchPage>(`/api/v1/chat/search?${parameters.toString()}`, {
+    method: "GET",
+    signal,
+  });
+}
+
 export interface AskRequest {
   question: string;
   mode?: RetrievalMode;
@@ -75,6 +103,7 @@ export interface ChatSessionResponse {
 }
 
 export interface ListChatSessionsOptions {
+  query?: string;
   isPinned?: boolean;
   limit?: number;
   offset?: number;
@@ -145,6 +174,7 @@ export async function setChatSessionPinned(
 }
 
 export async function listChatSessions({
+  query,
   limit = 100,
   offset = 0,
   scope,
@@ -157,6 +187,7 @@ export async function listChatSessions({
     offset: String(offset),
   });
   if (scope) searchParams.set("scope", scope);
+  if (query) searchParams.set("query", query);
   if (bulaId) searchParams.set("bula_id", bulaId);
   if (sort) searchParams.set("sort", sort);
   if (isPinned !== undefined) searchParams.set("is_pinned", String(isPinned));
@@ -165,3 +196,4 @@ export async function listChatSessions({
     method: "GET",
   });
 }
+import type { PublicCatalogBulaResponse } from "@/api/bulas";

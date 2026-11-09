@@ -29,6 +29,7 @@ export function ChatBubble({ message, isLoading = false }: ChatBubbleProps): Rea
 
   return (
     <article
+      id={`message-${message.id}`}
       aria-label={`Mensagem de ${authorLabel}`}
       className={cn(
         "flex items-start gap-3",

@@ -3,11 +3,7 @@ import { type ReactElement, useRef } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 
 import { CatalogBulaCard } from "@/components/bulas/catalog-bula-card";
-import {
-  type AudienceFilter,
-  CatalogFilters,
-  type CatalogSort,
-} from "@/components/bulas/catalog-filters";
+import { type AudienceFilter, CatalogFilters } from "@/components/bulas/catalog-filters";
 import { CatalogSelector } from "@/components/bulas/catalog-selector";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -29,7 +25,6 @@ export function BulaCatalog(): ReactElement {
   const searchTerm = parameters.get("q") ?? "";
   const catalogScope = readCatalogScope(parameters.get("catalogo"));
   const audienceValue = parameters.get("publico");
-  const sort: CatalogSort = parameters.get("ordem") === "za" ? "name_desc" : "name_asc";
   const audience: AudienceFilter =
     catalogScope === "system" && (audienceValue === "patient" || audienceValue === "professional")
       ? audienceValue
@@ -47,7 +42,6 @@ export function BulaCatalog(): ReactElement {
     audience,
     limit: PAGE_SIZE,
     offset: (page - 1) * PAGE_SIZE,
-    ...(sort === "name_desc" ? { sort } : {}),
   });
   const items = catalogQuery.data?.items ?? [];
   const total = catalogQuery.data?.total ?? 0;
@@ -58,14 +52,12 @@ export function BulaCatalog(): ReactElement {
     query: string,
     targetAudience: AudienceFilter,
     targetPage = 1,
-    targetSort: CatalogSort = sort,
     targetCatalogScope: CatalogScope = catalogScope
   ): void => {
     const next = catalogParameters(targetCatalogScope);
     if (query) next.set("q", query);
     if (targetAudience !== "all") next.set("publico", targetAudience);
     if (targetPage > 1) next.set("pagina", String(targetPage));
-    if (targetSort === "name_desc") next.set("ordem", "za");
     setParameters(next);
     if (targetPage !== page) titleRef.current?.scrollIntoView?.({ block: "start" });
   };
@@ -91,24 +83,20 @@ export function BulaCatalog(): ReactElement {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <CatalogSelector
           value={catalogScope}
-          onChange={(selected) => navigateToResults(searchTerm, "all", 1, sort, selected)}
+          onChange={(selected) => navigateToResults(searchTerm, "all", 1, selected)}
         />
-        <Button asChild variant="outline" size="sm">
+        {catalogScope === "system" ? (
+          <CatalogFilters
+            audience={audience}
+            onChange={(selected) => navigateToResults(searchTerm, selected)}
+          />
+        ) : null}
+        <Button asChild variant="outline" size="sm" className="ml-auto">
           <Link to={`/chat?${catalogParameters(catalogScope).toString()}`}>
             Conversar com este catálogo
           </Link>
         </Button>
       </div>
-      <CatalogFilters
-        key={catalogScope}
-        showAudience={catalogScope === "system"}
-        searchTerm={searchTerm}
-        audience={audience}
-        sort={sort}
-        onSearch={(query, selectedAudience, selectedSort) =>
-          navigateToResults(query, selectedAudience, 1, selectedSort)
-        }
-      />
       {catalogQuery.isLoading ? (
         <div role="status" aria-label="Carregando catálogo" className="space-y-3">
           {Array.from({ length: 5 }, (_, index) => (

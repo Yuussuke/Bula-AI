@@ -162,6 +162,38 @@ async def test_unified_catalog_filters_authorized_documents_before_pagination(
 
 
 @pytest.mark.anyio
+async def test_name_matches_precede_metadata_matches_before_pagination(
+    client: AsyncClient,
+    db_session: AsyncSession,
+    catalog_search_functions: None,
+) -> None:
+    token = await get_access_token(client, email="ranked-search@example.com")
+    metadata_match = await create_shared_bula(db_session, name="Alfa")
+    metadata_match.manufacturer = "Los Pharma"
+    contains_match = await create_shared_bula(
+        db_session, name="Cloridrato de losartana"
+    )
+    prefix_match = await create_system_bula(
+        db_session,
+        owner_id=1,
+        product_name="Losartana",
+        state=SystemBulaPublicationState.PUBLISHED,
+    )
+    exact_match = await create_shared_bula(db_session, name="Los")
+    await db_session.commit()
+    expected = [exact_match, prefix_match, contains_match, metadata_match]
+    for offset, bula in enumerate(expected):
+        response = await client.get(
+            "/api/v1/bulas/catalog/search",
+            params={"query": " LÓS ", "limit": 1, "offset": offset},
+            headers=auth_headers(token),
+        )
+        assert response.status_code == 200, response.text
+        assert response.json()["total"] == 4
+        assert [item["id"] for item in response.json()["items"]] == [str(bula.id)]
+
+
+@pytest.mark.anyio
 @pytest.mark.parametrize("mode", list(RetrievalMode))
 @pytest.mark.parametrize("scope", ["all", "system", "shared"])
 async def test_chat_preserves_catalog_boundary_on_creation_continuation_and_history(

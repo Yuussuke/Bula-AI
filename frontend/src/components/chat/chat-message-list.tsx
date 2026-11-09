@@ -12,6 +12,7 @@ interface ChatMessageListProps {
   messages: ChatTimelineMessage[];
   isResponding: boolean;
   scope?: ChatScope;
+  targetMessageId?: string | null;
   onSuggestionSelected?: (question: string) => void;
 }
 
@@ -19,11 +20,13 @@ export function ChatMessageList({
   messages,
   isResponding,
   scope = "bula",
+  targetMessageId,
   onSuggestionSelected,
 }: ChatMessageListProps): ReactElement {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const shouldFollowRef = useRef(true);
+  const lastTargetMessageRef = useRef<string | null>(null);
   const [isAtBottom, setIsAtBottom] = useState(true);
 
   const scrollToLatest = (): void => {
@@ -37,10 +40,19 @@ export function ChatMessageList({
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
+    if (targetMessageId && lastTargetMessageRef.current !== targetMessageId) {
+      const target = document.getElementById(`message-${targetMessageId}`);
+      if (target && container.contains(target)) {
+        shouldFollowRef.current = false;
+        lastTargetMessageRef.current = targetMessageId;
+        target.scrollIntoView?.({ block: "center", behavior: "auto" });
+        return;
+      }
+    }
     if (messages.at(-1)?.role === "user") shouldFollowRef.current = true;
     if (shouldFollowRef.current)
       container.scrollTo?.({ top: container.scrollHeight, behavior: "auto" });
-  }, [isResponding, messages]);
+  }, [isResponding, messages, targetMessageId]);
 
   // Lazy Markdown can change the height after the message arrives.
   useEffect(() => {

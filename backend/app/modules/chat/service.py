@@ -344,6 +344,7 @@ class ChatService:
         bula_id: UUID | None = None,
         sort: SessionSortOrder = "created_at",
         is_pinned: bool | None = None,
+        query: str = "",
     ) -> list[ChatSession]:
         return await self.chat_repository.list_user_sessions(
             user_id=user_id,
@@ -353,6 +354,7 @@ class ChatService:
             bula_id=bula_id,
             sort=sort,
             is_pinned=is_pinned,
+            query=query.strip(),
         )
 
     async def get_session_with_history(

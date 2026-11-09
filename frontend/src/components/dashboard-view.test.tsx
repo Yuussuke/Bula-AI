@@ -27,7 +27,7 @@ vi.mock("@/api/bulas", () => ({
   uploadBula: vi.fn(),
 }));
 
-vi.mock("@/api/chat", () => ({ listChatSessions: vi.fn(), getChatSession: vi.fn() }));
+vi.mock("@/api/chat", () => ({ listChatSessions: vi.fn() }));
 
 const BULA_ID = "11111111-1111-4111-8111-111111111111";
 const searchPublicCatalogMock = vi.mocked(searchPublicCatalog);
@@ -235,24 +235,20 @@ describe("library navigation", () => {
 });
 
 describe("server-paginated system catalog", () => {
-  it("keeps controls together and clears search without redundant filter tags", async () => {
+  it("uses only the top search and ignores obsolete alphabetical ordering", async () => {
     const user = userEvent.setup();
-    renderDashboard("/catalogo?catalogo=system&q=amox&publico=patient&pagina=3");
+    renderDashboard("/catalogo?catalogo=system&q=amox&publico=patient&pagina=3&ordem=za");
     await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO");
-    await user.selectOptions(
-      screen.getByRole("combobox", { name: "Ordenar catálogo" }),
-      "name_desc"
-    );
+    expect(screen.getAllByRole("searchbox")).toHaveLength(1);
+    expect(screen.queryByRole("combobox", { name: "Ordenar catálogo" })).not.toBeInTheDocument();
     expect(searchPublicCatalogMock).toHaveBeenLastCalledWith({
       catalog_scope: "system",
       query: "amox",
       audience: "patient",
       limit: 20,
-      offset: 0,
-      sort: "name_desc",
+      offset: 40,
     });
-    expect(screen.queryByLabelText("Filtros ativos")).not.toBeInTheDocument();
-    await user.clear(screen.getByRole("searchbox"));
+    await user.clear(screen.getByRole("searchbox", { name: "Pesquisar medicamentos e conversas" }));
     await waitFor(() =>
       expect(searchPublicCatalogMock).toHaveBeenLastCalledWith({
         catalog_scope: "system",
@@ -260,9 +256,12 @@ describe("server-paginated system catalog", () => {
         audience: "patient",
         limit: 20,
         offset: 0,
-        sort: "name_desc",
       })
     );
+    expect(
+      screen.queryByRole("region", { name: "Resultados da pesquisa" })
+    ).not.toBeInTheDocument();
+    expect(screen.getByTestId("location")).not.toHaveTextContent("ordem");
   });
   it("shows only one bounded page and supports next/previous navigation", async () => {
     const firstItems = Array.from({ length: 20 }, (_, index) =>
@@ -323,9 +322,14 @@ describe("server-paginated system catalog", () => {
     const user = userEvent.setup();
     renderDashboard("/catalogo?catalogo=system&pagina=2");
     await screen.findByText("Página inicial");
-    await user.type(screen.getByRole("searchbox"), "termo alternativo");
+    await user.type(
+      screen.getByRole("searchbox", { name: "Pesquisar medicamentos e conversas" }),
+      "termo alternativo"
+    );
     expect(await screen.findByText("Resultado remoto")).toBeInTheDocument();
-    expect(screen.getByRole("searchbox")).toHaveFocus();
+    expect(
+      screen.getByRole("searchbox", { name: "Pesquisar medicamentos e conversas" })
+    ).toHaveFocus();
     expect(searchPublicCatalogMock).toHaveBeenLastCalledWith({
       catalog_scope: "system",
       query: "termo alternativo",
@@ -356,7 +360,9 @@ describe("server-paginated system catalog", () => {
       limit: 20,
       offset: 40,
     });
-    expect(screen.getByRole("searchbox")).toHaveValue("potassio");
+    expect(
+      screen.getByRole("searchbox", { name: "Pesquisar medicamentos e conversas" })
+    ).toHaveValue("potassio");
     expect(screen.getByLabelText("Filtrar por público da bula")).toHaveValue("patient");
   });
 
@@ -430,7 +436,9 @@ describe("server-paginated system catalog", () => {
     expect(await screen.findByText("Nenhuma bula encontrada")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Limpar busca e filtros" }));
     expect(await screen.findByText("AMOXICILINA + CLAVULANATO DE POTÁSSIO")).toBeInTheDocument();
-    expect(screen.getByRole("searchbox")).toHaveValue("");
+    expect(
+      screen.getByRole("searchbox", { name: "Pesquisar medicamentos e conversas" })
+    ).toHaveValue("");
   });
 
   it("offers retry for a failed request", async () => {

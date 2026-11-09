@@ -323,6 +323,7 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
             </Alert>
           ) : null}
           <ChatMessageList
+            targetMessageId={searchParams.get("message")}
             messages={chatSession.messages}
             isResponding={chatSession.isSending}
             scope={scope}

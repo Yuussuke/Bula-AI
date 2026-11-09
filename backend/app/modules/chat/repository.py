@@ -1,7 +1,8 @@
 from datetime import datetime, timezone
 from uuid import UUID
+from typing import Literal
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, func
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -9,6 +10,7 @@ from app.modules.chat.models import ChatMessage, ChatRole, ChatSession, ChatScop
 from app.modules.bulas.models import PublicCatalogScope
 from app.modules.chat.schemas import SessionSortOrder
 from app.modules.rag.retrieval_mode import RetrievalMode
+from app.core.text_search import text_search_match
 
 MAX_CHAT_SESSION_TITLE_LENGTH = 50
 DEFAULT_CHAT_SESSION_TITLE = "New conversation"
@@ -21,6 +23,77 @@ class ChatPersistenceError(Exception):
 class ChatRepository:
     def __init__(self, db: AsyncSession) -> None:
         self.db = db
+
+    async def search_user_history(
+        self,
+        *,
+        user_id: int,
+        query: str,
+        match: Literal["title_prefix", "message_prefix", "title_substring"],
+        limit: int,
+        offset: int,
+    ) -> list[tuple[ChatSession, ChatMessage | None]]:
+        title_prefix = text_search_match(ChatSession.title, query, word_prefix=True)
+        message_prefix = text_search_match(ChatMessage.content, query, word_prefix=True)
+        if match == "message_prefix":
+            # Rank only the owner's messages, then keep the latest matching message per chat.
+            matching_messages = (
+                select(
+                    ChatMessage.id,
+                    func.row_number()
+                    .over(
+                        partition_by=ChatMessage.session_id,
+                        order_by=(ChatMessage.created_at.desc(), ChatMessage.id.desc()),
+                    )
+                    .label("position"),
+                )
+                .join(ChatSession, ChatSession.id == ChatMessage.session_id)
+                .where(
+                    ChatSession.user_id == user_id,
+                    ChatMessage.role == ChatRole.USER,
+                    message_prefix,
+                )
+                .subquery()
+            )
+            statement = (
+                select(ChatSession, ChatMessage)
+                .join(ChatMessage, ChatMessage.session_id == ChatSession.id)
+                .join(matching_messages, matching_messages.c.id == ChatMessage.id)
+                .where(
+                    ChatSession.user_id == user_id,
+                    ~title_prefix,
+                    matching_messages.c.position == 1,
+                )
+                .order_by(ChatMessage.created_at.desc(), ChatMessage.id.desc())
+            )
+            result = await self.db.execute(statement.limit(limit).offset(offset))
+            return [(row[0], row[1]) for row in result.all()]
+        session_statement = select(ChatSession).where(ChatSession.user_id == user_id)
+        if match == "title_prefix":
+            session_statement = session_statement.where(title_prefix)
+        else:
+            has_matching_message = (
+                select(ChatMessage.id)
+                .where(
+                    ChatMessage.session_id == ChatSession.id,
+                    ChatMessage.role == ChatRole.USER,
+                    message_prefix,
+                )
+                .exists()
+            )
+            session_statement = session_statement.where(
+                text_search_match(ChatSession.title, query, word_prefix=False),
+                ~title_prefix,
+                ~has_matching_message,
+            )
+        sessions = await self.db.execute(
+            session_statement.order_by(
+                ChatSession.updated_at.desc(), ChatSession.id.desc()
+            )
+            .limit(limit)
+            .offset(offset)
+        )
+        return [(session, None) for session in sessions.scalars().all()]
 
     async def create_session(
         self,
@@ -253,8 +326,11 @@ class ChatRepository:
         bula_id: UUID | None = None,
         sort: SessionSortOrder = "created_at",
         is_pinned: bool | None = None,
+        query: str = "",
     ) -> list[ChatSession]:
         filters = [ChatSession.user_id == user_id]
+        if query:
+            filters.append(ChatSession.title.icontains(query, autoescape=True))
         if scope is not None:
             filters.append(ChatSession.scope == scope.value)
         if bula_id is not None:

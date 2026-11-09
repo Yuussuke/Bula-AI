@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Annotated, cast
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -6,6 +6,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from app.modules.auth.dependencies import get_current_user
 from app.modules.auth.models import User
 from app.modules.chat.models import ChatScope
+from app.modules.chat.dependencies import get_workspace_search_service
+from app.modules.chat.search_service import WorkspaceSearchService
+from app.modules.chat.search_schemas import WorkspaceSearchQuery, WorkspaceSearchPage
 from app.modules.chat.dependencies import get_chat_service, require_chat_capacity
 from app.modules.chat.schemas import (
     AskRequest,
@@ -27,6 +30,17 @@ from app.modules.chat.service import (
 )
 
 router = APIRouter(prefix="/chat", tags=["chat"])
+
+
+@router.get("/search", response_model=WorkspaceSearchPage)
+async def search_workspace(
+    filters: Annotated[WorkspaceSearchQuery, Query()],
+    current_user: User = Depends(get_current_user),
+    search_service: WorkspaceSearchService = Depends(get_workspace_search_service),
+) -> WorkspaceSearchPage:
+    return await search_service.search(
+        user_id=cast(int, current_user.id), filters=filters
+    )
 
 
 @router.post("/ask", response_model=AskResponse)
@@ -97,6 +111,7 @@ async def list_sessions(
     bula_id: UUID | None = Query(default=None),
     sort: SessionSortOrder = Query(default="created_at"),
     is_pinned: bool | None = Query(default=None),
+    query: str = Query(default="", max_length=200),
     current_user: User = Depends(get_current_user),
     chat_service: ChatService = Depends(get_chat_service),
 ) -> list[ChatSessionResponse]:
@@ -113,6 +128,7 @@ async def list_sessions(
         bula_id=bula_id,
         sort=sort,
         is_pinned=is_pinned,
+        query=query,
     )
     return [ChatSessionResponse.from_session(session) for session in sessions]
 

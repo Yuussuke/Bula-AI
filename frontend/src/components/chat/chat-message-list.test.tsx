@@ -6,6 +6,25 @@ import { ChatMessageList } from "@/components/chat/chat-message-list";
 import type { ChatTimelineMessage } from "@/components/chat/types";
 
 describe("conversation scrolling", () => {
+  it("opens the message selected in search without following the conversation's bottom", () => {
+    const messages: ChatTimelineMessage[] = [
+      { id: "found", role: "user", content: "Mensagem encontrada", sourceChunks: [] },
+      { id: "latest", role: "user", content: "Outra mensagem", sourceChunks: [] },
+    ];
+    const { rerender } = render(<ChatMessageList messages={messages} isResponding={false} />);
+    const target = screen.getByText("Mensagem encontrada").closest("article") as HTMLElement;
+    const scrollIntoView = vi.fn();
+    Object.defineProperty(target, "scrollIntoView", { configurable: true, value: scrollIntoView });
+    const scrollTo = vi.fn();
+    Object.defineProperty(screen.getByRole("log"), "scrollTo", {
+      configurable: true,
+      value: scrollTo,
+    });
+    rerender(<ChatMessageList messages={messages} isResponding={false} targetMessageId="found" />);
+    expect(target).toHaveAttribute("id", "message-found");
+    expect(scrollIntoView).toHaveBeenCalledWith({ block: "center", behavior: "auto" });
+    expect(scrollTo).not.toHaveBeenCalled();
+  });
   it("keeps the reply avatar mounted while the loading indicator becomes an answer", async () => {
     const question: ChatTimelineMessage = {
       id: "question",
