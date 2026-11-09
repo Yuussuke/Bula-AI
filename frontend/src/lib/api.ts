@@ -3,10 +3,24 @@ import { type AuthUser, useAuthStore } from "@/store/auth";
 
 const envVariables = import.meta.env as Record<string, unknown>;
 const apiBaseUrlFromEnv = envVariables.VITE_API_BASE_URL;
-const API_BASE_URL =
+const configuredApiBaseUrl =
   typeof apiBaseUrlFromEnv === "string" && apiBaseUrlFromEnv.length > 0
     ? apiBaseUrlFromEnv
     : "http://localhost:8000";
+export function resolveApiBaseUrl(configuredBaseUrl: string, frontendOrigin: string): string {
+  const apiBaseUrl = new URL(configuredBaseUrl, frontendOrigin);
+  const frontendUrl = new URL(frontendOrigin);
+  const localHostnames = new Set(["localhost", "127.0.0.1"]);
+
+  // Local UI and API must share a hostname for SameSite refresh cookies.
+  if (localHostnames.has(frontendUrl.hostname) && localHostnames.has(apiBaseUrl.hostname)) {
+    apiBaseUrl.hostname = frontendUrl.hostname;
+  }
+
+  return apiBaseUrl.href.replace(/\/$/, "");
+}
+
+const API_BASE_URL = resolveApiBaseUrl(configuredApiBaseUrl, window.location.origin);
 const AUTH_PREFIX = "/api/v1/auth";
 
 let activeRefreshRequest: Promise<string | null> | null = null;

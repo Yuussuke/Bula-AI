@@ -1,6 +1,7 @@
 import { act, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import type { ReactElement } from "react";
-import { MemoryRouter, useLocation } from "react-router-dom";
+import { Link, MemoryRouter, Outlet, useLocation } from "react-router-dom";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import App from "@/App";
@@ -19,11 +20,22 @@ vi.mock("@/components/auth-view", () => ({
 }));
 
 vi.mock("@/components/dashboard-view", () => ({
-  DashboardView: () => <p>Dashboard screen</p>,
+  DashboardView: () => (
+    <>
+      <p>Dashboard screen</p>
+      <Link to="/chat">General conversation</Link>
+      <Link to="/bulas/bula-id/chat">Leaflet conversation</Link>
+      <Outlet />
+    </>
+  ),
 }));
 
 vi.mock("@/pages/chat-page", () => ({
   ChatPage: () => <p>Chat screen</p>,
+}));
+
+vi.mock("@/pages/home-page", () => ({
+  HomePage: () => <p>Home screen</p>,
 }));
 
 function LocationProbe(): ReactElement {
@@ -42,6 +54,22 @@ beforeEach(() => {
 });
 
 describe("protected application routes", () => {
+  it("preserves the application shell when navigating between protected pages", async () => {
+    useAuthStore.setState({ authResolved: true, isAuthenticated: true });
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <App />
+      </MemoryRouter>
+    );
+    const shell = await screen.findByText("Dashboard screen");
+    await user.click(screen.getByRole("link", { name: "General conversation" }));
+    expect(await screen.findByText("Chat screen")).toBeInTheDocument();
+    expect(screen.getByText("Dashboard screen")).toBe(shell);
+    await user.click(screen.getByRole("link", { name: "Leaflet conversation" }));
+    expect(screen.getByText("Dashboard screen")).toBe(shell);
+    expect(bootstrapAuthSessionMock).toHaveBeenCalledOnce();
+  });
   it("redirects an unauthenticated chat visitor to the authentication page", async () => {
     render(
       <MemoryRouter initialEntries={["/bulas/bula-id/chat"]}>

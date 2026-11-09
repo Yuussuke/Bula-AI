@@ -23,9 +23,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useChatSession } from "@/hooks/use-chat-session";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ApiError } from "@/lib/api";
-import { catalogParameters, type CatalogScope, readCatalogScope } from "@/lib/catalog-scope";
+import {
+  catalogParameters,
+  type CatalogScope,
+  readCatalogReturnTo,
+  readCatalogScope,
+} from "@/lib/catalog-scope";
 import { cn } from "@/lib/utils";
-import { useSidebarStore } from "@/store/sidebar";
 
 const ModeSelector = lazy(() =>
   import("@/components/chat/mode-selector").then((module) => ({ default: module.ModeSelector }))
@@ -36,37 +40,9 @@ function isNotFoundError(error: Error | null): boolean {
 }
 
 function ChatPageLoadingState(): ReactElement {
-  const isSidebarCollapsed = useSidebarStore((state) => state.isCollapsed);
   return (
-    <div
-      role="status"
-      aria-label="Carregando conversa"
-      className="bg-background flex h-dvh overflow-hidden"
-    >
+    <div role="status" aria-label="Carregando conversa" className="flex h-full overflow-hidden">
       <span className="sr-only">Carregando conversa…</span>
-
-      <aside
-        className="bg-sidebar border-sidebar-border hidden shrink-0 overflow-hidden border-r lg:block"
-        style={{ width: isSidebarCollapsed ? 56 : 288 }}
-      >
-        <div className="border-sidebar-border flex items-center gap-3 border-b p-5">
-          <Skeleton className="bg-sidebar-accent h-9 w-9 shrink-0" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="bg-sidebar-accent h-4 w-20" />
-            <Skeleton className="bg-sidebar-accent h-3 w-36" />
-          </div>
-        </div>
-        <div className="border-sidebar-border space-y-3 border-b p-4">
-          <Skeleton className="bg-sidebar-accent h-9 w-full" />
-          <Skeleton className="bg-sidebar-accent h-9 w-full" />
-        </div>
-        <div className="space-y-3 p-4">
-          <Skeleton className="bg-sidebar-accent h-3 w-36" />
-          <Skeleton className="bg-sidebar-accent h-14 w-full" />
-          <Skeleton className="bg-sidebar-accent h-14 w-full" />
-          <Skeleton className="bg-sidebar-accent h-14 w-full" />
-        </div>
-      </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="bg-card border-border border-b lg:hidden">
@@ -106,7 +82,7 @@ function ChatPageLoadingState(): ReactElement {
 
 function ChatPageUnavailable({ message }: { message: string }): ReactElement {
   return (
-    <main className="bg-background flex min-h-screen items-center justify-center p-4">
+    <main className="flex h-full items-center justify-center p-4">
       <Card className="w-full max-w-lg p-6 text-center">
         <AlertCircle aria-hidden="true" className="text-destructive mx-auto h-10 w-10" />
         <h1 className="mt-4 text-xl font-semibold">Chat indisponível</h1>
@@ -123,14 +99,7 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
   const { bulaId } = useParams<{ bulaId: string }>();
   const location = useLocation();
   const navigationState: unknown = location.state;
-  const catalogReturnTo =
-    typeof navigationState === "object" &&
-    navigationState !== null &&
-    "returnTo" in navigationState &&
-    typeof navigationState.returnTo === "string" &&
-    /^\/catalogo(?:\?|$)/.test(navigationState.returnTo)
-      ? navigationState.returnTo
-      : null;
+  const catalogReturnTo = readCatalogReturnTo(navigationState);
   const [searchParams, setSearchParams] = useSearchParams();
   const [question, setQuestion] = useState("");
   const [isMobileSessionsOpen, setIsMobileSessionsOpen] = useState(false);
@@ -272,7 +241,7 @@ export function ChatPage({ scope = "bula" }: { scope?: ChatScope }): ReactElemen
   );
 
   return (
-    <div className="bg-background flex h-dvh overflow-hidden">
+    <div className="flex h-full overflow-hidden">
       {!isCompactLayout ? (
         <ChatSessionNavigation
           context={context}
