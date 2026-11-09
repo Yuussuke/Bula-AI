@@ -37,6 +37,43 @@ async def create_conversation(
 
 
 @pytest.mark.anyio
+async def test_title_search_is_private_literal_and_applied_before_pagination(
+    client: AsyncClient, db_session: AsyncSession
+) -> None:
+    token = await get_access_token(client, email="search-owner@example.com")
+    await get_access_token(client, email="search-other@example.com")
+    older = await create_conversation(db_session, user_id=1, scope=ChatScope.CROSS_BULA)
+    older.title = "LOSARTANA - cuidados"
+    newer = await create_conversation(db_session, user_id=1, scope=ChatScope.CROSS_BULA)
+    newer.title = "Uso da losartana"
+    unrelated = await create_conversation(db_session, user_id=1, scope=ChatScope.BULA)
+    unrelated.title = "Outra conversa"
+    foreign = await create_conversation(
+        db_session, user_id=2, scope=ChatScope.CROSS_BULA
+    )
+    foreign.title = "Losartana de outra pessoa"
+    literal = await create_conversation(
+        db_session, user_id=1, scope=ChatScope.CROSS_BULA
+    )
+    literal.title = "Concentração 10%_teste"
+    await db_session.commit()
+
+    response = await client.get(
+        "/api/v1/chat/sessions",
+        params={"query": "  losArt  ", "limit": 1, "offset": 1, "sort": "updated_at"},
+        headers=auth_headers(token),
+    )
+    assert response.status_code == 200
+    assert [row["id"] for row in response.json()] == [str(older.id)]
+    literal_response = await client.get(
+        "/api/v1/chat/sessions",
+        params={"query": "%_"},
+        headers=auth_headers(token),
+    )
+    assert [row["id"] for row in literal_response.json()] == [str(literal.id)]
+
+
+@pytest.mark.anyio
 @pytest.mark.parametrize("scope", list(ChatScope))
 async def test_owner_can_rename_and_delete_without_changing_other_history(
     client: AsyncClient,

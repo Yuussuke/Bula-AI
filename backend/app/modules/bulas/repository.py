@@ -1,11 +1,14 @@
 from datetime import datetime
 from collections.abc import Sequence
 from uuid import UUID
+from typing import Literal
 
 from sqlalchemy import Select, SQLColumnExpression, and_, func, or_, select, case
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
+from sqlalchemy.sql.elements import ColumnElement
+from app.core.text_search import text_search_match
 
 from app.modules.bulas.models import (
     Bula,
@@ -350,6 +353,9 @@ class BulaRepository:
             product_order = SystemBulaPublication.product_name.desc()
         page_statement = (
             statement.order_by(
+                self._catalog_name_relevance(
+                    SystemBulaPublication.product_name, filters.query
+                ),
                 product_order,
                 SystemBulaPublication.manufacturer.asc(),
                 Bula.id.asc(),
@@ -407,7 +413,10 @@ class BulaRepository:
         return statement
 
     async def search_public_catalog(
-        self, *, filters: PublicCatalogSearchQuery
+        self,
+        *,
+        filters: PublicCatalogSearchQuery,
+        name_match: Literal["word_prefix", "substring"] | None = None,
     ) -> tuple[list[Bula], int]:
         system_ids = self._published_system_bula_statement().with_only_columns(Bula.id)
         shared_ids = (
@@ -432,6 +441,15 @@ class BulaRepository:
         name = case(
             (is_system, SystemBulaPublication.product_name), else_=Bula.drug_name
         )
+        if name_match is not None:
+            prefix_match = text_search_match(name, filters.query, word_prefix=True)
+            if name_match == "word_prefix":
+                statement = statement.where(prefix_match)
+            else:
+                statement = statement.where(
+                    text_search_match(name, filters.query, word_prefix=False),
+                    ~prefix_match,
+                )
         manufacturer = case(
             (is_system, SystemBulaPublication.manufacturer), else_=Bula.manufacturer
         )
@@ -469,6 +487,7 @@ class BulaRepository:
         )
         result = await self.db.execute(
             statement.order_by(
+                self._catalog_name_relevance(name, filters.query),
                 name.desc() if filters.sort == "name_desc" else name.asc(),
                 manufacturer.asc(),
                 Bula.id,
@@ -477,6 +496,21 @@ class BulaRepository:
             .offset(filters.offset)
         )
         return list(result.unique().scalars().all()), total
+
+    def _catalog_name_relevance(
+        self, name: SQLColumnExpression[str | None], query: str
+    ) -> ColumnElement[int]:
+        """Prioritize product-name matches before metadata matches and pagination."""
+        normalized_name = func.lower(func.unaccent(name))
+        query = query.strip()
+        escaped_query = query.replace("/", "//").replace("%", "/%").replace("_", "/_")
+        normalized_query = func.lower(func.unaccent(escaped_query))
+        return case(
+            (normalized_name == func.lower(func.unaccent(query)), 0),
+            (normalized_name.startswith(normalized_query, escape="/"), 1),
+            (normalized_name.contains(normalized_query, escape="/"), 2),
+            else_=3,
+        )
 
     def _published_system_bula_statement(self) -> Select[tuple[Bula]]:
         return (
