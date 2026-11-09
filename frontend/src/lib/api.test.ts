@@ -1,6 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { ApiError, authFetch, requestJson, SessionExpiredError } from "@/lib/api";
+import {
+  ApiError,
+  authFetch,
+  requestJson,
+  resolveApiBaseUrl,
+  SessionExpiredError,
+} from "@/lib/api";
 import { queryClient } from "@/lib/queryClient";
 import { useAuthStore } from "@/store/auth";
 
@@ -29,6 +35,19 @@ function getRequestUrl(input: RequestInfo | URL): string {
 function getAuthorizationHeader(requestInit: RequestInit | undefined): string | null {
   return new Headers(requestInit?.headers).get("Authorization");
 }
+
+describe("API base URL", () => {
+  it.each([
+    ["http://127.0.0.1:8100", "http://localhost:3100", "http://localhost:8100"],
+    ["http://localhost:8000", "http://127.0.0.1:3100", "http://127.0.0.1:8000"],
+    ["http://127.0.0.1:8100/backend/", "http://localhost:3100", "http://localhost:8100/backend"],
+    ["https://api.example.test", "https://app.example.test", "https://api.example.test"],
+    ["https://api.example.test", "http://localhost:3100", "https://api.example.test"],
+    ["/backend", "http://localhost:3100", "http://localhost:3100/backend"],
+  ])("resolves %s from %s as %s", (configuredBaseUrl, frontendOrigin, expected) => {
+    expect(resolveApiBaseUrl(configuredBaseUrl, frontendOrigin)).toBe(expected);
+  });
+});
 
 describe("authFetch", () => {
   beforeEach(() => {
