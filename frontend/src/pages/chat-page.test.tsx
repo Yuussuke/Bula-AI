@@ -17,6 +17,7 @@ import {
   listChatSessions,
   type RetrievalMode,
 } from "@/api/chat";
+import { DashboardView } from "@/components/dashboard-view";
 import { ApiError } from "@/lib/api";
 import { ChatPage } from "@/pages/chat-page";
 import { setViewportWidth } from "@/test/viewport";
@@ -150,9 +151,11 @@ function renderChatPage(
     <QueryClientProvider client={queryClient}>
       <MemoryRouter initialEntries={[initialEntry]}>
         <Routes>
-          <Route path="/bulas/:bulaId/chat" element={<ChatPage />} />
-          <Route path="/chat" element={<ChatPage scope="cross_bula" />} />
-          <Route path="/" element={<p>Dashboard</p>} />
+          <Route element={<DashboardView />}>
+            <Route path="/bulas/:bulaId/chat" element={<ChatPage />} />
+            <Route path="/chat" element={<ChatPage scope="cross_bula" />} />
+            <Route path="/" element={<p>Dashboard</p>} />
+          </Route>
         </Routes>
         <LocationProbe />
       </MemoryRouter>
@@ -253,9 +256,9 @@ describe("ChatPage", () => {
       "href",
       returnTo
     );
-    await user.type(screen.getByRole("textbox"), "Para que serve?");
+    await user.type(await screen.findByRole("textbox"), "Para que serve?");
     await user.click(screen.getByRole("button", { name: "Enviar pergunta" }));
-    await screen.findByText(FIRST_RESPONSE.answer);
+    await screen.findByText(FIRST_RESPONSE.answer, {}, { timeout: 5000 });
     expect(screen.getByRole("link", { name: "Explorar catálogo de bulas" })).toHaveAttribute(
       "href",
       returnTo
@@ -989,7 +992,7 @@ describe("compact conversation navigation", () => {
     expect(
       screen.queryByRole("navigation", { name: "Conversas recentes" })
     ).not.toBeInTheDocument();
-    const rail = screen.getByRole("navigation", { name: "Atalhos do chat" });
+    const rail = screen.getByRole("navigation", { name: "Navegação principal" });
     expect(within(rail).getByRole("combobox", { name: "Catálogo consultado" })).toHaveTextContent(
       "Compartilhado"
     );

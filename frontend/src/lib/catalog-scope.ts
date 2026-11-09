@@ -17,3 +17,11 @@ export function readCatalogScope(value: string | null): CatalogScope {
 export function catalogParameters(scope: CatalogScope): URLSearchParams {
   return new URLSearchParams(scope === "all" ? {} : { catalogo: scope });
 }
+
+export function readCatalogReturnTo(state: unknown): string | null {
+  if (typeof state !== "object" || state === null || !("returnTo" in state)) return null;
+  const destination = state.returnTo;
+  return typeof destination === "string" && /^\/catalogo(?:\?|$)/.test(destination)
+    ? destination
+    : null;
+}

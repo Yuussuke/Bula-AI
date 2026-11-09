@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { ComponentProps } from "react";
 import { MemoryRouter } from "react-router-dom";
@@ -63,6 +63,25 @@ beforeEach(() => {
 });
 
 describe("recent conversations", () => {
+  it("keeps collapsed conversation groups when navigation content remounts", async () => {
+    const user = userEvent.setup();
+    renderNavigation();
+    await user.click(screen.getByRole("button", { name: "Chat geral" }));
+    expect(screen.getByRole("button", { name: "Chat geral" })).toHaveAttribute(
+      "aria-expanded",
+      "false"
+    );
+    cleanup();
+    renderNavigation();
+    expect(screen.getByRole("button", { name: "Chat geral" })).toHaveAttribute(
+      "aria-expanded",
+      "false"
+    );
+    expect(screen.getByRole("button", { name: "Por medicamento" })).toHaveAttribute(
+      "aria-expanded",
+      "true"
+    );
+  });
   it("moves pinned chats above recent chats and restores them when unpinned", async () => {
     let isPinned = false;
     listSessionsMock.mockImplementation((options = {}) => {

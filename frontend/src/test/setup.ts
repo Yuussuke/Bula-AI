@@ -29,7 +29,10 @@ vi.stubGlobal("ResizeObserver", ResizeObserverMock);
 
 beforeEach(() => {
   installViewportMock();
-  useSidebarStore.setState({ isCollapsed: false });
+  useSidebarStore.setState({
+    isCollapsed: false,
+    expandedConversationGroups: ["pinned", "cross_bula", "bula"],
+  });
 });
 
 afterEach(() => {

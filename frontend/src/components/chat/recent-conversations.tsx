@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { catalogParameters } from "@/lib/catalog-scope";
+import { getChatSessionPath } from "@/lib/chat-navigation";
 import { cn } from "@/lib/utils";
+import { useSidebarStore } from "@/store/sidebar";
 
 const PAGE_SIZE = 10;
 const ConversationActions = lazy(() =>
@@ -151,18 +152,14 @@ function ConversationGroup({
         {sessions.length > 0 ? (
           <ul className="space-y-1">
             {sessions.map((session) => {
-              const scope = session.scope ?? "bula";
               const updatedAt = new Date(session.updated_at);
               const dateLabel = Number.isNaN(updatedAt.getTime())
                 ? ""
                 : sessionDateFormatter.format(updatedAt);
-              const isUnavailable = scope === "bula" && session.bula_id === null;
+              const conversationPath = getChatSessionPath(session);
+              const isUnavailable = conversationPath === null;
               const isCurrentSession = session.id === currentSessionId;
               const isSameBula = context?.scope === "bula" && context.bulaId === session.bula_id;
-              const parameters = catalogParameters(
-                scope === "cross_bula" ? (session.catalog_scope ?? "all") : "all"
-              );
-              parameters.set("session", session.id);
               const content = (
                 <>
                   <span className="block truncate text-sm font-medium">{session.title}</span>
@@ -191,7 +188,7 @@ function ConversationGroup({
                     <div className="min-w-0 flex-1 px-3 py-2.5">{content}</div>
                   ) : (
                     <Link
-                      to={`${scope === "cross_bula" ? "/chat" : `/bulas/${session.bula_id}/chat`}?${parameters.toString()}`}
+                      to={conversationPath}
                       state={isSameBula && returnTo ? { returnTo } : undefined}
                       aria-current={isCurrentSession ? "page" : undefined}
                       onClick={onNavigate}
@@ -235,15 +232,15 @@ function ConversationGroup({
 }
 
 export function RecentConversations(props: RecentConversationsProps): ReactElement {
+  const expandedGroups = useSidebarStore((state) => state.expandedConversationGroups);
+  const setExpandedGroups = useSidebarStore((state) => state.setExpandedConversationGroups);
   return (
     <nav aria-label="Conversas recentes" className="px-3 py-2">
-      <Accordion type="multiple" defaultValue={["pinned"]}>
+      <Accordion type="multiple" value={expandedGroups} onValueChange={setExpandedGroups}>
         <ConversationGroup scope="pinned" {...props} />
-      </Accordion>
-      <p className="text-sidebar-foreground/60 px-2 py-2 text-xs font-semibold tracking-wide uppercase">
-        Conversas recentes
-      </p>
-      <Accordion type="multiple" defaultValue={["cross_bula", "bula"]}>
+        <p className="text-sidebar-foreground/60 px-2 py-2 text-xs font-semibold tracking-wide uppercase">
+          Conversas recentes
+        </p>
         <ConversationGroup scope="cross_bula" {...props} />
         <ConversationGroup scope="bula" {...props} />
       </Accordion>

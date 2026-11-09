@@ -70,7 +70,7 @@ export default function App(): ReactElement {
   }, []);
 
   return (
-    <div key={location.pathname} className="route-transition">
+    <div className="route-transition">
       <Routes location={location}>
         <Route
           element={<ProtectedRoute authResolved={authResolved} isAuthenticated={isAuthenticated} />}
@@ -90,9 +90,9 @@ export default function App(): ReactElement {
               <Route path="/curadoria" element={<SharedBulasPage review />} />
               <Route path="/administracao/usuarios" element={<CurationUsersPage />} />
             </Route>
+            <Route path="/chat" element={<ChatPage scope="cross_bula" />} />
+            <Route path="/bulas/:bulaId/chat" element={<ChatPage />} />
           </Route>
-          <Route path="/chat" element={<ChatPage scope="cross_bula" />} />
-          <Route path="/bulas/:bulaId/chat" element={<ChatPage />} />
         </Route>
         <Route
           path="/auth"
