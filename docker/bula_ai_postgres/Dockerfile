@@ -1,4 +1,4 @@
-FROM postgres:18 AS builder
+FROM postgres:19 AS builder
 
 ARG PG_MAJOR=18
 ARG PGVECTOR_VERSION=v0.8.2
@@ -40,7 +40,7 @@ RUN cd /tmp \
     && make \
     && make install
 
-FROM postgres:18
+FROM postgres:19
 
 ARG PG_MAJOR=18
 
